@@ -31,3 +31,8 @@
 .errors {
   color: #000000;
 }
+
+.login-errors {
+  color: red;
+  display: none;
+}

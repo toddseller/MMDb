@@ -9,4 +9,29 @@ $(document).ready(function() {
       window.location.reload()
     }
   });
+
+  $('#sign-in-form').on('submit', validate);
+  $('.close').on('click', clearForm);
 });
+
+var validate = function(event) {
+  event.preventDefault();
+    var formData = $("#sign-in-form :input").filter(checkValue).serialize();
+    console.log(formData)
+  if (formData === '') {
+    $('p.login-errors').show();
+  } else {
+    $('#sign-in-form').trigger('reset');  
+    $.post('/sessions', formData);
+  }
+}
+
+var clearForm = function(event) {
+  $('#sign-in-form').trigger('reset');
+  $('p.login-errors').hide();
+}
+
+var checkValue = function(index, element) {
+  return $(element).val() != '';
+}
+
