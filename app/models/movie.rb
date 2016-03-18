@@ -6,7 +6,7 @@ class Movie < ActiveRecord::Base
 
   before_save :create_sort_name, :set_image
 
-  scope :sorted_list, -> { order(:sort_name) }
+  scope :sorted_list, -> { order(:sort_name, :year) }
 
   private
 
