@@ -66,7 +66,7 @@ var displayMovie = function(response) {
   $('#preview').show();
   $('#create-movie').closest('div').slideDown('slow');
   if (response.Poster === 'N/A') {
-    $('#poster').append().attr('src', '/imgs/default_image.png').attr('alt', 'No Image Available')
+    $('#poster').append().attr('src', 'http/mmdb.online/imgs/default_image.png').attr('alt', 'No Image Available')
   } else {
     $('#poster').append().attr('src', response.Poster).attr('alt', response.Title + " Poster");
   }

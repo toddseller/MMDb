@@ -4,7 +4,7 @@ class Movie < ActiveRecord::Base
 
   has_and_belongs_to_many :users
 
-  before_save :create_sort_name
+  before_save :create_sort_name, :set_image
 
   scope :sorted_list, -> { order(:sort_name) }
 
@@ -14,4 +14,9 @@ class Movie < ActiveRecord::Base
       self.sort_name = self.title.gsub(/^(The\b*\W|A\b*\W|An\b*\W)/, '')
     end
 
+    def set_image
+      if self.poster == 'N/A'
+        self.poster = 'http://mmdb.online/imgs/default_image.png'
+      end
+    end
 end
