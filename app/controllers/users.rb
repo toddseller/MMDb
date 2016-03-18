@@ -24,14 +24,14 @@ get '/users/:id' do
   erb :'/users/show'
 end
 
-get '/users/:id/edit' do
-  erb :'/users/edit'
-end
+# get '/users/:id/edit' do
+#   erb :'/users/edit'
+# end
 
-put '/users/:id' do
+# put '/users/:id' do
 
-end
+# end
 
-delete '/users/:id' do
+# delete '/users/:id' do
 
-end
+# end

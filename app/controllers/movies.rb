@@ -7,6 +7,5 @@ post '/movies' do
       page = erb :'/partials/_my_movies', locals: { movie: movie }, layout: false
       json status: "true", page: page
     end
-  end
-    
+  end   
 end
