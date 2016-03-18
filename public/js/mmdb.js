@@ -57,7 +57,7 @@ var showYear = function() {
 var getMovie = function(event) {
   event.preventDefault();
   var title = $(this).serialize();
-  var route = "http://www.omdbapi.com/?" + title + "&plot=full&r=json"
+  var route = "https://www.omdbapi.com/?" + title + "&plot=full&r=json"
   $.post(route, displayMovie);
 }
 
