@@ -17,17 +17,13 @@
   <title></title>
 </head>
 <body>
-  <nav class="navbar navbar-default navbar-static-top">
+  <nav class="navbar navbar-inverse navbar-fixed-top">
     <div class="container-fluid">
       <div class="navbar-header">
         <% if session[:user_id] %>
-          <div class="navbar-brand">
-
-          </div>
+          <a class="pull-left logo" href=<%= "/users/#{session[:user_id]}" %>><img src="/imgs/logo.png" alt="MMDb logo"></a>
         <% else %>
-          <div class="navbar-brand">
-
-          </div>
+          <a class="pull-left logo" href="#"><img src="/imgs/logo.png" alt="MMDb logo"></a>
         <% end %>
       </div>
       <% if session[:user_id] %>
@@ -39,14 +35,14 @@
         </div>
       <% else %>
         <div id="sign-in" class="navbar-right">
-          <button type="button" class="btn btn-success navbar-btn" data-toggle="modal" data-target="#logIn">Sign in</button>
+          <button type="button" class="btn btn-danger navbar-btn" data-toggle="modal" data-target="#logIn">Sign in</button>
         </div>
       <% end %>
     </div>
   </nav>
-
-  <%= yield %>
-
+  <div class="container">
+    <%= yield %>
+  </div>
   <div class="modal fade" id="logIn" tabindex="-1" role="dialog">
     <div class="modal-dialog">
       <div class="modal-content">
@@ -55,11 +51,11 @@
           <h4 class="modal-title">Sign in!</h4>
         </div>
         <div class="modal-body">
-          <p class="login-errors text-center">Invalid login. Please check your email and password.</p>
+          <p class="login-errors text-center">Invalid login. Please check your credentials and try again.</p>
           <form id="sign-in-form" action='/sessions' method="POST">
             <div class="form-group">
-              <label for="email">Email:</label>
-              <input class="form-control" type="text" name="email" placeholder="Email" value="">
+              <label for="username_email">User Name or Email:</label>
+              <input class="form-control" type="text" name="username_email" placeholder="User Name or Email" value="" autofocus="">
             </div>
             <div class="form-group">
               <label for="password">Password:</label>
@@ -74,5 +70,7 @@
       </div>
     </div>
   </div>
+
+  <script src="/js/mmdb.js"></script>
 </body>
 </html>

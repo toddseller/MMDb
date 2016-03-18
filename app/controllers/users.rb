@@ -8,7 +8,7 @@ get '/users/new' do
 end
 
 post '/users' do
-  @user = User.create(first_name: params[:first_name], last_name: params[:last_name], user_name: params[:user_name], email: params[:email], password: params[:password])
+  @user = User.create(params[:user])
   if @user.valid?
     session[:user_id] = @user.id
     session[:name] = @user.full_name
@@ -20,6 +20,7 @@ end
 
 get '/users/:id' do
   @user = User.find(params[:id])
+  @my_movies = @user.movies.sorted_list
   erb :'/users/show'
 end
 

@@ -1,0 +1,38 @@
+<div class="row">
+  <div class="col-lg-12 description-header">
+    <h2><%= movie.title %></h2>
+    <p><span id="description-year"><%= movie.year %></span><span id="description-rating"><%= movie.rating %></span></p>
+  </div>
+  <div class="col-lg-8 description-details">
+    <h4>Plot Summary</h4>
+    <p id="description-plot"><%= movie.plot %></p>
+    <h4>Cast and Crew</h4>
+    <div class="col-lg-6">
+      <h5>Actors:</h5>
+     <p><%= movie.actors %></p>
+    </div>
+    <div class="col-lg-6">
+      <h5>Director:</h5>
+      <p><%= movie.director %></p>
+      <h5>Writers:</h5>
+      <p><%= movie.writer %></p>
+    </div>
+    <div class="description-info">
+      <div class="col-lg-2">
+        <h4>Information</h4>
+        <p class="first">Genre</p>
+        <p>Released</p>
+        <p>Runtime</p>
+      </div>
+      <div class="col-lg-4">
+        <h4>&nbsp;&nbsp;&nbsp;</h4>
+        <p class="first"><%= movie.genre %></p>
+        <p><%= movie.year %></p>
+        <p><%= movie.runtime %></p>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-4 description-poster">
+    <img src=<%= "#{movie.poster}" %> alt=<%= "#{movie.title} Poster" %>>
+  </div>
+</div>

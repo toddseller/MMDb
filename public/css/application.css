@@ -1,3 +1,8 @@
+body {
+  background: #fafafa;
+  padding-top: 70px;
+}
+
 #sign-in {
   margin-right: 25px;
 }
@@ -35,4 +40,132 @@
 .login-errors {
   color: red;
   display: none;
+}
+
+.logo {
+  height: 50px;
+}
+
+.logo img {
+  margin-top: 5px;
+  margin-left: 40px;
+}
+
+#movie-search {
+  width: 100%;
+}
+
+#poster {
+  width: 175px;
+}
+
+#poster:hover {
+  box-shadow: 1px 1px 7px #ff0000;
+}
+
+#year {
+  margin: 0;
+}
+
+#genre {
+  margin: 0;
+}
+
+#search {
+  display: none;
+}
+
+#preview {
+  display: none;
+}
+
+#create-movie textarea {
+  display: none;
+}
+
+#search-year {
+  display: none;
+  width: 81px;
+  right: -180px;
+  top: -34px;
+}
+
+.index-preview img {
+  margin-top: 55px;
+  width: 140px;
+  height: 208px;
+}
+
+.truncate {
+  margin: 0 auto;
+  width: 140px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sort-name {
+  display: none;
+}
+
+.description {
+  display: none;
+}
+
+.modal-lg {
+  width: 1050px;
+}
+
+.modal-header .description {
+  border-bottom: none;
+}
+
+#description-rating {
+  padding: 1px 3px;
+  border: 2px solid #333333;
+  border-radius: 3px;
+  font-weight: bolder;
+}
+
+#description-year {
+  font-size: 1.25em;
+  padding-right: 5px;
+}
+
+.description-header {
+  border-bottom: 1px solid #eaeaea;
+}
+
+.description-details {
+  margin-top: 15px !important;
+}
+
+.description-details h5 {
+  font-size: 1.1em;
+}
+
+.description-poster {
+  margin-top: 30px !important;
+  margin-bottom: 15px;
+}
+
+.description-poster img {
+  width: 300px;
+  height: auto;
+}
+
+.description-info h4 {
+  margin-bottom: 10px;
+}
+
+.description-info p.first {
+  margin-top: 0px !important;
+}
+
+.description-info p {
+  margin-top: -10px !important;
+}
+
+.description-info .col-lg-4 {
+  margin-left: -40px !important;
 }

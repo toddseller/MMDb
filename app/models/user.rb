@@ -1,7 +1,9 @@
 class User < ActiveRecord::Base
-  # Remember to create a migration!
+
   validates :first_name, :last_name, :user_name, :email, :password_hash, presence: true
   validates :user_name, :email, uniqueness: true
+
+  has_and_belongs_to_many :movies
 
   def password
     @password ||= BCrypt::Password.new(password_hash)
@@ -18,5 +20,9 @@ class User < ActiveRecord::Base
 
   def full_name
     "#{first_name} #{last_name}"
+  end
+
+  def sorted
+    this.movies
   end
 end
