@@ -1,0 +1,71 @@
+<div class="row">
+  <div class="col-sm-12 edit-movie">
+    <div class="col-sm-2 edit-poster">
+      <img class="text-right" src=<%= "#{@movie.poster}" %> alt="">
+    </div>
+    <div class="col-sm-10">
+      <form id="edit-form" class="form-horizontal" action=<%= "/movies/#{@movie.id}" %> method="POST">
+        <div class="form-group row">
+          <label class="col-sm-2 control-label text-right" for="movie_title">Title</label>
+          <div class="col-sm-10">
+            <textarea id="movie_title" name="movie[title]" class="form-control" rows="1"><%= @movie.title %></textarea>
+          </div>
+        </div> 
+        <div class="form-group row">
+          <label class="col-sm-2 control-label text-right" for="movie_year">Year</label>
+          <div class="col-sm-1">
+            <input id="movie_year" type="text" class="form-control" name="movie[year]" value=<%= "#{@movie.year}" %>>
+          </div>
+          <label class="col-sm-1 control-label text-right" for="movie[rating]">Rating</label>
+          <div class="col-sm-1">
+            <input type="text" class="form-control" name="movie[rating]" value=<%= "#{@movie.rating}" %>>
+          </div>
+          <label class="col-sm-1 control-label  text-right" for="movie[runtime]">Runtime</label>
+          <div class="col-sm-2">
+            <textarea name="movie[runtime]" class="form-control" rows="1"><%= @movie.runtime %></textarea>
+          </div>
+          <label class="col-sm-1 control-label  text-right" for="movie[genre]">Genre</label>
+          <div class="col-sm-3">
+            <textarea name="movie[genre]" class="form-control" rows="1"><%= @movie.genre %></textarea>
+          </div>
+        </div>
+        <div class="form-group row">
+          <label class="col-sm-2 control-label text-right" for="movie[plot]">Plot Summary</label>
+          <div class="col-sm-10">
+            <textarea name="movie[plot]" class="form-control" rows="5"><%= @movie.plot %></textarea>
+          </div>
+        </div>
+        <div class="form-group row">
+          <label class="col-sm-2 control-label text-right" for="movie[actors]">Actors</label>
+          <div class="col-sm-10">
+            <textarea name="movie[actors]" class="form-control" rows="2"><%= @movie.actors %></textarea>
+          </div>
+        </div>
+        <div class="form-group row">
+          <label class="col-sm-2 control-label text-right" for="movie[director]">Director</label>
+          <div class="col-sm-10">
+            <textarea name="movie[director]" class="form-control" rows="1"><%= @movie.director %></textarea>
+          </div>
+        </div>
+        <div class="form-group row">
+          <label class="col-sm-2 control-label text-right" for="movie[writer]">Writer</label>
+          <div class="col-sm-10">
+            <textarea name="movie[writer]" class="form-control" rows="2"><%= @movie.writer %></textarea>
+          </div>
+        </div>
+        <div class="form-group row">
+          <label class="col-sm-2 control-label text-right" for="movie[poster]">Poster</label>
+          <div class="col-sm-10">
+            <input type="text" class="form-control" name="movie[poster]" value=<%= "#{@movie.poster}" %>>
+          </div>
+        </div>
+        <input type="hidden" name="_method" value="PUT">
+        <button id="edit-button" type="submit" class="btn btn-default pull-right">Update</button>
+      </form>
+      <form id="delete-form" action=<%= "/movies/#{@movie.id}" %> method="POST">
+        <input type="hidden" name="_method" value="DELETE">
+        <button id="delete-button" type="submit" class="btn btn-danger pull-right">Delete</button>
+      </form>
+    </div>
+  </div>
+</div>

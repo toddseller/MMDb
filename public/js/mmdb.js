@@ -98,5 +98,3 @@ var listMovie = function(response) {
     document.location.reload(true);
   }
 }
-
-

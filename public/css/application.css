@@ -174,3 +174,23 @@ body {
 .description-plot {
   margin-left: 15px;
 }
+
+.edit-movie {
+  margin-top: 30px;
+}
+
+.edit-poster img {
+  width: 150px;
+  height: auto;
+  margin-bottom: 15px;
+}
+
+#delete-button {
+  margin-right: 15px;
+}
+
+@media (max-width: 768px) {
+  .modal-lg {
+    max-width: 400px;
+  }
+}

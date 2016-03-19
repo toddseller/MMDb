@@ -4,7 +4,8 @@ class Movie < ActiveRecord::Base
 
   has_and_belongs_to_many :users
 
-  before_save :create_sort_name, :set_image
+  before_save :create_sort_name
+  before_save :set_image
 
   scope :sorted_list, -> { order(:sort_name, :year) }
 
@@ -15,8 +16,6 @@ class Movie < ActiveRecord::Base
     end
 
     def set_image
-      if self.poster == 'N/A'
-        self.poster = 'http://mmdb.online/imgs/default_image.png'
-      end
+      self.poster.gsub!(/^(http)/, 'https')
     end
 end
