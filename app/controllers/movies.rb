@@ -2,7 +2,7 @@ get '/movies/:id/edit' do
   @movie = Movie.find(params[:id])
   # page = erb :'/partials/_edit_movie', locals: { movie: @movie }, layout: false
   # json page: page
-  erb :'/movies/edit', layout: false
+  erb :'/partials/_edit_movie', layout: false
 end
 
 post '/movies' do
@@ -20,7 +20,16 @@ end
 put '/movies/:id' do
   @movie = Movie.find(params[:id])
   @movie.update(params[:movie])
-  @user = User.find(session[:user])
+  @user = User.find(session[:user_id])
+  @my_movies = @user.movies.sorted_list
+  erb :'/users/show'
+end
+
+delete '/movies/:id' do
+  @movie = Movie.find(params[:id])
+  @user = User.find(session[:user_id])
+  @my_movies = @user.movies.sorted_list
+  @movie.users.destroy(@user)
   erb :'/users/show'
 end
 

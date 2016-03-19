@@ -4,7 +4,7 @@ class Movie < ActiveRecord::Base
 
   has_and_belongs_to_many :users
 
-  before_save :create_sort_name
+  before_create :create_sort_name
 
   scope :sorted_list, -> { order(:sort_name, :year) }
 

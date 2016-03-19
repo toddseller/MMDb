@@ -187,6 +187,7 @@ body {
 
 #delete-button {
   margin-right: 15px;
+  margin-bottom: 30px;
 }
 
 @media (max-width: 768px) {

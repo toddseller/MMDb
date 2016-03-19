@@ -6,6 +6,9 @@ var bindListeners = function() {
   $('#movie-search').on('submit', getMovie);
   $('#create-movie').on('submit', addMovie);
   $('#more').on('click', showYear);
+  $('.movie-edit').on('click', editMovie);
+  $('#edit-form').on('submit', submitUpdate);
+  $('#delete-button').on('submit', deleteMovie);
 }
 
 var validate = function(event) {
@@ -97,4 +100,37 @@ var listMovie = function(response) {
   if (response.status === "true") {
     document.location.reload(true);
   }
+}
+
+var editMovie = function(event) {
+  event.preventDefault();
+  var route = $(this).attr('href')
+  $.get(route, displayEditForm)
+}
+
+var displayEditForm = function(response) {
+  // window.location.replace(response);
+  console.log(response);
+  $('.modal-body').replaceWith(response);
+  $('.modal-footer').remove();
+}
+
+var submitUpdate = function(event) {
+  event.preventDefault();
+  var formRoute = $(this).attr('action');
+  var formData = $(this).serialize();
+  $.ajax({
+    url: formRoute,
+    data: formData,
+    type: 'PUT'
+  });
+}
+
+var deleteMovie = function(event) {
+  event.preventDefault();
+  var formRoute = $(this).attr('action');
+  $.ajax({
+    url: formRoute,
+    type: 'DELETE'
+  });
 }
