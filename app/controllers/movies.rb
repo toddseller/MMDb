@@ -11,9 +11,9 @@ post '/movies' do
   if movie.save
     movie.users << user if !movie.users.include?(user)
     if request.xhr?
-      page = erb :'/partials/_my_movies', locals: { movie: movie }, layout: false
-      json status: "true", page: page
-    end
+      # page = erb :'/partials/_my_movies', locals: { movie: movie }, layout: false
+      json status: "true"
+      erb :'/users/show'
   end   
 end
 
@@ -30,7 +30,9 @@ delete '/movies/:id' do
   @user = User.find(session[:user_id])
   @my_movies = @user.movies.sorted_list
   @movie.users.destroy(@user)
-  erb :'/users/show'
+  # erb :'/users/show'
+  page = erb :'/partials/_description', locals: { movie: @movie }, layout: false
+  json page: page
 end
 
 # put '/items/:id' do

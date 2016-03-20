@@ -124,6 +124,11 @@ var submitUpdate = function(event) {
     url: formRoute,
     data: formData,
     type: 'PUT'
+    success: function(response) {
+      // document.location.reload(true);
+      $('.modal-body').replaceWith(response);
+      $('.modal-footer').show();
+    };
   });
 }
 
