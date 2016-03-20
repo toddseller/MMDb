@@ -60,18 +60,22 @@ var showYear = function() {
 var getMovie = function(event) {
   event.preventDefault();
   var title = $(this).serialize();
-  var route = "https://www.omdbapi.com/?" + title + "&plot=full&r=json"
+  var itunesTitle = $('#search-title').serialize().replace('t=','');
+  console.log(itunesTitle);
+  var route = "https://www.omdbapi.com/?" + title + "&plot=full&r=json";
+  var itunes = "https://itunes.apple.com/search?term=" + itunesTitle + "&country=us&entity=movie";
   $.post(route, displayMovie);
+  $.post(itunes, displayPoster);
 }
 
 var displayMovie = function(response) {
   console.log(response);
   $('#preview').show();
   $('#create-movie').closest('div').slideDown('slow');
-  if (response.Poster === 'N/A') {
-    $('#poster').append().attr('src', 'http/mmdb.online/imgs/default_image.png').attr('alt', 'No Image Available')
-  } else {
-    $('#poster').append().attr('src', response.Poster).attr('alt', response.Title + " Poster");
+  // if (response.Poster === 'N/A') {
+  //   $('#poster').append().attr('src', 'http/mmdb.online/imgs/default_image.png').attr('alt', 'No Image Available')
+  // } else {
+  //   $('#poster').append().attr('src', response.Poster).attr('alt', response.Title + " Poster");
   }
   $('#title').append(response.Title);
   $('#genre').append(response.Genre);
@@ -85,9 +89,15 @@ var displayMovie = function(response) {
   $('input[name="movie[writer]"]').val(response.Writer);
   $('input[name="movie[genre]"]').val(response.Genre);
   $('input[name="movie[runtime]"]').val(response.Runtime);
-  $('input[name="movie[poster]"]').val(response.Poster);
 }
 
+var displayPoster = function(response) {
+  console.log(response);
+  poster = response.artworkUrl100;
+  poster.replace('http', 'https').replace('100x100bb','100000x100000-999');
+  $('#poster').append().attr('src', poster);
+  $('input[name="movie[poster]"]').val(poster);
+}
 var addMovie = function(event) {
   event.preventDefault();
   console.log('YAY!');
