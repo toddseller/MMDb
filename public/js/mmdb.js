@@ -123,11 +123,7 @@ var submitUpdate = function(event) {
   $.ajax({
     url: formRoute,
     data: formData,
-    type: 'PUT',
-    success: function(response) {
-      $('.modal-body').replaceWith(response);
-      $('.modal-footer').show();
-    }
+    type: 'PUT'
   });
 }
 
