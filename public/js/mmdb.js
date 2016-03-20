@@ -99,9 +99,9 @@ var addMovie = function(event) {
 }
 
 var listMovie = function(response) {
-  if (response.status === "true") {
+  // if (response.status === "true") {
     document.location.reload(true);
-  }
+  // }
 }
 
 var editMovie = function(event) {
