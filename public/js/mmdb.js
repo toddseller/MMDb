@@ -128,7 +128,7 @@ var submitUpdate = function(event) {
       // document.location.reload(true);
       $('.modal-body').replaceWith(response);
       $('.modal-footer').show();
-    };
+    }
   });
 }
 
