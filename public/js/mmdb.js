@@ -125,6 +125,7 @@ var submitUpdate = function(event) {
     data: formData,
     type: 'PUT'
   });
+  document.location.reload(true);
 }
 
 var deleteMovie = function(event) {
@@ -134,4 +135,5 @@ var deleteMovie = function(event) {
     url: formRoute,
     type: 'DELETE'
   });
+  document.location.reload(true);
 }
