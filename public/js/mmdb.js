@@ -111,10 +111,9 @@ var editMovie = function(event) {
 }
 
 var displayEditForm = function(response) {
-  // window.location.replace(response);
   console.log(response);
   $('.modal-body').replaceWith(response);
-  $('.modal-footer').remove();
+  $('.modal-footer').hide();
 }
 
 var submitUpdate = function(event) {
@@ -124,7 +123,11 @@ var submitUpdate = function(event) {
   $.ajax({
     url: formRoute,
     data: formData,
-    type: 'PUT'
+    type: 'PUT',
+    success: function(response) {
+      $('.modal-body').replaceWith(response);
+      $('.modal-footer').show();
+    }
   });
 }
 
