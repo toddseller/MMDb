@@ -22,8 +22,7 @@ put '/movies/:id' do
   @movie.update(params[:movie])
   @user = User.find(session[:user_id])
   @my_movies = @user.movies.sorted_list
-  page = erb :'/partials/_description', locals: { movie: @movie }, layout: false
-  json page: page
+  erb :'/users/show'
 end
 
 delete '/movies/:id' do
