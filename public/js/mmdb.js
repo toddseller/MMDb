@@ -76,7 +76,7 @@ var displayMovie = function(response) {
   //   $('#poster').append().attr('src', 'http/mmdb.online/imgs/default_image.png').attr('alt', 'No Image Available')
   // } else {
   //   $('#poster').append().attr('src', response.Poster).attr('alt', response.Title + " Poster");
-  }
+  // }
   $('#title').append(response.Title);
   $('#genre').append(response.Genre);
   $('#year').append(response.Year);
