@@ -126,8 +126,9 @@ var submitUpdate = function(event) {
     type: 'PUT'
     success: function(response) {
       // document.location.reload(true);
-      $('.modal-body').replaceWith(response);
-      $('.modal-footer').show();
+      // $('.modal-body').replaceWith(response);
+      // $('.modal-footer').show();
+      console.log(response);
     }
   });
 }
