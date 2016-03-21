@@ -3,7 +3,7 @@ class User < ActiveRecord::Base
   validates :first_name, :last_name, :user_name, :email, :password_hash, presence: true
   validates :user_name, :email, uniqueness: true
 
-  has_and_belongs_to_many :movies
+  has_and_belongs_to_many :movies, counter_cache: true
 
   def password
     @password ||= BCrypt::Password.new(password_hash)

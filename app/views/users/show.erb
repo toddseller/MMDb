@@ -1,6 +1,8 @@
 <div class="row">
   <div class="col-lg-12">
-    <button id="add" class="btn btn-danger pull-right">Add Movie</button>
+    <% if session[:user_id] %>
+      <button id="add" class="btn btn-danger pull-right">Add Movie</button>
+    <% end %>
     <div id="search" class="pull-right">
       <%= erb :'/partials/_add_movie', layout: false %>
     </div>
@@ -11,7 +13,7 @@
   <div class="row">
     <div id="movie-list" class="col-xs-12">
       <% @my_movies.each do |movie| %>
-        <%= erb :'/partials/_my_movies', locals: {movie: movie}, layout: false %>
+        <%= erb :'/partials/_my_movies', locals: {movie: movie, user: @user}, layout: false %>
       <% end %>
     </div>
   </div>

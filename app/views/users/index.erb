@@ -1,5 +1,14 @@
-<div class="row">
-  <div class="col-lg-12">
-    <img src="http://mmdb.online/imgs/logo.svg" alt="MMDb Logo">
-  </div>
+<div class="container">
+  <div class="row">
+    <div class="col-sm-12">
+      <div class="col-sm-10">
+        <img src="http://mmdb.online/imgs/logo.svg" alt="MMDb logo">
+      </div>
+      <div class="col-sm-2">
+        <% @users.each do |user| %>
+          <%= erb :'/partials/_users', locals: { user: user }, layout: false %>
+        <% end %>
+      </div>
+    </div>
+  </div><!-- end row -->
 </div>
