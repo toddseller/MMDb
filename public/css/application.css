@@ -190,6 +190,17 @@ body {
   margin-bottom: 30px;
 }
 
+.index-user h4 {
+  color: #d9534f;
+  margin-bottom: 3px;
+}
+
+a.index-user:hover, h4:hover {
+  color: #b9433b;
+/*  color: #333333;*/
+  text-decoration: none;
+}
+
 @media (max-width: 768px) {
   .modal-lg {
     max-width: 400px;

@@ -1,10 +1,10 @@
 <div class="container">
   <div class="row">
     <div class="col-sm-12">
-      <div class="col-sm-10">
+      <div class="col-sm-9">
         <img src="http://mmdb.online/imgs/logo.svg" alt="MMDb logo">
       </div>
-      <div class="col-sm-2">
+      <div class="col-sm-3">
         <% @users.each do |user| %>
           <%= erb :'/partials/_users', locals: { user: user }, layout: false %>
         <% end %>
