@@ -23,7 +23,7 @@
         <% if session[:user_id] %>
           <a class="pull-left logo" href=<%= "/users/#{session[:user_id]}" %>><img src="http://mmdb.online/imgs/logo.png" alt="MMDb logo"></a>
         <% else %>
-          <a class="pull-left logo" href="#"><img src="http://mmdb.online/imgs/logo.png" alt="MMDb logo"></a>
+          <a class="pull-left logo" href="/users"><img src="http://mmdb.online/imgs/logo.png" alt="MMDb logo"></a>
         <% end %>
       </div>
       <% if session[:user_id] %>
