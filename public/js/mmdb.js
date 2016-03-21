@@ -7,7 +7,7 @@ var bindListeners = function() {
   $('#create-movie').on('submit', addMovie);
   $('#more').on('click', showYear);
   $('.movie-edit').on('click', editMovie);
-  $('#edit-form').on('submit', submitUpdate);
+  $('.edit-form').on('click', '#edit-button', submitUpdate);
   $('#delete-button').on('submit', deleteMovie);
 }
 
@@ -99,9 +99,9 @@ var addMovie = function(event) {
 }
 
 var listMovie = function(response) {
-  // if (response.status === "true") {
+  if (response.status === "true") {
     document.location.reload(true);
-  // }
+  }
 }
 
 var editMovie = function(event) {
@@ -111,21 +111,25 @@ var editMovie = function(event) {
 }
 
 var displayEditForm = function(response) {
-  console.log(response);
   $('.modal-body').replaceWith(response);
   $('.modal-footer').hide();
 }
 
 var submitUpdate = function(event) {
   event.preventDefault();
+  console.log('FUCK!');
   var formRoute = $(this).attr('action');
   var formData = $(this).serialize();
   $.ajax({
     url: formRoute,
     data: formData,
-    type: 'PUT'
+    type: 'PUT',
+    success: displayUpdatedMovie
   });
-  document.location.reload(true);
+}
+
+var displayUpdatedMovie = function(response) {
+  console.log(response);
 }
 
 var deleteMovie = function(event) {
