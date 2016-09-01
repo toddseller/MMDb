@@ -14,7 +14,7 @@
       <div class="modal-body">
         <%= erb :'/partials/_description', locals: {movie: movie}, layout: false %>
       </div>
-      <% if session[:user_id] == @user.id %>
+      <% if session[:user_id] == user.id %>
         <div class="modal-footer">
             <a class="btn btn-danger movie-edit" href=<%= "/movies/#{movie.id}/edit" %>>Edit</a>
         </div>

@@ -1,7 +1,4 @@
-$(document).ready(function() {
-  console.log('Document Ready');
-  bindListeners();
-});
-
-
-
+$(document).ready(function () {
+  console.log('Document Ready Bitch!!!!!!!')
+  bindListeners()
+})

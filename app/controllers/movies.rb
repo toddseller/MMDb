@@ -11,10 +11,10 @@ post '/movies' do
   if movie.save
     movie.users << user if !movie.users.include?(user)
     if request.xhr?
-      page = erb :'/partials/_my_movies', locals: { movie: movie }, layout: false
+      page = erb :'/partials/_my_movies', locals: { movie: movie, user: user }, layout: false
       json status: "true", page: page
     end
-  end   
+  end
 end
 
 put '/movies/:id' do
