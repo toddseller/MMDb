@@ -37,7 +37,8 @@ put '/movies/:id' do
     page = erb :'/partials/_modal', locals: {movie: @movie, user: @user}, layout: false
     id = @movie.id
     image = @movie.poster
-    json page: page, id: id, image: image
+    title = @movie.title
+    json page: page, id: id, image: image, title: title
   else
     erb :'/users/show'
   end
