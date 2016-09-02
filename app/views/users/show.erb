@@ -1,6 +1,6 @@
 <div class="row">
   <div class="col-lg-12">
-    <% if session[:user_id] %>
+    <% if session[:user_id] == @user.id %>
       <button id="add" class="btn btn-danger pull-right">Add Movie</button>
     <% end %>
     <div id="search" class="pull-right">

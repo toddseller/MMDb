@@ -11,10 +11,11 @@ post '/movies' do
 end
 
 get '/movies/:id' do
-  p '*' * 25
+  p params[:user]
+  user = User.find(params[:user])
   movie = Movie.find(params[:id])
   if request.xhr?
-    page = erb :'/partials/_modal', locals: {movie: movie}, layout: false
+    page = erb :'/partials/_modal', locals: {movie: movie, user: user}, layout: false
     json page
   end
 end

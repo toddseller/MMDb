@@ -111,9 +111,16 @@ var listMovie = function (response) {
 
 var getMovieModal = function (event) {
   event.preventDefault()
+  var user = $(this).parent().attr('id')
   var movieId = $(this).attr('id')
   var route = '/movies/' + movieId
-  $.get(route, displayMovieModal)
+  console.log(route)
+  // $.get(route, displayMovieModal)
+  $.ajax({
+    url: route,
+    data: { user: user },
+    success: displayMovieModal
+  })
 }
 
 var displayMovieModal = function (response) {
