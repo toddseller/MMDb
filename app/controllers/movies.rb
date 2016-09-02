@@ -1,10 +1,3 @@
-get '/movies/:id/edit' do
-  @movie = Movie.find(params[:id])
-  # page = erb :'/partials/_edit_movie', locals: { movie: @movie }, layout: false
-  # json page: page
-  erb :'/partials/_edit_movie', layout: false
-end
-
 post '/movies' do
   user = User.find(session[:user_id])
   movie = Movie.find_by("title = ? AND year = ?", params[:movie]['title'], params[:movie]['year']) || Movie.new(params[:movie])
@@ -15,6 +8,22 @@ post '/movies' do
       json status: "true", page: page
     end
   end
+end
+
+get '/movies/:id' do
+  p user = User.find(session[:user_id])
+  movie = Movie.find(params[:id])
+  if request.xhr?
+    page = erb :'/partials/_modal', locals: {movie: movie, user: user}, layout: false
+    json page
+  end
+end
+
+get '/movies/:id/edit' do
+  @movie = Movie.find(params[:id])
+  # page = erb :'/partials/_edit_movie', locals: { movie: @movie }, layout: false
+  # json page: page
+  erb :'/partials/_edit_movie', layout: false
 end
 
 put '/movies/:id' do
@@ -32,22 +41,3 @@ delete '/movies/:id' do
   @movie.users.destroy(@user)
   erb :'/users/show'
 end
-
-# put '/items/:id' do
-#   @item = Item.find(params[:id])
-#   @item.update(params[:item])
-#   @user = User.find(@item.creator_id)
-#   if @item.save
-#     erb :'/users/show'
-#   else
-#     @errors = @errors = errors.full_messages.join(" and ")
-#     redirect "/items/#{item.id}/edit?errors=#{@errors}"
-#   end
-# end
-
-# delete '/items/:id' do
-#   @item = Item.find(params[:id])
-#   @user = User.find(@item.creator_id)
-#   @item.destroy
-#   erb :'/users/show'
-# end

@@ -1,4 +1,5 @@
 var bindListeners = function () {
+  dynamicListener()
   $('#sign-in-form').on('submit', validate)
   $('.close').on('click', clearForm)
   $('.modal').on('shown.bs.modal', autoFocus)
@@ -6,9 +7,13 @@ var bindListeners = function () {
   $('#movie-search').on('submit', getMovie)
   $('#create-movie').on('submit', addMovie)
   $('#more').on('click', showYear)
-  $('.movie-edit').on('click', editMovie)
   $('.edit-form').on('click', '#edit-button', submitUpdate)
   $('#delete-button').on('submit', deleteMovie)
+  $('.movie-modal').on('click', getMovieModal)
+}
+
+var dynamicListener = function () {
+  $('#movie').on('click', '.movie-edit', editMovie)
 }
 
 var validate = function (event) {
@@ -92,9 +97,9 @@ var displayMovie = function (response) {
 
 var addMovie = function (event) {
   event.preventDefault()
-  console.log('YAY!')
   var movie = $(this).serialize()
   var route = $(this).attr('action')
+  console.log(route)
   $.post(route, movie, listMovie)
 }
 
@@ -102,6 +107,18 @@ var listMovie = function (response) {
   if (response.status === 'true') {
     document.location.reload(true)
   }
+}
+
+var getMovieModal = function (event) {
+  event.preventDefault()
+  var movieId = $(this).attr('id')
+  var route = '/movies/' + movieId
+  $.get(route, displayMovieModal)
+}
+
+var displayMovieModal = function (response) {
+  $('#movie .modal-content').empty().append(response)
+  $('#movie').modal('show')
 }
 
 var editMovie = function (event) {
