@@ -31,8 +31,16 @@ put '/movies/:id' do
   @movie = Movie.find(params[:id])
   @movie.update(params[:movie])
   @user = User.find(session[:user_id])
+  p @movie
   @my_movies = @user.movies.sorted_list
-  erb :'/users/show'
+  if request.xhr?
+    page = erb :'/partials/_modal', locals: {movie: @movie, user: @user}, layout: false
+    id = @movie.id
+    image = @movie.poster
+    json page: page, id: id, image: image
+  else
+    erb :'/users/show'
+  end
 end
 
 delete '/movies/:id' do

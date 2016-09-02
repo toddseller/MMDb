@@ -23,15 +23,3 @@ get '/users/:id' do
   @my_movies = @user.movies.sorted_list
   erb :'/users/show'
 end
-
-# get '/users/:id/edit' do
-#   erb :'/users/edit'
-# end
-
-# put '/users/:id' do
-
-# end
-
-# delete '/users/:id' do
-
-# end

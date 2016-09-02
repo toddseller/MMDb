@@ -1,5 +1,4 @@
 var bindListeners = function () {
-  dynamicListener()
   $('#sign-in-form').on('submit', validate)
   $('.close').on('click', clearForm)
   $('.modal').on('shown.bs.modal', autoFocus)
@@ -7,19 +6,18 @@ var bindListeners = function () {
   $('#movie-search').on('submit', getMovie)
   $('#create-movie').on('submit', addMovie)
   $('#more').on('click', showYear)
-  $('.edit-form').on('click', '#edit-button', submitUpdate)
   $('#delete-button').on('submit', deleteMovie)
   $('.movie-modal').on('click', getMovieModal)
 }
 
 var dynamicListener = function () {
-  $('#movie').on('click', '.movie-edit', editMovie)
+  $('.movie-content').on('click', '.movie-edit', editMovie)
+  $('#movie').on('click', '#edit-button', submitUpdate)
 }
 
 var validate = function (event) {
   event.preventDefault()
   var formData = $('#sign-in-form :input').filter(checkValue).serialize()
-  console.log(formData)
   if (formData === '') {
     $('p.login-errors').show()
   } else {
@@ -65,14 +63,11 @@ var showYear = function () {
 var getMovie = function (event) {
   event.preventDefault()
   var title = $(this).serialize()
-  var itunesTitle = $('#search-title').serialize().replace('t=', '')
-  console.log(itunesTitle)
   var route = 'https://www.omdbapi.com/?' + title + '&plot=full&r=json'
   $.get(route, displayMovie)
 }
 
 var displayMovie = function (response) {
-  console.log(response)
   $('#preview').show()
   $('#create-movie').closest('div').slideDown('slow')
   if (response.Poster === 'N/A') {
@@ -99,7 +94,6 @@ var addMovie = function (event) {
   event.preventDefault()
   var movie = $(this).serialize()
   var route = $(this).attr('action')
-  console.log(route)
   $.post(route, movie, listMovie)
 }
 
@@ -114,8 +108,6 @@ var getMovieModal = function (event) {
   var user = $(this).parent().attr('id')
   var movieId = $(this).attr('id')
   var route = '/movies/' + movieId
-  console.log(route)
-  // $.get(route, displayMovieModal)
   $.ajax({
     url: route,
     data: { user: user },
@@ -141,19 +133,19 @@ var displayEditForm = function (response) {
 
 var submitUpdate = function (event) {
   event.preventDefault()
-  console.log('FUCK!')
-  var formRoute = $(this).attr('action')
-  var formData = $(this).serialize()
+  var formRoute = $(this).parent().attr('action')
+  var formData = $(this).parent().serialize()
   $.ajax({
     url: formRoute,
-    data: formData,
     type: 'PUT',
+    data: formData,
     success: displayUpdatedMovie
   })
 }
 
 var displayUpdatedMovie = function (response) {
-  console.log(response)
+  $('#movie .modal-content').empty().append(response.page)
+  $('#' + response.id + ' img').attr('src', response.image)
 }
 
 var deleteMovie = function (event) {
