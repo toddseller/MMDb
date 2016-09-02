@@ -8,6 +8,10 @@ class Movie < ActiveRecord::Base
 
   scope :sorted_list, -> { order(:sort_name, :year) }
 
+  def user
+
+  end
+
   private
 
     def create_sort_name

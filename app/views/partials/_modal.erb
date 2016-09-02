@@ -38,7 +38,7 @@
     </div>
   </div>
 </div>
-<% if session[:user_id] == user.id %>
+<% if current_user %>
   <div class="modal-footer">
       <a class="btn btn-danger movie-edit" href=<%= "/movies/#{movie.id}/edit" %>>Edit</a>
   </div>
