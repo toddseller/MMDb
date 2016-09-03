@@ -65,19 +65,20 @@ var getMovie = function (event) {
   var title = $(this).serialize()
   var route = 'https://www.omdbapi.com/?' + title + '&plot=full&r=json'
   $.get(route, displayMovie)
+  $(this).trigger('reset')
 }
 
 var displayMovie = function (response) {
   $('#preview').show()
   $('#create-movie').closest('div').slideDown('slow')
   if (response.Poster === 'N/A') {
-    $('#poster').append().attr('src', 'http/mmdb.online/imgs/default_image.png').attr('alt', 'No Image Available')
+    $('#poster').empty().append().attr('src', 'http/mmdb.online/imgs/default_image.png').attr('alt', 'No Image Available')
   } else {
-    $('#poster').append().attr('src', response.Poster).attr('alt', response.Title + ' Poster')
+    $('#poster').empty().append().attr('src', response.Poster).attr('alt', response.Title + ' Poster')
   }
-  $('#title').append(response.Title)
-  $('#genre').append(response.Genre)
-  $('#year').append(response.Year)
+  $('#title').empty().append(response.Title)
+  $('#genre').empty().append(response.Genre)
+  $('#year').empty().append(response.Year)
   $('input[name="movie[title]"]').val(response.Title)
   $('input[name="movie[year]"]').val(response.Year)
   $('input[name="movie[rating]"]').val(response.Rated)
