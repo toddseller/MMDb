@@ -6,13 +6,13 @@ var bindListeners = function () {
   $('#movie-search').on('submit', getMovie)
   $('#create-movie').on('submit', addMovie)
   $('#more').on('click', showYear)
-  $('#delete-button').on('submit', deleteMovie)
   $('.movie-modal').on('click', getMovieModal)
 }
 
 var dynamicListener = function () {
   $('.movie-content').on('click', '.movie-edit', editMovie)
   $('#movie').on('click', '#edit-button', submitUpdate)
+  $('#movie').on('click', '#delete-button', deleteMovie)
 }
 
 var validate = function (event) {
@@ -107,12 +107,8 @@ var getMovieModal = function (event) {
   event.preventDefault()
   var user = $(this).parent().attr('id')
   var movieId = $(this).attr('id')
-  var route = '/movies/' + movieId
-  $.ajax({
-    url: route,
-    data: { user: user },
-    success: displayMovieModal
-  })
+  var route = '/users/' + user + '/movies/' + movieId
+  $.get(route, displayMovieModal)
 }
 
 var displayMovieModal = function (response) {
@@ -152,7 +148,10 @@ var displayUpdatedMovie = function (response) {
 
 var deleteMovie = function (event) {
   event.preventDefault()
-  var formRoute = $(this).attr('action')
+  var parentForm = $(this).parent().parent().children('form')
+  var route = $(parentForm[0]).attr('action')
+  var newRoute = $(this).attr('action', route)
+  var formRoute = $(newRoute).attr('action')
   $.ajax({
     url: formRoute,
     type: 'DELETE'

@@ -1,5 +1,5 @@
 <div class="col-lg-12">
-  <form id="create-movie" action="/movies" method="POST">
+  <form id="create-movie" action=<%="/users/#{@user.id}/movies"%> method="POST">
     <input type="hidden" name="movie[title]" value="">
     <input type="hidden" name="movie[year]" value="">
     <input type="hidden" name="movie[rating]" value="">
