@@ -25,12 +25,16 @@ get '/users/:id' do
 end
 
 post '/users/:user_id/movies' do
-  user = User.find(params[:user_id])
+  @user = User.find(params[:user_id])
   movie = Movie.find_by("title = ? AND year = ?", params[:movie]['title'], params[:movie]['year']) || Movie.new(params[:movie])
   if movie.save
-    movie.users << user if !movie.users.include?(user)
+    movie.users << @user if !movie.users.include?(@user)
+    @my_movies = @user.movies.sorted_list
     if request.xhr?
-      json status: "true"
+      page = erb :'/partials/_all_movies', locals: {movie: @my_movies, user: @user}, layout: false
+      json status: "true", page: page
+    else
+      erb :'/users/show'
     end
   end
 end
@@ -71,8 +75,14 @@ end
 delete '/users/:user_id/movies/:id' do
   @movie = Movie.find(params[:id])
   @user = User.find(params[:user_id])
-  @my_movies = @user.movies.sorted_list
   @movie.users.destroy(@user)
-  erb :'/users/show'
+  if request.xhr?
+    @my_movies = @user.movies.sorted_list
+    page = erb :'/partials/_all_movies', locals: {movie: @my_movies, user: @user}, layout: false
+    json status: "true", page: page
+  else
+    @my_movies = @user.movies.sorted_list
+    erb :'/users/show'
+  end
 end
 

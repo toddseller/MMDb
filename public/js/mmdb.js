@@ -2,14 +2,14 @@ var bindListeners = function () {
   $('#sign-in-form').on('submit', validate)
   $('.close').on('click', clearForm)
   $('.modal').on('shown.bs.modal', autoFocus)
-  $('#add').on('click', showSearchBar)
-  $('#movie-search').on('submit', getMovie)
-  $('#create-movie').on('submit', addMovie)
-  $('#more').on('click', showYear)
-  $('.movie-modal').on('click', getMovieModal)
 }
 
 var dynamicListener = function () {
+  $('#user-page').on('click', '#add', showSearchBar)
+  $('#user-page').on('submit', '#movie-search', getMovie)
+  $('#user-page').on('submit', '#create-movie', addMovie)
+  $('#user-page').on('click', '#more', showYear)
+  $('#user-page').on('click', '.movie-modal', getMovieModal)
   $('.movie-content').on('click', '.movie-edit', editMovie)
   $('#movie').on('click', '#edit-button', submitUpdate)
   $('#movie').on('click', '#delete-button', deleteMovie)
@@ -100,7 +100,7 @@ var addMovie = function (event) {
 
 var listMovie = function (response) {
   if (response.status === 'true') {
-    document.location.reload(true)
+    $('#user-page').empty().append(response.page)
   }
 }
 
@@ -155,7 +155,8 @@ var deleteMovie = function (event) {
   var formRoute = $(newRoute).attr('action')
   $.ajax({
     url: formRoute,
-    type: 'DELETE'
+    type: 'DELETE',
+    success: listMovie
   })
-  document.location.reload(true)
+  $('#movie').modal('toggle')
 }
