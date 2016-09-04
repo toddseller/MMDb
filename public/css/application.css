@@ -195,7 +195,7 @@ body {
   margin-bottom: 3px;
 }
 
-a.index-user:hover, h4:hover {
+a.index-user:hover, .index-user h4:hover {
   color: #b9433b;
 /*  color: #333333;*/
   text-decoration: none;
