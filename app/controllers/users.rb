@@ -51,22 +51,21 @@ end
 get '/users/:user_id/movies/:id/edit' do
   @movie = Movie.find(params[:id])
   @user = User.find(params[:user_id])
-  # page = erb :'/partials/_edit_movie', locals: { movie: @movie }, layout: false
-  # json page: page
-  erb :'/partials/_edit_movie', layout: false
+  if request.xhr?
+    page = erb :'/partials/_edit_movie', locals: {movie: @movie, user: @user}, layout: false
+    json page
+  else
+    erb :'/partials/_edit_movie', layout: false
+  end
 end
 
 put '/users/:user_id/movies/:id' do
   @movie = Movie.find(params[:id])
   @movie.update(params[:movie])
   @user = User.find(params[:user_id])
-  @my_movies = @user.movies.sorted_list
   if request.xhr?
     page = erb :'/partials/_modal', locals: {movie: @movie, user: @user}, layout: false
-    id = @movie.id
-    image = @movie.poster
-    title = @movie.title
-    json page: page, id: id, image: image, title: title
+    json page: page, id: @movie.id, image: @movie.poster, title: @movie.title
   else
     erb :'/users/show'
   end
