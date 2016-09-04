@@ -1,4 +1,5 @@
 var bindListeners = function () {
+  $('img.lazy').lazyload()
   $('#sign-in-form').on('submit', validate)
   $('.close').on('click', clearForm)
   $('.modal').on('shown.bs.modal', autoFocus)
@@ -72,7 +73,7 @@ var displayMovie = function (response) {
   $('#preview').show()
   $('#create-movie').closest('div').slideDown('slow')
   if (response.Poster === 'N/A') {
-    $('#poster').empty().append().attr('src', 'http/mmdb.online/imgs/default_image.png').attr('alt', 'No Image Available')
+    $('#poster').empty().append().attr('src', '/imgs/default_image.png').attr('alt', 'No Image Available')
   } else {
     $('#poster').empty().append().attr('src', response.Poster).attr('alt', response.Title + ' Poster')
   }
