@@ -8,7 +8,7 @@
     type='rotate'
     from='0 70 104'
     to='360 70 104'
-    dur='1s'
+    dur='2s'
     repeatCount='indefinite' />
 
   </path>
