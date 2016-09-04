@@ -1,1 +1,14 @@
-<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 140 208"><defs><style>.cls-1,.cls-2{fill:#ccc;}.cls-2{stroke:#f2f2f2;stroke-miterlimit:10;}.cls-3{fill:#f2f2f2;}</style></defs><title>loading_image</title><rect class="cls-1" width="140" height="208"/><rect class="cls-2" x="35.1" y="69.1" width="69.9" height="69.9"/><g id="PL_Film"><rect class="cls-3" x="40.2" y="74.2" width="5" height="5.42"/><path class="cls-3" d="M89.9,74.2H50.1v27.5H89.9V74.2Z"/><path class="cls-3" d="M89.9,106.2H50.1v27.6H89.9V106.2Z"/><rect class="cls-3" x="40.2" y="85" width="5" height="5.42"/><rect class="cls-3" x="40.2" y="95.9" width="5" height="5.42"/><rect class="cls-3" x="40.2" y="106.7" width="5" height="5.42"/><rect class="cls-3" x="40.2" y="117.6" width="5" height="5.42"/><rect class="cls-3" x="40.2" y="128.4" width="5" height="5.42"/><rect class="cls-3" x="94.9" y="74.2" width="5" height="5.42"/><rect class="cls-3" x="94.9" y="85" width="5" height="5.42"/><rect class="cls-3" x="94.9" y="95.9" width="5" height="5.42"/><rect class="cls-3" x="94.9" y="106.7" width="5" height="5.42"/><rect class="cls-3" x="94.9" y="117.6" width="5" height="5.42"/><rect class="cls-3" x="94.9" y="128.4" width="5" height="5.42"/></g></svg>
+<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 140 208">
+  <defs>
+    <style>
+      .cls-1,.cls-2{fill:#ccc;}.cls-2{stroke:#f2f2f2;stroke-miterlimit:10;}.cls-3{fill:#f2f2f2;}
+    </style>
+  </defs>
+  <title>loading_image</title>
+  <rect class="cls-1" width="140" height="208"/>
+  <rect class="cls-2" x="35.1" y="69.1" width="69.9" height="69.9"/><g id="PL_Film">
+  <rect class="cls-3" x="40.2" y="74.2" width="5" height="5.42"/>
+  <path class="cls-3" d="M89.9,74.2H50.1v27.5H89.9V74.2Z"/>
+  <path class="cls-3" d="M89.9,106.2H50.1v27.6H89.9V106.2Z"/>
+  <rect class="cls-3" x="40.2" y="85" width="5" height="5.42"/><rect class="cls-3" x="40.2" y="95.9" width="5" height="5.42"/><rect class="cls-3" x="40.2" y="106.7" width="5" height="5.42"/><rect class="cls-3" x="40.2" y="117.6" width="5" height="5.42"/><rect class="cls-3" x="40.2" y="128.4" width="5" height="5.42"/><rect class="cls-3" x="94.9" y="74.2" width="5" height="5.42"/><rect class="cls-3" x="94.9" y="85" width="5" height="5.42"/><rect class="cls-3" x="94.9" y="95.9" width="5" height="5.42"/><rect class="cls-3" x="94.9" y="106.7" width="5" height="5.42"/><rect class="cls-3" x="94.9" y="117.6" width="5" height="5.42"/><rect class="cls-3" x="94.9" y="128.4" width="5" height="5.42"/></g>
+</svg>

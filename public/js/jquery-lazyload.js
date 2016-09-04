@@ -29,7 +29,7 @@
       skip_invisible: false,
       appear: null,
       load: null,
-      placeholder: '/imgs/loading_image.svg'
+      placeholder: '/imgs/animated.svg'
     }
 
     function update () {
