@@ -70,7 +70,7 @@ var getMovie = function (event) {
   // $(this).trigger('reset')
   var request = new XMLHttpRequest()
 
-  request.open('GET', 'https://api.themoviedb.org/3/search/movie?api_key=29f9cfa4c730839f8828ae772bd7d75a&' + title + '&page=1&append_to_response=credits')
+  request.open('GET', 'https://api.themoviedb.org/3/search/list?api_key=29f9cfa4c730839f8828ae772bd7d75a&' + title + '&page=1&append_to_response=credits')
 
   request.setRequestHeader('Accept', 'application/json')
 
