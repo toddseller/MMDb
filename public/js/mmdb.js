@@ -8,7 +8,7 @@ var bindListeners = function () {
 var dynamicListener = function () {
   $('#user-page').on('click', '#add', showSearchBar)
   $('#user-page').on('submit', '#movie-search', getMovie)
-  $('#user-page').on('submit', '#create-movie', addMovie)
+  $('#user-page').on('submit', '#create-movie', movieToDB)
   $('#user-page').on('click', '#more', showYear)
   $('#user-page').on('click', '.movie-modal', getMovieModal)
   $('.movie-content').on('click', '.movie-edit', editMovie)
@@ -64,53 +64,44 @@ var showYear = function () {
 var getMovie = function (event) {
   event.preventDefault()
   var title = $(this).serialize()
-  // // var route = 'https://www.omdbapi.com/?' + title + '&plot=full&r=json'
   var route = 'https://api.themoviedb.org/3/search/movie?api_key=29f9cfa4c730839f8828ae772bd7d75a&' + title + '&append_to_response=credits'
-  $.get(route, displayMovie)
+  $.get(route, addMovie)
   $(this).trigger('reset')
-  //   var request = new XMLHttpRequest()
-
-  // request.open('GET', 'https://api.themoviedb.org/3/search/movie?api_key=29f9cfa4c730839f8828ae772bd7d75a&' + title + '&append_to_response=credits')
-
-  // request.setRequestHeader('Accept', 'application/json')
-
-  // request.onreadystatechange = function () {
-  //   if (this.readyState === 4) {
-  //     console.log('Status:', this.status)
-  //     console.log('Headers:', this.getAllResponseHeaders())
-  //     console.log('Body:', this.responseText)
-  //   }
-  // }
-
-// request.send()
 }
 
 var displayMovie = function (response) {
-  var test = response
-  console.log(response)
-// $('#preview').show()
-// $('#create-movie').closest('div').slideDown('slow')
-// if (response.Poster === 'N/A') {
-//   $('#poster').empty().append().attr('src', '/imgs/default_image.png').attr('alt', 'No Image Available')
-// } else {
-//   $('#poster').empty().append().attr('src', response.Poster).attr('alt', response.Title + ' Poster')
-// }
-// $('#title').empty().append(response.Title)
-// $('#genre').empty().append(response.Genre)
-// $('#year').empty().append(response.Year)
-// $('input[name="movie[title]"]').val(response.Title)
-// $('input[name="movie[year]"]').val(response.Year)
-// $('input[name="movie[rating]"]').val(response.Rated)
-// $('textarea[name="movie[plot]"]').val(response.Plot)
-// $('textarea[name="movie[actors]"]').val(response.Actors)
-// $('input[name="movie[director]"]').val(response.Director)
-// $('input[name="movie[writer]"]').val(response.Writer)
-// $('input[name="movie[genre]"]').val(response.Genre)
-// $('input[name="movie[runtime]"]').val(response.Runtime)
-// $('input[name="movie[poster]"]').val(response.Poster)
+  var year = response.release_date.split('-', 1)
+  var genres = getGenres(response.genres)
+  var actors = getActors(response.credits.cast)
+  var rating = getRating(response.releases.countries)
+  var director = getDirector(response.credits.crew)
+  var writer = getWriter(response.credits.crew)
+  console.log(genres)
+  $('#preview').show()
+  $('#create-movie').closest('div').slideDown('slow')
+  $('#poster').empty().append().attr('src', 'https://image.tmdb.org/t/p/w342' + response.poster_path).attr('alt', response.title + ' Poster')
+  $('#title').empty().append(response.title)
+  $('#genre').empty().append(genres)
+  $('#year').empty().append(year[0])
+  $('input[name="movie[title]"]').val(response.title)
+  $('input[name="movie[year]"]').val(year[0])
+  $('input[name="movie[rating]"]').val(rating)
+  $('textarea[name="movie[plot]"]').val(response.overview)
+  $('textarea[name="movie[actors]"]').val(actors)
+  $('input[name="movie[director]"]').val(director)
+  $('input[name="movie[writer]"]').val(writer)
+  $('input[name="movie[genre]"]').val(genres)
+  $('input[name="movie[runtime]"]').val(response.runtime + ' min')
+  $('input[name="movie[poster]"]').val('https://image.tmdb.org/t/p/w342' + response.poster_path)
 }
 
-var addMovie = function (event) {
+var addMovie = function (response) {
+  var id = response.results[0].id
+  var route = 'https://api.themoviedb.org/3/movie/' + id + '?api_key=29f9cfa4c730839f8828ae772bd7d75a&append_to_response=credits,releases'
+  $.get(route, displayMovie)
+}
+
+var movieToDB = function (event) {
   event.preventDefault()
   var movie = $(this).serialize()
   var route = $(this).attr('action')
@@ -118,8 +109,13 @@ var addMovie = function (event) {
 }
 
 var listMovie = function (response) {
+  console.log('listMovie:', response.page)
   if (response.status === 'true') {
-    $('#user-page').empty().append(response.page)
+    // $('#user-page').empty()
+    $('#movie-list').empty().append(response.page)
+    $('#preview').hide()
+    $('#add').show()
+    $('#search').hide()
   }
 }
 
@@ -178,4 +174,67 @@ var deleteMovie = function (event) {
     success: listMovie
   })
   $('#movie').modal('toggle')
+}
+
+var getActors = function (response) {
+  var actors = response.reduce(function (acc, actor) {
+    acc.push(actor.name)
+    return acc
+  }, [])
+
+  return actors.slice(0, 6).join(', ')
+}
+
+var getRating = function (response) {
+  var rating = response.filter(function (country) {
+    return country.iso_3166_1 === 'US'
+  })
+  return rating[0].certification
+}
+
+var getGenres = function (response) {
+  var genres = response.reduce(function (acc, genre) {
+    acc.push(genre.name)
+    return acc
+  }, [])
+
+  if (genres.length > 1) {
+    genres = genres.slice(0, 2).join(', ')
+    return genres
+  } else {
+    genres = genres.join('')
+    return genres
+  }
+}
+
+var getDirector = function (response) {
+  var director = response.reduce(function (acc, crew) {
+    if (crew.job === 'Director') {
+      acc.push(crew.name)
+    }
+    return acc
+  }, [])
+  if (director.length > 1) {
+    director = director.join(', ')
+    return director
+  } else {
+    director = director.join('')
+    return director
+  }
+}
+
+var getWriter = function (response) {
+  var writer = response.reduce(function (acc, crew) {
+    if (crew.job === 'Screenplay') {
+      acc.push(crew.name)
+    }
+    return acc
+  }, [])
+  if (writer.length > 1) {
+    writer = writer.join(', ')
+    return writer
+  } else {
+    writer = writer.join('')
+    return writer
+  }
 }
