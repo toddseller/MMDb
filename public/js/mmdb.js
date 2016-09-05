@@ -198,7 +198,9 @@ var getRating = function (response) {
   var rating = response.filter(function (country) {
     return country.iso_3166_1 === 'US'
   })
-  return rating[0].certification
+  if (rating.length > 0) {
+    return rating[0].certification
+  }
 }
 
 var getGenres = function (response) {
