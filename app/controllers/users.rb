@@ -77,7 +77,7 @@ delete '/users/:user_id/movies/:id' do
   @movie.users.destroy(@user)
   if request.xhr?
     @my_movies = @user.movies.sorted_list
-    page = erb :'/partials/_all_movies', locals: {movie: @my_movies, user: @user}, layout: false
+    page = erb :'/partials/_movie_list', locals: {movie: @my_movies, user: @user}, layout: false
     json status: "true", page: page
   else
     @my_movies = @user.movies.sorted_list

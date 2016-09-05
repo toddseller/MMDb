@@ -76,7 +76,7 @@ var displayMovie = function (response) {
   var rating = getRating(response.releases.countries)
   var director = getDirector(response.credits.crew)
   var writer = getWriter(response.credits.crew)
-  console.log(genres)
+  console.log(response)
   $('#preview').show()
   $('#create-movie').closest('div').slideDown('slow')
   $('#poster').empty().append().attr('src', 'https://image.tmdb.org/t/p/w342' + response.poster_path).attr('alt', response.title + ' Poster')
@@ -96,9 +96,16 @@ var displayMovie = function (response) {
 }
 
 var addMovie = function (response) {
-  var id = response.results[0].id
-  var route = 'https://api.themoviedb.org/3/movie/' + id + '?api_key=29f9cfa4c730839f8828ae772bd7d75a&append_to_response=credits,releases'
-  $.get(route, displayMovie)
+  if (response.results.length > 0) {
+    var id = response.results[0].id
+    var route = 'https://api.themoviedb.org/3/movie/' + id + '?api_key=29f9cfa4c730839f8828ae772bd7d75a&append_to_response=credits,releases'
+    $.get(route, displayMovie)
+  } else {
+    $('#preview').show()
+    $('#create-movie').closest('div').slideDown('slow')
+    $('#poster').empty().append().attr('src', '/imgs/loading_image.svg').attr('alt', 'No Movies Match Your Query')
+  }
+  console.log(response)
 }
 
 var movieToDB = function (event) {
