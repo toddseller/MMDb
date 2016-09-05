@@ -65,29 +65,28 @@ var getMovie = function (event) {
   event.preventDefault()
   var title = $(this).serialize()
   // // var route = 'https://www.omdbapi.com/?' + title + '&plot=full&r=json'
-  // var route = 'https://api.themoviedb.org/3/search/movie?api_key=29f9cfa4c730839f8828ae772bd7d75a&title=full+metal+jacket&append_to_response=credits'
-  // $.get(route, displayMovie)
-  // $(this).trigger('reset')
-  var request = new XMLHttpRequest()
+  var route = 'https://api.themoviedb.org/3/search/movie?api_key=29f9cfa4c730839f8828ae772bd7d75a&' + title + '&append_to_response=credits'
+  $.get(route, displayMovie)
+  $(this).trigger('reset')
+  //   var request = new XMLHttpRequest()
 
-  request.open('GET', 'https://api.themoviedb.org/3/search/movie?api_key=29f9cfa4c730839f8828ae772bd7d75a&' + title + '&append_to_response=credits')
+  // request.open('GET', 'https://api.themoviedb.org/3/search/movie?api_key=29f9cfa4c730839f8828ae772bd7d75a&' + title + '&append_to_response=credits')
 
-  request.setRequestHeader('Accept', 'application/json')
+  // request.setRequestHeader('Accept', 'application/json')
 
-  request.onreadystatechange = function () {
-    if (this.readyState === 4) {
-      console.log('Status:', this.status)
-      console.log('Headers:', this.getAllResponseHeaders())
-      console.log('Body:', this.responseText)
-    }
-  }
+  // request.onreadystatechange = function () {
+  //   if (this.readyState === 4) {
+  //     console.log('Status:', this.status)
+  //     console.log('Headers:', this.getAllResponseHeaders())
+  //     console.log('Body:', this.responseText)
+  //   }
+  // }
 
-  request.send()
+// request.send()
 }
 
 var displayMovie = function (response) {
   var test = response
-  debugger
   console.log(response)
 // $('#preview').show()
 // $('#create-movie').closest('div').slideDown('slow')
