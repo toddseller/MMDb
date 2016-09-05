@@ -14,10 +14,18 @@
        <p><%= movie.actors %></p>
       </div>
       <div class="col-lg-6">
-        <h5>Director:</h5>
-        <p><%= movie.director %></p>
-        <h5>Writers:</h5>
-        <p><%= movie.writer %></p>
+        <% if movie.director.length > 0 %>
+          <h5>Director:</h5>
+          <p><%= movie.director %></p>
+        <% end %>
+        <% if movie.writer.length > 0 %>
+          <h5>Writers:</h5>
+          <p><%= movie.writer %></p>
+        <% end %>
+        <% if movie.producer.length > 0 %>
+          <h5>Producers:</h5>
+          <p><%= movie.producer %></p>
+        <% end %>
       </div>
       <div class="description-info">
           <h4>Information</h4>
