@@ -9,6 +9,7 @@ class CreateMovies < ActiveRecord::Migration
       t.string :director
       t.string :writer
       t.string :genre
+      t.string :producer
       t.string :runtime
       t.string :poster
       t.string :sort_name

@@ -76,7 +76,8 @@ var displayMovie = function (response) {
   var rating = getRating(response.releases.countries)
   var director = getDirector(response.credits.crew)
   var writer = getWriter(response.credits.crew)
-  console.log(response)
+  var producer = getProducer(response.credits.crew)
+  console.log(producer)
   $('#preview').show()
   $('#create-movie').closest('div').slideDown('slow')
   $('#poster').empty().append().attr('src', 'https://image.tmdb.org/t/p/w342' + response.poster_path).attr('alt', response.title + ' Poster')
@@ -90,6 +91,7 @@ var displayMovie = function (response) {
   $('textarea[name="movie[actors]"]').val(actors)
   $('input[name="movie[director]"]').val(director)
   $('input[name="movie[writer]"]').val(writer)
+  $('input[name="movie[producer]"]').val(producer)
   $('input[name="movie[genre]"]').val(genres)
   $('input[name="movie[runtime]"]').val(response.runtime + ' min')
   $('input[name="movie[poster]"]').val('https://image.tmdb.org/t/p/w342' + response.poster_path)
@@ -206,11 +208,9 @@ var getGenres = function (response) {
   }, [])
 
   if (genres.length > 1) {
-    genres = genres.slice(0, 2).join(', ')
-    return genres
+    return genres.slice(0, 2).join(', ')
   } else {
-    genres = genres.join('')
-    return genres
+    return genres.join('')
   }
 }
 
@@ -222,11 +222,9 @@ var getDirector = function (response) {
     return acc
   }, [])
   if (director.length > 1) {
-    director = director.join(', ')
-    return director
+    return director.join(', ')
   } else {
-    director = director.join('')
-    return director
+    return director.join('')
   }
 }
 
@@ -238,10 +236,22 @@ var getWriter = function (response) {
     return acc
   }, [])
   if (writer.length > 1) {
-    writer = writer.join(', ')
-    return writer
+    return writer.join(', ')
   } else {
-    writer = writer.join('')
-    return writer
+    return writer.join('')
+  }
+}
+
+var getProducer = function (response) {
+  var producer = response.reduce(function (acc, crew) {
+    if (crew.job === 'Producer') {
+      acc.push(crew.name)
+    }
+    return acc
+  }, [])
+  if (producer.length > 1) {
+    return producer.join(', ')
+  } else {
+    return producer.join('')
   }
 }
