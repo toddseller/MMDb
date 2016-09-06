@@ -207,6 +207,8 @@ var getRating = function (response) {
   })
   if (rating.length > 0) {
     return rating[0].certification
+  } else {
+    return 'NOT RATED'
   }
 }
 
