@@ -232,7 +232,7 @@ var getDirector = function (response) {
 
 var getWriter = function (response) {
   var writer = response.reduce(function (acc, crew) {
-    if (crew.job === 'Screenplay') {
+    if (crew.job === 'Screenplay' || crew.job === 'Writer') {
       acc.push(crew.name)
     }
     return acc
