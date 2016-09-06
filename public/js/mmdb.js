@@ -125,6 +125,13 @@ var listMovie = function (response) {
     $('#preview').hide()
     $('#add').show()
     $('#search').hide()
+    $('#search-year').hide()
+    $('#search-title').css('right', '0')
+    $('.input-group-btn').css('top', '0')
+    $('#more').show()
+    $('#title').empty()
+    $('#genre').empty()
+    $('#year').empty()
   }
 }
 
