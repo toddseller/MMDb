@@ -42,6 +42,11 @@ body {
   display: none;
 }
 
+#main-logo {
+  margin-top: -200px;
+  margin-bottom: -200px;
+}
+
 .logo {
   height: 50px;
 }
@@ -99,6 +104,12 @@ body {
   margin-top: 55px;
   width: 140px;
   height: 208px;
+}
+
+.top-preview img {
+  margin-bottom: 55px;
+  width: 100px;
+  height: auto;
 }
 
 .truncate {

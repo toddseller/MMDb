@@ -1,5 +1,7 @@
 get '/users' do
   @users = User.all
+  @movies = Movie.all
+  p '*' * 30
   erb :'users/index'
 end
 

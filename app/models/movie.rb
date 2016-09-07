@@ -7,9 +7,10 @@ class Movie < ActiveRecord::Base
   before_create :create_sort_name
 
   scope :sorted_list, -> { order(:sort_name, :year) }
+  scope :recently_added, -> { order(created_at: :desc) }
 
-  def user
-
+  def self.user_count
+    self.all.sort_by { |movie| movie.users.count }.reverse![0, 6]
   end
 
   private
