@@ -59,7 +59,7 @@ var showYear = function () {
   $('#search-year').show()
   $('#search-title').css('right', '81px')
   $('.input-group-btn').css('top', '-17px')
-  $('#movie-list').css('top', '-35px')
+  $('#movie-list').css('top', '-34px')
   $('#more').hide()
 }
 
