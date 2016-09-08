@@ -59,6 +59,7 @@ var showYear = function () {
   $('#search-year').show()
   $('#search-title').css('right', '81px')
   $('.input-group-btn').css('top', '-17px')
+  $('#movie-list').css('top', '-35px')
   $('#more').hide()
 }
 
@@ -129,6 +130,7 @@ var listMovie = function (response) {
     $('#search-year').hide()
     $('#search-title').css('right', '0')
     $('.input-group-btn').css('top', '0')
+    $('#movie-list').css('top', '0')
     $('#more').show()
     $('#title').empty()
     $('#genre').empty()
