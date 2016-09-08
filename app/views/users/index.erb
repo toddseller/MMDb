@@ -13,7 +13,7 @@
         <% end %>
       </div>
       <div class="col-sm-3">
-        <% @users.each do |user| %>
+        <% @users.movie_count.each do |user| %>
           <%= erb :'/partials/_users', locals: { user: user }, layout: false %>
         <% end %>
       </div>

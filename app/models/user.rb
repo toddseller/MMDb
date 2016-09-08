@@ -5,6 +5,10 @@ class User < ActiveRecord::Base
 
   has_and_belongs_to_many :movies, counter_cache: true
 
+  def self.movie_count
+    self.all.sort_by { |user| user.movies.count }.reverse!
+  end
+
   def password
     @password ||= BCrypt::Password.new(password_hash)
   end
