@@ -3,10 +3,10 @@ var bindListeners = function () {
   $('#sign-in-form').on('submit', validate)
   $('.close').on('click', clearForm)
   $('.modal').on('shown.bs.modal', autoFocus)
-  $('.top-preview').on('click', activateModal)
 }
 
 var dynamicListener = function () {
+  $('#user-page').on('click', '.top-preview', activateModal)
   $('#user-page').on('click', '#add', showSearchBar)
   $('#user-page').on('submit', '#movie-search', getMovie)
   $('#user-page').on('submit', '#create-movie', movieToDB)
