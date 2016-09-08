@@ -1,3 +1,6 @@
 get '/movies/:id/show' do
-  p movie = Movie.find(params[:id])
+  movie = Movie.find(params[:id])
+  if request.xhr?
+    erb :"/partials/_preview_modal", layout: false, locals: {movie: movie}
+  end
 end

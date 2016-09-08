@@ -3,6 +3,7 @@ var bindListeners = function () {
   $('#sign-in-form').on('submit', validate)
   $('.close').on('click', clearForm)
   $('.modal').on('shown.bs.modal', autoFocus)
+  $('.top-preview').on('click', activateModal)
 }
 
 var dynamicListener = function () {
@@ -140,6 +141,13 @@ var getMovieModal = function (event) {
   var user = $(this).parent().attr('id')
   var movieId = $(this).attr('id')
   var route = '/users/' + user + '/movies/' + movieId
+  $.get(route, displayMovieModal)
+}
+
+var activateModal = function (event) {
+  event.preventDefault()
+  var route = $(this).children('a').attr('href')
+  console.log(route)
   $.get(route, displayMovieModal)
 }
 
