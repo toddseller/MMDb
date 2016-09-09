@@ -83,15 +83,6 @@ var previewMovie = function (response) {
     $('#year').empty().append(response.movie[0].year)
     $('input[name="movie[title]"]').val(response.movie[0].title)
     $('input[name="movie[year]"]').val(response.movie[0].year)
-    $('input[name="movie[rating]"]').val(response.movie[0].rating)
-    $('textarea[name="movie[plot]"]').val(response.movie[0].plot)
-    $('textarea[name="movie[actors]"]').val(response.movie[0].actors)
-    $('input[name="movie[director]"]').val(response.movie[0].director)
-    $('input[name="movie[writer]"]').val(response.movie[0].writer)
-    $('input[name="movie[producer]"]').val(response.movie[0].producer)
-    $('input[name="movie[genre]"]').val(response.movie[0].genre)
-    $('input[name="movie[runtime]"]').val(rresponse.movie[0].runtime)
-    $('input[name="movie[poster]"]').val(response.movie[0].poster)
   }
 }
 
