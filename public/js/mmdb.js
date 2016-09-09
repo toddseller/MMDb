@@ -33,7 +33,7 @@ var clearForm = function (event) {
 }
 
 var checkValue = function (index, element) {
-  return $(element).val() != ''
+  return $(element).val() !== ''
 }
 
 var displayLogin = function (response) {
@@ -100,7 +100,6 @@ var displayMovie = function (response) {
   var director = getDirector(response.credits.crew)
   var writer = getWriter(response.credits.crew)
   var producer = getProducer(response.credits.crew)
-  console.log(producer)
   $('#preview').show()
   $('#create-movie').closest('div').slideDown('slow')
   $('#poster').empty().append().attr('src', 'https://image.tmdb.org/t/p/w342' + response.poster_path).attr('alt', response.title + ' Poster')
@@ -130,7 +129,6 @@ var addMovie = function (response) {
     $('#create-movie').closest('div').slideDown('slow')
     $('#poster').empty().append().attr('src', '/imgs/loading_image.svg').attr('alt', 'No Movies Match Your Query')
   }
-  console.log(response)
 }
 
 var movieToDB = function (event) {
@@ -141,9 +139,7 @@ var movieToDB = function (event) {
 }
 
 var listMovie = function (response) {
-  console.log('listMovie:', response.page)
   if (response.status === 'true') {
-    // $('#user-page').empty()
     $('#movie-list').empty().append(response.page)
     $('#preview').hide()
     $('#add').show()
@@ -170,7 +166,6 @@ var getMovieModal = function (event) {
 var activateModal = function (event) {
   event.preventDefault()
   var route = $(this).children('a').attr('href')
-  console.log(route)
   $.get(route, displayMovieModal)
 }
 
