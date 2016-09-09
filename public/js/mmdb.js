@@ -8,7 +8,7 @@ var bindListeners = function () {
 var dynamicListener = function () {
   $('#user-page').on('click', '.top-preview', activateModal)
   $('#user-page').on('click', '#add', showSearchBar)
-  $('#user-page').on('submit', '#movie-search', getMovie)
+  $('#user-page').on('submit', '#movie-search', checkDatabase)
   $('#user-page').on('submit', '#create-movie', movieToDB)
   $('#user-page').on('click', '#more', showYear)
   $('#user-page').on('click', '.movie-modal', getMovieModal)
@@ -63,12 +63,42 @@ var showYear = function () {
   $('#more').hide()
 }
 
-var getMovie = function (event) {
+var checkDatabase = function (event) {
   event.preventDefault()
-  var title = $(this).serialize()
-  var route = 'https://api.themoviedb.org/3/search/movie?api_key=29f9cfa4c730839f8828ae772bd7d75a&' + title + '&append_to_response=credits'
-  $.get(route, addMovie)
+  var data = $(this).serialize()
+  var route = '/movies'
+  $.get(route, data, previewMovie)
   $(this).trigger('reset')
+}
+
+var previewMovie = function (response) {
+  if (response.movie.length < 1) {
+    getMovie(response.query)
+  } else {
+    $('#preview').show()
+    $('#create-movie').closest('div').slideDown('slow')
+    $('#poster').empty().append().attr('src', response.movie[0].poster).attr('alt', response.movie.title + ' Poster')
+    $('#title').empty().append(response.movie[0].title)
+    $('#genre').empty().append(response.movie[0].genre)
+    $('#year').empty().append(response.movie[0].year)
+    $('input[name="movie[title]"]').val(response.movie[0].title)
+    $('input[name="movie[year]"]').val(response.movie[0].year)
+    $('input[name="movie[rating]"]').val(response.movie[0].rating)
+    $('textarea[name="movie[plot]"]').val(response.movie[0].plot)
+    $('textarea[name="movie[actors]"]').val(response.movie[0].actors)
+    $('input[name="movie[director]"]').val(response.movie[0].director)
+    $('input[name="movie[writer]"]').val(response.movie[0].writer)
+    $('input[name="movie[producer]"]').val(response.movie[0].producer)
+    $('input[name="movie[genre]"]').val(response.movie[0].genre)
+    $('input[name="movie[runtime]"]').val(rresponse.movie[0].runtime)
+    $('input[name="movie[poster]"]').val(response.movie[0].poster)
+  }
+}
+
+var getMovie = function (query) {
+  query = $.param(query)
+  var route = 'https://api.themoviedb.org/3/search/movie?api_key=29f9cfa4c730839f8828ae772bd7d75a&' + query + '&append_to_response=credits'
+  $.get(route, addMovie)
 }
 
 var displayMovie = function (response) {
