@@ -83,6 +83,11 @@
   display: none;
 }
 
+#movie-list
+{
+  margin-bottom: 55px;
+}
+
 .index-user h4
 {
   margin-bottom: 3px;
