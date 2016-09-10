@@ -26,12 +26,10 @@
       </div>
       <% if session[:user_id] %>
         <div class="navbar-right">
-          <a href="<%="/users/#{session[:user_id]}"%>">
-            <p class="navbar-text"><%= "Signed in as #{session[:name]}" %></p>
+          <p class="navbar-text"><%= "Signed in as #{session[:name]}" %></p>
+          <a href="#" id="menu-toggle">
+            <div id="nav-toggle"><span></span></div>
           </a>
-          <form id="sign-in" class="navbar-form navbar-right" action="/sessions/logout" method="POST">
-            <button type="submit" class="btn btn-default">Sign out</button>
-          </form>
         </div>
       <% else %>
         <div id="sign-in" class="navbar-right">
@@ -40,6 +38,15 @@
       <% end %>
     </div>
   </nav>
+  <% if session[:user_id] %>
+    <div id="drop-down">
+      <ul>
+        <a href="<%="/users/#{session[:user_id]}"%>"><li><span class="glyphicon glyphicon-home"></span>Home</li></a>
+        <a id="update" href=<%="/users/#{session[:user_id]}/edit"%>><li><span class="glyphicon glyphicon-cog"></span>Settings</li></a>
+        <a id="logout" href=<%="#{session[:user_id]}"%>><li><span class="glyphicon glyphicon-log-out"></span>Sign Out</li></a>
+      </ul>
+    </div>
+  <% end %>
   <div id="user-page" class="container">
     <%= yield %>
   </div>

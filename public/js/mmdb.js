@@ -3,6 +3,9 @@ var bindListeners = function () {
   $('#sign-in-form').on('submit', validate)
   $('.close').on('click', clearForm)
   $('.modal').on('shown.bs.modal', autoFocus)
+  $('#menu-toggle').on('click', animateMenu)
+  $('#logout').on('click', logout)
+  $('#update').on('click', updateUser)
 }
 
 var dynamicListener = function () {
@@ -15,6 +18,50 @@ var dynamicListener = function () {
   $('.movie-content').on('click', '.movie-edit', editMovie)
   $('#movie').on('click', '#edit-button', submitUpdate)
   $('#movie').on('click', '#delete-button', deleteMovie)
+  $('#logIn').on('click', '#update-submit', userUpdateSubmit)
+}
+
+var animateMenu = function (event) {
+  event.preventDefault()
+  $('#nav-toggle').toggleClass('active')
+  $('#drop-down').toggleClass('active')
+}
+
+var logout = function (event) {
+  event.preventDefault()
+  var id = $(this).attr('href')
+  var route = '/sessions/' + id
+  $.post(route, function () {location.reload()})
+}
+
+var updateUser = function (event) {
+  event.preventDefault()
+  var route = $(this).attr('href')
+  $.get(route, displayUserForm)
+}
+
+var displayUserForm = function (response) {
+  $('#logIn .modal-content').empty().append(response)
+  $('#logIn').modal('show')
+  $('#nav-toggle').toggleClass('active')
+  $('#drop-down').toggleClass('active')
+}
+
+var userUpdateSubmit = function (event) {
+  event.preventDefault()
+  var route = $(this).parents('form').attr('action')
+  var data = $(this).parents('form').serialize()
+  $.ajax({
+    url: route,
+    type: 'PUT',
+    data: data,
+    success: userUpdated
+  })
+}
+
+var userUpdated = function (response) {
+  $('#logIn').modal('toggle')
+  $('.navbar-text').text('Signed in as ' + response)
 }
 
 var validate = function (event) {
