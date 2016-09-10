@@ -31,7 +31,9 @@ var logout = function (event) {
   event.preventDefault()
   var id = $(this).attr('href')
   var route = '/sessions/' + id
-  $.post(route, function () {location.reload()})
+  $('#nav-toggle').toggleClass('active')
+  $('#drop-down').toggleClass('active')
+  $.post(route, function () {window.location.replace('/users')})
 }
 
 var updateUser = function (event) {
