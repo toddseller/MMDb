@@ -1,0 +1,148 @@
+#logIn .modal-header
+{
+  text-align: center;
+
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
+  background-color: #d9534f;
+}
+
+#logIn .modal-title
+{
+  font-size: 2.5em;
+  font-weight: bold;
+
+  color: #fff;
+}
+
+.registration
+{
+  width: 450px;
+  height: 600px;
+  margin-top: 25px;
+  padding: 25px;
+
+  color: #fff;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  border-radius: 5px;
+  background-color: #d9534f;
+}
+
+.errors
+{
+  color: #000;
+}
+
+.login-errors
+{
+  display: none;
+
+  color: red;
+}
+
+.modal-lg
+{
+  width: 1050px;
+}
+
+.modal-header .description
+{
+  border-bottom: none;
+}
+
+#description-rating
+{
+  font-family: 'Times New Roman', serif;
+  font-weight: bolder;
+
+  padding: 1px 3px;
+
+  border: 2px solid #333;
+  border-radius: 3px;
+}
+
+#description-year
+{
+  font-size: 1.25em;
+
+  padding-right: 5px;
+}
+
+.description-header
+{
+  border-bottom: 1px solid #eaeaea;
+}
+
+.description-details
+{
+  margin-top: 15px !important;
+}
+
+.description-details h5
+{
+  font-size: 1.1em;
+}
+
+.description-poster
+{
+  margin-top: 30px !important;
+  margin-bottom: 15px;
+}
+
+.description-poster img
+{
+  width: 300px;
+  height: auto;
+}
+
+.description-info h4
+{
+  margin-bottom: 10px;
+}
+
+.description-info p.first
+{
+  margin-top: 0 !important;
+}
+
+.description-info p
+{
+  margin-top: -10px !important;
+}
+
+.description-info .col-lg-4
+{
+  margin-left: -40px !important;
+}
+
+.description-plot
+{
+  margin-left: 15px;
+}
+
+.edit-movie
+{
+  margin-top: 30px;
+}
+
+.edit-poster img
+{
+  width: 150px;
+  height: auto;
+  margin-bottom: 15px;
+}
+
+#delete-button
+{
+  margin-right: 15px;
+  margin-bottom: 30px;
+}
+
+@media (max-width: 768px)
+{
+  .modal-lg
+  {
+    max-width: 400px;
+  }
+}

@@ -1,0 +1,99 @@
+#movie-search
+{
+  width: 100%;
+}
+
+#poster
+{
+  width: 175px;
+}
+
+#poster:hover
+{
+  box-shadow: 1px 1px 7px #f00;
+}
+
+#year
+{
+  margin: 0;
+}
+
+#genre
+{
+  margin: 0;
+}
+
+#search
+{
+  display: none;
+}
+
+#preview
+{
+  display: none;
+}
+
+#create-movie textarea
+{
+  display: none;
+}
+
+#search-year
+{
+  top: -34px;
+  right: -180px;
+
+  display: none;
+
+  width: 81px;
+}
+
+.index-preview img
+{
+  width: 140px;
+  height: 208px;
+  margin-top: 55px;
+}
+
+.top-preview img
+{
+  width: 100px;
+  height: auto;
+  margin-bottom: 55px;
+}
+
+.truncate
+{
+  overflow: hidden;
+
+  width: 140px;
+  margin: 0 auto;
+
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.sort-name
+{
+  display: none;
+}
+
+.description
+{
+  display: none;
+}
+
+.index-user h4
+{
+  margin-bottom: 3px;
+
+  color: #d9534f;
+}
+
+a.index-user:hover,
+.index-user h4:hover
+{
+  text-decoration: none;
+
+  color: #b9433b;
+}

@@ -1,0 +1,168 @@
+#sign-in
+{
+  margin-right: 25px;
+}
+
+.logo
+{
+  height: 50px;
+}
+
+.logo img
+{
+  margin-top: 5px;
+  margin-left: 40px;
+}
+
+#tmdb
+{
+  height: 25px;
+}
+
+.navbar-right
+{
+  position: relative;
+}
+
+.navbar-text
+{
+  position: relative;
+  right: 75px;
+}
+
+#menu-toggle
+{
+  position: absolute;
+  top: 13px;
+  right: 40px;
+
+  width: 30px;
+  height: 20px;
+}
+
+#nav-toggle span,
+#nav-toggle span:before,
+#nav-toggle span:after
+{
+  position: absolute;
+  top: 10px;
+
+  display: block;
+
+  width: 30px;
+  height: 3px;
+
+  content: '';
+  cursor: pointer;
+
+  border-radius: 1px;
+  background: #fff;
+}
+
+#nav-toggle span:before
+{
+  top: -10px;
+}
+
+#nav-toggle span:after
+{
+  bottom: -10px;
+}
+
+#nav-toggle.active span
+{
+  width: 0;
+
+  background: transparent;
+}
+
+#nav-toggle.active span:before
+{
+  top: 0;
+
+  width: 20px;
+
+  transform: rotate(45deg);
+}
+
+#nav-toggle.active span:after
+{
+  top: 0;
+
+  width: 20px;
+
+  transform: rotate(-45deg);
+}
+
+#nav-toggle span,
+#nav-toggle span:before,
+#nav-toggle span:after
+{
+  transition: all .5s ease-in-out;
+}
+
+#drop-down
+{
+  position: fixed;
+  z-index: 10;
+  top: -181px;
+  right: 0;
+
+  width: 225px;
+  height: auto;
+  margin-top: 50px;
+
+  transition: all .5s ease-in-out;
+
+  background: rgba(255, 255, 255, .95);
+}
+
+#drop-down.active
+{
+  top: 0;
+
+  overflow: auto;
+
+  padding: 1.5em 0;
+
+  transition: top .5s ease-in-out;
+}
+
+#drop-down ul
+{
+  padding-left: 0;
+
+  list-style: none;
+}
+
+#drop-down li
+{
+  font-size: 18px;
+
+  width: 100%;
+  margin: 0;
+  padding: .5em;
+  padding-left: 1.5em;
+
+  transition: all .4s ease-in-out;
+}
+
+#drop-down a
+{
+  text-decoration: none;
+
+  color: #000;
+}
+
+#drop-down li:hover
+{
+  transition: all .4s ease-in-out;
+
+  color: #fff;
+  background-color: #f00;
+}
+
+.glyphicon
+{
+  margin-right: 15px;
+}
