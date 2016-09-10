@@ -22,7 +22,12 @@ end
 get '/users/:id' do
   @user = User.find(params[:id])
   @my_movies = @user.movies.sorted_list
-  erb :'/users/show'
+  if request.xhr?
+    page = erb :'/partials/_movie_list', locals: {movie: @my_movies, user: @user}, layout: false
+    json status: "true", page: page
+  else
+    erb :'/users/show'
+  end
 end
 
 get '/users/:id/edit' do

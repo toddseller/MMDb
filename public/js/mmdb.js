@@ -29,8 +29,9 @@ var filterMovies = function () {
   $('#movie-list > div:contains(' + search + ')').show()
 }
 
-var clearFilter = function (event) {
-  $('#movie-list > div').fadeIn(500)
+var clearFilter = function () {
+  var route = window.location.pathname
+  $.get(route, listMovie)
 }
 
 var animateMenu = function (event) {
