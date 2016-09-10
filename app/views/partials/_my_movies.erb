@@ -1,5 +1,5 @@
 <div class="col-lg-2 col-md-3 col-sm-4 col-xs-6 index-preview text-center" id=<%="#{user.id}"%>>
   <a class="movie-modal" id=<%="#{movie.id}"%>><img class="lazy" data-original=<%= "#{movie.poster}" %> alt='<%="#{movie.title}" %> Poster' ></a>
-  <p class="sort-name"><%= movie.sort_name %></p>
+  <p class="sort-name"><%= movie.sort_name.downcase %></p>
   <p class="truncate"><%= movie.title %></p>
 </div>

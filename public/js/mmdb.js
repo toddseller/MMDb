@@ -6,6 +6,7 @@ var bindListeners = function () {
   $('#menu-toggle').on('click', animateMenu)
   $('#logout').on('click', logout)
   $('#update').on('click', updateUser)
+  $('#search-movie-title').keyup(filterMovies)
 }
 
 var dynamicListener = function () {
@@ -19,6 +20,12 @@ var dynamicListener = function () {
   $('#movie').on('click', '#edit-button', submitUpdate)
   $('#movie').on('click', '#delete-button', deleteMovie)
   $('#logIn').on('click', '#update-submit', userUpdateSubmit)
+}
+
+var filterMovies = function () {
+  var search = $(this).val().toLowerCase()
+  $('#movie-list > div:not(:contains(' + search + '))').fadeOut(500)
+  $('#movie-list > div:contains(' + search + ')').show()
 }
 
 var animateMenu = function (event) {
