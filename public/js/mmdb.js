@@ -6,7 +6,7 @@ var bindListeners = function () {
   $('#menu-toggle').on('click', animateMenu)
   $('#logout').on('click', logout)
   $('#update').on('click', updateUser)
-  $('#search-movie-title').keyup(filterMovies)
+  $('#search-movie-title').on('keyup', filterMovies)
   $('#clear-btn').on('click', clearFilter)
 }
 
@@ -30,8 +30,7 @@ var filterMovies = function () {
 }
 
 var clearFilter = function () {
-  var route = window.location.pathname
-  $.get(route, listMovie)
+  $('#movie-list > div').fadeIn(500)
 }
 
 var animateMenu = function (event) {
