@@ -7,6 +7,7 @@ var bindListeners = function () {
   $('#logout').on('click', logout)
   $('#update').on('click', updateUser)
   $('#search-movie-title').keyup(filterMovies)
+  $('#clear-btn').on('click', clearFilter)
 }
 
 var dynamicListener = function () {
@@ -26,6 +27,10 @@ var filterMovies = function () {
   var search = $(this).val().toLowerCase()
   $('#movie-list > div:not(:contains(' + search + '))').fadeOut(500)
   $('#movie-list > div:contains(' + search + ')').show()
+}
+
+var clearFilter = function (event) {
+  $('#movie-list > div').fadeIn(500)
 }
 
 var animateMenu = function (event) {
@@ -112,7 +117,7 @@ var showSearchBar = function () {
 var showYear = function () {
   $('#search-year').show()
   $('#search-title').css('right', '81px')
-  $('.input-group-btn').css('top', '-17px')
+  $('#search-btn').css('top', '-17px')
   $('#movie-list').css('top', '-34px')
   $('#more').hide()
 }
