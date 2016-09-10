@@ -25,7 +25,7 @@ var dynamicListener = function () {
 
 var filterMovies = function () {
   var search = $(this).val().toLowerCase()
-  $('#movie-list > div:not(:contains(' + search + '))').fadeOut(500)
+  $('#movie-list > div:not(:contains(' + search + '))').hide()
   $('#movie-list > div:contains(' + search + ')').show()
 }
 
