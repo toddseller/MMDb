@@ -30,7 +30,7 @@ var filterMovies = function () {
 }
 
 var clearFilter = function () {
-  $('#movie-list > div').fadeIn(500)
+  $('#movie-list > div').show()
 }
 
 var animateMenu = function (event) {
