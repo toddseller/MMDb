@@ -21,7 +21,7 @@
   <div class="row">
     <div id="movie-list" class="col-xs-12">
       <% @my_movies.each do |movie| %>
-        <%= erb :'/partials/_movie_list', locals: {movie: movie, user: @user}, layout: false %>
+        <%= erb :'/partials/_my_movies', locals: {movie: movie, user: @user}, layout: false %>
       <% end %>
     </div>
   </div>
