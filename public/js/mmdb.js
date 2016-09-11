@@ -26,8 +26,14 @@ var dynamicListener = function () {
 
 var filterMovies = function () {
   var search = $(this).val().toLowerCase()
-  $('#movie-list > div:not(:contains(' + search + '))').hide()
-  $('#movie-list > div:contains(' + search + ')').show()
+  var test = $('#movie-list > div')
+  $.each(test, function (i, v) {
+    if ($(v).text().search(new RegExp(search, 'i')) < 0) {
+      $(v).fadeOut(250)
+    } else {
+      $(v).show()
+    }
+  })
 }
 
 var clearFilter = function () {
@@ -200,7 +206,7 @@ var movieToDB = function (event) {
 var listMovie = function (response) {
   if (response.status === 'true') {
     $('#movie-list').empty().append(response.page)
-    $('#preview').slideUp(300, 'linear')
+    $('#preview').slideUp(500, 'linear')
     $('#dismiss').hide()
     $('#add').show()
     $('#search').hide()
