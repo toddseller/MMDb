@@ -15,7 +15,7 @@
   <nav class="navbar navbar-inverse navbar-fixed-top">
     <div class="container-fluid">
       <div class="navbar-header">
-        <a class="pull-left logo" href="<%="/users/#{session[:user_id]}"%>"><img src="http://mmdb.online/imgs/logo.png" alt="MMDb logo"><img id="tmdb" src="/imgs/tmdb.svg" alt="The Movie Database logo"></a>
+        <a class="pull-left logo" href="<%="/users"%>"><img src="http://mmdb.online/imgs/logo.png" alt="MMDb logo"><img id="tmdb" src="/imgs/tmdb.svg" alt="The Movie Database logo"></a>
       </div>
       <% if session[:user_id] %>
         <div class="navbar-right">
@@ -35,7 +35,8 @@
     <div id="drop-down">
       <ul>
         <a href="/users"><li><span class="glyphicon glyphicon-home"></span>Home</li></a>
-        <a id="update" href=<%="/users/#{session[:user_id]}/edit"%>><li><span class="glyphicon glyphicon-user"></span>Profile</li></a>
+        <a href=<%="/users/#{session[:user_id]}"%>><li><span class="glyphicon glyphicon-user"></span>Profile</li></a>
+        <a id="update" href=<%="/users/#{session[:user_id]}/edit"%>><li><span class="glyphicon glyphicon-cog"></span>Account Settings</li></a>
         <a id="logout" href=<%="#{session[:user_id]}"%>><li><span class="glyphicon glyphicon-log-out"></span>Sign Out</li></a>
       </ul>
     </div>

@@ -118,7 +118,6 @@ var showYear = function () {
   $('#search-year').show()
   $('#search-title').css('right', '81px')
   $('#search-btn').css('top', '-17px')
-  $('#movie-list').css('top', '-34px')
   $('#more').hide()
 }
 
@@ -134,8 +133,8 @@ var previewMovie = function (response) {
   if (response.movie.length < 1) {
     getMovie(response.query)
   } else {
-    $('#preview').show()
-    $('#create-movie').closest('div').slideDown('slow')
+    $('#preview').slideDown(300, 'linear')
+    $('#create-movie').closest('div').slideDown(300, 'linear')
     $('#poster').empty().append().attr('src', response.movie[0].poster).attr('alt', response.movie.title + ' Poster')
     $('#title').empty().append(response.movie[0].title)
     $('#genre').empty().append(response.movie[0].genre)
@@ -159,8 +158,8 @@ var displayMovie = function (response) {
   var director = getDirector(response.credits.crew)
   var writer = getWriter(response.credits.crew)
   var producer = getProducer(response.credits.crew)
-  $('#preview').show()
-  $('#create-movie').closest('div').slideDown('slow')
+  $('#preview').slideDown(300, 'linear')
+  $('#create-movie').closest('div').slideDown(300, 'linear')
   $('#poster').empty().append().attr('src', 'https://image.tmdb.org/t/p/w342' + response.poster_path).attr('alt', response.title + ' Poster')
   $('#title').empty().append(response.title)
   $('#genre').empty().append(genres)
@@ -184,8 +183,8 @@ var addMovie = function (response) {
     var route = 'https://api.themoviedb.org/3/movie/' + id + '?api_key=29f9cfa4c730839f8828ae772bd7d75a&append_to_response=credits,releases'
     $.get(route, displayMovie)
   } else {
-    $('#preview').show()
-    $('#create-movie').closest('div').slideDown('slow')
+    $('#preview').slideDown(300, 'linear')
+    $('#create-movie').closest('div').slideDown(300, 'linear')
     $('#poster').empty().append().attr('src', '/imgs/loading_image.svg').attr('alt', 'No Movies Match Your Query')
   }
 }
@@ -200,7 +199,7 @@ var movieToDB = function (event) {
 var listMovie = function (response) {
   if (response.status === 'true') {
     $('#movie-list').empty().append(response.page)
-    $('#preview').hide()
+    $('#preview').slideUp(200, 'linear')
     $('#add').show()
     $('#search').hide()
     $('#search-year').hide()

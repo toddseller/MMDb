@@ -6,11 +6,12 @@
 #poster
 {
   width: 175px;
+  height: auto;
 }
 
 #poster:hover
 {
-  box-shadow: 1px 1px 7px #f00;
+  box-shadow: 0 0 7px #f00;
 }
 
 #year
@@ -23,14 +24,34 @@
   margin: 0;
 }
 
+#search-boxes
+{
+  position: fixed;
+  top: 50px;
+  z-index: 1;
+  padding: 1.5em;
+  background: rgba(234, 234, 234, .97);
+}
+
+#add
+{
+  margin-right: 135px;
+}
+
 #search
 {
   display: none;
+  margin-right: 135px;
+  height: 34px;
 }
 
 #preview
 {
   display: none;
+  position: relative;
+  top: 65px;
+  margin-bottom: 30px;
+  height: 267px;
 }
 
 #create-movie textarea
@@ -85,6 +106,7 @@
 
 #movie-list
 {
+  margin-top: 34px;
   margin-bottom: 55px;
 }
 
