@@ -26,8 +26,14 @@ var dynamicListener = function () {
 
 var filterMovies = function () {
   var search = $(this).val().toLowerCase()
-  $('#movie-list > div:not(:contains(' + search + '))').hide()
-  $('#movie-list > div:contains(' + search + ')').show()
+  var route = window.location.pathname
+  var request = $.get(route)
+  request.done(function (response) {
+    console.log(response.page)
+    $('#movie-list').empty().append(response.page)
+    $('#movie-list > div:not(:contains(' + search + '))').hide()
+    $('#movie-list > div:contains(' + search + ')').show()
+  })
 }
 
 var clearFilter = function () {
