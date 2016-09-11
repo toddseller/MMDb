@@ -26,12 +26,12 @@ var dynamicListener = function () {
 
 var filterMovies = function () {
   var search = $(this).val().toLowerCase()
-  $('#movie-list > div:not(:contains(' + search + '))').fadeOut(100)
+  $('#movie-list > div:not(:contains(' + search + '))').hide()
   $('#movie-list > div:contains(' + search + ')').show()
 }
 
 var clearFilter = function () {
-  $('#movie-list > div').fadeIn(100)
+  $('#movie-list > div').show()
 }
 
 var animateMenu = function (event) {
