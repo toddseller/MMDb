@@ -27,9 +27,11 @@
 #search-boxes
 {
   position: fixed;
-  top: 50px;
   z-index: 1;
+  top: 50px;
+
   padding: 1.5em;
+
   background: rgba(234, 234, 234, .97);
 }
 
@@ -41,17 +43,37 @@
 #search
 {
   display: none;
-  margin-right: 135px;
+
   height: 34px;
+  margin-right: 135px;
 }
 
 #preview
 {
-  display: none;
   position: relative;
   top: 50px;
-  margin-bottom: 30px;
+
+  display: none;
+
   height: 300px;
+  margin-bottom: 30px;
+}
+
+#dismiss
+{
+  display: block;
+
+  text-align: center;
+}
+
+#dismiss .glyphicon
+{
+  color: #333;
+}
+
+#dismiss .glyphicon:hover
+{
+  color: #595959;
 }
 
 #create-movie textarea

@@ -11,6 +11,7 @@ var bindListeners = function () {
 }
 
 var dynamicListener = function () {
+  $('#search-boxes').on('click', '#dismiss', closePreview)
   $('#user-page').on('click', '.top-preview', activateModal)
   $('#user-page').on('click', '#add', showSearchBar)
   $('#user-page').on('submit', '#movie-search', checkDatabase)
@@ -134,7 +135,7 @@ var previewMovie = function (response) {
     getMovie(response.query)
   } else {
     $('#preview').slideDown(300, 'linear')
-
+    $('#dismiss').show()
     $('#poster').empty().append().attr('src', response.movie[0].poster).attr('alt', response.movie.title + ' Poster')
     $('#title').empty().append(response.movie[0].title)
     $('#genre').empty().append(response.movie[0].genre)
@@ -159,6 +160,7 @@ var displayMovie = function (response) {
   var writer = getWriter(response.credits.crew)
   var producer = getProducer(response.credits.crew)
   $('#preview').slideDown(300, 'linear')
+  $('#dismiss').show()
   $('#poster').empty().append().attr('src', 'https://image.tmdb.org/t/p/w342' + response.poster_path).attr('alt', response.title + ' Poster')
   $('#title').empty().append(response.title)
   $('#genre').empty().append(genres)
@@ -183,7 +185,7 @@ var addMovie = function (response) {
     $.get(route, displayMovie)
   } else {
     $('#preview').slideDown(300, 'linear')
-
+    $('#dismiss').show()
     $('#poster').empty().append().attr('src', '/imgs/loading_image.svg').attr('alt', 'No Movies Match Your Query')
   }
 }
@@ -199,6 +201,7 @@ var listMovie = function (response) {
   if (response.status === 'true') {
     $('#movie-list').empty().append(response.page)
     $('#preview').slideUp(300, 'linear')
+    $('#dismiss').hide()
     $('#add').show()
     $('#search').hide()
     $('#search-year').hide()
@@ -210,6 +213,22 @@ var listMovie = function (response) {
     $('#genre').empty()
     $('#year').empty()
   }
+}
+
+var closePreview = function (event) {
+  event.preventDefault()
+  $('#preview').slideUp(300, 'linear')
+  $('#dismiss').hide()
+  $('#add').show()
+  $('#search').hide()
+  $('#search-year').hide()
+  $('#search-title').css('right', '0')
+  $('.input-group-btn').css('top', '0')
+  $('#movie-list').css('top', '0')
+  $('#more').show()
+  $('#title').empty()
+  $('#genre').empty()
+  $('#year').empty()
 }
 
 var getMovieModal = function (event) {
