@@ -49,9 +49,9 @@
 {
   display: none;
   position: relative;
-  top: 65px;
+  top: 50px;
   margin-bottom: 30px;
-  height: 267px;
+  height: 300px;
 }
 
 #create-movie textarea

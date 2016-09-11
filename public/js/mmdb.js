@@ -134,7 +134,7 @@ var previewMovie = function (response) {
     getMovie(response.query)
   } else {
     $('#preview').slideDown(300, 'linear')
-    $('#create-movie').closest('div').slideDown(300, 'linear')
+
     $('#poster').empty().append().attr('src', response.movie[0].poster).attr('alt', response.movie.title + ' Poster')
     $('#title').empty().append(response.movie[0].title)
     $('#genre').empty().append(response.movie[0].genre)
@@ -159,7 +159,6 @@ var displayMovie = function (response) {
   var writer = getWriter(response.credits.crew)
   var producer = getProducer(response.credits.crew)
   $('#preview').slideDown(300, 'linear')
-  $('#create-movie').closest('div').slideDown(300, 'linear')
   $('#poster').empty().append().attr('src', 'https://image.tmdb.org/t/p/w342' + response.poster_path).attr('alt', response.title + ' Poster')
   $('#title').empty().append(response.title)
   $('#genre').empty().append(genres)
@@ -184,7 +183,7 @@ var addMovie = function (response) {
     $.get(route, displayMovie)
   } else {
     $('#preview').slideDown(300, 'linear')
-    $('#create-movie').closest('div').slideDown(300, 'linear')
+
     $('#poster').empty().append().attr('src', '/imgs/loading_image.svg').attr('alt', 'No Movies Match Your Query')
   }
 }
@@ -199,7 +198,7 @@ var movieToDB = function (event) {
 var listMovie = function (response) {
   if (response.status === 'true') {
     $('#movie-list').empty().append(response.page)
-    $('#preview').slideUp(200, 'linear')
+    $('#preview').slideUp(300, 'linear')
     $('#add').show()
     $('#search').hide()
     $('#search-year').hide()
