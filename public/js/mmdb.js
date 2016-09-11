@@ -26,10 +26,10 @@ var dynamicListener = function () {
 
 var filterMovies = function () {
   var search = $(this).val().toLowerCase()
-  var test = $('#movie-list > div')
-  $.each(test, function (i, v) {
+  var movies = $('#movie-list > div')
+  $.each(movies, function (i, v) {
     if ($(v).text().search(new RegExp(search, 'i')) < 0) {
-      $(v).fadeOut(250)
+      $(v).hide()
     } else {
       $(v).show()
     }
