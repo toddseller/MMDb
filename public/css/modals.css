@@ -139,6 +139,39 @@
   margin-bottom: 30px;
 }
 
+.confirmation
+{
+  position: relative;
+}
+
+.confirmation>span
+{
+  display: none;
+  position: absolute;
+  right: 10px;
+  top: 35px;
+  color: green;
+}
+
+.confirmation>span.match
+{
+  display: block;
+  position: absolute;
+  right: 10px;
+  top: 35px;
+  color: green;
+}
+
+#no-match
+{
+  color: #ff0000;
+}
+
+#no-match2
+{
+  color: #fff;
+}
+
 @media (max-width: 768px)
 {
   .modal-lg

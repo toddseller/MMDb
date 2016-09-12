@@ -7,6 +7,7 @@ var bindListeners = function () {
   $('#logout').on('click', logout)
   $('#update').on('click', updateUser)
   $('#search-movie-title').on('keyup', filterMovies)
+  $('.registration #confirm').on('keyup', checkPassword)
   $('#clear-btn').on('click', clearFilter)
 }
 
@@ -22,6 +23,7 @@ var dynamicListener = function () {
   $('#movie').on('click', '#edit-button', submitUpdate)
   $('#movie').on('click', '#delete-button', deleteMovie)
   $('#logIn').on('click', '#update-submit', userUpdateSubmit)
+  $('#logIn').on('keyup', '#confirm', testPassword)
 }
 
 var filterMovies = function () {
@@ -67,10 +69,41 @@ var displayUserForm = function (response) {
   $('#drop-down').toggleClass('active')
 }
 
+var testPassword = function () {
+  var timer
+  clearTimeout(timer)
+  timer = setTimeout(function () {
+    if ($('form input[name="password"]').val() === $('form input[name="confirm"]').val()) {
+      $('.confirmation > span').show()
+      $('#no-match').slideUp()
+      $('form button[type=submit]').removeAttr('disabled', 'disabled')
+    } else {
+      $('#no-match').slideDown().text('Passwords do not match')
+      $('form button[type=submit]').attr('disabled', 'disabled')
+    }
+  }, 2000)
+}
+
+var checkPassword = function () {
+  var timer
+  clearTimeout(timer)
+  timer = setTimeout(function () {
+    if ($('form input[name="user[password]"]').val() === $('form input[name="confirm"]').val()) {
+      $('.confirmation > span').show()
+      $('#no-match').slideUp()
+      $('form input[type=submit]').removeAttr('disabled', 'disabled')
+    } else {
+      $('#no-match2').slideDown().text('Passwords do not match')
+      $('form input[type=submit]').attr('disabled', 'disabled')
+    }
+  }, 2000)
+}
+
 var userUpdateSubmit = function (event) {
   event.preventDefault()
   var route = $(this).parents('form').attr('action')
   var data = $(this).parents('form').serialize()
+  var form = $(this).parents('form')
   $.ajax({
     url: route,
     type: 'PUT',
@@ -80,8 +113,16 @@ var userUpdateSubmit = function (event) {
 }
 
 var userUpdated = function (response) {
-  $('#logIn').modal('toggle')
-  $('.navbar-text').text('Signed in as ' + response)
+  if (response.status === 'true') {
+    $('#logIn').modal('toggle')
+    $('.navbar-text').text('Signed in as ' + response.name)
+  } else {
+    $('p.login-errors').show()
+    $('form input[name="current"]').val('').focus()
+    $('form input[name="password"]').val('')
+    $('form input[name="confirm"]').val('')
+    $('.confirmation > span').hide()
+  }
 }
 
 var validate = function (event) {

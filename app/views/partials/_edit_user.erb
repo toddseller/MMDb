@@ -3,31 +3,44 @@
   <h4 class="modal-title">Update Profile</h4>
 </div>
 <div class="modal-body">
-  <p class="login-errors text-center">Invalid login. Please check your credentials and try again.</p>
-  <form class="login-form" action=<%="/users/#{user.id}"%> method="post">
-    <input type="hidden" name="_method" value="PUT">
-    <div class="form-group">
-      <label for="user[first_name]">First Name:</label>
-      <input class="form-control" type="text" name="first_name" value=<%="#{user.first_name}"%>>
-    </div>
-    <div class="form-group">
-      <label for="user[last_name]">Last Name:</label>
-      <input class="form-control" type="text" name="last_name" value=<%="#{user.last_name}"%>>
-    </div>
-    <div class="form-group">
-      <label for="user[user_name]">User name:</label>
-      <input class="form-control" type="text" name="user_name" value=<%="#{user.user_name}"%>>
-    </div>
-    <div class="form-group">
-      <label for="user[email]">Email:</label>
-      <input class="form-control" type="email" name="email" value=<%="#{user.email}"%>>
-    </div>
-    <div class="form-group">
-      <label for="password">Password:</label>
-      <input class="form-control" type="password" name="password" placeholder="Enter New Password to Update Password">
-    </div>
-    <div class="modal-footer">
-      <button id="update-submit" type="submit" class="btn btn-danger">Update</button>
-    </div>
-  </form>
+  <p class="login-errors text-center">Invalid Password.</p>
+  <div class="row">
+    <form class="login-form" action=<%="/users/#{user.id}"%> method="post">
+      <input type="hidden" name="_method" value="PUT">
+      <div class="form-group col-sm-12">
+        <label for="user[first_name]">First Name:</label>
+        <input class="form-control" type="text" name="first_name" value=<%="#{user.first_name}"%>>
+      </div>
+      <div class="form-group col-sm-12">
+        <label for="user[last_name]">Last Name:</label>
+        <input class="form-control" type="text" name="last_name" value=<%="#{user.last_name}"%>>
+      </div>
+      <div class="form-group col-sm-12">
+        <label for="user[user_name]">User name:</label>
+        <input class="form-control" type="text" name="user_name" value=<%="#{user.user_name}"%>>
+      </div>
+      <div class="form-group col-sm-12">
+        <label for="user[email]">Email:</label>
+        <input class="form-control" type="email" name="email" value=<%="#{user.email}"%>>
+      </div>
+      <div class="form-group col-sm-12">
+        <label for="current">Current Password:</label>
+        <input class="form-control" type="password" name="current" placeholder="Enter New Password to Update Password">
+      </div>
+      <div class="col-sm-12" id="no-match"></div>
+      <div class="form-group col-sm-6 confirmation">
+        <label for="password">New Password:</label>
+        <input class="form-control" type="password" name="password" placeholder="New Password">
+        <span class="glyphicon glyphicon-ok-sign"></span>
+      </div>
+      <div id="confirm" class="form-group col-sm-6 confirmation">
+        <label for="confirm">Confirm Password:</label>
+        <input class="form-control" type="password" name="confirm" placeholder="Confirm Password">
+        <span class="glyphicon glyphicon-ok-sign"></span>
+      </div>
+      <div class="modal-footer col-sm-12">
+        <button id="update-submit" type="submit" class="btn btn-danger">Update</button>
+      </div>
+    </form>
+  </div>
 </div>
