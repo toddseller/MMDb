@@ -283,6 +283,7 @@ var submitUpdate = function (event) {
 var displayUpdatedMovie = function (response) {
   $('#movie .modal-content').empty().append(response.page)
   $('#movie-list').empty().append(response.list)
+  $('#filter-input').trigger('reset')
 }
 
 var deleteMovie = function (event) {
