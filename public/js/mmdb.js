@@ -281,10 +281,8 @@ var submitUpdate = function (event) {
 }
 
 var displayUpdatedMovie = function (response) {
-  var title = $('#' + response.id).siblings()
   $('#movie .modal-content').empty().append(response.page)
-  $('#' + response.id + ' img').attr('src', response.image)
-  $(title[1]).html(response.title)
+  $('#movie-list').empty().append(response.list)
 }
 
 var deleteMovie = function (event) {

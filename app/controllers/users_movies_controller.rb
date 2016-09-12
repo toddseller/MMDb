@@ -38,8 +38,10 @@ put '/users/:user_id/movies/:id' do
   @movie.update(params[:movie])
   @user = User.find(params[:user_id])
   if request.xhr?
+    @my_movies = @user.movies.sorted_list
     page = erb :'/partials/_modal', locals: {movie: @movie, user: @user}, layout: false
-    json page: page, id: @movie.id, image: @movie.poster, title: @movie.title
+    list = erb :'/partials/_movie_list', locals: {movie: @my_movies, user: @user}, layout: false
+    json page: page, list: list
   else
     erb :'/users/show'
   end
