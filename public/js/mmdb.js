@@ -81,7 +81,7 @@ var testPassword = function () {
       $('#no-match').slideDown().text('Passwords do not match')
       $('form button[type=submit]').attr('disabled', 'disabled')
     }
-  }, 2000)
+  }, 1500)
 }
 
 var checkPassword = function () {
@@ -96,7 +96,7 @@ var checkPassword = function () {
       $('#no-match2').slideDown().text('Passwords do not match')
       $('form input[type=submit]').attr('disabled', 'disabled')
     }
-  }, 2000)
+  }, 1500)
 }
 
 var userUpdateSubmit = function (event) {
