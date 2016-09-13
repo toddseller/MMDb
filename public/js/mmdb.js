@@ -24,6 +24,7 @@ var dynamicListener = function () {
   $('#movie').on('click', '#delete-button', deleteMovie)
   $('#logIn').on('click', '#update-submit', userUpdateSubmit)
   $('#logIn').on('keyup', '#confirm', testPassword)
+  $('#logIn').on('change', '#current', deactivateSubmit)
 }
 
 var filterMovies = function () {
@@ -69,19 +70,26 @@ var displayUserForm = function (response) {
   $('#drop-down').toggleClass('active')
 }
 
+var deactivateSubmit = function () {
+  if ($('#current input').val()) {
+    $('form button[type=submit]').attr('disabled', 'disabled')
+    $('.confirmation input').removeAttr('disabled', 'disabled')
+  } else {
+    $('form button[type=submit]').removeAttr('disabled', 'disabled')
+    $('form input[name="confirm"]').css('border', '1px solid #cccccc').css('box-shadow', 'none')
+  }
+}
+
 var testPassword = function () {
-  var timer
-  clearTimeout(timer)
-  timer = setTimeout(function () {
-    if ($('form input[name="password"]').val() === $('form input[name="confirm"]').val()) {
-      $('.confirmation > span').show()
-      $('#no-match').slideUp()
-      $('form button[type=submit]').removeAttr('disabled', 'disabled')
-    } else {
-      $('#no-match').slideDown().text('Passwords do not match')
-      $('form button[type=submit]').attr('disabled', 'disabled')
-    }
-  }, 1500)
+  if ($('form input[name="password"]').val() === $('form input[name="confirm"]').val() && $('#current input').val()) {
+    $('.confirmation > span').show()
+    $('form button[type=submit]').removeAttr('disabled', 'disabled')
+    $('form input[name="confirm"]').css('border', '1px solid #088000').css('box-shadow', '0 0 5px #088000')
+  } else {
+    $('form input[name="confirm"]').css('border', '1px solid #ff0000').css('box-shadow', '0 0 5px #ff0000')
+    $('form button[type=submit]').attr('disabled', 'disabled')
+    $('.confirmation > span').hide()
+  }
 }
 
 var checkPassword = function () {
@@ -90,11 +98,12 @@ var checkPassword = function () {
   timer = setTimeout(function () {
     if ($('form input[name="user[password]"]').val() === $('form input[name="confirm"]').val()) {
       $('.confirmation > span').show()
-      $('#no-match').slideUp()
+      $('#no-match2').slideUp()
       $('form input[type=submit]').removeAttr('disabled', 'disabled')
     } else {
       $('#no-match2').slideDown().text('Passwords do not match')
       $('form input[type=submit]').attr('disabled', 'disabled')
+      $('.confirmation > span').hide()
     }
   }, 1500)
 }
@@ -119,8 +128,7 @@ var userUpdated = function (response) {
   } else {
     $('p.login-errors').show()
     $('form input[name="current"]').val('').focus()
-    $('form input[name="password"]').val('')
-    $('form input[name="confirm"]').val('')
+    $('.confirmation input').val('').css('border', '1px solid #cccccc').css('box-shadow', 'none').attr('disabled', 'disabled')
     $('.confirmation > span').hide()
   }
 }
