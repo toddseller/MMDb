@@ -30,4 +30,3 @@ bin/
 .elasticbeanstalk/*
 !.elasticbeanstalk/*.cfg.yml
 !.elasticbeanstalk/*.global.yml
-config/newrelic.yml
