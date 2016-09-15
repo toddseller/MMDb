@@ -20,6 +20,9 @@ require 'newrelic_rpm'
 require "sinatra/reloader" if development?
 require 'sinatra/json'
 
+require 'dotenv'
+Dotenv.load
+
 require 'erb'
 require 'bcrypt'
 
