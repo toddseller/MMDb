@@ -40,10 +40,10 @@ var filterMovies = function () {
   })
   var filterVisible = $('#movie-list > div').filter(':visible')
   $.each(filterVisible, function () {
-    $(this).css('margin-right', '1.17em')
+    $(this).css('margin-right', '1.8em')
   })
   $(filterVisible).filter(function (i) {
-    return (i + 1) % 7 === 0
+    return (i + 1) % 6 === 0
   }).css('margin-right', '0')
 }
 

@@ -1,160 +1,166 @@
 #movie-search
 {
-  width: 100%;
+    width: 100%;
 }
 
 #poster
 {
-  width: 175px;
-  height: auto;
+    width: 175px;
+    height: auto;
 }
 
 #poster:hover
 {
-  box-shadow: 0 0 7px #f00;
+    box-shadow: 0 0 7px #f00;
 }
 
 #year
 {
-  margin: 0;
+    margin: 0;
 }
 
 #genre
 {
-  margin: 0;
+    margin: 0;
 }
 
 #search-boxes
 {
-  position: fixed;
-  z-index: 1;
-  top: 50px;
+    position: fixed;
+    z-index: 1;
+    top: 50px;
 
-  padding: 1.5em;
+    padding: 1.5em;
 
-  background: rgba(234, 234, 234, .97);
+    background: rgba(234, 234, 234, .97);
 }
 
 #add
 {
-  margin-right: 135px;
+    margin-right: 135px;
 }
 
 #search
 {
-  display: none;
+    display: none;
 
-  height: 34px;
-  margin-right: 135px;
+    height: 34px;
+    margin-right: 135px;
 }
 
 #preview
 {
-  position: relative;
-  top: 50px;
+    position: relative;
+    top: 50px;
 
-  display: none;
+    display: none;
 
-  height: 300px;
-  margin-bottom: 30px;
+    height: 300px;
+    margin-bottom: 30px;
 }
 
 #dismiss
 {
-  display: block;
+    display: block;
 
-  text-align: center;
+    text-align: center;
 }
 
 #dismiss .glyphicon
 {
-  color: #333;
+    color: #333;
 }
 
 #dismiss .glyphicon:hover
 {
-  color: #595959;
+    color: #595959;
 }
 
 #create-movie textarea
 {
-  display: none;
+    display: none;
 }
 
 #search-year
 {
-  top: -34px;
-  right: -180px;
+    top: -34px;
+    right: -180px;
 
-  display: none;
+    display: none;
 
-  width: 81px;
+    width: 81px;
 }
 
 .index-preview
 {
-  margin-right: 1.17em;
+    width: 174px;
+    margin-right: 1.8em;
 }
 
-.index-preview:nth-child(7n)
+.index-preview:nth-child(6n)
 {
-  margin-right: 0;
+    margin-right: 0;
 }
 
 .index-preview img
 {
-  width: 153px;
-  height: 221px;
-  margin-top: 55px;
+    width: 174px;
+    height: auto;
+    margin-top: 20px;
+
+    border-radius: 4px;
 }
 
 .top-preview img
 {
-  width: 100px;
-  height: auto;
-  margin-bottom: 55px;
+    width: 100px;
+    height: auto;
+    margin-bottom: 55px;
 }
 
 .truncate
 {
-  overflow: hidden;
+    overflow: hidden;
 
-  width: 153px;
-  margin: 0 auto;
+    width: 174px;
+    margin: 0 auto;
+    margin-top: 2px;
 
-  white-space: nowrap;
-  text-overflow: ellipsis;
+    white-space: nowrap;
+    text-overflow: ellipsis;
 }
 
 .sort-name
 {
-  display: none;
+    display: none;
 }
 
 .description
 {
-  display: none;
+    display: none;
 }
 
 #movie-list
 {
-  display: flex;
-  flex-wrap: wrap;
-  margin-top: 34px;
-  margin-bottom: 55px;
+    display: flex;
+
+    margin-top: 80px;
+    margin-bottom: 55px;
+
+    flex-wrap: wrap;
 }
 
 .index-user h4
 {
-  margin-bottom: 3px;
+    margin-bottom: 3px;
 
-  color: #d9534f;
+    color: #d9534f;
 }
 
 a.index-user:hover,
 .index-user h4:hover
 {
-  text-decoration: none;
+    text-decoration: none;
 
-  color: #b9433b;
+    color: #b9433b;
 }
