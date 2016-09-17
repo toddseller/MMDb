@@ -93,8 +93,7 @@
 
 .index-preview
 {
-  width: calc(14.2857% - 1em);
-  margin-right: 1em;
+  margin-right: 1.17em;
 }
 
 .index-preview:nth-child(7n)

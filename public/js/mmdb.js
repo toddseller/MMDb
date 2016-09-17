@@ -38,6 +38,13 @@ var filterMovies = function () {
       $(this).show()
     }
   })
+  var filterVisible = $('#movie-list > div').filter(':visible')
+  $.each(filterVisible, function () {
+    $(this).css('margin-right', '1.17em')
+  })
+  $(filterVisible).filter(function (i) {
+    return (i + 1) % 7 === 0
+  }).css('margin-right', '0')
 }
 
 var clearFilter = function () {
