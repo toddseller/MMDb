@@ -17,7 +17,7 @@ get '/users/:user_id/movies/:id' do
   user = User.find(params[:user_id])
   movie = Movie.find(params[:id])
   if request.xhr?
-    page = erb :'/partials/_modal', locals: {movie: movie, user: user}, layout: false
+    page = erb :'/partials/_info', locals: {movie: movie, user: user}, layout: false
     json page
   end
 end
@@ -39,7 +39,7 @@ put '/users/:user_id/movies/:id' do
   @user = User.find(params[:user_id])
   if request.xhr?
     @my_movies = @user.movies.sorted_list
-    page = erb :'/partials/_modal', locals: {movie: @movie, user: @user}, layout: false
+    page = erb :'/partials/_info', locals: {movie: @movie, user: @user}, layout: false
     list = erb :'/partials/_movie_list', locals: {movie: @my_movies, user: @user}, layout: false
     json page: page, list: list
   else

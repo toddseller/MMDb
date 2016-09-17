@@ -19,9 +19,10 @@ var dynamicListener = function () {
   $('#user-page').on('submit', '#create-movie', movieToDB)
   $('#user-page').on('click', '#more', showYear)
   $('#user-page').on('click', '.movie-modal', getMovieModal)
-  $('.movie-content').on('click', '.movie-edit', editMovie)
-  $('#movie').on('click', '#edit-button', submitUpdate)
-  $('#movie').on('click', '#delete-button', deleteMovie)
+  $('#user-page').on('click', '.close', closeInfo)
+  $('#user-page').on('click', '.movie-edit', editMovie)
+  $('#user-page').on('click', '#edit-button', submitUpdate)
+  $('#user-page').on('click', '#delete-button', deleteMovie)
   $('#logIn').on('click', '#update-submit', userUpdateSubmit)
   $('#logIn').on('keyup', '#confirm', testPassword)
   $('#logIn').on('change', '#current', deactivateSubmit)
@@ -38,17 +39,20 @@ var filterMovies = function () {
       $(this).show()
     }
   })
-  var filterVisible = $('#movie-list > div').filter(':visible')
-  $.each(filterVisible, function () {
-    $(this).css('margin-right', '1.8em')
+  var filteredList = $('#movie-list > div').filter('.index-preview:visible')
+  $.each(filteredList, function (i) {
+    if ((i + 1) % 6 === 0) {
+      $(this).css('margin-right', '0')
+    } else {
+      $(this).css('margin-right', '1.8em')
+    }
   })
-  $(filterVisible).filter(function (i) {
-    return (i + 1) % 6 === 0
-  }).css('margin-right', '0')
 }
 
 var clearFilter = function () {
-  $('#movie-list > div').show()
+  $('.info').remove()
+  $('.pointer').removeClass('active')
+  $('#movie-list > div').removeAttr('style').show()
 }
 
 var animateMenu = function (event) {
@@ -299,7 +303,53 @@ var getMovieModal = function (event) {
   var user = $(this).parent().attr('id')
   var movieId = $(this).attr('id')
   var route = '/users/' + user + '/movies/' + movieId
-  $.get(route, displayMovieModal)
+  var that = $(this).parent('div')
+  var posterArt = $(this).children('img')
+  var title = $(this).siblings('p')
+  var request = $.ajax({
+    url: route
+  })
+  request.done(function (response) {
+    if ($('#movie-list > div').hasClass('info')) {
+      $('.truncate').show()
+      $('.lazy').removeClass('active')
+      $('.info').empty().removeAttr('style')
+      $('.pointer').removeClass('active').removeAttr('style')
+      $(posterArt).toggleClass('active')
+      $(title).hide()
+      $(that).nextAll('div.info').first().css('height', 'auto').css('width', '1270px').append('<div class="info-wrapper">' + response + '</div>')
+      $(that).find('.pointer').addClass('active')
+    } else {
+      var filteredList = $('#movie-list > div').filter('.index-preview:visible')
+      $.each(filteredList, function (i) {
+        if ((i + 1) % 6 === 0) {
+          $(this).css('margin-right', '0')
+          $(this).after('<div class="info"></div>')
+        } else {
+          $(this).css('margin-right', '1.8em')
+        }
+      })
+      $('#movie-list > .index-preview:last').after('<div class="info"></div>')
+      $(posterArt).toggleClass('active')
+      $(title).hide()
+      $(that).find('.pointer').toggleClass('active').hide().fadeIn(400)
+      $(that).nextAll('div.info').first().append('<div class="info-wrapper">' + response + '</div>').css('height', 'auto').css('width', '1270px').hide().slideDown(300)
+      console.log(posterArt)
+    }
+  })
+}
+
+var closeInfo = function (event) {
+  event.preventDefault()
+  var test = function () {
+    $('.pointer').removeClass('active').removeAttr('style')
+    $('.info').remove()
+    $('.truncate').show()
+    $('.lazy').removeClass('active')
+  }
+  $('.info').slideUp(300, 'linear')
+  $('.pointer').fadeOut(250, 'linear')
+  setTimeout(test, 300)
 }
 
 var activateModal = function (event) {
@@ -337,7 +387,7 @@ var submitUpdate = function (event) {
 }
 
 var displayUpdatedMovie = function (response) {
-  $('#movie .modal-content').empty().append(response.page)
+  $('.info > .modal-content').empty().append(response.page)
   $('#movie-list').empty().append(response.list)
   $('#filter-input').trigger('reset')
 }
