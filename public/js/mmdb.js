@@ -48,7 +48,7 @@ var filterMovies = function () {
 }
 
 var clearFilter = function () {
-  $('#movie-list > div').show()
+  $('#movie-list > div').removeAttr('style').show()
 }
 
 var animateMenu = function (event) {
