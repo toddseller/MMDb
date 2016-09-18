@@ -172,6 +172,17 @@
   color: #fff;
 }
 
+ul
+{
+  padding-left: 0;
+}
+
+li
+{
+  padding-left: 10px;
+  list-style: none;
+}
+
 @media (max-width: 768px)
 {
   .modal-lg

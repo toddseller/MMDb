@@ -11,20 +11,36 @@
       <h4>Cast and Crew</h4>
       <div class="col-lg-6">
         <h5>Actors:</h5>
-       <p><%= movie.actors %></p>
+        <ul>
+          <% movie.actors.split(", ").each do |line| %>
+            <li><%= line %></li>
+          <% end %>
+        </ul>
       </div>
       <div class="col-lg-6">
         <% if movie.director.length > 0 %>
           <h5>Director:</h5>
-          <p><%= movie.director %></p>
+          <ul>
+          <% movie.director.split(", ").each do |line| %>
+            <li><%= line %></li>
+          <% end %>
+        </ul>
         <% end %>
         <% if movie.writer.length > 0 %>
           <h5>Writers:</h5>
-          <p><%= movie.writer %></p>
+          <ul>
+          <% movie.writer.split(", ").each do |line| %>
+            <li><%= line %></li>
+          <% end %>
+        </ul>
         <% end %>
         <% if movie.producer.length > 0 %>
           <h5>Producers:</h5>
-          <p><%= movie.producer %></p>
+          <ul>
+          <% movie.producer.split(", ").each do |line| %>
+            <li><%= line %></li>
+          <% end %>
+        </ul>
         <% end %>
       </div>
       <div class="description-info">

@@ -52,7 +52,6 @@ var filterMovies = function () {
 var clearFilter = function () {
   $('.info').remove()
   $('.pointer').removeClass('active')
-  $('#movie-list > div').removeAttr('style').show()
 }
 
 var animateMenu = function (event) {
