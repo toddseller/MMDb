@@ -96,6 +96,10 @@
   height: auto;
 }
 
+.filler {
+  height: 15px;
+}
+
 .description-info h4
 {
   margin-bottom: 10px;
