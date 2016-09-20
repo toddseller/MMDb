@@ -11,7 +11,7 @@ class Movie < ActiveRecord::Base
   scope :recently_added, -> { order(created_at: :desc) }
 
   def self.user_count
-    self.all.sort_by { |movie| movie.users.count }.reverse![0, 6]
+    self.all.sort_by { |movie| [movie.users.count, movie[:title]] }.reverse![0, 6]
   end
 
   private
