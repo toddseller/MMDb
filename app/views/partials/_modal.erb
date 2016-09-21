@@ -41,7 +41,8 @@
             <li><%= line %></li>
           <% end %>
         </ul>
-        <% else %>
+        <% end %>
+        <% if movie.writer.empty? || movie.producer.empty? %>
           <p class="filler"></p>
         <% end %>
       </div>
