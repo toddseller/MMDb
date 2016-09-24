@@ -114,8 +114,9 @@
 .top-preview img
 {
     width: 100px;
-    height: auto;
+    height: 150px;
     margin-bottom: 55px;
+    border-radius: 3px;
 }
 
 .truncate
