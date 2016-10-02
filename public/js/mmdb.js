@@ -316,7 +316,7 @@ var getMovieModal = function (event) {
       $('.pointer').removeClass('active').removeAttr('style')
       $(posterArt).toggleClass('active')
       $(title).hide()
-      $(that).nextAll('div.info').first().css('height', 'auto').css('width', '1270px').append('<div class="info-wrapper">' + response + '</div>')
+      $(that).nextAll('div.info').first().append('<div class="info-wrapper">' + response + '</div>')
       $(that).find('.pointer').addClass('active')
     } else {
       var filteredList = $('#movie-list > div').filter('.index-preview:visible')
@@ -332,7 +332,7 @@ var getMovieModal = function (event) {
       $(posterArt).toggleClass('active')
       $(title).hide()
       $(that).find('.pointer').toggleClass('active').hide().fadeIn(400)
-      $(that).nextAll('div.info').first().append('<div class="info-wrapper">' + response + '</div>').css('height', 'auto').css('width', '1270px').hide().slideDown(300)
+      $(that).nextAll('div.info').first().append('<div class="info-wrapper">' + response + '</div>').hide().slideDown(300)
       console.log(posterArt)
     }
   })
