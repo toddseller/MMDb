@@ -15,10 +15,17 @@
   color: #fff;
 }
 
+#meta-data
+{
+  width: 1170px;
+  margin: 0 auto;
+}
+
 .info-wrapper .modal-header,
 .info-wrapper .modal-body
 {
-  padding-left: calc((100vw - 1170px)/2);
+  padding-left: 0;
+  padding-right: 0;
 }
 
 .info-wrapper .modal-header
@@ -28,9 +35,9 @@
   border: none;
 }
 
-.info-wrapper .close
+#meta-data .description-poster img
 {
-  margin-right: calc((100vw - 1170px)/2);
+  float: right;
 }
 
 .glyphicon-option-vertical

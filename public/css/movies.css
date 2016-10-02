@@ -90,14 +90,20 @@ img
   background: rgba(234, 234, 234, .97);
 }
 
+#search-wrapper
+{
+  width: 1170px;
+  margin: 0 auto;
+}
+
 #filter-input
 {
-  margin-left: calc((100vw - 1250px)/2);
+  margin-left: 25px;
 }
 
 #add
 {
-  margin-right: calc((100vw - 1250px)/2);
+  margin-right: 25px;
 }
 
 #search
@@ -105,7 +111,7 @@ img
   display: none;
 
   height: 34px;
-  margin-right: calc((100vw - 1250px)/2);
+  margin-right: 25px;
 }
 
 #preview
