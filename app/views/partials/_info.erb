@@ -1,5 +1,8 @@
 <div class="modal-header">
   <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+  <% if session[:user_id] == user.id %>
+    <a class="movie-edit" href=<%= "/users/#{user.id}/movies/#{movie.id}/edit" %>><span class="glyphicon glyphicon-option-vertical" aria-hidden="true"></span></a>
+  <% end %>
   <h2 class="modal-title"><%= movie.title %></h2>
   <p><span id="description-year"><%= movie.year %></span><span id="description-rating"><%= movie.rating %></span></p>
 </div>
@@ -65,8 +68,3 @@
     </div>
   </div>
 </div>
-<% if session[:user_id] == user.id %>
-  <div class="modal-footer">
-      <a class="btn btn-danger movie-edit" href=<%= "/users/#{user.id}/movies/#{movie.id}/edit" %>>Edit</a>
-  </div>
-<% end %>

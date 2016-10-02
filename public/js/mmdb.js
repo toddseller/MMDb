@@ -50,6 +50,8 @@ var filterMovies = function () {
 }
 
 var clearFilter = function () {
+  $('#movie-list > div').removeAttr('style').show()
+  $('#filter-input').trigger('reset')
   $('.info').remove()
   $('.pointer').removeClass('active')
 }
@@ -312,11 +314,11 @@ var getMovieModal = function (event) {
     if ($('#movie-list > div').hasClass('info')) {
       $('.truncate').show()
       $('.lazy').removeClass('active')
-      $('.info').empty().removeAttr('style')
+      $('.info').empty().removeAttr('style').removeClass('active')
       $('.pointer').removeClass('active').removeAttr('style')
       $(posterArt).toggleClass('active')
       $(title).hide()
-      $(that).nextAll('div.info').first().append('<div class="info-wrapper">' + response + '</div>')
+      $(that).nextAll('div.info').first().toggleClass('active').append('<div class="info-wrapper">' + response + '</div>')
       $(that).find('.pointer').addClass('active')
     } else {
       var filteredList = $('#movie-list > div').filter('.index-preview:visible')
@@ -332,7 +334,7 @@ var getMovieModal = function (event) {
       $(posterArt).toggleClass('active')
       $(title).hide()
       $(that).find('.pointer').toggleClass('active').hide().fadeIn(400)
-      $(that).nextAll('div.info').first().append('<div class="info-wrapper">' + response + '</div>').hide().slideDown(300)
+      $(that).nextAll('div.info').first().toggleClass('active').append('<div class="info-wrapper">' + response + '</div>').hide().slideDown(300)
       console.log(posterArt)
     }
   })

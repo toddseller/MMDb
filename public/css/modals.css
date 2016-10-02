@@ -18,7 +18,39 @@
 .info-wrapper .modal-header,
 .info-wrapper .modal-body
 {
-  padding-left: 135px;
+  padding-left: calc((100vw - 1170px)/2);
+}
+
+.info-wrapper .modal-header
+{
+  padding-bottom: 0;
+
+  border: none;
+}
+
+.info-wrapper .close
+{
+  margin-right: calc((100vw - 1170px)/2);
+}
+
+.glyphicon-option-vertical
+{
+  font-size: 21px;
+
+  float: right;
+
+  margin-top: -2px;
+
+  opacity: .2;
+  color: #000;
+}
+.glyphicon-option-vertical:hover,
+.glyphicon-option-vertical:focus
+{
+  text-decoration: none;
+
+  opacity: .5;
+  color: #000;
 }
 
 .registration
@@ -100,10 +132,12 @@
 {
   width: 300px;
   height: auto;
+
   border-radius: 6px;
 }
 
-.filler {
+.filler
+{
   height: 35px;
 }
 
@@ -155,27 +189,31 @@
   position: relative;
 }
 
-.confirmation>span
+.confirmation > span
 {
-  display: none;
   position: absolute;
-  right: 10px;
   top: 35px;
+  right: 10px;
+
+  display: none;
+
   color: green;
 }
 
-.confirmation>span.match
+.confirmation > span.match
 {
-  display: block;
   position: absolute;
-  right: 10px;
   top: 35px;
+  right: 10px;
+
+  display: block;
+
   color: green;
 }
 
 #no-match
 {
-  color: #ff0000;
+  color: #f00;
 }
 
 #no-match2
