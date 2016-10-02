@@ -385,6 +385,15 @@ var submitUpdate = function (event) {
     data: formData,
     success: displayUpdatedMovie
   })
+  var test = function () {
+    $('.pointer').removeClass('active').removeAttr('style')
+    $('.info').remove()
+    $('.truncate').show()
+    $('.lazy').removeClass('active')
+  }
+  $('.info').slideUp(300, 'linear')
+  $('.pointer').fadeOut(250, 'linear')
+  setTimeout(test, 300)
 }
 
 var displayUpdatedMovie = function (response) {
@@ -404,7 +413,15 @@ var deleteMovie = function (event) {
     type: 'DELETE',
     success: listMovie
   })
-  $('#movie').modal('toggle')
+  var test = function () {
+    $('.pointer').removeClass('active').removeAttr('style')
+    $('.info').remove()
+    $('.truncate').show()
+    $('.lazy').removeClass('active')
+  }
+  $('.info').slideUp(300, 'linear')
+  $('.pointer').fadeOut(250, 'linear')
+  setTimeout(test, 300)
 }
 
 var getActors = function (response) {
