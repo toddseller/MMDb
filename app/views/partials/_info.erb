@@ -1,0 +1,70 @@
+<div class="modal-header">
+  <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+  <% if session[:user_id] == user.id %>
+    <a class="movie-edit" href=<%= "/users/#{user.id}/movies/#{movie.id}/edit" %>><span class="glyphicon glyphicon-option-vertical" aria-hidden="true"></span></a>
+  <% end %>
+  <h2 class="modal-title"><%= movie.title %></h2>
+  <p><span id="description-year"><%= movie.year %></span><span id="description-rating"><%= movie.rating %></span></p>
+</div>
+<div class="modal-body">
+  <div class="row">
+    <div class="col-lg-8 description-details">
+      <h4>Plot Summary</h4>
+      <p class="description-plot"><%= movie.plot %></p>
+      <h4>Cast and Crew</h4>
+      <div class="col-lg-6">
+        <h5>Actors:</h5>
+        <ul>
+          <% movie.actors.split(", ").each do |line| %>
+            <li><%= line %></li>
+          <% end %>
+        </ul>
+      </div>
+      <div class="col-lg-6">
+        <% if !movie.director.empty? %>
+          <h5>Director:</h5>
+          <ul>
+          <% movie.director.split(", ").each do |line| %>
+            <li><%= line %></li>
+          <% end %>
+        </ul>
+        <% end %>
+        <% if !movie.writer.empty? %>
+          <h5>Writers:</h5>
+          <ul>
+          <% movie.writer.split(", ").each do |line| %>
+            <li><%= line %></li>
+          <% end %>
+        </ul>
+        <% end %>
+        <% if !movie.producer.empty? %>
+          <h5>Producers:</h5>
+          <ul>
+          <% movie.producer.split(", ").each do |line| %>
+            <li><%= line %></li>
+          <% end %>
+        </ul>
+        <% end %>
+        <% if movie.writer.empty? || movie.producer.empty? %>
+          <p class="filler"></p>
+        <% end %>
+      </div>
+      <div class="description-info">
+          <h4>Information</h4>
+        <div class="col-lg-2">
+          <p class="first">Genre</p>
+          <p>Released</p>
+          <p>Runtime</p>
+        </div>
+        <div class="col-lg-4">
+          <p class="first"><%= movie.genre %></p>
+          <p><%= movie.year %></p>
+          <p><%= movie.runtime %></p>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-4 description-poster">
+      <img src=<%= "#{movie.poster}" %> alt=<%= "#{movie.title} Poster" %>>
+    </div>
+  </div>
+</div>
