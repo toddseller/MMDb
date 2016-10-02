@@ -15,6 +15,12 @@
   color: #fff;
 }
 
+.info-wrapper .modal-header,
+.info-wrapper .modal-body
+{
+  padding-left: 135px;
+}
+
 .registration
 {
   width: 450px;
@@ -94,6 +100,11 @@
 {
   width: 300px;
   height: auto;
+  border-radius: 6px;
+}
+
+.filler {
+  height: 35px;
 }
 
 .description-info h4
@@ -179,7 +190,6 @@ ul
 
 li
 {
-  padding-left: 10px;
   list-style: none;
 }
 

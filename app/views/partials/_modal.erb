@@ -18,7 +18,7 @@
         </ul>
       </div>
       <div class="col-lg-6">
-        <% if movie.director.length > 0 %>
+        <% if !movie.director.empty? %>
           <h5>Director:</h5>
           <ul>
           <% movie.director.split(", ").each do |line| %>
@@ -26,7 +26,7 @@
           <% end %>
         </ul>
         <% end %>
-        <% if movie.writer.length > 0 %>
+        <% if !movie.writer.empty? %>
           <h5>Writers:</h5>
           <ul>
           <% movie.writer.split(", ").each do |line| %>
@@ -34,13 +34,16 @@
           <% end %>
         </ul>
         <% end %>
-        <% if movie.producer.length > 0 %>
+        <% if !movie.producer.empty? %>
           <h5>Producers:</h5>
           <ul>
           <% movie.producer.split(", ").each do |line| %>
             <li><%= line %></li>
           <% end %>
         </ul>
+        <% end %>
+        <% if movie.writer.empty? || movie.producer.empty? %>
+          <p class="filler"></p>
         <% end %>
       </div>
       <div class="description-info">
