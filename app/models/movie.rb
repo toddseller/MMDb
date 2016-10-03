@@ -6,6 +6,7 @@ class Movie < ActiveRecord::Base
 
   before_create :create_sort_name
   before_save :create_search_name
+  before_save :create_duration
 
   scope :sorted_list, -> { order(:sort_name, :year) }
   scope :recently_added, -> { order(created_at: :desc) }
@@ -26,5 +27,18 @@ class Movie < ActiveRecord::Base
 
     def set_image
       self.poster.gsub!(/^(http)/, 'https')
+    end
+
+    def create_duration
+      time = self.runtime.to_i
+      hour = time.round / 60
+      min = time % 60
+      if hour == 1
+        self.runtime = hour.to_s + ' hour, ' + min.to_s + ' minutes'
+      elsif hour > 1
+        self.runtime = hour.to_s + ' hours, ' + min.to_s + ' minutes'
+      else
+        self.runtime = min.to_s + ' minutes'
+      end
     end
 end
