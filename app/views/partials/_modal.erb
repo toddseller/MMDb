@@ -40,9 +40,9 @@
           <% end %>
           <% if !movie.writer.empty? %>
             <% if movie.writer.split(',').length > 1 %>
-              <h5>Writers:</h5>
+              <h5>Screenwriters:</h5>
             <% else %>
-              <h5>Writer:</h5>
+              <h5>Screenwriter:</h5>
             <% end %>
             <ul>
             <% movie.writer.split(", ").each do |line| %>
