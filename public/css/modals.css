@@ -1,3 +1,8 @@
+.modal-header
+{
+  border: none;
+}
+
 #logIn .modal-header
 {
   text-align: center;
@@ -17,27 +22,48 @@
 
 #meta-data
 {
-  width: 1270px;
+  width: 1170px;
   margin: 0 auto;
+}
+
+.info-wrapper .modal-title
+{
+  font-size: 1.75em;
+  margin-bottom: 10px;
 }
 
 .info-wrapper .modal-header,
 .info-wrapper .modal-body
 {
-  padding-left: 0;
-  padding-right: 0;
+  padding: 0;
 }
 
 .info-wrapper .modal-header
 {
-  padding-bottom: 0;
+  padding-top: 15px;
+}
 
-  border: none;
+#meta-data h4
+{
+  margin-bottom: 0;
+}
+
+#meta-data hr
+{
+  margin-top: 10px;
 }
 
 #meta-data .description-poster img
 {
-  float: right;
+  width: 340px;
+  height: auto;
+
+  border-radius: 6px;
+}
+
+.modal-body .col-lg-3
+{
+  padding-left: 0;
 }
 
 .glyphicon-option-vertical
@@ -119,10 +145,10 @@
   border-bottom: 1px solid #eaeaea;
 }
 
-.description-details
+/*.description-details
 {
   margin-top: 15px !important;
-}
+}*/
 
 .description-details h5
 {
@@ -131,8 +157,8 @@
 
 .description-poster
 {
-  margin-top: 30px !important;
-  margin-bottom: 15px;
+/*  margin-top: 30px !important;*/
+  margin-bottom: 30px;
 }
 
 .description-poster img
@@ -170,7 +196,7 @@
 
 .description-plot
 {
-  margin-left: 15px;
+  margin: 20px 0;
 }
 
 .edit-movie

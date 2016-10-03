@@ -227,6 +227,7 @@ var displayMovie = function (response) {
   var director = getDirector(response.credits.crew)
   var writer = getWriter(response.credits.crew)
   var producer = getProducer(response.credits.crew)
+
   $('#preview').slideDown(300, 'linear')
   $('#dismiss').show()
   $('#poster').empty().append().attr('src', 'https://image.tmdb.org/t/p/w342' + response.poster_path).attr('alt', response.title + ' Poster')
@@ -242,7 +243,7 @@ var displayMovie = function (response) {
   $('input[name="movie[writer]"]').val(writer)
   $('input[name="movie[producer]"]').val(producer)
   $('input[name="movie[genre]"]').val(genres)
-  $('input[name="movie[runtime]"]').val(response.runtime + ' min')
+  $('input[name="movie[runtime]"]').val(response.runtime)
   $('input[name="movie[poster]"]').val('https://image.tmdb.org/t/p/w342' + response.poster_path)
 }
 

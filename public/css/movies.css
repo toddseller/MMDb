@@ -5,12 +5,10 @@ img
 
 .info
 {
-  /*margin-top: -8px;*/
   width: 100vw;
   margin-right: calc(-50vw + 50%);
   margin-left: calc(-50vw + 50%);
 
-  /*border-top: 1px solid rgba(51, 51, 51, .60);*/
   background: #fff;
 }
 
@@ -19,6 +17,7 @@ img
   margin-top: -8px;
 
   border-top: 1px solid rgba(51, 51, 51, .60);
+  border-bottom: 1px solid rgba(51, 51, 51, .60);
 }
 
 .info-wrapper
