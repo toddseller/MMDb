@@ -185,7 +185,7 @@ var showSearchBar = function () {
 
 var showYear = function () {
   $('#search-year').show()
-  $('#search-title').css('right', '81px')
+  $('#search-title').css('right', '70px')
   $('#search-btn').css('top', '-17px')
   $('#more').hide()
 }
