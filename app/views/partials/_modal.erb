@@ -18,34 +18,54 @@
         </ul>
       </div>
       <div class="col-lg-6">
-        <% if !movie.director.empty? %>
-          <h5>Director:</h5>
+          <h5>Actors:</h5>
           <ul>
-          <% movie.director.split(", ").each do |line| %>
-            <li><%= line %></li>
+            <% movie.actors.split(", ").each do |line| %>
+              <li><%= line %></li>
+            <% end %>
+          </ul>
+        </div>
+        <div class="col-lg-6">
+          <% if !movie.director.empty? %>
+            <% if movie.director.split(',').length > 1 %>
+              <h5>Directors:</h5>
+            <% else %>
+              <h5>Director:</h5>
+            <% end %>
+            <ul>
+            <% movie.director.split(", ").each do |line| %>
+              <li><%= line %></li>
+            <% end %>
+          </ul>
           <% end %>
-        </ul>
-        <% end %>
-        <% if !movie.writer.empty? %>
-          <h5>Writers:</h5>
-          <ul>
-          <% movie.writer.split(", ").each do |line| %>
-            <li><%= line %></li>
+          <% if !movie.writer.empty? %>
+            <% if movie.writer.split(',').length > 1 %>
+              <h5>Writers:</h5>
+            <% else %>
+              <h5>Writer:</h5>
+            <% end %>
+            <ul>
+            <% movie.writer.split(", ").each do |line| %>
+              <li><%= line %></li>
+            <% end %>
+          </ul>
           <% end %>
-        </ul>
-        <% end %>
-        <% if !movie.producer.empty? %>
-          <h5>Producers:</h5>
-          <ul>
-          <% movie.producer.split(", ").each do |line| %>
-            <li><%= line %></li>
+          <% if !movie.producer.empty? %>
+            <% if movie.producer.split(',').length > 1 %>
+              <h5>Producers:</h5>
+            <% else %>
+              <h5>Producer:</h5>
+            <% end %>
+            <ul>
+            <% movie.producer.split(", ").each do |line| %>
+              <li><%= line %></li>
+            <% end %>
+          </ul>
           <% end %>
-        </ul>
-        <% end %>
-        <% if movie.writer.empty? || movie.producer.empty? %>
-          <p class="filler"></p>
-        <% end %>
-      </div>
+          <% if movie.writer.empty? || movie.producer.empty? %>
+            <p class="filler"></p>
+          <% end %>
+        </div>
       <div class="description-info">
           <h4>Information</h4>
         <div class="col-lg-2">
