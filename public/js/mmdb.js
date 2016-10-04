@@ -413,15 +413,14 @@ var deleteMovie = function (event) {
     type: 'DELETE',
     success: listMovie
   })
-  var test = function () {
+  var removePointerClass = function () {
     $('.pointer').removeClass('active').removeAttr('style')
-    $('.info').remove()
-    $('.truncate').show()
-    $('.lazy').removeClass('active')
   }
-  $('.info').slideUp(300, 'linear')
-  $('.pointer').fadeOut(250, 'linear')
-  setTimeout(test, 300)
+  $('.info').removeClass('active')
+  $('.truncate').show()
+  $('.lazy').removeClass('active')
+  $('.pointer').css('border-top', '#fff').css('border-left', '#fff')
+  setTimeout(removePointerClass, 100)
 }
 
 var getActors = function (response) {
