@@ -5,16 +5,28 @@ img
 
 .info
 {
+  overflow: hidden;
+
   width: 100vw;
+  max-height: 0;
+  margin-top: -16px;
   margin-right: calc(-50vw + 50%);
   margin-left: calc(-50vw + 50%);
+
+  transition: all .2s linear;
 
   background: #fff;
 }
 
 .info.active
 {
+  overflow: auto;
+
+  height: auto;
+  max-height: 700px;
   margin-top: -8px;
+
+  transition: all .3s linear;
 
   border-top: 1px solid rgba(51, 51, 51, .60);
   border-bottom: 1px solid rgba(51, 51, 51, .60);
@@ -28,13 +40,11 @@ img
 
 .pointer
 {
-  display: none;
+  height: 0;
 }
 
 .pointer.active
 {
-  display: block;
-
   width: 15px;
   height: 15px;
   margin: 0 auto;
