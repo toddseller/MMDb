@@ -316,7 +316,7 @@ var getMovieModal = function (event) {
       $('.truncate').show()
       $('.lazy').removeClass('active')
       $('.info').empty().removeAttr('style').removeClass('active')
-      $('.pointer').removeClass('active').removeAttr('style')
+      $('.pointer').removeClass('active')
       $(posterArt).toggleClass('active')
       $(title).hide()
       $(that).nextAll('div.info').first().toggleClass('active').append('<div class="info-wrapper">' + response + '</div>')
@@ -334,8 +334,8 @@ var getMovieModal = function (event) {
       $('#movie-list > .index-preview:last').after('<div class="info"></div>')
       $(posterArt).toggleClass('active')
       $(title).hide()
-      $(that).find('.pointer').toggleClass('active').hide().fadeIn(400)
-      $(that).nextAll('div.info').first().toggleClass('active').append('<div class="info-wrapper">' + response + '</div>').hide().slideDown(300)
+      $(that).find('.pointer').toggleClass('active')
+      $(that).nextAll('div.info').first().toggleClass('active').append('<div class="info-wrapper">' + response + '</div>')
       console.log(posterArt)
     }
   })
@@ -343,15 +343,14 @@ var getMovieModal = function (event) {
 
 var closeInfo = function (event) {
   event.preventDefault()
-  var test = function () {
+  var removePointerClass = function () {
     $('.pointer').removeClass('active').removeAttr('style')
-    $('.info').remove()
-    $('.truncate').show()
-    $('.lazy').removeClass('active')
   }
-  $('.info').slideUp(300, 'linear')
-  $('.pointer').fadeOut(250, 'linear')
-  setTimeout(test, 300)
+  $('.info').removeClass('active')
+  $('.truncate').show()
+  $('.lazy').removeClass('active')
+  $('.pointer').css('border-top', '#fff').css('border-left', '#fff')
+  setTimeout(removePointerClass, 100)
 }
 
 var activateModal = function (event) {
