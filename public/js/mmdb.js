@@ -32,6 +32,7 @@ var filterMovies = function () {
   var filter = $(this).val()
   var filterExp = new RegExp(filter, 'i')
   var movies = $('#movie-list > div')
+  $('.info').remove()
   $.each(movies, function () {
     if ($(this).text().search(filterExp) < 0) {
       $(this).hide()
