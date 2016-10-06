@@ -29,6 +29,7 @@
 .info-wrapper .modal-title
 {
   font-size: 1.75em;
+
   margin-bottom: 10px;
 }
 
@@ -145,11 +146,6 @@
   border-bottom: 1px solid #eaeaea;
 }
 
-/*.description-details
-{
-  margin-top: 15px !important;
-}*/
-
 .description-details h5
 {
   font-size: 1.1em;
@@ -157,7 +153,6 @@
 
 .description-poster
 {
-/*  margin-top: 30px !important;*/
   margin-bottom: 30px;
 }
 
@@ -166,6 +161,7 @@
   width: 300px;
   height: auto;
 
+  border: solid 1px #e9e9e9;
   border-radius: 6px;
 }
 
