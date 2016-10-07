@@ -260,6 +260,73 @@ li
   list-style: none;
 }
 
+.spacing
+{
+  margin-right: 20px;
+}
+
+.rating
+{
+  position: relative;
+  top: -40px;
+  right: 50px;
+}
+.rating:not(:checked) > input
+{
+  position: absolute;
+
+  clip: rect(0,0,0,0);
+}
+
+.rating:not(:checked) > label
+{
+  font-size: 18px;
+  line-height: 1.2;
+
+  float: right;
+  overflow: hidden;
+
+  width: 1em;
+
+  cursor: pointer;
+  white-space: nowrap;
+
+  color: #e4e4e4;
+}
+
+.rating:not(:checked) > label:before
+{
+  font-family:'Glyphicons Halflings';
+  content: "\e006";
+}
+
+.rating > input:checked ~ label
+{
+  color: gold;
+}
+
+.rating:not(:checked) > label:hover,
+.rating:not(:checked) > label:hover ~ label
+{
+  color: #ff0000;
+}
+
+.rating > input:checked + label:hover,
+.rating > input:checked + label:hover ~ label,
+.rating > input:checked ~ label:hover,
+.rating > input:checked ~ label:hover ~ label,
+.rating > label:hover ~ input:checked ~ label
+{
+  color: #ff0000;
+}
+
+.rating > label:active
+{
+  position: relative;
+  top: 2px;
+  left: 2px;
+}
+
 @media (max-width: 768px)
 {
   .modal-lg
