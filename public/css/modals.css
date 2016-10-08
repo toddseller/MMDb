@@ -57,6 +57,7 @@
 .description-info
 {
   margin-top: -5px;
+  position: relative;
 }
 
 #meta-data .description-poster img
@@ -252,9 +253,8 @@ li
 
 #ratings-container
 {
-  position: relative;
+  position: absolute;
   display: inline-block;
-  top: 7px;
 }
 
 .rating:not(:checked) > input
@@ -272,7 +272,7 @@ li
   float: right;
   overflow: hidden;
 
-  width: 1em;
+  width: .98em;
 
   cursor: pointer;
   white-space: nowrap;
@@ -341,9 +341,18 @@ li
   display: inline-block;
   width: 100%;
   left: 95px;
-  bottom: 7px;
   font-size: 9px;
   margin: 0;
+}
+
+.rated p
+{
+  bottom: 7px;
+}
+
+.rating p
+{
+  bottom: 12px;
 }
 
 @media (max-width: 768px)
