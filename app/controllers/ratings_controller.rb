@@ -4,7 +4,7 @@ post '/movies/:id/ratings' do
   rating = movie.ratings.find_by(user_id: user.id) || movie.ratings.create(user_id: user.id)
   rating.update(stars: params[:rating])
   if request.xhr?
-    erb :'/partials/_info', layout: false, locals: {movie: movie, user: user}
+    erb :'/partials/_ratings_form', layout: false, locals: {movie: movie}
   else
     redirect "/users/#{session[:user_id]}"
   end

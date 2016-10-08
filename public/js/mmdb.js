@@ -356,7 +356,7 @@ var ratingSubmit = function (event) {
   })
 
   request.done(function (response) {
-    $('#meta-data').html(response)
+    $('#ratings-container').html(response)
   })
 }
 
