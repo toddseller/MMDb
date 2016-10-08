@@ -54,6 +54,11 @@
   margin-top: 10px;
 }
 
+.description-info
+{
+  margin-top: -15px;
+}
+
 #meta-data .description-poster img
 {
   width: 340px;
@@ -170,7 +175,7 @@
   height: 35px;
 }
 
-.description-info h4
+/*.description-info h4
 {
   margin-bottom: 10px;
 }
@@ -188,7 +193,7 @@
 .description-info .col-lg-4
 {
   margin-left: -40px !important;
-}
+}*/
 
 .description-plot
 {
@@ -265,14 +270,20 @@ li
   margin-right: 20px;
 }
 
-.rating,
+#ratings-container
+{
+  position: relative;
+  display: inline-block;
+  top: 12px;
+}
+/*.rating,
 .rated
 {
   position: relative;
   top: -40px;
   right: 50px;
   float: right;
-}
+}*/
 
 .rating:not(:checked) > input
 {
@@ -323,12 +334,12 @@ li
   color: #ff0000;
 }
 
-.rating > label:active
+/*.rating > label:active
 {
   font-size: 19px;
   text-shadow: 1px 1px rgba(0,0,0,.25)
   color: gold;
-}
+}*/
 
 .rated > .glyphicon-rating
 {
@@ -362,7 +373,10 @@ li
 .rating p
 {
   position: absolute;
-  top: 20px;
+  display: inline-block;
+  width: 100%;
+  left: 95px;
+  bottom: 2px;
   font-size: 9px;
 }
 

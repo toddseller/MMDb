@@ -348,6 +348,10 @@ var ratingSubmit = function (event) {
 
   var rating = $(this).serialize()
   var route = $(this).parents('form').attr('action')
+  var label = $('label[for="' + $(this).attr('id') + '"]')
+
+  label.nextAll('label').andSelf().css('color', '#ff0000')
+  label.prevAll('label').css('color', '#e4e4e4')
 
   var request = $.ajax({
     url: route,
