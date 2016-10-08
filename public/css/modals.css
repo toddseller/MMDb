@@ -56,7 +56,7 @@
 
 .description-info
 {
-  margin-top: -15px;
+  margin-top: -5px;
 }
 
 #meta-data .description-poster img
@@ -175,26 +175,6 @@
   height: 35px;
 }
 
-/*.description-info h4
-{
-  margin-bottom: 10px;
-}
-
-.description-info p.first
-{
-  margin-top: 0 !important;
-}
-
-.description-info p
-{
-  margin-top: -10px !important;
-}
-
-.description-info .col-lg-4
-{
-  margin-left: -40px !important;
-}*/
-
 .description-plot
 {
   margin: 20px 0;
@@ -274,16 +254,8 @@ li
 {
   position: relative;
   display: inline-block;
-  top: 12px;
+  top: 7px;
 }
-/*.rating,
-.rated
-{
-  position: relative;
-  top: -40px;
-  right: 50px;
-  float: right;
-}*/
 
 .rating:not(:checked) > input
 {
@@ -334,13 +306,6 @@ li
   color: #ff0000;
 }
 
-/*.rating > label:active
-{
-  font-size: 19px;
-  text-shadow: 1px 1px rgba(0,0,0,.25)
-  color: gold;
-}*/
-
 .rated > .glyphicon-rating
 {
 
@@ -376,8 +341,9 @@ li
   display: inline-block;
   width: 100%;
   left: 95px;
-  bottom: 2px;
+  bottom: 7px;
   font-size: 9px;
+  padding: 0;
 }
 
 @media (max-width: 768px)
