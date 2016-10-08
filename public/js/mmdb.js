@@ -23,7 +23,7 @@ var dynamicListener = function () {
   $('#user-page').on('click', '.movie-edit', editMovie)
   $('#user-page').on('click', '#edit-button', submitUpdate)
   $('#user-page').on('click', '#delete-button', deleteMovie)
-  // $('#user-page').on('mouseover', '.rating', highlightStar)
+  $('#user-page').on('click', '.rating-input', ratingSubmit)
   $('#logIn').on('click', '#update-submit', userUpdateSubmit)
   $('#logIn').on('keyup', '#confirm', testPassword)
   $('#logIn').on('change', '#current', deactivateSubmit)
@@ -343,14 +343,22 @@ var getMovieModal = function (event) {
   })
 }
 
-var highlightStar = function () {
-  $(this).prevAll('rating').andSelf().removeClass('glyphicon-star-empty').addClass('glyphicon-star')
-  $(this).nextAll('rating').removeClass('glyphicon-star')
-}
+var ratingSubmit = function (event) {
+  event.preventDefault()
 
-// var unselectStar = function () {
-//   $(this).prevAll('rating').andSelf().removeClass('glyphicon-star').addClass('glyphicon-star-empty')
-// }
+  var rating = $(this).serialize()
+  var route = $(this).parents('form').attr('action')
+
+  var request = $.ajax({
+    url: route,
+    type: 'POST',
+    data: rating
+  })
+
+  request.done(function (response) {
+    $('#meta-data').html(response)
+  })
+}
 
 var closeInfo = function (event) {
   event.preventDefault()

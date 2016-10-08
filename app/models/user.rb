@@ -4,6 +4,7 @@ class User < ActiveRecord::Base
   validates :user_name, :email, uniqueness: true
 
   has_and_belongs_to_many :movies, counter_cache: true
+  has_many :ratings
 
   def self.movie_count
     self.all.sort_by { |user| user.movies.count }.reverse!

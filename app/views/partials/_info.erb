@@ -12,13 +12,11 @@
       </div>
       <div class="col-lg-8 description-details">
         <h2 class="modal-title"><%= movie.title %></h2>
-        <form action="" method="post" class="rating">
-            <input type="radio" id="star5" name="rating" value="5"><label for="star5" title="Rocks!">5 stars</label>
-            <input type="radio" id="star4" name="rating" value="4"><label for="star4" title="Pretty Good">4 stars</label>
-            <input type="radio" id="star3" name="rating" value="3"><label for="star3" title="Meh">3 stars</label>
-            <input type="radio" id="star2" name="rating" value="2"><label for="star2" title="Kinda Sucks">2 stars</label>
-            <input type="radio" id="star1" name="rating" value="1"><label for="star1" title="Sucks Big Time">1 stars</label>
-          </form>
+        <% if session[:user_id] %>
+          <%= erb :'partials/_ratings_form', locals: {movie: movie} %>
+        <% else %>
+          <%= erb :'partials/_ratings', locals: {movie: movie} %>
+        <% end %>
         <p>
           <span class="spacing"><%= movie.runtime %></span>
           <span class="spacing"><%= movie.year %></span>

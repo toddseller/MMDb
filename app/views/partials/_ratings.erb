@@ -1,0 +1,34 @@
+<div class="rated">
+  <% if movie.get_average == 5 %>
+    <span class="glyphicon-rating checked"></span>
+  <% else %>
+    <span class="glyphicon-rating"></span>
+  <% end %>
+  <% if movie.get_average == 4 %>
+    <span class="glyphicon-rating checked"></span>
+  <% else %>
+    <span class="glyphicon-rating"></span>
+  <% end %>
+  <% if movie.get_average == 3 %>
+    <span class="glyphicon-rating checked"></span>
+  <% else %>
+    <span class="glyphicon-rating"></span>
+  <% end %>
+  <% if movie.get_average == 2 %>
+    <span class="glyphicon-rating checked"></span>
+  <% else %>
+    <span class="glyphicon-rating"></span>
+  <% end %>
+  <% if movie.get_average == 1 %>
+    <span class="glyphicon-rating checked"></span>
+  <% else %>
+    <span class="glyphicon-rating"></span>
+  <% end %>
+  <% if movie.ratings.count > 1 %>
+    <p>Based on <%= movie.ratings.count %> Ratings</p>
+  <% elsif movie.ratings.count == 1 %>
+    <p>Based on <%= movie.ratings.count %> Rating</p>
+  <% else %>
+    <p>Has Not Been Rated</p>
+  <% end %>
+</div>

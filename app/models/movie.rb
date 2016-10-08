@@ -3,6 +3,7 @@ class Movie < ActiveRecord::Base
   validates :title, presence: true
 
   has_and_belongs_to_many :users
+  has_many :ratings
 
   before_create :create_sort_name
   before_create :create_duration
@@ -13,6 +14,11 @@ class Movie < ActiveRecord::Base
 
   def self.user_count
     self.all.sort_by { |movie| [movie.users.count, movie[:sort_name]] }.reverse![0, 6]
+  end
+
+  def get_average
+    sum = self.ratings.map(&:stars).inject(:+)
+    average = self.ratings.length > 0 ? (sum.to_f / self.ratings.count).round : 0
   end
 
   private

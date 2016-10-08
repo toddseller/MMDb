@@ -265,12 +265,15 @@ li
   margin-right: 20px;
 }
 
-.rating
+.rating,
+.rated
 {
   position: relative;
   top: -40px;
   right: 50px;
+  float: right;
 }
+
 .rating:not(:checked) > input
 {
   position: absolute;
@@ -325,6 +328,42 @@ li
   font-size: 19px;
   text-shadow: 1px 1px rgba(0,0,0,.25)
   color: gold;
+}
+
+.rated > .glyphicon-rating
+{
+
+  font-size: 18px;
+  line-height: 1.2;
+
+  float: right;
+  overflow: hidden;
+
+  width: 1em;
+
+  white-space: nowrap;
+
+  color: #e4e4e4;
+}
+
+.rated > span:before
+{
+  font-family:'Glyphicons Halflings';
+  content: "\e006";
+}
+
+.rated > .glyphicon-rating.checked,
+.rated > .glyphicon-rating.checked ~ .glyphicon-rating
+{
+  color: gold;
+}
+
+.rated p,
+.rating p
+{
+  position: absolute;
+  top: 20px;
+  font-size: 9px;
 }
 
 @media (max-width: 768px)

@@ -1,0 +1,34 @@
+<form action=<%="/movies/#{movie.id}/ratings"%> method="post" class="rating">
+  <% if movie.get_average == 5 %>
+    <input type="radio" id="star5" class="rating-input" name="rating" value="5" checked><label for="star5">5 stars</label>
+  <% else %>
+    <input type="radio" id="star5" class="rating-input" name="rating" value="5"><label for="star5">5 stars</label>
+  <% end %>
+  <% if movie.get_average == 4 %>
+    <input type="radio" id="star4" class="rating-input" name="rating" value="4" checked><label for="star4">4 stars</label>
+  <% else %>
+    <input type="radio" id="star4" class="rating-input" name="rating" value="4"><label for="star4">4 stars</label>
+  <% end %>
+  <% if movie.get_average == 3 %>
+    <input type="radio" id="star3" class="rating-input" name="rating" value="3" checked><label for="star3">3 stars</label>
+  <% else %>
+    <input type="radio" id="star3" class="rating-input" name="rating" value="3"><label for="star3">3 stars</label>
+  <% end %>
+  <% if movie.get_average == 2 %>
+    <input type="radio" id="star2" class="rating-input" name="rating" value="2" checked><label for="star2">2 stars</label>
+  <% else %>
+    <input type="radio" id="star2" class="rating-input" name="rating" value="2"><label for="star2">2 stars</label>
+  <% end %>
+  <% if movie.get_average == 1 %>
+    <input type="radio" id="star1" class="rating-input" name="rating" value="1" checked><label for="star1">1 stars</label>
+  <% else %>
+    <input type="radio" id="star1" class="rating-input" name="rating" value="1"><label for="star1">1 stars</label>
+  <% end %>
+  <% if movie.ratings.count > 1 %>
+    <p>Based on <%= movie.ratings.count %> Ratings</p>
+  <% elsif movie.ratings.count == 1 %>
+    <p>Based on <%= movie.ratings.count %> Rating</p>
+  <% else %>
+    <p>Has Not Been Rated</p>
+  <% end %>
+</form>
