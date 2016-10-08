@@ -23,6 +23,7 @@ var dynamicListener = function () {
   $('#user-page').on('click', '.movie-edit', editMovie)
   $('#user-page').on('click', '#edit-button', submitUpdate)
   $('#user-page').on('click', '#delete-button', deleteMovie)
+  $('#user-page').on('click', '.rating-input', ratingSubmit)
   $('#logIn').on('click', '#update-submit', userUpdateSubmit)
   $('#logIn').on('keyup', '#confirm', testPassword)
   $('#logIn').on('change', '#current', deactivateSubmit)
@@ -339,6 +340,23 @@ var getMovieModal = function (event) {
       $(that).nextAll('div.info').first().toggleClass('active').append('<div class="info-wrapper">' + response + '</div>')
       console.log(posterArt)
     }
+  })
+}
+
+var ratingSubmit = function (event) {
+  event.preventDefault()
+
+  var rating = $(this).serialize()
+  var route = $(this).parents('form').attr('action')
+
+  var request = $.ajax({
+    url: route,
+    type: 'POST',
+    data: rating
+  })
+
+  request.done(function (response) {
+    $('#meta-data').html(response)
   })
 }
 

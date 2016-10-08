@@ -12,7 +12,17 @@
       </div>
       <div class="col-lg-8 description-details">
         <h2 class="modal-title"><%= movie.title %></h2>
-        <p><%= movie.runtime %>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<%= movie.year %>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<%= movie.genre %>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span id="description-rating"><%= movie.rating %></span></p>
+        <% if session[:user_id] %>
+          <%= erb :'partials/_ratings_form', locals: {movie: movie} %>
+        <% else %>
+          <%= erb :'partials/_ratings', locals: {movie: movie} %>
+        <% end %>
+        <p>
+          <span class="spacing"><%= movie.runtime %></span>
+          <span class="spacing"><%= movie.year %></span>
+          <span class="spacing"><%= movie.genre %></span>
+          <span class="spacing" id="description-rating"><%= movie.rating %></span>
+        </p>
         <p class="description-plot"><%= movie.plot %></p>
         <h4>Cast and Crew</h4>
         <hr/>
