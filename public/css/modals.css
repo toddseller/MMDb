@@ -56,7 +56,6 @@
 
 .description-info
 {
-  margin-top: -5px;
   position: relative;
 }
 
@@ -254,6 +253,7 @@ li
 #ratings-container
 {
   position: absolute;
+
   display: inline-block;
 }
 
@@ -282,8 +282,9 @@ li
 
 .rating:not(:checked) > label:before
 {
-  font-family:'Glyphicons Halflings';
-  content: "\e006";
+  font-family: 'Glyphicons Halflings';
+
+  content: '\e006';
 }
 
 .rating > input:checked ~ label
@@ -294,7 +295,7 @@ li
 .rating:not(:checked) > label:hover,
 .rating:not(:checked) > label:hover ~ label
 {
-  color: #ff0000;
+  color: #f00;
 }
 
 .rating > input:checked + label:hover,
@@ -303,12 +304,11 @@ li
 .rating > input:checked ~ label:hover ~ label,
 .rating > label:hover ~ input:checked ~ label
 {
-  color: #ff0000;
+  color: #f00;
 }
 
 .rated > .glyphicon-rating
 {
-
   font-size: 18px;
   line-height: 1.2;
 
@@ -324,8 +324,9 @@ li
 
 .rated > span:before
 {
-  font-family:'Glyphicons Halflings';
-  content: "\e006";
+  font-family: 'Glyphicons Halflings';
+
+  content: '\e006';
 }
 
 .rated > .glyphicon-rating.checked,
@@ -337,11 +338,14 @@ li
 .rated p,
 .rating p
 {
-  position: absolute;
-  display: inline-block;
-  width: 100%;
-  left: 95px;
   font-size: 9px;
+
+  position: absolute;
+  left: 95px;
+
+  display: inline-block;
+
+  width: 100%;
   margin: 0;
 }
 
