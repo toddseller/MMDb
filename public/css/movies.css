@@ -188,12 +188,15 @@ img
 
 .index-preview img.active
 {
+  position: relative;
+  z-index: 2;
+
   width: 194px;
   height: 291px;
   margin-top: 15px;
   margin-left: -10px;
 
-  box-shadow: 0 15px 15px #909090;
+  box-shadow: 0 15px 25px #808080;
 }
 
 .top-preview img
