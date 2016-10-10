@@ -89,7 +89,7 @@ img
 #search-boxes
 {
   position: fixed;
-  z-index: 1;
+  z-index: 3;
   top: 50px;
 
   width: 100vw;
