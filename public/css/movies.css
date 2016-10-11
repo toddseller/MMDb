@@ -51,6 +51,7 @@ img
   margin-top: 15px;
 
   transform: rotate(45deg);
+  transition-delay: .15s;
 
   border-top: 1px solid #333;
   border-right: 1px solid #fff;
@@ -201,6 +202,11 @@ img
   transition: all .3s ease-in-out;
 
   box-shadow: 0 15px 25px #4f4f4f;
+}
+
+.notransition
+{
+  transition: none !important;
 }
 
 .top-preview img
