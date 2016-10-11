@@ -315,7 +315,7 @@ var getMovieModal = function (event) {
   })
   request.done(function (response) {
     if ($('#movie-list > div').hasClass('info')) {
-      $('.truncate').show()
+      $('.truncate').fadeIn(400, 'linear')
       $('.lazy').removeClass('active').removeClass('notransition')
       $('.info').empty().removeAttr('style').removeClass('active')
       $('.pointer').removeClass('notransition').removeClass('active')
@@ -371,7 +371,7 @@ var closeInfo = function (event) {
   }
   $('.pointer').removeClass('notransition').removeClass('active').removeAttr('style')
   $('.info').removeClass('active')
-  $('.truncate').show()
+  $('.truncate').fadeIn(400, 'linear')
   $('.lazy').removeClass('notransition').removeClass('active')
   setTimeout(removeInfoClass, 1000)
 }
