@@ -316,13 +316,13 @@ var getMovieModal = function (event) {
   request.done(function (response) {
     if ($('#movie-list > div').hasClass('info')) {
       $('.truncate').show()
-      $('.lazy').removeClass('active')
+      $('.lazy').removeClass('active').removeClass('notransition')
       $('.info').empty().removeAttr('style').removeClass('active')
-      $('.pointer').removeClass('active')
-      $(posterArt).toggleClass('active')
+      $('.pointer').removeClass('notransition').removeClass('active')
+      $(posterArt).toggleClass('active').addClass('notransition')
       $(title).hide()
       $(that).nextAll('div.info').first().toggleClass('active').append('<div class="info-wrapper">' + response + '</div>')
-      $(that).find('.pointer').addClass('active')
+      $(that).find('.pointer').addClass('notransition').addClass('active')
     } else {
       var filteredList = $('#movie-list > div').filter('.index-preview:visible')
       $.each(filteredList, function (i) {
@@ -366,14 +366,14 @@ var ratingSubmit = function (event) {
 
 var closeInfo = function (event) {
   event.preventDefault()
-  var removePointerClass = function () {
-    $('.pointer').removeClass('active').removeAttr('style')
+  var removeInfoClass = function () {
+    $('.info').remove()
   }
+  $('.pointer').removeClass('notransition').removeClass('active').removeAttr('style')
   $('.info').removeClass('active')
   $('.truncate').show()
-  $('.lazy').removeClass('active')
-  $('.pointer').css('border-top', '#fff').css('border-left', '#fff')
-  setTimeout(removePointerClass, 100)
+  $('.lazy').removeClass('notransition').removeClass('active')
+  setTimeout(removeInfoClass, 1000)
 }
 
 var activateModal = function (event) {
