@@ -350,8 +350,9 @@ var ratingSubmit = function (event) {
   var route = $(this).parents('form').attr('action')
   var label = $('label[for="' + $(this).attr('id') + '"]')
 
-  label.nextAll('label').andSelf().css('color', '#ff0000')
-  label.prevAll('label').css('color', '#e4e4e4')
+  label.nextAll('label').andSelf().css('color', '#ff0000').css('font-size', '19px')
+  label.prevAll('label').css('color', '#e4e4e4').css('font-size', '19px')
+  $('.rating>p').css('bottom', '13px')
 
   var request = $.ajax({
     url: route,
