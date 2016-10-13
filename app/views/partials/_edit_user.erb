@@ -25,10 +25,10 @@
       </div>
       <div class="form-group col-sm-12">
         <label class="radio-inline">
-          <input type="radio" name="theme" value="default" <% if user.theme == 'default' %> checked <% end %>> Default
+          <input type="radio" name="theme" value="default" <% if session[:theme] == 'default' %> checked <% end %>> Default
         </label>
         <label class="radio-inline">
-          <input type="radio" name="theme" value="dark" <% if user.theme == 'dark' %> checked <% end %>> Dark
+          <input type="radio" name="theme" value="dark" <% if session[:theme] == 'dark' %> checked <% end %>> Dark
         </label>
       </div>
       <div id="current" class="form-group col-sm-12">
