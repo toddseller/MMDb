@@ -92,7 +92,20 @@
 
 .movie-content
 {
-  background: #888;
+  background: #222;
+}
+
+.movie-content .close
+{
+  opacity: 1;
+  color: #d9534f;
+  text-shadow: none;
+}
+
+.movie-content .close:hover,
+.movie-content .close:focus
+{
+  color: #f00;
 }
 
 .glyphicon-option-vertical
