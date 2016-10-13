@@ -1,0 +1,388 @@
+.modal-header
+{
+  border: none;
+}
+
+#logIn .modal-content
+{
+  color: #333;
+}
+
+#logIn .modal-header
+{
+  text-align: center;
+
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
+  background-color: #d9534f;
+}
+
+#logIn .modal-title
+{
+  font-size: 2.5em;
+  font-weight: bold;
+
+  color: #fff;
+}
+
+#meta-data
+{
+  width: 1170px;
+  margin: 0 auto;
+}
+
+#meta-data .close
+{
+  color: #d9534f;
+  opacity: 1;
+  text-shadow: none;
+}
+
+#meta-data .close:hover,
+#meta-data .close:focus
+{
+  color: #ff0000;
+}
+
+.info-wrapper .modal-title
+{
+  font-size: 1.75em;
+
+  margin-bottom: 10px;
+}
+
+.info-wrapper .modal-header,
+.info-wrapper .modal-body
+{
+  padding: 0;
+}
+
+.info-wrapper .modal-header
+{
+  padding-top: 15px;
+}
+
+#meta-data h4
+{
+  margin-bottom: 0;
+}
+
+#meta-data hr
+{
+  margin-top: 10px;
+}
+
+.description-info
+{
+  position: relative;
+}
+
+#meta-data .description-poster img
+{
+  width: 340px;
+  height: auto;
+
+  border-radius: 6px;
+}
+
+.modal-body .col-lg-3
+{
+  padding-left: 0;
+}
+
+.movie-content
+{
+  background: #888;
+}
+
+.glyphicon-option-vertical
+{
+  font-size: 21px;
+
+  float: right;
+
+  margin-top: -2px;
+
+  color: #d9534f;
+}
+.glyphicon-option-vertical:hover,
+.glyphicon-option-vertical:focus
+{
+  text-decoration: none;
+
+  color: #ff0000;
+}
+
+.registration
+{
+  width: 450px;
+  height: 600px;
+  margin-top: 25px;
+  padding: 25px;
+
+  color: #fff;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  border-radius: 5px;
+  background-color: #d9534f;
+}
+
+.errors
+{
+  color: #000;
+}
+
+.login-errors
+{
+  display: none;
+
+  color: red;
+}
+
+.modal-lg
+{
+  width: 1050px;
+}
+
+.modal-header .description
+{
+  border-bottom: none;
+}
+
+#description-rating
+{
+  font-family: 'Times New Roman', serif;
+  font-weight: bolder;
+
+  padding: 1px 3px;
+
+  border: 2px solid #f3f3f3;
+  border-radius: 3px;
+}
+
+#description-year
+{
+  font-size: 1.25em;
+
+  padding-right: 5px;
+}
+
+.description-header
+{
+  border-bottom: 1px solid #eaeaea;
+}
+
+.description-details h5
+{
+  font-size: 1.1em;
+}
+
+.description-poster
+{
+  margin-bottom: 30px;
+}
+
+.description-poster img
+{
+  width: 300px;
+  height: auto;
+
+  border-radius: 6px;
+}
+
+.filler
+{
+  height: 35px;
+}
+
+.description-plot
+{
+  margin: 20px 0;
+}
+
+.edit-movie
+{
+  margin-top: 30px;
+}
+
+.edit-poster img
+{
+  width: 150px;
+  height: auto;
+  margin-bottom: 15px;
+}
+
+#delete-button
+{
+  margin-right: 15px;
+  margin-bottom: 30px;
+}
+
+.confirmation
+{
+  position: relative;
+}
+
+.confirmation > span
+{
+  position: absolute;
+  top: 35px;
+  right: 10px;
+
+  display: none;
+
+  color: green;
+}
+
+.confirmation > span.match
+{
+  position: absolute;
+  top: 35px;
+  right: 10px;
+
+  display: block;
+
+  color: green;
+}
+
+#no-match
+{
+  color: #f00;
+}
+
+#no-match2
+{
+  color: #fff;
+}
+
+ul
+{
+  padding-left: 0;
+}
+
+li
+{
+  list-style: none;
+}
+
+.spacing
+{
+  margin-right: 20px;
+}
+
+#ratings-container
+{
+  position: absolute;
+
+  display: inline-block;
+}
+
+.rating:not(:checked) > input
+{
+  position: absolute;
+
+  clip: rect(0,0,0,0);
+}
+
+.rating:not(:checked) > label
+{
+  font-size: 18px;
+  line-height: 1.2;
+
+  float: right;
+  overflow: hidden;
+
+  width: .98em;
+
+  cursor: pointer;
+  white-space: nowrap;
+
+  color: #e4e4e4;
+}
+
+.rating:not(:checked) > label:before
+{
+  font-family: 'Glyphicons Halflings';
+
+  content: '\e006';
+}
+
+.rating > input:checked ~ label
+{
+  color: gold;
+}
+
+.rating:not(:checked) > label:hover,
+.rating:not(:checked) > label:hover ~ label
+{
+  color: #f00;
+}
+
+.rating > input:checked + label:hover,
+.rating > input:checked + label:hover ~ label,
+.rating > input:checked ~ label:hover,
+.rating > input:checked ~ label:hover ~ label,
+.rating > label:hover ~ input:checked ~ label
+{
+  color: #f00;
+}
+
+.rated > .glyphicon-rating
+{
+  font-size: 18px;
+  line-height: 1.2;
+
+  float: right;
+  overflow: hidden;
+
+  width: 1em;
+
+  white-space: nowrap;
+
+  color: #e4e4e4;
+}
+
+.rated > span:before
+{
+  font-family: 'Glyphicons Halflings';
+
+  content: '\e006';
+}
+
+.rated > .glyphicon-rating.checked,
+.rated > .glyphicon-rating.checked ~ .glyphicon-rating
+{
+  color: gold;
+}
+
+.rated p,
+.rating p
+{
+  font-size: 9px;
+
+  position: absolute;
+  left: 95px;
+
+  display: inline-block;
+
+  width: 200px;
+  margin: 0;
+}
+
+.rated p
+{
+  bottom: 7px;
+}
+
+.rating p
+{
+  bottom: 12px;
+}
+
+@media (max-width: 768px)
+{
+  .modal-lg
+  {
+    max-width: 400px;
+  }
+}
