@@ -33,15 +33,15 @@
 
 #meta-data .close
 {
-  color: #d9534f;
   opacity: 1;
+  color: #d9534f;
   text-shadow: none;
 }
 
 #meta-data .close:hover,
 #meta-data .close:focus
 {
-  color: #ff0000;
+  color: #f00;
 }
 
 .info-wrapper .modal-title
@@ -103,6 +103,7 @@
 
   margin-top: -2px;
 
+  opacity: 1;
   color: #d9534f;
 }
 .glyphicon-option-vertical:hover,
@@ -110,7 +111,7 @@
 {
   text-decoration: none;
 
-  color: #ff0000;
+  color: #f00;
 }
 
 .registration
