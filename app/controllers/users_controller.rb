@@ -38,14 +38,16 @@ end
 put '/users/:id' do
   @user = User.find(params[:id])
   if params[:current] == ''
-    @user.update(first_name: params[:first_name], last_name: params[:last_name], user_name: params[:user_name], email: params[:email], password_hash: @user.password_hash)
+    @user.update(first_name: params[:first_name], last_name: params[:last_name], user_name: params[:user_name], email: params[:email], theme: params[:theme], password_hash: @user.password_hash)
       session[:name] = @user.full_name
-    json status: "true", name: @user.full_name
+      session[:theme] = @user.theme
+    json status: "true", name: @user.full_name, theme: @user.theme
   else
     if @user.authenticate(params[:current])
-      @user.update(first_name: params[:first_name], last_name: params[:last_name], user_name: params[:user_name], email: params[:email], password: params[:password])
+      @user.update(first_name: params[:first_name], last_name: params[:last_name], user_name: params[:user_name], email: params[:email], theme: params[:theme], password: params[:password])
       session[:name] = @user.full_name
-      json status: "true", name: @user.full_name
+      session[:theme] = @user.theme
+      json status: "true", name: @user.full_name, theme: @user.theme
     else
       json status: "false"
     end

@@ -139,6 +139,7 @@ var userUpdated = function (response) {
   if (response.status === 'true') {
     $('#logIn').modal('toggle')
     $('.navbar-text').text('Signed in as ' + response.name)
+    $('link[rel=stylesheet]').attr('href', '/css/' + response.theme + '.css')
   } else {
     $('p.login-errors').show()
     $('form input[name="current"]').val('').focus()

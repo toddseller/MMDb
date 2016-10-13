@@ -3,6 +3,8 @@ post '/sessions' do
   if user && user.authenticate(params[:password])
     session[:user_id] = user.id
     session[:name] = user.full_name
+    p '*' * 30
+    p session[:theme] = user.theme
     if request.xhr?
       json status: "true", user_id: user.id
     else
@@ -18,5 +20,6 @@ end
 post '/sessions/:id' do
   session[:user_id] = nil
   session[:name] = nil
+  session[:theme] = 'default'
   redirect '/'
 end
