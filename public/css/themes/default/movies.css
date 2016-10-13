@@ -144,12 +144,14 @@ img
 
 #dismiss .glyphicon
 {
-  color: #333;
+  opacity: .2;
+  color: #000;
 }
 
 #dismiss .glyphicon:hover
 {
-  color: #595959;
+  opacity: .5;
+  color: #000;
 }
 
 #create-movie textarea
