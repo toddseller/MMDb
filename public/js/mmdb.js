@@ -27,6 +27,7 @@ var dynamicListener = function () {
   $('#logIn').on('click', '#update-submit', userUpdateSubmit)
   $('#logIn').on('keyup', '#confirm', testPassword)
   $('#logIn').on('change', '#current', deactivateSubmit)
+  $('#logIn').on('click', '.theme', changeTheme)
 }
 
 var filterMovies = function () {
@@ -122,6 +123,11 @@ var checkPassword = function () {
   }, 1500)
 }
 
+var changeTheme = function () {
+  var theme = $(this).val()
+  $('head').append('<link rel="stylesheet" href="/css/' + theme + '.css" type="text/css" />')
+}
+
 var userUpdateSubmit = function (event) {
   event.preventDefault()
   var route = $(this).parents('form').attr('action')
@@ -139,7 +145,6 @@ var userUpdated = function (response) {
   if (response.status === 'true') {
     $('#logIn').modal('toggle')
     $('.navbar-text').text('Signed in as ' + response.name)
-    $('head').append('<link rel="stylesheet" href="/css/' + response.theme + '.css" type="text/css" />')
   } else {
     $('p.login-errors').show()
     $('form input[name="current"]').val('').focus()

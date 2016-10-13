@@ -83,8 +83,20 @@
   opacity: .2;
   color: #000;
 }
+
+#meta-data .close,
+.close
+{
+  opacity: .2;
+  color: #000;
+}
+
 .glyphicon-option-vertical:hover,
-.glyphicon-option-vertical:focus
+.glyphicon-option-vertical:focus,
+#meta-data .close:hover,
+#meta-data .close:focus,
+.close:hover,
+.close:focus
 {
   text-decoration: none;
 
