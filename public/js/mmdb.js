@@ -27,7 +27,7 @@ var dynamicListener = function () {
   $('#logIn').on('click', '#update-submit', userUpdateSubmit)
   $('#logIn').on('keyup', '#confirm', testPassword)
   $('#logIn').on('change', '#current', deactivateSubmit)
-  $('#logIn').on('click', '.theme', changeTheme)
+  $('#logIn').on('click', '#myonoffswitch', changeTheme)
 }
 
 var filterMovies = function () {
@@ -124,8 +124,11 @@ var checkPassword = function () {
 }
 
 var changeTheme = function () {
-  var theme = $(this).val()
-  $('head').append('<link rel="stylesheet" href="/css/' + theme + '.css" type="text/css" />')
+  if ($('#myonoffswitch').is(':checked')) {
+    $('head').append('<link rel="stylesheet" href="/css/dark.css" type="text/css" />')
+  } else {
+    $('head').append('<link rel="stylesheet" href="/css/default.css" type="text/css" />')
+  }
 }
 
 var userUpdateSubmit = function (event) {
