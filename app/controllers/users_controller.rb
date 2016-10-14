@@ -31,7 +31,7 @@ get '/users/:id' do
 end
 
 get '/users/:id/edit' do
-  p @user = User.find(params[:id])
+  @user = User.find(params[:id])
   erb :'/partials/_edit_user', layout: false, locals: {user: @user}
 end
 
