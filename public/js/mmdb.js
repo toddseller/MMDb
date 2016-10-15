@@ -67,7 +67,9 @@ var clearFilter = function () {
   $('#movie-list > div').removeAttr('style').show()
   $('#filter-input').trigger('reset')
   $('.info').remove()
-  $('.pointer').removeClass('active')
+  $('.pointer').removeClass('notransition').removeClass('active').removeAttr('style')
+  $('.truncate').fadeIn(400, 'linear')
+  $('.lazy').removeClass('notransition').removeClass('active')
 }
 
 var animateMenu = function (event) {
