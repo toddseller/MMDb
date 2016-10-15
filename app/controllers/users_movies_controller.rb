@@ -41,7 +41,7 @@ put '/users/:user_id/movies/:id' do
     @my_movies = @user.movies.sorted_list
     page = erb :'/partials/_info', locals: {movie: @movie, user: @user}, layout: false
     list = erb :'/partials/_movie_list', locals: {movie: @my_movies, user: @user}, layout: false
-    json page: page, list: list
+    json page: page, list: list, id: @movie.id
   else
     erb :'/users/show'
   end
