@@ -35,17 +35,28 @@ var filterMovies = function () {
   var filterExp = new RegExp(filter, 'i')
   var movies = $('#movie-list > div')
   $('.info').remove()
-  $.each(movies, function () {
-    if ($(this).text().search(filterExp) < 0) {
+
+  hideShow(movies, filterExp)
+
+  var filteredList = $('#movie-list > div').filter('.index-preview:visible')
+  filteredWithInfo(filteredList)
+}
+
+var hideShow = function (array, expression) {
+  return $.each(array, function () {
+    if ($(this).text().search(expression) < 0) {
       $(this).hide()
     } else {
       $(this).show()
     }
   })
-  var filteredList = $('#movie-list > div').filter('.index-preview:visible')
-  $.each(filteredList, function (i) {
+}
+
+var filteredWithInfo = function (array) {
+  return $.each(array, function (i) {
     if ((i + 1) % 6 === 0) {
       $(this).css('margin-right', '0')
+      $(this).after('<div class="info"></div>')
     } else {
       $(this).css('margin-right', '1.8em')
     }
@@ -313,7 +324,7 @@ var closePreview = function (event) {
 
 var getMovieModal = function (event) {
   event.preventDefault()
-  console.log($(this))
+
   var user = $(this).parent().attr('id')
   var movieId = $(this).attr('id')
   var route = '/users/' + user + '/movies/' + movieId
@@ -335,14 +346,7 @@ var getMovieModal = function (event) {
       $(that).find('.pointer').addClass('notransition').addClass('active')
     } else {
       var filteredList = $('#movie-list > div').filter('.index-preview:visible')
-      $.each(filteredList, function (i) {
-        if ((i + 1) % 6 === 0) {
-          $(this).css('margin-right', '0')
-          $(this).after('<div class="info"></div>')
-        } else {
-          $(this).css('margin-right', '1.8em')
-        }
-      })
+      filteredWithInfo(filteredList)
       $('#movie-list > .index-preview:last').after('<div class="info"></div>')
       $(posterArt).toggleClass('active')
       $(title).hide()
@@ -418,10 +422,6 @@ var submitUpdate = function (event) {
     data: formData,
     success: displayUpdatedMovie
   })
-// $('.pointer').removeClass('notransition').removeClass('active').removeAttr('style')
-// $('.info').removeClass('active')
-// $('.truncate').fadeIn(400, 'linear')
-// $('.lazy').removeClass('notransition').removeClass('active')
 }
 
 var displayUpdatedMovie = function (response) {
@@ -432,28 +432,13 @@ var displayUpdatedMovie = function (response) {
   var that = $('#' + response.id).parent('div')
   var posterArt = $('#' + response.id).children('img')
   var title = $('#' + response.id).siblings('p')
-  console.log('response.id: ', response.id)
-  console.log('id: ', $('#' + response.id))
-  console.log('that: ', that)
-  console.log('posterArt: ', posterArt)
-  console.log('title: ', title)
-  $.each(movies, function () {
-    if ($(this).text().search(filterExp) < 0) {
-      $(this).hide()
-    } else {
-      $(this).show()
-    }
-  })
+
+  hideShow(movies, filterExp)
+
   var filteredList = $('#movie-list > div').filter('.index-preview:visible')
-  $.each(filteredList, function (i) {
-    if ((i + 1) % 6 === 0) {
-      $(this).css('margin-right', '0')
-      $(this).after('<div class="info"></div>')
-    } else {
-      $(this).css('margin-right', '1.8em')
-    }
-  })
+  filteredWithInfo(filteredList)
   $('#movie-list > .index-preview:last').after('<div class="info"></div>')
+
   $(posterArt).toggleClass('active').addClass('notransition')
   $(title).hide()
   $(that).find('.pointer').toggleClass('active').addClass('notransition')
