@@ -56,7 +56,9 @@ var clearFilter = function () {
   $('#movie-list > div').removeAttr('style').show()
   $('#filter-input').trigger('reset')
   $('.info').remove()
-  $('.pointer').removeClass('active')
+  $('.pointer').removeClass('notransition').removeClass('active').removeAttr('style')
+  $('.truncate').fadeIn(400, 'linear')
+  $('.lazy').removeClass('notransition').removeClass('active')
 }
 
 var animateMenu = function (event) {
@@ -418,10 +420,6 @@ var submitUpdate = function (event) {
     data: formData,
     success: displayUpdatedMovie
   })
-// $('.pointer').removeClass('notransition').removeClass('active').removeAttr('style')
-// $('.info').removeClass('active')
-// $('.truncate').fadeIn(400, 'linear')
-// $('.lazy').removeClass('notransition').removeClass('active')
 }
 
 var displayUpdatedMovie = function (response) {
