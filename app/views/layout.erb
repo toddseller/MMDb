@@ -32,7 +32,7 @@
       <div class="navbar-header">
         <a class="pull-left logo" href="<%="/users"%>"><img src="http://mmdb.online/imgs/logo.png" alt="MMDb logo"><img id="tmdb" src="/imgs/tmdb.svg" alt="The Movie Database logo"></a>
       </div>
-      <% if session[:user_id] %>
+      <% if current_user %>
         <div class="navbar-right">
           <p class="navbar-text"><%= "Signed in as #{session[:name]}" %></p>
           <a href="#" id="menu-toggle">
@@ -46,7 +46,7 @@
       <% end %>
     </div>
   </nav>
-  <% if session[:user_id] %>
+  <% if current_user %>
     <div id="drop-down">
       <ul>
         <a href="/users"><li><span class="glyphicon glyphicon-home"></span>Home</li></a>

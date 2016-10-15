@@ -31,12 +31,12 @@ get '/users/:id' do
 end
 
 get '/users/:id/edit' do
-  @user = User.find(params[:id])
+  @user = current_user
   erb :'/partials/_edit_user', layout: false, locals: {user: @user}
 end
 
 put '/users/:id' do
-  @user = User.find(params[:id])
+  @user = current_user
   if params[:current] == ''
     @user.update(first_name: params[:first_name], last_name: params[:last_name], user_name: params[:user_name], email: params[:email], theme: params[:theme], password_hash: @user.password_hash)
       session[:name] = @user.full_name

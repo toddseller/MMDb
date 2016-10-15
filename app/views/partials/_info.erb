@@ -1,7 +1,7 @@
 <div id="meta-data">
   <div class="modal-header">
     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-    <% if session[:user_id] == user.id %>
+    <% if user %>
       <a class="movie-edit" href=<%= "/users/#{user.id}/movies/#{movie.id}/edit" %>><span class="glyphicon glyphicon-option-vertical" aria-hidden="true"></span></a>
     <% end %>
   </div>
@@ -18,7 +18,7 @@
           <span class="spacing"><%= movie.genre %></span>
           <span class="spacing" id="description-rating"><%= movie.rating %></span>
           <div id="ratings-container">
-            <% if session[:user_id] %>
+            <% if current_user %>
               <%= erb :'partials/_ratings_form', locals: {movie: movie} %>
             <% else %>
               <%= erb :'partials/_ratings', locals: {movie: movie} %>

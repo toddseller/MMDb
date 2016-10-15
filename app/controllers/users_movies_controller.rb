@@ -1,6 +1,6 @@
 post '/users/:user_id/movies' do
-  @user = User.find(params[:user_id])
-  p movie = Movie.find_by("title = ? AND year = ?", params[:movie]['title'], params[:movie]['year']) || Movie.new(params[:movie])
+  @user = current_user
+  movie = Movie.find_by("title = ? AND year = ?", params[:movie]['title'], params[:movie]['year']) || Movie.new(params[:movie])
   if movie.save
     movie.users << @user if !movie.users.include?(@user)
     @my_movies = @user.movies.sorted_list
@@ -14,7 +14,7 @@ post '/users/:user_id/movies' do
 end
 
 get '/users/:user_id/movies/:id' do
-  user = User.find(params[:user_id])
+  user = current_user if current_user == User.find(params[:user_id])
   movie = Movie.find(params[:id])
   if request.xhr?
     page = erb :'/partials/_info', locals: {movie: movie, user: user}, layout: false
@@ -24,7 +24,7 @@ end
 
 get '/users/:user_id/movies/:id/edit' do
   @movie = Movie.find(params[:id])
-  @user = User.find(params[:user_id])
+  @user = current_user
   if request.xhr?
     page = erb :'/partials/_edit_movie', locals: {movie: @movie, user: @user}, layout: false
     json page
@@ -36,7 +36,7 @@ end
 put '/users/:user_id/movies/:id' do
   @movie = Movie.find(params[:id])
   @movie.update(params[:movie])
-  @user = User.find(params[:user_id])
+  @user = current_user
   if request.xhr?
     @my_movies = @user.movies.sorted_list
     page = erb :'/partials/_info', locals: {movie: @movie, user: @user}, layout: false
@@ -49,7 +49,7 @@ end
 
 delete '/users/:user_id/movies/:id' do
   @movie = Movie.find(params[:id])
-  @user = User.find(params[:user_id])
+  @user = current_user
   @movie.users.destroy(@user)
   if request.xhr?
     @my_movies = @user.movies.sorted_list
