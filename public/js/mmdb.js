@@ -293,7 +293,6 @@ var movieToDB = function (event) {
 
 var listMovie = function (response) {
   if (response.status === 'true') {
-    $('#movie-list').empty().append(response.page)
     $('#preview').slideUp(500, 'linear')
     $('#dismiss').hide()
     $('#add').show()
@@ -306,6 +305,15 @@ var listMovie = function (response) {
     $('#title').empty()
     $('#genre').empty()
     $('#year').empty()
+    $('#movie-list').empty().append(response.page)
+    var filter = $('#search-movie-title').val()
+    var filterExp = new RegExp(filter, 'i')
+    var movies = $('#movie-list > div')
+
+    hideShow(movies, filterExp)
+
+    var filteredList = $('#movie-list > div').filter('.index-preview:visible')
+    filteredWithInfo(filteredList)
   }
 }
 
@@ -440,7 +448,6 @@ var displayUpdatedMovie = function (response) {
 
   var filteredList = $('#movie-list > div').filter('.index-preview:visible')
   filteredWithInfo(filteredList)
-  $('#movie-list > .index-preview:last').after('<div class="info"></div>')
 
   $(posterArt).toggleClass('active').addClass('notransition')
   $(title).hide()
