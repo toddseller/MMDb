@@ -60,6 +60,7 @@ var filteredWithInfo = function (array) {
     } else {
       $(this).css('margin-right', '1.8em')
     }
+    $('#movie-list > .index-preview:last').after('<div class="info"></div>')
   })
 }
 
@@ -349,7 +350,7 @@ var getMovieModal = function (event) {
     } else {
       var filteredList = $('#movie-list > div').filter('.index-preview:visible')
       filteredWithInfo(filteredList)
-      $('#movie-list > .index-preview:last').after('<div class="info"></div>')
+
       $(posterArt).toggleClass('active')
       $(title).hide()
       $(that).find('.pointer').toggleClass('active')
