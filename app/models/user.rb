@@ -3,6 +3,8 @@ class User < ActiveRecord::Base
   validates :first_name, :last_name, :user_name, :email, :password_hash, presence: true
   validates :user_name, :email, uniqueness: true
 
+  before_save :sanitize_input
+
   has_and_belongs_to_many :movies, counter_cache: true
   has_many :ratings
 
@@ -29,5 +31,13 @@ class User < ActiveRecord::Base
 
   def sorted
     this.movies
+  end
+
+  private
+  def sanitize_input
+    self.first_name.gsub!(/(\s*\<.*\/.*\>)/, '')
+    self.last_name.gsub!(/(\s*\<.*\/.*\>)/, '')
+    self.user_name.gsub!(/(\s*\<.*\/.*\>)/, '')
+    self.email.gsub!(/(\s*\<.*\/.*\>)/, '')
   end
 end

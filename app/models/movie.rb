@@ -8,6 +8,7 @@ class Movie < ActiveRecord::Base
   before_create :create_sort_name
   before_create :create_duration
   before_save :create_search_name
+  before_save :sanitize_input
 
   scope :sorted_list, -> { order(:sort_name, :year) }
   scope :recently_added, -> { order(created_at: :desc) }
@@ -46,5 +47,20 @@ class Movie < ActiveRecord::Base
       else
         self.runtime = min.to_s + ' minutes'
       end
+    end
+
+    def sanitize_input
+      self.title.gsub!(/(\s*\<.*\/.*\>)/, '')
+      self.year.gsub!(/\s*\<.*\/.*\>/, '')
+      self.rating.gsub!(/\s*\<.*\/.*\>/, '')
+      self.plot.gsub!(/\s*\<.*\/.*\>/, '')
+      self.actors.gsub!(/\s*\<.*\/.*\>/, '')
+      self.director.gsub!(/\s*\<.*\/.*\>/, '')
+      self.writer.gsub!(/\s*\<.*\/.*\>/, '')
+      self.genre.gsub!(/\s*\<.*\/.*\>/, '')
+      self.producer.gsub!(/\s*\<.*\/.*\>/, '')
+      self.runtime.gsub!(/\s*\<.*\/.*\>/, '')
+      self.poster.gsub!(/\s*\<.*\/.*\>/, '')
+      self.sort_name.gsub!(/\s*\<.*\/.*\>/, '')
     end
 end
