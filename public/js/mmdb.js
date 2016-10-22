@@ -1,5 +1,4 @@
 var bindListeners = function () {
-  $('img.lazy').lazyload()
   $('#sign-in-form').on('submit', validate)
   $('.close').on('click', clearForm)
   $('.modal').on('shown.bs.modal', autoFocus)
@@ -172,6 +171,7 @@ var userUpdated = function (response) {
 
 var validate = function (event) {
   event.preventDefault()
+  console.log('In validate function')
   var formData = $('#sign-in-form :input').filter(checkValue).serialize()
   if (formData === '') {
     $('p.login-errors').show()
