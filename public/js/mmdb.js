@@ -63,16 +63,6 @@ var filteredWithInfo = function (array) {
   })
 }
 
-var filtered = function (array) {
-  return $.each(array, function (i) {
-    if ((i + 1) % 6 === 0) {
-      $(this).css('margin-right', '0')
-    } else {
-      $(this).css('margin-right', '1.8em')
-    }
-  })
-}
-
 var clearFilter = function () {
   $('#movie-list > div').removeAttr('style').show()
   $('#filter-input').trigger('reset')
@@ -352,11 +342,6 @@ var getMovieModal = function (event) {
   var that = $(this).parent('div')
   var posterArt = $(this).children('img')
   var title = $(this).siblings('p')
-  var itemsPerRow = 6
-  var index = $(that).index()
-  var col = (index % itemsPerRow) + 1
-  var endOfRow = $('.index-preview:visible').eq(index + itemsPerRow - col)
-  if (!endOfRow.length) endOfRow = $('.index-preview').last()
   var request = $.ajax({
     url: route
   })
@@ -371,14 +356,13 @@ var getMovieModal = function (event) {
       $(that).nextAll('div.info').first().toggleClass('active').append('<div class="info-wrapper">' + response + '</div>')
       $(that).find('.pointer').addClass('notransition').addClass('active')
     } else {
-      console.log('endOfRow: ', endOfRow)
       var filteredList = $('#movie-list > div').filter('.index-preview:visible')
-      filtered(filteredList)
-      endOfRow.after('<div class="info"></div>')
+      filteredWithInfo(filteredList)
+
       $(posterArt).toggleClass('active')
       $(title).hide()
       $(that).find('.pointer').toggleClass('active')
-      $(that).nextAll('div.info').toggleClass('active').append('<div class="info-wrapper">' + response + '</ditehparadox.comv>')
+      $(that).nextAll('div.info').first().toggleClass('active').append('<div class="info-wrapper">' + response + '</div>')
     }
   })
 }
@@ -407,12 +391,14 @@ var ratingSubmit = function (event) {
 
 var closeInfo = function (event) {
   event.preventDefault()
-
+  var removeInfoClass = function () {
+    $('.info').remove()
+  }
   $('.pointer').removeClass('notransition').removeClass('active').removeAttr('style')
   $('.info').removeClass('active')
   $('.truncate').fadeIn(400, 'linear')
   $('.lazy').removeClass('notransition').removeClass('active')
-  $('.info').remove()
+  setTimeout(removeInfoClass, 1000)
 }
 
 var activateModal = function (event) {
@@ -541,6 +527,30 @@ var getWriter = function (response) {
   var writer = response.reduce(function (acc, crew) {
     if (crew.job === 'Screenplay' || crew.job === 'Writer') {
       acc.push(crew.name)
+    }
+    return acc
+  }, [])
+  if (writer.length > 1) {
+    return writer.join(', ')
+  } else {
+    return writer.join('')
+  }
+}
+
+var getProducer = function (response) {
+  var producer = response.reduce(function (acc, crew) {
+    if (crew.job === 'Producer') {
+      acc.push(crew.name)
+    }
+    return acc
+  }, [])
+  if (producer.length > 1) {
+    return producer.join(', ')
+  } else {
+    return producer.join('')
+  }
+}
+  acc.push(crew.name)
     }
     return acc
   }, [])
