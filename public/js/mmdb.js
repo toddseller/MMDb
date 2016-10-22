@@ -550,27 +550,3 @@ var getProducer = function (response) {
     return producer.join('')
   }
 }
-  acc.push(crew.name)
-    }
-    return acc
-  }, [])
-  if (writer.length > 1) {
-    return writer.join(', ')
-  } else {
-    return writer.join('')
-  }
-}
-
-var getProducer = function (response) {
-  var producer = response.reduce(function (acc, crew) {
-    if (crew.job === 'Producer') {
-      acc.push(crew.name)
-    }
-    return acc
-  }, [])
-  if (producer.length > 1) {
-    return producer.join(', ')
-  } else {
-    return producer.join('')
-  }
-}
