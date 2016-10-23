@@ -13,7 +13,7 @@ img
   margin-right: calc(-50vw + 50%);
   margin-left: calc(-50vw + 50%);
 
-  transition: all .2s linear;
+  transition: all .3s linear;
 
   background: #fff;
 }
