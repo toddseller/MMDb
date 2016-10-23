@@ -321,9 +321,10 @@ var listMovie = function (response) {
     var movies = $('#movie-list > div')
 
     hideShow(movies, filterExp)
-
-    var filteredList = $('#movie-list > div').filter('.index-preview:visible')
-    filteredWithInfo(filteredList)
+    if ($('.index-preview:hidden').length !== 0) {
+      var filteredList = $('#movie-list > div').filter('.index-preview:visible')
+      filteredWithInfo(filteredList)
+    }
   }
 }
 
