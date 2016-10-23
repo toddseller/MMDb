@@ -63,6 +63,16 @@ var filteredWithInfo = function (array) {
   })
 }
 
+var filtered = function (array) {
+  return $.each(array, function (i) {
+    if ((i + 1) % 6 === 0) {
+      $(this).css('margin-right', '0')
+    } else {
+      $(this).css('margin-right', '1.8em')
+    }
+  })
+}
+
 var clearFilter = function () {
   $('#movie-list > div').removeAttr('style').show()
   $('#filter-input').trigger('reset')
@@ -342,27 +352,54 @@ var getMovieModal = function (event) {
   var that = $(this).parent('div')
   var posterArt = $(this).children('img')
   var title = $(this).siblings('p')
+  var index = $(that).index()
+  var itemsPerRow = 6
+  var col = (index % itemsPerRow) + 1
+  var endOfRow = $('.index-preview').eq(index + itemsPerRow - col)
+  if (!endOfRow.length) endOfRow = $('.index-preview').last()
   var request = $.ajax({
     url: route
   })
   request.done(function (response) {
-    if ($('#movie-list > div').hasClass('info')) {
-      $('.truncate').fadeIn(400, 'linear')
-      $('.lazy').removeClass('active').removeClass('notransition')
-      $('.info').empty().removeAttr('style').removeClass('active')
-      $('.pointer').removeClass('notransition').removeClass('active')
-      $(posterArt).toggleClass('active').addClass('notransition')
-      $(title).hide()
-      $(that).nextAll('div.info').first().toggleClass('active').append('<div class="info-wrapper">' + response + '</div>')
-      $(that).find('.pointer').addClass('notransition').addClass('active')
+    if ($('.index-preview:hidden').length === 0) {
+      if ($('#movie-list > div').hasClass('info')) {
+        $('.truncate').fadeIn(400, 'linear')
+        $('.lazy').removeClass('active').removeClass('notransition')
+        $('.info').remove()
+        $('.pointer').removeClass('notransition').removeClass('active')
+        $(posterArt).toggleClass('active').addClass('notransition')
+        $(title).hide()
+        endOfRow.after('<div class="info"></div>')
+        $(that).nextAll('div.info').toggleClass('active').append('<div class="info-wrapper">' + response + '</div>')
+        $(that).find('.pointer').addClass('notransition').addClass('active')
+      } else {
+        var filteredList = $('#movie-list > div').filter('.index-preview')
+        filtered(filteredList)
+        endOfRow.after('<div class="info"></div>')
+        $(posterArt).toggleClass('active')
+        $(title).hide()
+        $(that).find('.pointer').toggleClass('active')
+        $(that).nextAll('div.info').first().toggleClass('active').append('<div class="info-wrapper">' + response + '</div>')
+      }
     } else {
-      var filteredList = $('#movie-list > div').filter('.index-preview:visible')
-      filteredWithInfo(filteredList)
+      if ($('#movie-list > div').hasClass('info')) {
+        $('.truncate').fadeIn(400, 'linear')
+        $('.lazy').removeClass('active').removeClass('notransition')
+        $('.info').empty().removeAttr('style').removeClass('active')
+        $('.pointer').removeClass('notransition').removeClass('active')
+        $(posterArt).toggleClass('active').addClass('notransition')
+        $(title).hide()
+        $(that).nextAll('div.info').first().toggleClass('active').append('<div class="info-wrapper">' + response + '</div>')
+        $(that).find('.pointer').addClass('notransition').addClass('active')
+      } else {
+        var filteredList = $('#movie-list > div').filter('.index-preview:visible')
+        filteredWithInfo(filteredList)
 
-      $(posterArt).toggleClass('active')
-      $(title).hide()
-      $(that).find('.pointer').toggleClass('active')
-      $(that).nextAll('div.info').first().toggleClass('active').append('<div class="info-wrapper">' + response + '</div>')
+        $(posterArt).toggleClass('active')
+        $(title).hide()
+        $(that).find('.pointer').toggleClass('active')
+        $(that).nextAll('div.info').first().toggleClass('active').append('<div class="info-wrapper">' + response + '</div>')
+      }
     }
   })
 }
