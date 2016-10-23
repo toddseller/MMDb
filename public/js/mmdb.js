@@ -363,12 +363,7 @@ var getMovieModal = function (event) {
   request.done(function (response) {
     if ($('.index-preview:hidden').length === 0) {
       if ($('#movie-list > div').hasClass('info')) {
-        $('.truncate').fadeIn(400, 'linear')
-        $('.lazy').removeClass('active').removeClass('notransition')
-        $('.info').remove()
-        $('.pointer').removeClass('notransition').removeClass('active')
-        $(posterArt).toggleClass('active').addClass('notransition')
-        $(title).hide()
+        switchInfoDiv(posterArt, title)
         endOfRow.after('<div class="info"></div>')
         $(that).nextAll('div.info').toggleClass('active').append('<div class="info-wrapper">' + response + '</div>')
         $(that).find('.pointer').addClass('notransition').addClass('active')
@@ -383,12 +378,7 @@ var getMovieModal = function (event) {
       }
     } else {
       if ($('#movie-list > div').hasClass('info')) {
-        $('.truncate').fadeIn(400, 'linear')
-        $('.lazy').removeClass('active').removeClass('notransition')
-        $('.info').empty().removeAttr('style').removeClass('active')
-        $('.pointer').removeClass('notransition').removeClass('active')
-        $(posterArt).toggleClass('active').addClass('notransition')
-        $(title).hide()
+        switchInfoDiv(posterArt, title)
         $(that).nextAll('div.info').first().toggleClass('active').append('<div class="info-wrapper">' + response + '</div>')
         $(that).find('.pointer').addClass('notransition').addClass('active')
       } else {
@@ -402,6 +392,15 @@ var getMovieModal = function (event) {
       }
     }
   })
+}
+
+var switchInfoDiv = function (posterArt, title) {
+  $('.truncate').fadeIn(400, 'linear')
+  $('.lazy').removeClass('active').removeClass('notransition')
+  $('.info').remove()
+  $('.pointer').removeClass('notransition').removeClass('active')
+  posterArt.toggleClass('active').addClass('notransition')
+  title.hide()
 }
 
 var ratingSubmit = function (event) {
