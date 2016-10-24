@@ -481,18 +481,30 @@ var displayUpdatedMovie = function (response) {
   var that = $('#' + response.id).parent('div')
   var posterArt = $('#' + response.id).children('img')
   var title = $('#' + response.id).siblings('p')
+  var index = $(that).index()
+  var itemsPerRow = 6
+  var col = (index % itemsPerRow) + 1
+  var endOfRow = $('.index-preview').eq(index + itemsPerRow - col)
+  if (!endOfRow.length) endOfRow = $('.index-preview').last()
 
   hideShow(movies, filterExp)
 
   if ($('.index-preview:hidden').length !== 0) {
     var filteredList = $('#movie-list > div').filter('.index-preview:visible')
     filteredWithInfo(filteredList)
+    $(posterArt).toggleClass('active').addClass('notransition')
+    $(title).hide()
+    $(that).find('.pointer').toggleClass('active').addClass('notransition')
+    $(that).nextAll('div.info').first().toggleClass('active').addClass('notransition').append('<div class="info-wrapper">' + response.page + '</div>')
+  } else {
+    var filteredList = $('#movie-list > div').filter('.index-preview')
+    filtered(filteredList)
+    endOfRow.after('<div class="info"></div>')
+    $(posterArt).toggleClass('active').addClass('notransition')
+    $(title).hide()
+    $(that).find('.pointer').toggleClass('active').addClass('notransition')
+    $(that).nextAll('div.info').first().toggleClass('active').addClass('notransition').append('<div class="info-wrapper">' + response.page + '</div>')
   }
-
-  $(posterArt).toggleClass('active').addClass('notransition')
-  $(title).hide()
-  $(that).find('.pointer').toggleClass('active').addClass('notransition')
-  $(that).nextAll('div.info').first().toggleClass('active').addClass('notransition').append('<div class="info-wrapper">' + response.page + '</div>')
 }
 
 var deleteMovie = function (event) {
