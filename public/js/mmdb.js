@@ -484,8 +484,10 @@ var displayUpdatedMovie = function (response) {
 
   hideShow(movies, filterExp)
 
-  var filteredList = $('#movie-list > div').filter('.index-preview:visible')
-  filteredWithInfo(filteredList)
+  if ($('.index-preview:hidden').length !== 0) {
+    var filteredList = $('#movie-list > div').filter('.index-preview:visible')
+    filteredWithInfo(filteredList)
+  }
 
   $(posterArt).toggleClass('active').addClass('notransition')
   $(title).hide()
