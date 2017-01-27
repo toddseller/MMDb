@@ -20,6 +20,23 @@
   ga('send', 'pageview');
 
 </script>
+  <script type="application/javascript"> 
+window['optimizely'] = window['optimizely'] || []; 
+window['optimizely'].push({type: 'log', level: 'ALL'}); 
+window['optimizely'].push({type: 'activate'});
+
+window['optimizely'].push({ 
+type: "page", 
+pageName: "experiment_dimer_1" 
+});
+
+window["optimizely"].push({ 
+"type": "bucketVisitor", 
+"experimentId": "7983005246", 
+"variationId": "7994402500" 
+}); 
+</script>
+  <script src="//cdn.optimizely.com/js/7859721234.js"></script>
   <script>
     <!--
     function getStylesheet() {
@@ -105,7 +122,6 @@
       </div>
     </div>
   </div>
-  <script src="//cdn.optimizely.com/js/7859721234.js"></script>
   <script src="/js/mmdb.js"></script>
 </body>
 </html>
