@@ -33,6 +33,18 @@
     getStylesheet();
       -->
   </script>
+  <script>
+    window['optimizely'] = window['optimizely'] || [];
+    window['optimizely'].push({
+      type: "page",
+      pageName: "user3"
+    });
+    window["optimizely"].push({
+      "type": "bucketVisitor",
+      "experimentId": "8206701206",
+      "variationIndex": 1
+    });
+  </script>
   <script src="//cdn.optimizely.com/js/7859721234.js"></script>
   <noscript><link rel="stylesheet" href="/css/default.css"></noscript>
 
