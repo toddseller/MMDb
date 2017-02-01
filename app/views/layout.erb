@@ -33,6 +33,19 @@
     getStylesheet();
       -->
   </script>
+  <script>
+    window['optimizely'] = window['optimizely'] || [];
+    window['optimizely'].push({
+      type: "page",
+      pageName: "user3"
+    });
+    window["optimizely"].push({
+      "type": "bucketVisitor",
+      "experimentId": "8207313172",
+      "variationId": "8206701206"
+    });
+  </script>
+  <script src="//cdn.optimizely.com/js/7859721234.js"></script>
   <noscript><link rel="stylesheet" href="/css/default.css"></noscript>
 
   <title></title>
@@ -105,18 +118,5 @@
     </div>
   </div>
   <script src="/js/mmdb.js"></script>
-  <script>
-    window['optimizely'] = window['optimizely'] || [];
-    window['optimizely'].push({
-      type: "page",
-      pageName: "user3"
-    });
-    window["optimizely"].push({
-      "type": "bucketVisitor",
-      "experimentId": "8207313172",
-      "variationId": "8206701206"
-    });
-  </script>
-  <script src="//cdn.optimizely.com/js/7859721234.js"></script>
 </body>
 </html>
