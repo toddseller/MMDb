@@ -42,7 +42,6 @@ var filterMovies = function (event) {
     data: data
   })
   request.done(function (response) {
-    console.log(response)
     $('#movie-list').empty().append(response)
   })
 }
