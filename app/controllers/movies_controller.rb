@@ -21,11 +21,11 @@ get '/movies/filter' do
   p 'Here'
   title = params[:title].downcase
   user = User.find(params[:id])
-  movies = Movie.where('search_name LIKE ?', "%#{title}%")
-  movies = movies.sorted_list
-  @my_movies = []
-  movies.each { |movie| @my_movies << movie if movie.users.include?(user) }
-  p @my_movies
+  p '*' * 50
+  p movies = user.movies
+  p '-' * 50
+  p movies = movies.where('search_name LIKE ?', "%#{title}%")
+  @my_movies = movies.sorted_list
   if request.xhr?
     erb :"/partials/_movie_list", layout: false, locals: {user: user}
   end
