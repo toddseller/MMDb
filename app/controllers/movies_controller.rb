@@ -16,3 +16,13 @@ get '/movies/:id/show' do
     erb :"/partials/_preview_modal", layout: false, locals: {movie: movie}
   end
 end
+
+get '/movies/filter' do
+  p 'Here'
+  title = params[:title].downcase
+  movies = Movie.where('search_name LIKE ?', "%#{title}%")
+  @my_movies = movies.sorted_list
+  if request.xhr?
+    erb :"/partials/_movie_list", layout: false, locals: {user: current_user}
+  end
+end
