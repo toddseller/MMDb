@@ -32,12 +32,14 @@ var dynamicListener = function () {
 var filterMovies = function (event) {
   event.preventDefault()
 
-  var filter = $(this).serialize()
+  var filter = $(this).val()
+  var id = window.location.href.substr(window.location.href.lastIndexOf('/') + 1)
+  var data = $.param({title:filter, id:id})
   var route = '/movies/filter'
 
   var request = $.ajax({
     url: route,
-    data: filter
+    data: data
   })
   request.done(function (response) {
     console.log(response)
