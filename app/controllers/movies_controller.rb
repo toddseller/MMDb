@@ -3,9 +3,7 @@ get '/movies' do
   if params[:year] != ''
     movie = Movie.where("search_name LIKE ? AND year = ?","%#{title}%", params[:year])
   else
-    p '*' * 45
     movie = Movie.where("search_name LIKE ?", "%#{title}%")
-    movie.sorted_list.each {|movie| p movie.title}
   end
   if request.xhr?
     json movie: movie, query: params

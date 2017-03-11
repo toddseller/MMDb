@@ -79,8 +79,7 @@ var filtered = function (array) {
 
 var clearFilter = function () {
   var route = window.location.pathname
-  var request = $.get(route)
-  request.done(function (response) {
+  $.get(route).done(function (response) {
     $('#movie-list').empty().append(response.page)
   })
   $('#filter-input').trigger('reset')
