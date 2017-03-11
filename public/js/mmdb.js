@@ -78,7 +78,11 @@ var filtered = function (array) {
 }
 
 var clearFilter = function () {
-  $('#movie-list > div').removeAttr('style').show()
+  var route = window.location.pathname
+  var request = $.get(route)
+  request.done(function (response) {
+    $('#movie-list').empty().append(response.page)
+  })
   $('#filter-input').trigger('reset')
   $('.info').remove()
   $('.pointer').removeClass('notransition').removeClass('active').removeAttr('style')
