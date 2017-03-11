@@ -1,8 +1,8 @@
 <div id="search-boxes">
   <div id="search-wrapper">
-    <form id="filter-input">
+    <form id="filter-input" action="/movies/filter" method="GET">
       <div id="search-movies" class="pull-left col-sm-3 input-group">
-        <input id="search-movie-title" class="form-control" type="text" placeholder="Search Collection">
+        <input id="search-movie-title" class="form-control" name="title" type="text" placeholder="Search Collection">
         <span class="input-group-btn" id="clear-btn">
           <input type="reset" class="btn btn-danger" value="Clear">
         </span>

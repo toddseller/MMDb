@@ -29,16 +29,20 @@ var dynamicListener = function () {
   $('#logIn').on('click', '#myonoffswitch', changeTheme)
 }
 
-var filterMovies = function () {
-  var filter = $(this).val()
-  var filterExp = new RegExp(filter, 'i')
-  var movies = $('#movie-list > div')
-  $('.info').remove()
+var filterMovies = function (event) {
+  event.preventDefault()
 
-  hideShow(movies, filterExp)
+  var filter = $(this).serialize()
+  var route = '/movies/filter'
 
-  var filteredList = $('#movie-list > div').filter('.index-preview:visible')
-  filteredWithInfo(filteredList)
+  var request = $.ajax({
+    url: route,
+    data: filter
+  })
+  request.done(function (response) {
+    console.log(response)
+    $('#movie-list').empty().append(response)
+  })
 }
 
 var hideShow = function (array, expression) {
