@@ -21,6 +21,7 @@ gem 'rake'
 gem 'shotgun'
 gem 'bcrypt'
 gem 'json'
+gem 'httparty'
 
 group :test do
   gem 'faker'

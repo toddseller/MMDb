@@ -27,3 +27,12 @@ get '/movies/filter' do
     erb :"/partials/_movie_list", layout: false, locals: {user: user}
   end
 end
+
+get '/movies/tmdb' do
+  title = params[:query].downcase
+  year = params[:year]
+  p query = Movie.search_title(title, year)
+  if request.xhr?
+    json query: query
+  end
+end

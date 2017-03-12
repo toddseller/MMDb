@@ -46,28 +46,6 @@ var filterMovies = function (event) {
   })
 }
 
-var hideShow = function (array, expression) {
-  return $.each(array, function () {
-    if ($(this).text().search(expression) < 0) {
-      $(this).hide()
-    } else {
-      $(this).show()
-    }
-  })
-}
-
-var filteredWithInfo = function (array) {
-  return $.each(array, function (i) {
-    if ((i + 1) % 6 === 0) {
-      $(this).css('margin-right', '0')
-      $(this).after('<div class="info"></div>')
-    } else {
-      $(this).css('margin-right', '1.8em')
-    }
-    $('#movie-list > .index-preview:last').after('<div class="info"></div>')
-  })
-}
-
 var filtered = function (array) {
   return $.each(array, function (i) {
     if ((i + 1) % 6 === 0) {
@@ -257,44 +235,32 @@ var previewMovie = function (response) {
 }
 
 var getMovie = function (query) {
-  query = $.param(query)
-  var route = 'https://api.themoviedb.org/3/search/movie?api_key=29f9cfa4c730839f8828ae772bd7d75a&' + query + '&append_to_response=credits'
-  $.get(route, addMovie)
+  var query = $.param(query)
+  var route = '/movies/tmdb'
+  var data = query
+  var response = $.get(route, data, displayMovie)
 }
 
 var displayMovie = function (response) {
-  var year = response.release_date.split('-', 1)
-  var genres = getGenres(response.genres)
-  var actors = getActors(response.credits.cast)
-  var rating = getRating(response.releases.countries)
-  var director = getDirector(response.credits.crew)
-  var writer = getWriter(response.credits.crew)
-  var producer = getProducer(response.credits.crew)
-
-  $('#preview').slideDown(300, 'linear')
-  $('#dismiss').show()
-  $('#poster').empty().append().attr('src', 'https://image.tmdb.org/t/p/w342' + response.poster_path).attr('alt', response.title + ' Poster')
-  $('#title').empty().append(response.title)
-  $('#genre').empty().append(genres)
-  $('#year').empty().append(year[0])
-  $('input[name="movie[title]"]').val(response.title)
-  $('input[name="movie[year]"]').val(year[0])
-  $('input[name="movie[rating]"]').val(rating)
-  $('textarea[name="movie[plot]"]').val(response.overview)
-  $('textarea[name="movie[actors]"]').val(actors)
-  $('input[name="movie[director]"]').val(director)
-  $('input[name="movie[writer]"]').val(writer)
-  $('input[name="movie[producer]"]').val(producer)
-  $('input[name="movie[genre]"]').val(genres)
-  $('input[name="movie[runtime]"]').val(response.runtime)
-  $('input[name="movie[poster]"]').val('https://image.tmdb.org/t/p/w342' + response.poster_path)
-}
-
-var addMovie = function (response) {
-  if (response.results.length > 0) {
-    var id = response.results[0].id
-    var route = 'https://api.themoviedb.org/3/movie/' + id + '?api_key=29f9cfa4c730839f8828ae772bd7d75a&append_to_response=credits,releases'
-    $.get(route, displayMovie)
+  console.log(response)
+  if (response.query != null) {
+    $('#preview').slideDown(300, 'linear')
+    $('#dismiss').show()
+    $('#poster').empty().append().attr('src', response.query.poster).attr('alt', response.query.title + ' Poster')
+    $('#title').empty().append(response.query.title)
+    $('#genre').empty().append(response.query.genre)
+    $('#year').empty().append(response.query.year)
+    $('input[name="movie[title]"]').val(response.query.title)
+    $('input[name="movie[year]"]').val(response.query.year)
+    $('input[name="movie[rating]"]').val(response.query.rating)
+    $('textarea[name="movie[plot]"]').val(response.query.plot)
+    $('textarea[name="movie[actors]"]').val(response.query.actors)
+    $('input[name="movie[director]"]').val(response.query.director)
+    $('input[name="movie[writer]"]').val(response.query.writer)
+    $('input[name="movie[producer]"]').val(response.query.producer)
+    $('input[name="movie[genre]"]').val(response.query.genre)
+    $('input[name="movie[runtime]"]').val(response.query.runtime)
+    $('input[name="movie[poster]"]').val(response.query.poster)
   } else {
     $('#preview').slideDown(300, 'linear')
     $('#dismiss').show()
@@ -324,15 +290,6 @@ var listMovie = function (response) {
     $('#genre').empty()
     $('#year').empty()
     $('#movie-list').empty().append(response.page)
-    var filter = $('#search-movie-title').val()
-    var filterExp = new RegExp(filter, 'i')
-    var movies = $('#movie-list > div')
-
-    hideShow(movies, filterExp)
-    if ($('.index-preview:hidden').length !== 0) {
-      var filteredList = $('#movie-list > div').filter('.index-preview:visible')
-      filteredWithInfo(filteredList)
-    }
   }
 }
 
@@ -370,37 +327,20 @@ var getMovieModal = function (event) {
     url: route
   })
   request.done(function (response) {
-    if ($('.index-preview:hidden').length === 0) {
-      if ($('#movie-list > div').hasClass('info')) {
-        $('.info').remove()
-        switchInfoDiv(posterArt, title)
-        endOfRow.after('<div class="info"></div>')
-        $(that).nextAll('div.info').toggleClass('active').append('<div class="info-wrapper">' + response + '</div>')
-        $(that).find('.pointer').addClass('notransition').addClass('active')
-      } else {
-        var filteredList = $('#movie-list > div').filter('.index-preview')
-        filtered(filteredList)
-        endOfRow.after('<div class="info"></div>')
-        $(posterArt).toggleClass('active')
-        $(title).hide()
-        $(that).find('.pointer').toggleClass('active')
-        $(that).nextAll('div.info').first().toggleClass('active').append('<div class="info-wrapper">' + response + '</div>')
-      }
+    if ($('#movie-list > div').hasClass('info')) {
+      $('.info').remove()
+      switchInfoDiv(posterArt, title)
+      endOfRow.after('<div class="info"></div>')
+      $(that).nextAll('div.info').toggleClass('active').append('<div class="info-wrapper">' + response + '</div>')
+      $(that).find('.pointer').addClass('notransition').addClass('active')
     } else {
-      if ($('#movie-list > div').hasClass('info')) {
-        switchInfoDiv(posterArt, title)
-        $('.info').empty().removeAttr('style').removeClass('active')
-        $(that).nextAll('div.info').first().toggleClass('active').append('<div class="info-wrapper">' + response + '</div>')
-        $(that).find('.pointer').addClass('notransition').addClass('active')
-      } else {
-        var filteredList = $('#movie-list > div').filter('.index-preview:visible')
-        filteredWithInfo(filteredList)
-
-        $(posterArt).toggleClass('active')
-        $(title).hide()
-        $(that).find('.pointer').toggleClass('active')
-        $(that).nextAll('div.info').first().toggleClass('active').append('<div class="info-wrapper">' + response + '</div>')
-      }
+      var filteredList = $('#movie-list > div').filter('.index-preview')
+      filtered(filteredList)
+      endOfRow.after('<div class="info"></div>')
+      $(posterArt).toggleClass('active')
+      $(title).hide()
+      $(that).find('.pointer').toggleClass('active')
+      $(that).nextAll('div.info').first().toggleClass('active').append('<div class="info-wrapper">' + response + '</div>')
     }
   })
 }
@@ -495,16 +435,6 @@ var displayUpdatedMovie = function (response) {
   var endOfRow = $('.index-preview').eq(index + itemsPerRow - col)
   if (!endOfRow.length) endOfRow = $('.index-preview').last()
 
-  hideShow(movies, filterExp)
-
-  if ($('.index-preview:hidden').length !== 0) {
-    var filteredList = $('#movie-list > div').filter('.index-preview:visible')
-    filteredWithInfo(filteredList)
-  } else {
-    var filteredList = $('#movie-list > div').filter('.index-preview')
-    filtered(filteredList)
-    endOfRow.after('<div class="info"></div>')
-  }
   $(posterArt).toggleClass('active').addClass('notransition')
   $(title).hide()
   $(that).find('.pointer').toggleClass('active').addClass('notransition')
@@ -530,79 +460,4 @@ var deleteMovie = function (event) {
   $('.lazy').removeClass('active')
   $('.pointer').css('border-top', '#fff').css('border-left', '#fff')
   setTimeout(removePointerClass, 100)
-}
-
-var getActors = function (response) {
-  var actors = response.reduce(function (acc, actor) {
-    acc.push(actor.name)
-    return acc
-  }, [])
-
-  return actors.slice(0, 6).join(', ')
-}
-
-var getRating = function (response) {
-  var rating = response.filter(function (country) {
-    return country.iso_3166_1 === 'US'
-  })
-  if (rating.length > 0) {
-    return rating[0].certification
-  } else {
-    return 'NR'
-  }
-}
-
-var getGenres = function (response) {
-  var genres = response.reduce(function (acc, genre) {
-    acc.push(genre.name)
-    return acc
-  }, [])
-
-  if (genres.length > 1) {
-    return genres.slice(0, 2).join(', ')
-  } else {
-    return genres.join('')
-  }
-}
-
-var getDirector = function (response) {
-  var director = response.reduce(function (acc, crew) {
-    if (crew.job === 'Director') {
-      acc.push(crew.name)
-    }
-    return acc
-  }, [])
-  if (director.length > 1) {
-    return director.join(', ')
-  } else {
-    return director.join('')
-  }
-}
-
-var getWriter = function (response) {
-  var writer = response.reduce(function (acc, crew) {
-    if (crew.job === 'Screenplay' || crew.job === 'Writer') {
-      acc.push(crew.name)
-    }
-    return acc
-  }, [])
-  if (writer.length > 1) {
-    return writer.join(', ')
-  } else {
-    return writer.join('')
-  }
-}
-
-var getProducer = function (response) {
-  var producer = response.reduce(function (acc, crew) {
-    if (crew.job === 'Producer') {
-      acc.push(crew.name)
-    }
-    return acc
-  }, [])
-  if (producer.length > 1) {
-    return producer.join(', ')
-  } else {
-    return producer.join('')
-  }
 }
