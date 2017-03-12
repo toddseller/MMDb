@@ -56,6 +56,18 @@ var filtered = function (array) {
   })
 }
 
+var filteredWithInfo = function (array) {
+  return $.each(array, function (i) {
+    if ((i + 1) % 6 === 0) {
+      $(this).css('margin-right', '0')
+      $(this).after('<div class="info"></div>')
+     } else {
+      $(this).css('margin-right', '1.8em')
+     }
+    $('#movie-list > .index-preview:last').after('<div class="info"></div>')
+  })
+ }
+
 var clearFilter = function () {
   var route = window.location.pathname
   $.get(route).done(function (response) {
@@ -270,7 +282,7 @@ var displayMovie = function (response) {
 
 var movieToDB = function (event) {
   event.preventDefault()
-  var movie = $(this).serialize()
+  var movie = $(this).serialize() + '&filter=' + $('#search-movie-title').val()
   var route = $(this).attr('action')
   $.post(route, movie, listMovie)
 }
@@ -289,8 +301,7 @@ var listMovie = function (response) {
     $('#title').empty()
     $('#genre').empty()
     $('#year').empty()
-    //$('#movie-list').empty().append(response.page)
-    filterMovies()
+    $('#movie-list').empty().append(response.page)
   }
 }
 
@@ -413,8 +424,8 @@ var displayEditForm = function (response) {
 var submitUpdate = function (event) {
   event.preventDefault()
   var formRoute = $(this).parent().attr('action')
-  var formData = $(this).parent().serialize()
-  $.ajax({
+  var formData = $(this).parent().serialize() + '&filter=' + $('#search-movie-title').val()
+  var response = $.ajax({
     url: formRoute,
     type: 'PUT',
     data: formData,
@@ -423,10 +434,8 @@ var submitUpdate = function (event) {
 }
 
 var displayUpdatedMovie = function (response) {
-  $('#movie-list').empty().append(response.list)
-  var filter = $('#search-movie-title').val()
-  var filterExp = new RegExp(filter, 'i')
-  var movies = $('#movie-list > div')
+  console.log(response)
+  $('#movie-list').empty().append(response.query)
   var that = $('#' + response.id).parent('div')
   var posterArt = $('#' + response.id).children('img')
   var title = $('#' + response.id).siblings('p')
@@ -435,7 +444,14 @@ var displayUpdatedMovie = function (response) {
   var col = (index % itemsPerRow) + 1
   var endOfRow = $('.index-preview').eq(index + itemsPerRow - col)
   if (!endOfRow.length) endOfRow = $('.index-preview').last()
-
+  if ($('.index-preview:hidden').length !== 0) {
+  var filteredList = $('#movie-list > div').filter('.index-preview:visible')
+    filteredWithInfo(filteredList)
+  } else {
+    var filteredList = $('#movie-list > div').filter('.index-preview')
+    filtered(filteredList)
+    endOfRow.after('<div class="info"></div>')
+  }
   $(posterArt).toggleClass('active').addClass('notransition')
   $(title).hide()
   $(that).find('.pointer').toggleClass('active').addClass('notransition')

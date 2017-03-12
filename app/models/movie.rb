@@ -35,6 +35,12 @@ class Movie < ActiveRecord::Base
     average = self.ratings.length > 0 ? (sum.to_f / self.ratings.count).round : 0
   end
 
+  def self.filter_movies(t, u)
+    title = t.downcase
+    user = User.find(u)
+    movies = user.movies.where('search_name LIKE ?', "%#{title}%")
+  end
+
   private
 
     def create_sort_name
