@@ -32,7 +32,7 @@ var dynamicListener = function () {
 var filterMovies = function (event) {
   event.preventDefault()
 
-  var filter = $(this).val()
+  var filter = $('#search-movie-title').val()
   var id = window.location.href.substr(window.location.href.lastIndexOf('/') + 1)
   var data = $.param({title:filter, id:id})
   var route = '/movies/filter'
