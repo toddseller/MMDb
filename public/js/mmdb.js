@@ -289,7 +289,8 @@ var listMovie = function (response) {
     $('#title').empty()
     $('#genre').empty()
     $('#year').empty()
-    $('#movie-list').empty().append(response.page)
+    //$('#movie-list').empty().append(response.page)
+    filteredList()
   }
 }
 
