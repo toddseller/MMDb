@@ -3,11 +3,8 @@ post '/sessions' do
   if user && user.authenticate(params[:password])
     session[:user_id] = user.id
     session[:name] = user.full_name
-    p '*' * 30
-    p session[:theme] = user.theme
+    session[:theme] = user.theme
     if request.xhr?
-      p '+' * 30
-      p 'Bob'
       json status: "true", user_id: user.id
     else
       erb :'/users/show'

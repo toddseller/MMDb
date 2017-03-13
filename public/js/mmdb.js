@@ -179,7 +179,6 @@ var userUpdated = function (response) {
 
 var validate = function (event) {
   event.preventDefault()
-  console.log('In validate function')
   var formData = $('#sign-in-form :input').filter(checkValue).serialize()
   if (formData === '') {
     $('p.login-errors').show()
@@ -254,7 +253,6 @@ var getMovie = function (query) {
 }
 
 var displayMovie = function (response) {
-  console.log(response)
   if (response.query != null) {
     $('#preview').slideDown(300, 'linear')
     $('#dismiss').show()
@@ -434,7 +432,6 @@ var submitUpdate = function (event) {
 }
 
 var displayUpdatedMovie = function (response) {
-  console.log(response)
   $('#movie-list').empty().append(response.query)
   var that = $('#' + response.id).parent('div')
   var posterArt = $('#' + response.id).children('img')
@@ -465,7 +462,6 @@ var deleteMovie = function (event) {
   var newRoute = $(this).attr('action', route)
   var formRoute = $(newRoute).attr('action')
   var data = $.param({filter:$('#search-movie-title').val()})
-  console.log(route)
   $.ajax({
     url: formRoute,
     type: 'DELETE',
@@ -478,7 +474,6 @@ var deleteMovie = function (event) {
   }
   $('.info').removeClass('active')
   $('.truncate').show()
-  console.log($(this))
   $('.lazy').removeClass('active')
   $('.pointer').css('border-top', '#fff').css('border-left', '#fff')
   setTimeout(removePointerClass, 100)
