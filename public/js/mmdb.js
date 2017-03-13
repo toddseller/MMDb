@@ -464,16 +464,21 @@ var deleteMovie = function (event) {
   var route = $(parentForm[0]).attr('action')
   var newRoute = $(this).attr('action', route)
   var formRoute = $(newRoute).attr('action')
+  var data = $.param({filter:$('#search-movie-title').val()})
+  console.log(route)
   $.ajax({
     url: formRoute,
     type: 'DELETE',
+    data: data,
     success: listMovie
   })
+
   var removePointerClass = function () {
     $('.pointer').removeClass('active').removeAttr('style')
   }
   $('.info').removeClass('active')
   $('.truncate').show()
+  console.log($(this))
   $('.lazy').removeClass('active')
   $('.pointer').css('border-top', '#fff').css('border-left', '#fff')
   setTimeout(removePointerClass, 100)
