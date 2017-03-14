@@ -48,7 +48,7 @@ var filterMovies = function (event) {
 
 var filtered = function (array) {
   return $.each(array, function (i) {
-    if ((i + 1) % 6 === 0) {
+    if ((i + 1) % 7 === 0) {
       $(this).css('margin-right', '0')
     } else {
       $(this).css('margin-right', '1.8em')
@@ -58,7 +58,7 @@ var filtered = function (array) {
 
 var filteredWithInfo = function (array) {
   return $.each(array, function (i) {
-    if ((i + 1) % 6 === 0) {
+    if ((i + 1) % 7 === 0) {
       $(this).css('margin-right', '0')
       $(this).after('<div class="info"></div>')
      } else {
@@ -329,7 +329,7 @@ var getMovieModal = function (event) {
   var posterArt = $(this).children('img')
   var title = $(this).siblings('p')
   var index = $(that).index()
-  var itemsPerRow = 6
+  var itemsPerRow = 7
   var col = (index % itemsPerRow) + 1
   var endOfRow = $('.index-preview').eq(index + itemsPerRow - col)
   if (!endOfRow.length) endOfRow = $('.index-preview').last()
@@ -437,7 +437,7 @@ var displayUpdatedMovie = function (response) {
   var posterArt = $('#' + response.id).children('img')
   var title = $('#' + response.id).siblings('p')
   var index = $(that).index()
-  var itemsPerRow = 6
+  var itemsPerRow = 7
   var col = (index % itemsPerRow) + 1
   var endOfRow = $('.index-preview').eq(index + itemsPerRow - col)
   if (!endOfRow.length) endOfRow = $('.index-preview').last()
