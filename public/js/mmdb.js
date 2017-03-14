@@ -51,7 +51,7 @@ var filtered = function (array) {
     if ((i + 1) % 7 === 0) {
       $(this).css('margin-right', '0')
     } else {
-      $(this).css('margin-right', '1.8em')
+      $(this).css('margin-right', '2em')
     }
   })
 }
@@ -62,7 +62,7 @@ var filteredWithInfo = function (array) {
       $(this).css('margin-right', '0')
       $(this).after('<div class="info"></div>')
      } else {
-      $(this).css('margin-right', '1.8em')
+      $(this).css('margin-right', '2em')
      }
     $('#movie-list > .index-preview:last').after('<div class="info"></div>')
   })
