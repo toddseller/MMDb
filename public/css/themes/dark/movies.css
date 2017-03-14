@@ -94,7 +94,7 @@ img
   top: 50px;
 
   width: 100vw;
-  margin-left: calc((100vw - 1369.2px)/-2);
+  margin-left: calc((100vw - 1386px)/-2);
   padding: 1.5em 5em;
 
   background: rgba(44, 44, 44, .97);
@@ -102,7 +102,7 @@ img
 
 #search-wrapper
 {
-  width: 1300px;
+  width: 1386px;
   margin: 0 auto;
 }
 
@@ -172,7 +172,7 @@ img
 .index-preview
 {
   width: 174px;
-  margin-right: 1.8em;
+  margin-right: 2em;
 }
 
 .index-preview:nth-child(7n)
