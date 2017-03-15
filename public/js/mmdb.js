@@ -78,6 +78,7 @@ var clearFilter = function () {
   $('.pointer').removeClass('notransition').removeClass('active').removeAttr('style')
   $('.truncate').fadeIn(400, 'linear')
   $('.lazy').removeClass('notransition').removeClass('active')
+  $('img.lazy').lazyload()
 }
 
 var animateMenu = function (event) {
