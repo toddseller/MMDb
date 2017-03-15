@@ -1,5 +1,4 @@
 var bindListeners = function () {
-  $('img.lazy').lazyload()
   $('#sign-in-form').on('submit', validate)
   $('.close').on('click', clearForm)
   $('.modal').on('shown.bs.modal', autoFocus)
