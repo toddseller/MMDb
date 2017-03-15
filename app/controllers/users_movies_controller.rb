@@ -40,7 +40,7 @@ put '/users/:user_id/movies/:id' do
   if request.xhr?
     @my_movies = Movie.filter_movies(params[:filter], current_user).sorted_list
     page = erb :'/partials/_info', locals: {movie: @movie, user: @user}, layout: false
-    list = erb :'/partials/_movie_list', locals: {movie: @my_movies, user: @user}, layout: false
+    list = erb :'/partials/_filtered_list', locals: {movie: @my_movies, user: @user}, layout: false
     json page: page, query: list, id: @movie.id
   else
     erb :'/users/show'
@@ -53,7 +53,7 @@ delete '/users/:user_id/movies/:id' do
   @movie.users.destroy(@user)
   if request.xhr?
     @my_movies = Movie.filter_movies(params[:filter], @user).sorted_list
-    page = erb :'/partials/_movie_list', locals: {movie: @my_movies, user: @user}, layout: false
+    page = erb :'/partials/_filtered_list', locals: {movie: @my_movies, user: @user}, layout: false
     json status: "true", page: page
   else
     @my_movies = @user.movies.sorted_list
