@@ -72,13 +72,13 @@ var clearFilter = function () {
   var route = window.location.pathname
   $.get(route).done(function (response) {
     $('#movie-list').empty().append(response.page)
+    $('img.lazy').lazyload()
   })
   $('#filter-input').trigger('reset')
   $('.info').remove()
   $('.pointer').removeClass('notransition').removeClass('active').removeAttr('style')
   $('.truncate').fadeIn(400, 'linear')
   $('.lazy').removeClass('notransition').removeClass('active')
-  $('img.lazy').lazyload()
 }
 
 var animateMenu = function (event) {
