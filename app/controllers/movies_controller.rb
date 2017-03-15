@@ -21,7 +21,7 @@ get '/movies/filter' do
   user = User.find(params[:id])
   @my_movies = Movie.filter_movies(params[:title], params[:id]).sorted_list
   if request.xhr?
-    erb :"/partials/_movie_list", layout: false, locals: {user: user}
+    erb :"/partials/_filtered_list", layout: false, locals: {user: user}
   end
 end
 
