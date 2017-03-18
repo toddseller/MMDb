@@ -15,14 +15,23 @@ class Movie < ActiveRecord::Base
   scope :recently_added, -> { order(created_at: :desc) }
 
   def self.search_title(t,y)
-    query = {'api_key' => '29f9cfa4c730839f8828ae772bd7d75a', 'query' => t}
-    title_response = HTTParty.get('https://api.themoviedb.org/3/search/movie?api_key=' + ENV['TMDB_KEY'] + '&query=' + t +'&year=' + y)
-    if title_response['results'] == []
-      return nil
+    if y != ''
+      movie_array = Movie.where("search_name LIKE ? AND year = ?","%#{t}%", "%#{y}%").sorted_list.first(10)
+    else
+      movie_array = Movie.where("search_name LIKE ?", "%#{t}%").sorted_list.first(10)
     end
-    id = title_response['results'][0]['id'].to_s
-    movie_response = HTTParty.get('https://api.themoviedb.org/3/movie/' + id + '?api_key=' + ENV['TMDB_KEY'] + '&append_to_response=credits,releases')
-    response = {title: title_response['results'][0]['title'], plot: title_response['results'][0]['overview'], poster: 'https://image.tmdb.org/t/p/w342' +title_response['results'][0]['poster_path'], year: title_response['results'][0]['release_date'].split('-').slice(0,1).join(), actors: get_actors(movie_response), director: get_director(movie_response), genre: get_genres(movie_response), producer: get_producers(movie_response), rating: get_rating(movie_response), runtime: movie_response['runtime'].to_s, writer: get_writers(movie_response)}
+    movie_array
+    title_response = HTTParty.get('https://api.themoviedb.org/3/search/movie?api_key=' + ENV['TMDB_KEY'] + '&query=' + t +'&year=' + y)
+    return nil if title_response['results'] == []
+    title_response['results'].first(20).each do |movie|
+      movie_response = HTTParty.get('https://api.themoviedb.org/3/movie/' + movie['id'].to_s + '?api_key=' + ENV['TMDB_KEY'] + '&append_to_response=credits,releases')
+      runtime = movie_response['runtime'] != nil ? movie_response['runtime'].to_s : '0'
+      year = movie_response['release_date'] != nil ? movie['release_date'].split('-').slice(0,1).join() : ''
+      poster = movie_response['poster_path'] != nil ? 'https://image.tmdb.org/t/p/w342' + movie['poster_path'] : 'NA'
+      test_movie = {title: movie['title'], plot: movie['overview'], poster: poster, year: year, actors: get_actors(movie_response), director: get_director(movie_response), genre: get_genres(movie_response), producer: get_producers(movie_response), rating: get_rating(movie_response), runtime: runtime, writer: get_writers(movie_response)}
+      movie_array << test_movie if movie_array.all? {|el| el['title'] != movie['title'] || el['year'] != year}
+    end
+    movie_array
   end
 
 
@@ -86,36 +95,36 @@ class Movie < ActiveRecord::Base
     def self.get_actors(r)
       actors = []
       r['credits']['cast'].each { |k| actors << k['name'] }
-      actors.first(6).join(', ')
+      actors.length != 0 ? actors.first(6).join(', ') : ''
     end
 
     def self.get_director(r)
       director = []
       r['credits']['crew'].each { |k| director << k['name'] if k['job'] == 'Director' }
-      director.first(6).join(', ')
+      director.length != 0 ? director.first(6).join(', ') : ''
     end
 
     def self.get_genres(r)
       genres = []
-      r['genres'].each { |k| genres << k['name'] }
-      genres.first(2).join(', ')
+      r['genres'].each { |k| genres << k['name'] } if r['genres']
+      genres.length != 0 ? genres.first(2).join(', ') : ''
     end
 
     def self.get_producers(r)
       producers = []
       r['credits']['crew'].each { |k| producers << k['name'] if k['job'] == 'Producer' }
-      producers.first(6).join(', ')
+      producers.length != 0 ? producers.first(6).join(', ') : ''
     end
 
     def self.get_rating(r)
       rating = ''
-      r['releases']['countries'].each { |k| rating = k['certification'] if k['iso_3166_1'] == 'US' }
-      rating != '' ? rating : 'NR'
+      r['releases']['countries'].each { |k| rating = k['certification'] if k['iso_3166_1'] == 'US' } if r['releases']['countries'] != nil
+      p rating != '' ? rating : 'NR'
     end
 
     def self.get_writers(r)
       writers = []
       r['credits']['crew'].each { |k| writers << k['name'] if k['job'] == 'Screenplay' || k['job'] == 'Writer' }
-      writers.first(6).join(', ')
+      writers.length != 0 ? writers.first(6).join(', ') : ''
     end
 end

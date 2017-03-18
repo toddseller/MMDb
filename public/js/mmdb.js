@@ -229,59 +229,27 @@ var checkDatabase = function (event) {
   var route = '/movies'
   $.get(route, data, previewMovie)
   $(this).trigger('reset')
+  $('#preview').empty().slideDown(300, 'linear').append('<div id="loading"><h3>Searching Our Database...</h3><div class="loader"></div></div>').css('display','block')
+  $('#dismiss').show()
 }
 
 var previewMovie = function (response) {
-  if (response.movie.length < 1) {
-    getMovie(response.query)
+  console.log(response.query.length)
+  if (response.query.length <= 6) {
+    $('#preview').slideDown(300, 'linear')
+    $('#dismiss').show()
+    $('#preview').empty().append(response.page).css({'display':'flex', 'justify-content': 'center'})
   } else {
     $('#preview').slideDown(300, 'linear')
     $('#dismiss').show()
-    $('#poster').empty().append().attr('src', response.movie[0].poster).attr('alt', response.movie.title + ' Poster')
-    $('#title').empty().append(response.movie[0].title)
-    $('#genre').empty().append(response.movie[0].genre)
-    $('#year').empty().append(response.movie[0].year)
-    $('input[name="movie[title]"]').val(response.movie[0].title)
-    $('input[name="movie[year]"]').val(response.movie[0].year)
-  }
-}
-
-var getMovie = function (query) {
-  var query = $.param(query)
-  var route = '/movies/tmdb'
-  var data = query
-  var response = $.get(route, data, displayMovie)
-}
-
-var displayMovie = function (response) {
-  if (response.query != null) {
-    $('#preview').slideDown(300, 'linear')
-    $('#dismiss').show()
-    $('#poster').empty().append().attr('src', response.query.poster).attr('alt', response.query.title + ' Poster')
-    $('#title').empty().append(response.query.title)
-    $('#genre').empty().append(response.query.genre)
-    $('#year').empty().append(response.query.year)
-    $('input[name="movie[title]"]').val(response.query.title)
-    $('input[name="movie[year]"]').val(response.query.year)
-    $('input[name="movie[rating]"]').val(response.query.rating)
-    $('textarea[name="movie[plot]"]').val(response.query.plot)
-    $('textarea[name="movie[actors]"]').val(response.query.actors)
-    $('input[name="movie[director]"]').val(response.query.director)
-    $('input[name="movie[writer]"]').val(response.query.writer)
-    $('input[name="movie[producer]"]').val(response.query.producer)
-    $('input[name="movie[genre]"]').val(response.query.genre)
-    $('input[name="movie[runtime]"]').val(response.query.runtime)
-    $('input[name="movie[poster]"]').val(response.query.poster)
-  } else {
-    $('#preview').slideDown(300, 'linear')
-    $('#dismiss').show()
-    $('#poster').empty().append().attr('src', '/imgs/loading_image.svg').attr('alt', 'No Movies Match Your Query')
+    $('#preview').empty().append(response.page).css({'display':'flex', 'justify-content': 'space-between'})
   }
 }
 
 var movieToDB = function (event) {
   event.preventDefault()
   var movie = $(this).serialize() + '&filter=' + $('#search-movie-title').val()
+  console.log(movie)
   var route = $(this).attr('action')
   $.post(route, movie, listMovie)
 }
@@ -297,10 +265,8 @@ var listMovie = function (response) {
     $('.input-group-btn').css('top', '0')
     $('#movie-list').css('top', '0')
     $('#more').show()
-    $('#title').empty()
-    $('#genre').empty()
-    $('#year').empty()
     $('#movie-list').empty().append(response.page)
+    $('img.lazy').lazyload()
   }
 }
 
@@ -315,9 +281,6 @@ var closePreview = function (event) {
   $('.input-group-btn').css('top', '0')
   $('#movie-list').css('top', '0')
   $('#more').show()
-  $('#title').empty()
-  $('#genre').empty()
-  $('#year').empty()
 }
 
 var getMovieModal = function (event) {

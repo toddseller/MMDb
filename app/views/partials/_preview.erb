@@ -1,24 +1,22 @@
-<div class="col-lg-12">
-  <form id="create-movie" action=<%="/users/#{@user.id}/movies"%> method="POST">
-    <input type="hidden" name="movie[title]" value="">
-    <input type="hidden" name="movie[year]" value="">
-    <input type="hidden" name="movie[rating]" value="">
-    <textarea type="hidden" name="movie[plot]" value=""></textarea>
-    <textarea type="hidden" name="movie[actors]" value=""></textarea>
-    <input type="hidden" name="movie[director]" value="">
-    <input type="hidden" name="movie[writer]" value="">
-    <input type="hidden" name="movie[producer]" value="">
-    <input type="hidden" name="movie[genre]" value="">
-    <input type="hidden" name="movie[runtime]" value="">
-    <input type="hidden" name="movie[poster]" value="">
-    <div class="col-lg-offset-4 col-lg-2">
-      <input type="image" id="poster" name="submit" src="" border="0" alt="">
+<%@movie_previews.each do |movie| %>
+  <% if movie[:poster] != 'NA' %>
+    <div class="movie-preview">
+      <form id="create-movie" action=<%="/users/#{@user.id}/movies"%> method="POST">
+        <input type="hidden" name="movie[title]" value="<%="#{movie[:title]}"%>">
+        <input type="hidden" name="movie[year]" value="<%="#{movie[:year]}"%>">
+        <input type="hidden" name="movie[rating]" value="<%="#{movie[:rating]}"%>">
+        <input type="hidden" name="movie[director]" value="<%="#{movie[:director]}"%>">
+        <input type="hidden" name="movie[writer]" value="<%="#{movie[:writer]}"%>">
+        <input type="hidden" name="movie[producer]" value="<%="#{movie[:producer]}"%>">
+        <input type="hidden" name="movie[genre]" value="<%="#{movie[:genre]}"%>">
+        <input type="hidden" name="movie[runtime]" value="<%="#{movie[:runtime]}"%>">
+        <input type="hidden" name="movie[actors]" value="<%="#{movie[:actors]}"%>"></input>
+        <input type="hidden" name="movie[plot]" value="<%="#{movie[:plot]}"%>"></input>
+        <input type="hidden" name="movie[poster]" value="<%="#{movie[:poster]}"%>">
+        <input type="image" id="poster" name="submit" src="<%="#{movie[:poster]}"%>" border="0" alt="<%="#{movie[:title]}"%> Poster">
+        <p class="preview-truncate"><%="#{movie[:title]}"%></p>
+        <p id="year"><%="#{movie[:year]}"%></p>
+      </form>
     </div>
-    <a class="pull-right" id="dismiss" href="#"><span class="glyphicon glyphicon-remove"></span></a>
-    <div class="col-lg-6">
-      <h3 id="title"></h3>
-      <p id='genre'></p>
-      <p id="year"></p>
-    </div>
-  </form>
-</div>
+  <% end %>
+<% end %>
