@@ -1,12 +1,11 @@
 get '/movies' do
   title = params[:query].downcase
-  if params[:year] != ''
-    movie = Movie.where("search_name LIKE ? AND year = ?","%#{title}%", params[:year])
-  else
-    movie = Movie.where("search_name LIKE ?", "%#{title}%")
-  end
+  year = params[:year]
+  p @user = current_user
+  p @movie_previews = Movie.search_title(title, year)
+  page = erb :"/partials/_preview", layout: false
   if request.xhr?
-    json movie: movie, query: params
+    json query: @movie_previews, page: page
   end
 end
 
@@ -25,11 +24,3 @@ get '/movies/filter' do
   end
 end
 
-get '/movies/tmdb' do
-  title = params[:query].downcase
-  year = params[:year]
-  query = Movie.search_title(title, year)
-  if request.xhr?
-    json query: query
-  end
-end
