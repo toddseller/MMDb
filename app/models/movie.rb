@@ -23,7 +23,7 @@ class Movie < ActiveRecord::Base
     movie_array
     title_response = HTTParty.get('https://api.themoviedb.org/3/search/movie?api_key=' + ENV['TMDB_KEY'] + '&query=' + t +'&year=' + y)
     return nil if title_response['results'] == []
-    title_response['results'].first(20).each do |movie|
+    title_response['results'].each do |movie|
       movie_response = HTTParty.get('https://api.themoviedb.org/3/movie/' + movie['id'].to_s + '?api_key=' + ENV['TMDB_KEY'] + '&append_to_response=credits,releases')
       runtime = movie_response['runtime'] != nil ? movie_response['runtime'].to_s : '0'
       year = movie_response['release_date'] != nil ? movie['release_date'].split('-').slice(0,1).join() : ''
