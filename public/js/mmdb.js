@@ -1,3 +1,5 @@
+var lastPos = 0
+
 var bindListeners = function () {
   $('#sign-in-form').on('submit', validate)
   $('.close').on('click', clearForm)
@@ -8,6 +10,8 @@ var bindListeners = function () {
   $('#search-movie-title').on('keyup', filterMovies)
   $('.registration #confirm').on('keyup', checkPassword)
   $('#clear-btn').on('click', clearFilter)
+  $('#scroll-right').on('click', scrollRight)
+  $('#scroll-left').on('click', scrollLeft)
 }
 
 var dynamicListener = function () {
@@ -227,23 +231,75 @@ var checkDatabase = function (event) {
   event.preventDefault()
   var data = $(this).serialize()
   var route = '/movies'
-  $.get(route, data, previewMovie)
+  $.ajax({
+    url: route,
+    data: data,
+    success: previewMovie,
+    error: (function(jqXHR, textStatus, errorThrown) {
+      if (jqXHR.status == 500) {
+        $('#preview').empty().slideDown(300, 'linear').append('<div style="width: 174px; height: auto;"><img src="/imgs/loading_image.svg" width: 174 height: auto></div>').css({'display':'flex','justify-content':'center'})
+      }
+    })
+  })
   $(this).trigger('reset')
   $('#preview').empty().slideDown(300, 'linear').append('<div id="loading"><h3>Searching Our Database...</h3><div class="loader"></div></div>').css('display','block')
   $('#dismiss').show()
+  $('#scroll-right').hide()
 }
 
 var previewMovie = function (response) {
-  console.log(response.query.length)
   if (response.query.length <= 6) {
     $('#preview').slideDown(300, 'linear')
     $('#dismiss').show()
+    $('#scroll-right').hide()
     $('#preview').empty().append(response.page).css({'display':'flex', 'justify-content': 'center'})
   } else {
     $('#preview').slideDown(300, 'linear')
     $('#dismiss').show()
+    $('#preview').scroll(addArrow)
     $('#preview').empty().append(response.page).css({'display':'flex', 'justify-content': 'space-between'})
+    if ($('#preview > div').size() <= 6) {
+      $('#scroll-right').hide()
+    } else {
+      $('#scroll-right').show()
+    }
   }
+}
+
+var addArrow = function () {
+  var currPos = $('#preview').scrollLeft()
+  var maxWidth = $('#preview').prop("scrollWidth") - $('#preview').width() - 30
+  var minWidth = 0
+
+  if (lastPos < currPos) {
+    $('#scroll-right').fadeIn()
+    $('#scroll-left').fadeIn()
+  }
+
+  if (lastPos > currPos) {
+    $('#scroll-left').fadeIn()
+    $('#scroll-right').fadeIn()
+  }
+
+  if (currPos == maxWidth) {
+    $('#scroll-right').fadeOut()
+  }
+
+  if (currPos == 0) {
+    $('#scroll-left').fadeOut()
+  }
+}
+
+var scrollRight = function () {
+  $('#preview').animate({
+    scrollLeft: '+=1386px'
+  }, 1000)
+}
+
+var scrollLeft = function () {
+  $('#preview').animate({
+    scrollLeft: '-=1386px'
+  }, 1000)
 }
 
 var movieToDB = function (event) {
