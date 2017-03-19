@@ -28,7 +28,7 @@ class Movie < ActiveRecord::Base
       year = movie_response['release_date'] != nil ? movie['release_date'].split('-').slice(0,1).join() : ''
       poster = movie_response['poster_path'] != nil ? 'https://image.tmdb.org/t/p/w342' + movie['poster_path'] : 'NA'
       test_movie = {title: movie['title'], plot: movie['overview'], poster: poster, year: year, actors: get_actors(movie_response), director: get_director(movie_response), genre: get_genres(movie_response), producer: get_producers(movie_response), rating: get_rating(movie_response), runtime: runtime, writer: get_writers(movie_response)}
-      movie_array << test_movie if movie_array.all? {|el| el[:year] != year || el[:actors] != get_director(movie_response)}
+      movie_array << test_movie if movie_array.all? {|el| el[:year] != year || el[:director] != get_director(movie_response)}
     end
     movie_array.sort_by {|k| k[:year]}
   end
