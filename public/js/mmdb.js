@@ -314,6 +314,8 @@ var listMovie = function (response) {
   if (response.status === 'true') {
     $('#preview').slideUp(500, 'linear')
     $('#dismiss').hide()
+    $('#scroll-right').hide()
+    $('#scroll-left').hide()
     $('#add').show()
     $('#search').hide()
     $('#search-year').hide()
