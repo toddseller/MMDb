@@ -70,6 +70,8 @@ img
 {
   width: 175px;
   height: 262.5px;
+  border-radius: 4px;
+  margin-top: 3px;
 }
 
 #poster:hover
@@ -125,7 +127,7 @@ img
 }
 
 .movie-preview {
-  margin-right: 1em;
+  margin-right: 2em;
 }
 
 .movie-preview-title {
@@ -142,6 +144,12 @@ img
   height: 350px;
   margin-bottom: 30px;
   overflow: auto;
+}
+
+#preview > :last-child
+{
+  margin-right: 0;
+  padding-right: 3px;
 }
 
 #dismiss
@@ -165,6 +173,37 @@ img
 {
   opacity: 1;
   color: #ff0000;
+}
+
+#scroll-left, #scroll-right
+{
+  position: absolute;
+  top:108px;
+  height: 263px;
+  background: rgba(0,0,0,.4);
+  display: none;
+}
+
+#scroll-left:hover, #scroll-right:hover
+{
+  cursor: pointer;
+}
+
+#scroll-left .glyphicon, #scroll-right .glyphicon
+{
+  font-size: 50px;
+  line-height: 5em;
+  color: rgba(255,255,255,.8);
+}
+
+#scroll-left
+{
+  left: 8.75%;
+}
+
+#scroll-right
+{
+  right: 8.75%;
 }
 
 #preview h3
