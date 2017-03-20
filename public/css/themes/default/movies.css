@@ -69,7 +69,9 @@ img
 #poster
 {
   width: 175px;
-  height: auto;
+  height: 262.5px;
+  border-radius: 4px;
+  margin-top: 3px;
 }
 
 #poster:hover
@@ -144,6 +146,12 @@ img
   overflow: auto;
 }
 
+#preview > :last-child
+{
+  margin-right: 0;
+  padding-right: 3px;
+}
+
 #dismiss
 {
   position: absolute;
@@ -165,6 +173,41 @@ img
 {
   opacity: .5;
   color: #000;
+}
+
+#scroll-left, #scroll-right
+{
+  position: absolute;
+  top:108px;
+  height: 263px;
+  background: rgba(0,0,0,.4);
+  display: none;
+}
+
+#scroll-left:hover, #scroll-right:hover
+{
+  cursor: pointer;
+}
+
+#scroll-left .glyphicon, #scroll-right .glyphicon
+{
+  font-size: 50px;
+  line-height: 5em;
+  color: rgba(255,255,255,.8);
+}
+
+#scroll-left
+{
+  left: 8.75%;
+  border-top-left-radius: 4px;
+  border-bottom-left-radius: 4px;
+}
+
+#scroll-right
+{
+  right: 8.75%;
+  border-top-right-radius: 4px;
+  border-bottom-right-radius: 4px;
 }
 
 #preview h3

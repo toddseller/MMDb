@@ -332,6 +332,8 @@ var closePreview = function (event) {
   event.preventDefault()
   $('#preview').slideUp(300, 'linear')
   $('#dismiss').hide()
+  $('#scroll-right').hide()
+  $('#scroll-left').hide()
   $('#add').show()
   $('#search').hide()
   $('#search-year').hide()
