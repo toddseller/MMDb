@@ -245,6 +245,7 @@ var checkDatabase = function (event) {
   $('#preview').empty().slideDown(300, 'linear').append('<div id="loading"><h3>Searching Our Database...</h3><div class="loader"></div></div>').css('display','block')
   $('#dismiss').show()
   $('#scroll-right').hide()
+  $('#scroll-left').hide()
 }
 
 var previewMovie = function (response) {
