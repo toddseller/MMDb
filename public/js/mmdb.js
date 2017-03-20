@@ -344,25 +344,24 @@ var closePreview = function (event) {
   $('#more').show()
 }
 
-var first = true;
+var first = true
 
 var getMovieModal = function (event) {
   event.preventDefault()
 
+  var user = $(this).parent().attr('id')
+  var movieId = $(this).attr('id')
+  var route = '/users/' + user + '/movies/' + movieId
+  var that = $(this).parent('div')
+  var posterArt = $(this).children('img')
+  var title = $(this).siblings('p')
+  var index = $(that).index()
+  var itemsPerRow = 7
+  var col = (index % itemsPerRow) + 1
+  var endOfRow = $('.index-preview').eq(index + itemsPerRow - col)
+  if (!endOfRow.length) endOfRow = $('.index-preview').last()
 
-  if (first) {
-    console.log(first)
-    var user = $(this).parent().attr('id')
-    var movieId = $(this).attr('id')
-    var route = '/users/' + user + '/movies/' + movieId
-    var that = $(this).parent('div')
-    var posterArt = $(this).children('img')
-    var title = $(this).siblings('p')
-    var index = $(that).index()
-    var itemsPerRow = 7
-    var col = (index % itemsPerRow) + 1
-    var endOfRow = $('.index-preview').eq(index + itemsPerRow - col)
-    if (!endOfRow.length) endOfRow = $('.index-preview').last()
+  if (title.is(':visible')) {
     var request = $.ajax({
       url: route
     })
@@ -384,7 +383,6 @@ var getMovieModal = function (event) {
       }
     })
   } else {
-    console.log(first)
     var removeInfoClass = function () {
       $('.info').remove()
     }
@@ -394,7 +392,6 @@ var getMovieModal = function (event) {
     $('.lazy').removeClass('notransition').removeClass('active')
     setTimeout(removeInfoClass, 1000)
   }
-  first = !first
 }
 
 var switchInfoDiv = function (posterArt, title) {
