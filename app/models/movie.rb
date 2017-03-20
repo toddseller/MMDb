@@ -8,7 +8,7 @@ class Movie < ActiveRecord::Base
 
   before_create :create_sort_name
   before_create :create_duration
-  # before_save :create_search_name
+  before_save :create_search_name
   before_update :sanitize_input
 
   scope :sorted_list, -> { order(:sort_name, :year) }
