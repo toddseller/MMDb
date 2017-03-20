@@ -344,6 +344,8 @@ var closePreview = function (event) {
   $('#more').show()
 }
 
+var first = true
+
 var getMovieModal = function (event) {
   event.preventDefault()
 
@@ -358,26 +360,38 @@ var getMovieModal = function (event) {
   var col = (index % itemsPerRow) + 1
   var endOfRow = $('.index-preview').eq(index + itemsPerRow - col)
   if (!endOfRow.length) endOfRow = $('.index-preview').last()
-  var request = $.ajax({
-    url: route
-  })
-  request.done(function (response) {
-    if ($('#movie-list > div').hasClass('info')) {
+
+  if (title.is(':visible')) {
+    var request = $.ajax({
+      url: route
+    })
+    request.done(function (response) {
+      if ($('#movie-list > div').hasClass('info')) {
+        $('.info').remove()
+        switchInfoDiv(posterArt, title)
+        endOfRow.after('<div class="info"></div>')
+        $(that).nextAll('div.info').toggleClass('active').append('<div class="info-wrapper">' + response + '</div>')
+        $(that).find('.pointer').addClass('notransition').addClass('active')
+      } else {
+        var filteredList = $('#movie-list > div').filter('.index-preview')
+        filtered(filteredList)
+        endOfRow.after('<div class="info"></div>')
+        $(posterArt).toggleClass('active')
+        $(title).hide()
+        $(that).find('.pointer').toggleClass('active')
+        $(that).nextAll('div.info').first().toggleClass('active').append('<div class="info-wrapper">' + response + '</div>')
+      }
+    })
+  } else {
+    var removeInfoClass = function () {
       $('.info').remove()
-      switchInfoDiv(posterArt, title)
-      endOfRow.after('<div class="info"></div>')
-      $(that).nextAll('div.info').toggleClass('active').append('<div class="info-wrapper">' + response + '</div>')
-      $(that).find('.pointer').addClass('notransition').addClass('active')
-    } else {
-      var filteredList = $('#movie-list > div').filter('.index-preview')
-      filtered(filteredList)
-      endOfRow.after('<div class="info"></div>')
-      $(posterArt).toggleClass('active')
-      $(title).hide()
-      $(that).find('.pointer').toggleClass('active')
-      $(that).nextAll('div.info').first().toggleClass('active').append('<div class="info-wrapper">' + response + '</div>')
     }
-  })
+    $('.pointer').removeClass('notransition').removeClass('active').removeAttr('style')
+    $('.info').removeClass('active')
+    $('.truncate').fadeIn(400, 'linear')
+    $('.lazy').removeClass('notransition').removeClass('active')
+    setTimeout(removeInfoClass, 1000)
+  }
 }
 
 var switchInfoDiv = function (posterArt, title) {
