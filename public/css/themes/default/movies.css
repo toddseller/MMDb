@@ -134,6 +134,12 @@ img
   float: right;
 }
 
+.preview-wrapper
+{
+  position: relative;
+  width: 1386px;
+}
+
 #preview {
   position: relative;
   top: 50px;
@@ -155,8 +161,8 @@ img
 #dismiss
 {
   position: absolute;
-  right: 80px;
-  top: 105px;
+  right: -50px;
+  top: 87px;
   z-index: 3;
   display: none;
 
@@ -178,7 +184,7 @@ img
 #scroll-left, #scroll-right
 {
   position: absolute;
-  top:108px;
+  top: 87px;
   height: 263px;
   background: rgba(0,0,0,.4);
   display: none;
@@ -198,12 +204,12 @@ img
 
 #scroll-left
 {
-  left: 8.75%;
+  left: 0;
 }
 
 #scroll-right
 {
-  right: 8.75%;
+  right: 0;
 }
 
 #preview h3

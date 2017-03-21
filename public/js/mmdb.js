@@ -305,8 +305,9 @@ var scrollLeft = function () {
 
 var movieToDB = function (event) {
   event.preventDefault()
+  var title = $(this).find('input[name="movie[title]"]').val()
   var movie = $(this).serialize() + '&filter=' + $('#search-movie-title').val()
-  console.log(movie)
+  $('#preview').empty().slideDown(300, 'linear').append('<div id="loading"><h3>Adding ' + title + ' to Your Collection...</h3><div class="loader"></div></div>').css('display','block')
   var route = $(this).attr('action')
   $.post(route, movie, listMovie)
 }
