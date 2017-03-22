@@ -1,6 +1,5 @@
 <div id="meta-data">
   <div class="modal-header">
-    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
     <% if user %>
       <a class="movie-edit" href=<%= "/users/#{user.id}/movies/#{movie.id}/edit" %>><span class="glyphicon glyphicon-option-vertical" aria-hidden="true"></span></a>
     <% end %>
