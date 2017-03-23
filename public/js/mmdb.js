@@ -1,4 +1,5 @@
 var lastPos = 0
+var timeoutId = 0
 
 var bindListeners = function () {
   $('#sign-in-form').on('submit', validate)
@@ -7,7 +8,10 @@ var bindListeners = function () {
   $('#menu-toggle').on('click', animateMenu)
   $('#logout').on('click', logout)
   $('#update').on('click', updateUser)
-  $('#search-movie-title').on('keyup', filterMovies)
+  $('#search-movie-title').on('keyup', function () {
+    clearTimeout(timeoutId)
+    timeoutId = setTimeout(filterMovies, 200)
+  })
   $('.registration #confirm').on('keyup', checkPassword)
   $('#clear-btn').on('click', clearFilter)
   $('#scroll-right').on('click', scrollRight)
@@ -34,7 +38,7 @@ var dynamicListener = function () {
 }
 
 var filterMovies = function (event) {
-  event.preventDefault()
+  //event.preventDefault()
 
   var filter = $('#search-movie-title').val()
   var id = window.location.href.substr(window.location.href.lastIndexOf('/') + 1)
