@@ -262,7 +262,7 @@ var previewMovie = function (response) {
     $('#preview').slideDown(300, 'linear')
     $('#dismiss').show()
     $('#preview').scroll(addArrow)
-    $('#preview').empty().append(response.page).css({'display':'flex', 'justify-content': 'space-around'})
+    $('#preview').empty().append(response.page).css({'display':'flex', 'justify-content': 'space-between'})
     if ($('#preview > div').size() <= 6) {
       $('#scroll-right').hide()
     } else {
