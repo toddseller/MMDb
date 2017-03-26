@@ -10,7 +10,7 @@ var bindListeners = function () {
   $('#update').on('click', updateUser)
   $('#search-movie-title').on('keyup', function () {
     clearTimeout(timeoutId)
-    timeoutId = setTimeout(filterMovies, 200)
+    timeoutId = setTimeout(filterMovies, 100)
   })
   $('.registration #confirm').on('keyup', checkPassword)
   $('#clear-btn').on('click', clearFilter)
