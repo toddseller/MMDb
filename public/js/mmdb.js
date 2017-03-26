@@ -438,7 +438,7 @@ var closeInfo = function (event) {
   $('.info').removeClass('active')
   $('.truncate').fadeIn(400, 'linear')
   $('.lazy').removeClass('notransition').removeClass('active')
-  setTimeout(removeInfoClass, 1000)
+  setTimeout(removeInfoClass, 500)
 }
 
 var activateModal = function (event) {
