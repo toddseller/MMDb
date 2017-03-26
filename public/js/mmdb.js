@@ -10,7 +10,7 @@ var bindListeners = function () {
   $('#update').on('click', updateUser)
   $('#search-movie-title').on('keyup', function () {
     clearTimeout(timeoutId)
-    timeoutId = setTimeout(filterMovies, 200)
+    timeoutId = setTimeout(filterMovies, 300)
   })
   $('.registration #confirm').on('keyup', checkPassword)
   $('#clear-btn').on('click', clearFilter)
@@ -438,7 +438,7 @@ var closeInfo = function (event) {
   $('.info').removeClass('active')
   $('.truncate').fadeIn(400, 'linear')
   $('.lazy').removeClass('notransition').removeClass('active')
-  setTimeout(removeInfoClass, 1000)
+  setTimeout(removeInfoClass, 0)
 }
 
 var activateModal = function (event) {
