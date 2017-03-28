@@ -14,14 +14,13 @@ class Movie < ActiveRecord::Base
   scope :sorted_list, -> { order(:sort_name, :year) }
   scope :recently_added, -> { order(created_at: :desc) }
 
-  def self.search_title(t,y)
-    if y != ''
-      movie_array = Movie.where("search_name LIKE ? AND year = ?","%#{t}%", "%#{y}%").sorted_list.first(10)
-    else
-      movie_array = Movie.where("search_name LIKE ?", "%#{t}%").sorted_list.first(10)
-    end
-    title_response = HTTParty.get('https://api.themoviedb.org/3/search/movie?api_key=' + ENV['TMDB_KEY'] + '&query=' + t +'&year=' + y)
+  def self.search_title(t)
+    movie_array = Movie.where("search_name LIKE ?", "%#{t}%").sorted_list.first(10)
+
+    title_response = HTTParty.get('https://api.themoviedb.org/3/search/movie?api_key=' + ENV['TMDB_KEY'] + '&query=' + t)
+
     return nil if title_response['results'] == []
+
     title_response['results'].each do |movie|
       movie_response = HTTParty.get('https://api.themoviedb.org/3/movie/' + movie['id'].to_s + '?api_key=' + ENV['TMDB_KEY'] + '&append_to_response=credits,releases')
       runtime = movie_response['runtime'] != nil ? movie_response['runtime'].to_s : '0'
