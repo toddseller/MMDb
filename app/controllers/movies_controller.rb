@@ -1,8 +1,7 @@
 get '/movies' do
   title = params[:query].downcase
-  year = params[:year]
-  p @user = current_user
-  p @movie_previews = Movie.search_title(title, year)
+  @user = current_user
+  @movie_previews = Movie.search_title(title)
   page = erb :"/partials/_preview", layout: false
   if request.xhr?
     json query: @movie_previews, page: page
