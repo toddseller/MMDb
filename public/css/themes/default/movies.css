@@ -20,7 +20,7 @@ img
 
 .info.active
 {
-  overflow: auto;
+  overflow: hidden;
 
   height: auto;
   max-height: 700px;
@@ -179,6 +179,36 @@ img
 {
   opacity: .5;
   color: #000;
+}
+
+.movie-edit
+{
+  height: 30px;
+  width: 30px;
+  float: right;
+  background: #d9534f;
+  border-radius: 50%;
+  margin-bottom: -10px;
+}
+
+.movie-edit .glyphicon
+{
+  color: #fff;
+  font-size: 1.5em;
+  text-align: center;
+  margin-right: 0;
+  top: 15%;
+  left: 11%;
+}
+
+a.movie-edit:hover, a.movie-edit:focus
+{
+  text-decoration: none;
+}
+
+a.movie-edit:hover
+{
+  background: #c9302c;
 }
 
 #scroll-left, #scroll-right

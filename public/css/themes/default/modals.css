@@ -199,9 +199,15 @@
 
 .edit-poster img
 {
-  width: 150px;
+  width: 250px;
   height: auto;
-  margin-bottom: 15px;
+  margin-left: -30px;
+  border-radius: 4px;
+}
+
+.edit-form
+{
+  margin-right: -30px;
 }
 
 #delete-button
