@@ -151,6 +151,17 @@
   border-radius: 3px;
 }
 
+#description-hd
+{
+    background: #333;
+    color: #fff;
+    padding: 2px 5px;
+    border-radius: 3px;
+    font-weight: bolder;
+    position: relative;
+    top: 1px;
+}
+
 #description-year
 {
   font-size: 1.25em;

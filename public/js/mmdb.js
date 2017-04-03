@@ -459,6 +459,7 @@ var editMovie = function (event) {
 }
 
 var displayEditForm = function (response) {
+  console.log(response)
   $('.modal-body').replaceWith(response)
   $('.modal-footer').hide()
 }

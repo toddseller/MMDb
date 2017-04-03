@@ -16,6 +16,9 @@
           <span class="spacing"><%= movie.year %></span>
           <span class="spacing"><%= movie.genre %></span>
           <span class="spacing" id="description-rating"><%= movie.rating %></span>
+          <% if movie.hd %>
+            <span class="spacing" id="description-hd">HD</span>
+          <% end %>
           <div id="ratings-container">
             <% if current_user %>
               <%= erb :'partials/_ratings_form', locals: {movie: movie} %>
