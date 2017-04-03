@@ -448,6 +448,7 @@ var activateModal = function (event) {
 }
 
 var displayMovieModal = function (response) {
+  console.log(response)
   $('#movie .modal-content').empty().append(response)
   $('#movie').modal('show')
 }

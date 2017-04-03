@@ -155,7 +155,7 @@
 
 .modal-lg
 {
-  width: 1050px;
+  width: 1100px;
 }
 
 .modal-header .description
@@ -172,6 +172,17 @@
 
   border: 2px solid #f3f3f3;
   border-radius: 3px;
+}
+
+#description-hd
+{
+    background: #f3f3f3;
+    color: #222;
+    padding: 2px 5px;
+    border-radius: 3px;
+    font-weight: bolder;
+    position: relative;
+    top: 1px;
 }
 
 #description-year
