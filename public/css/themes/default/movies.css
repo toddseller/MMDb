@@ -181,6 +181,11 @@ img
   color: #000;
 }
 
+.checkbox .edit-hd
+{
+  font-weight: 700;
+}
+
 .movie-edit
 {
   height: 30px;
