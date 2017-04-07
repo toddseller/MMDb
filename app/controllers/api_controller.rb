@@ -1,5 +1,5 @@
 get '/api/movies' do
-  user = params[':user_key']
+  user = User.find(params[:user_key])
   movies = user.movies.sorted_list
 
   json movies: movies
