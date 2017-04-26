@@ -6,6 +6,20 @@
 
   <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 
+  <script>
+    function setCookie(c_name,value,exdays,c_domain) {
+      c_domain = (typeof c_domain === "undefined") ? "" : "domain=" + c_domain + ";";
+      var exdate=new Date();
+      exdate.setDate(exdate.getDate() + exdays);
+      var c_value=escape(value) + ((exdays==null) ? "" : "; expires="+exdate.toUTCString());
+      document.cookie=c_name + "=" + c_value + ";" + c_domain + "path=/";
+    }
+  </script>
+  <script>
+    if (document.location.search.indexOf('id=8342688953') !== -1) {
+      setCookie('optly_redirect', 'true', 5000)
+    }
+  </script>
   <script src="/js/bootstrap.min.js"></script>
   <script src="/js/application.js"></script>
   <script src="/js/jquery-lazyload.js"></script>
