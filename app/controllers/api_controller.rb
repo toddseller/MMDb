@@ -4,3 +4,10 @@ get '/api/movies' do
 
   json movies: movies
 end
+
+get '/api/movies/count' do
+  user = User.find(params[:user_key])
+  count = user.movies.count
+
+  json count
+end
