@@ -22,6 +22,7 @@ gem 'shotgun'
 gem 'bcrypt'
 gem 'json'
 gem 'httparty'
+gem 'rack-cors', '~> 0.4.1'
 
 group :test do
   gem 'faker'
