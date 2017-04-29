@@ -1,7 +1,7 @@
   <div class="row">
     <div class="col-sm-12">
       <div class="col-sm-9">
-        <img id="main-logo" src="http://mmdb.online/imgs/logo.svg" alt="MMDb logo">
+        <img id="main-logo" src="https://mmdb.online/imgs/logo.svg" alt="MMDb logo">
         <h3>Most Popular Movies</h3>
         <% @movies.user_count.each do |movie| %>
           <%= erb :'/partials/_top_movies', locals: { movie: movie }, layout: false %>
