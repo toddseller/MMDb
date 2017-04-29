@@ -1,13 +1,9 @@
 post '/users/:user_id/movies' do
-  p '*' * 25
-  p @user = current_user
-  p '+' * 25
-  p movie = Movie.find_by("title = ? AND year = ?", params[:movie]['title'], params[:movie]['year']) || Movie.new(params[:movie])
+  @user = current_user
+  movie = Movie.find_by("title = ? AND year = ?", params[:movie]['title'], params[:movie]['year']) || Movie.new(params[:movie])
   if movie.save
-    p '*' * 25
-    p movie.users << @user if !movie.users.include?(@user)
-    p '+' * 25
-    p @my_movies = Movie.filter_movies(params[:filter], @user.id).sorted_list
+    movie.users << @user if !movie.users.include?(@user)
+    @my_movies = Movie.filter_movies(params[:filter], @user.id).sorted_list
     if request.xhr?
       page = erb :'/partials/_movie_list', locals: {movie: @my_movies, user: @user}, layout: false
       json status: "true", page: page
