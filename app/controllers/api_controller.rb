@@ -2,9 +2,9 @@ use Rack::Cors do |config|
   config.allow do |allow|
     allow.origins '*'
     allow.resource '/api/movies/count',
-        :methods =&gt; [:get],
-        :headers =&gt; :any,
-        :max_age =&gt; 0
+        :methods => [:get],
+        :headers => :any,
+        :max_age => 0
   end
 end
 
