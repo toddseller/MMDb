@@ -3,15 +3,16 @@
   margin-right: 25px;
 }
 
-.logo
+/*.logo
 {
   height: 50px;
-}
+}*/
 
 .logo img
 {
   margin-top: 5px;
   margin-left: 40px;
+  width: 120px;
 }
 
 #tmdb

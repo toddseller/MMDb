@@ -12,6 +12,7 @@ body
 
 #main-logo
 {
-  margin-top: -200px;
-  margin-bottom: -200px;
+  margin-top: 75px;
+  margin-bottom: 75px;
+  width: 60%;
 }
