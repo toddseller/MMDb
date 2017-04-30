@@ -22,3 +22,9 @@ get '/api/movies/count' do
 
   json count
 end
+
+get '/api/year' do
+  year = DateTime.now.year
+
+  json year
+end
