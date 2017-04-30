@@ -3,9 +3,13 @@ use Rack::Cors do |config|
 
     allow.origins 'http://toddseller.com', 'http://www.toddseller.com'
     allow.resource '/api/movies/count',
-        :methods => [:get],
-        :headers => :any,
-        :max_age => 0
+      :methods => [:get],
+      :headers => :any,
+      :max_age => 0
+    allow.resource '/api/year',
+      :methods => [:get],
+      :headers => :any,
+      :max_age => 0
   end
 end
 
