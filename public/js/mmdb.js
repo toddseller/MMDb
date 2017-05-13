@@ -377,6 +377,8 @@ var getMovieModal = function (event) {
         endOfRow.after('<div class="info"></div>')
         $(that).nextAll('div.info').toggleClass('active').append('<div class="info-wrapper">' + response + '</div>')
         $(that).find('.pointer').addClass('notransition').addClass('active')
+        $(that).find('.new-label').addClass('active').addClass('notransition')
+        $(that).find('.new-text').addClass('active').addClass('notransition')
       } else {
         var filteredList = $('#movie-list > div').filter('.index-preview')
         filtered(filteredList)
@@ -384,6 +386,8 @@ var getMovieModal = function (event) {
         $(posterArt).toggleClass('active')
         $(title).hide()
         $(that).find('.pointer').toggleClass('active')
+        $(that).find('.new-label').toggleClass('active')
+        $(that).find('.new-text').toggleClass('active')
         $(that).nextAll('div.info').first().toggleClass('active').append('<div class="info-wrapper">' + response + '</div>')
       }
     })
@@ -394,6 +398,8 @@ var getMovieModal = function (event) {
     $('.pointer').removeClass('notransition').removeClass('active').removeAttr('style')
     $('.info').removeClass('active')
     $('.truncate').fadeIn(400, 'linear')
+    $('.new-label').removeClass('active').removeClass('notransition')
+    $('.new-text').removeClass('active').removeClass('notransition')
     $('.lazy').removeClass('notransition').removeClass('active')
     setTimeout(removeInfoClass, 1000)
   }
@@ -403,6 +409,8 @@ var switchInfoDiv = function (posterArt, title) {
   $('.truncate').fadeIn(400, 'linear')
   $('.lazy').removeClass('active').removeClass('notransition')
   $('.pointer').removeClass('notransition').removeClass('active')
+  $('.new-label').removeClass('active').removeClass('notransition')
+  $('.new-text').removeClass('active').removeClass('notransition')
   posterArt.toggleClass('active').addClass('notransition')
   title.hide()
 }
@@ -437,6 +445,8 @@ var closeInfo = function (event) {
   $('.pointer').removeClass('notransition').removeClass('active').removeAttr('style')
   $('.info').removeClass('active')
   $('.truncate').fadeIn(400, 'linear')
+  $('.new-label').removeClass('active')
+  $('.new-text').removeClass('active')
   $('.lazy').removeClass('notransition').removeClass('active')
   setTimeout(removeInfoClass, 0)
 }
@@ -497,6 +507,8 @@ var displayUpdatedMovie = function (response) {
   $(posterArt).toggleClass('active').addClass('notransition')
   $(title).hide()
   $(that).find('.pointer').toggleClass('active').addClass('notransition')
+  $(that).find('.new-label').toggleClass('active').addClass('notransition')
+  $(that).find('.new-text').toggleClass('active').addClass('notransition')
   $(that).nextAll('div.info').first().toggleClass('active').addClass('notransition').append('<div class="info-wrapper">' + response.page + '</div>')
 }
 
