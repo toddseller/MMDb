@@ -37,13 +37,23 @@
                 <textarea name="movie[genre]" class="form-control" rows="1"><%= @movie.genre %></textarea>
               </div>
               <div class="col-sm-1">
-                <div class="checkbox">
+                <div class="checkbox hd">
                   <label class="edit-hd">
                     <input id="movie-hd" type="hidden" name="movie[hd]" value="false">
                     <% if @movie.hd %>
                       <input id="movie-hd" type="checkbox" name="movie[hd]" value="true" checked="checked"> HD
                     <% else %>
                       <input id="movie-hd" type="checkbox" name="movie[hd]" value="true"> HD
+                    <% end %>
+                  </label>
+                </div>
+                <div class="checkbox isnew">
+                  <label class="edit-isnew">
+                    <input id="movie-isnew" type="hidden" name="movie[isnew]" value="false">
+                    <% if @movie.isnew %>
+                      <input id="movie-hd" type="checkbox" name="movie[isnew" value="true" checked="checked"> New
+                    <% else %>
+                      <input id="movie-hd" type="checkbox" name="movie[isnew]" value="true"> New
                     <% end %>
                   </label>
                 </div>
