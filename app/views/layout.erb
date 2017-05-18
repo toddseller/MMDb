@@ -34,17 +34,17 @@
   </script>
     <script>
     var state = window.optimizely.get('state')
-    var redirect = state.getRedirectInfo()
-    // if(redirect['8392481056'] === '8394510811') {
-    //   alert('In if!')
-      console.log(redirect)
-    //   window.optimizely.push({
-    //     type: 'user',
-    //     attributes: {
-    //       userType: '1234'
-    //     }
-    //   })
-    // }
+    var map = state.getVariationMap()
+    if(map['8385033437'].id === '8392460559') {
+      alert('In if!')
+      window.optimizely = window.optimizely || []
+      window.optimizely.push({
+        type: 'user',
+        attributes: {
+          userType: '1234'
+        }
+      })
+    }
   </script>
   <noscript><link rel="stylesheet" href="/css/default.css"></noscript>
   <title></title>
