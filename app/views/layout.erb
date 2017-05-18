@@ -32,6 +32,19 @@
     getStylesheet();
       -->
   </script>
+
+  <script>
+    var state = window.optimizely.get('state')
+    if(state.getRedirectInfo()[1] === '8394510811') {
+      alert('In if!')
+      window.optimizely.push({
+        type: 'user',
+        attributes: {
+          userType: '1234'
+        }
+      })
+    }
+  </script>
   <noscript><link rel="stylesheet" href="/css/default.css"></noscript>
   <title></title>
 </head>
