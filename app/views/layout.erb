@@ -35,14 +35,16 @@
 
   <script>
     var state = window.optimizely.get('state')
-    if(state.getRedirectInfo()[1] === '8394510811') {
+    var redirect = state.getRedirectInfo()
+    //if(state.getRedirectInfo()[1] === '8394510811') {
       alert('In if!')
-      window.optimizely.push({
-        type: 'user',
-        attributes: {
-          userType: '1234'
-        }
-      })
+      console.log(redirect)
+      //window.optimizely.push({
+        //type: 'user',
+        //attributes: {
+          //userType: '1234'
+        //}
+      //})
     }
   </script>
   <noscript><link rel="stylesheet" href="/css/default.css"></noscript>
