@@ -32,3 +32,10 @@ get '/api/year' do
 
   json year
 end
+
+get '/api/movies/new' do
+  user = User.find(params[:user_key])
+  movies = user.movies.where('isnew').sorted_list
+
+  json movies
+end
