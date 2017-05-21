@@ -23,3 +23,10 @@ get '/movies/filter' do
   end
 end
 
+get '/movies/new/:id' do
+  user = User.find(params[:id])
+  @my_movies = user.movies.where('isnew').sorted_list
+  if request.xhr?
+    erb :"/partials/_filtered_list", layout: false, locals: {user: user}
+  end
+end

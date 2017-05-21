@@ -32,6 +32,20 @@
     getStylesheet();
       -->
   </script>
+    <script>
+    var state = window.optimizely.get('state')
+    var map = state.getVariationMap()
+    if(map['8385033437'].id === '8392460559') {
+      alert('In if!')
+      window.optimizely = window.optimizely || []
+      window.optimizely.push({
+        type: 'user',
+        attributes: {
+          userType: '1234'
+        }
+      })
+    }
+  </script>
   <noscript><link rel="stylesheet" href="/css/default.css"></noscript>
   <title></title>
 </head>

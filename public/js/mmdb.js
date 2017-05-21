@@ -16,6 +16,8 @@ var bindListeners = function () {
   $('#clear-btn').on('click', clearFilter)
   $('#scroll-right').on('click', scrollRight)
   $('#scroll-left').on('click', scrollLeft)
+  $('#unwatched').on('click', unwatched)
+  $('#library').on('click', clearFilter)
 }
 
 var dynamicListener = function () {
@@ -48,6 +50,19 @@ var filterMovies = function (event) {
   var request = $.ajax({
     url: route,
     data: data
+  })
+  request.done(function (response) {
+    $('#movie-list').empty().append(response)
+  })
+}
+
+var unwatched = function (evenet) {
+  event.preventDefault()
+
+  $('#unwatched').addClass('active')
+  var route = $(this).attr('href')
+  var request = $.ajax({
+    url: route
   })
   request.done(function (response) {
     $('#movie-list').empty().append(response)
@@ -87,6 +102,7 @@ var clearFilter = function () {
   $('.pointer').removeClass('notransition').removeClass('active').removeAttr('style')
   $('.truncate').fadeIn(400, 'linear')
   $('.lazy').removeClass('notransition').removeClass('active')
+  $('#unwatched').removeClass('active')
 }
 
 var animateMenu = function (event) {
