@@ -568,4 +568,5 @@ a.index-user:hover,
   background-color: #d9534f;
   border: 1px solid #d43f3a;
   border-radius: 4px;
+  cursor: default;
 }
