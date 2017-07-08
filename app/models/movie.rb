@@ -123,7 +123,7 @@ class Movie < ActiveRecord::Base
     def self.get_studio(r)
       studio = []
       r['production_companies'].each { |k| studio << k['name'] } if r['production_companies']
-      studio.length !=0 ? studio.first(2).join(', ') : ''
+      studio.length != 0 ? studio.first(1).join() : ''
     end
 
     def self.get_writers(r)
