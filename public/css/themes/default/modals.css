@@ -194,6 +194,17 @@
   font-weight: 600;
 }
 
+.description-details a
+{
+  color: #333;
+  text-decoration: none;
+}
+
+.description-details a:hover
+{
+  color: #c9302c;
+}
+
 #info-body {
   min-height: 600px;
 }

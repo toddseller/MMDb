@@ -1,4 +1,4 @@
-.modal
+680611544li.modal
 {
   position: fixed;
   top: 50%;
@@ -215,6 +215,17 @@
 .description-details h5
 {
   font-weight: 600;
+}
+
+.description-details a
+{
+  color: #f3f3f3;
+  text-decoration: none;
+}
+
+.description-details a:hover
+{
+  color: #c9302c;
 }
 
 #info-body {
