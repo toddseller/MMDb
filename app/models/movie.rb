@@ -32,7 +32,6 @@ class Movie < ActiveRecord::Base
     movie_array.sort_by {|k| k[:year]}
   end
 
-
   def self.user_count
     self.all.sort_by { |movie| [movie.users.count, movie[:sort_name]] }.reverse![0, 6]
   end
@@ -46,6 +45,11 @@ class Movie < ActiveRecord::Base
     title = t.downcase
     user = User.find(u)
     movies = user.movies.where('search_name LIKE ?', "%#{title}%")
+  end
+
+  def self.search_by_name(n, u)
+    user = User.find(u)
+    movies = user.movies.where('actors LIKE ? OR director LIKE ? OR producer LIKE ? OR writer LIKE ?', "%#{n}%", "%#{n}%", "%#{n}%", "%#{n}%")
   end
 
   private

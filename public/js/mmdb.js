@@ -33,6 +33,7 @@ var dynamicListener = function () {
   $('#user-page').on('click', '#edit-button', submitUpdate)
   $('#user-page').on('click', '#delete-button', deleteMovie)
   $('#user-page').on('click', '.rating-input', ratingSubmit)
+  $('#user-page').on('click', '.description-details a', searchByName)
   $('#logIn').on('click', '#update-submit', userUpdateSubmit)
   $('#logIn').on('keyup', '#confirm', testPassword)
   $('#logIn').on('change', '#current', deactivateSubmit)
@@ -330,6 +331,22 @@ var movieToDB = function (event) {
   $('#preview').empty().slideDown(300, 'linear').append('<div id="loading"><h3>Adding ' + title + ' to Your Collection...</h3><div class="loader"></div></div>').css('display','block')
   var route = $(this).attr('action')
   $.post(route, movie, listMovie)
+}
+
+var searchByName = function (event) {
+  event.preventDefault()
+  var name = $(this).text()
+  var id = window.location.href.substr(window.location.href.lastIndexOf('/') + 1)
+  var data = $.param({name:name, id:id})
+  var route = '/movies/search'
+
+  var request = $.ajax({
+    url: route,
+    data: data
+  })
+  request.done(function (response) {
+    $('#movie-list').empty().append(response)
+  })
 }
 
 var listMovie = function (response) {
