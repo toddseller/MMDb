@@ -26,7 +26,7 @@ class Movie < ActiveRecord::Base
       runtime = movie_response['runtime'] != nil ? movie_response['runtime'].to_s : '0'
       year = movie_response['release_date'] != nil ? movie['release_date'].split('-').slice(0,1).join() : ''
       poster = movie_response['poster_path'] != nil ? 'https://image.tmdb.org/t/p/w342' + movie['poster_path'] : 'NA'
-      test_movie = {title: movie['title'], plot: movie['overview'], poster: poster, year: year, actors: get_actors(movie_response), director: get_director(movie_response), genre: get_genres(movie_response), producer: get_producers(movie_response), rating: get_rating(movie_response), runtime: runtime, writer: get_writers(movie_response)}
+      test_movie = {title: movie['title'], plot: movie['overview'], poster: poster, year: year, actors: get_actors(movie_response), director: get_director(movie_response), genre: get_genres(movie_response), producer: get_producers(movie_response), rating: get_rating(movie_response), runtime: runtime, studio: get_studio(movie_response), writer: get_writers(movie_response)}
       movie_array << test_movie if movie_array.all? {|el| el[:year] != year || el[:director] != get_director(movie_response)}
     end
     movie_array.sort_by {|k| k[:year]}
@@ -118,6 +118,12 @@ class Movie < ActiveRecord::Base
       rating = ''
       r['releases']['countries'].each { |k| rating = k['certification'] if k['iso_3166_1'] == 'US' } if r['releases']['countries'] != nil
       rating != '' ? rating : 'NR'
+    end
+
+    def self.get_studio(r)
+      studio = []
+      r['production_companies'].each { |k| studio << k['name'] } if r['production_companies']
+      studio.length !=0 ? studio.first(2).join(', ') : ''
     end
 
     def self.get_writers(r)
