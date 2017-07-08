@@ -5,7 +5,7 @@
     <% end %>
   </div>
   <div class="modal-body">
-    <div class="row">
+    <div id="info-body" class="row">
       <div class="col-lg-4 description-poster">
         <img src=<%= "#{movie.poster}" %> alt=<%= "#{movie.title} Poster" %>>
       </div>
@@ -31,7 +31,7 @@
         <h4>Cast and Crew</h4>
         <hr/>
         <div class="col-lg-3">
-          <h5>Starring</h5>
+          <h5>STARRING</h5>
           <ul>
             <% movie.actors.split(", ").each do |line| %>
               <li><%= line %></li>
@@ -41,9 +41,9 @@
         <div class="col-lg-3 col-lg-offset-1">
           <% if !movie.director.empty? %>
             <% if movie.director.split(',').length > 1 %>
-              <h5>Directors</h5>
+              <h5>DIRECTORS</h5>
             <% else %>
-              <h5>Director</h5>
+              <h5>DIRECTOR</h5>
             <% end %>
             <ul>
             <% movie.director.split(", ").each do |line| %>
@@ -53,9 +53,9 @@
           <% end %>
           <% if !movie.writer.empty? %>
             <% if movie.writer.split(',').length > 1 %>
-              <h5>Screenwriters</h5>
+              <h5>SCREENWRITERS</h5>
             <% else %>
-              <h5>Screenwriter</h5>
+              <h5>SCREENWRITER</h5>
             <% end %>
             <ul>
             <% movie.writer.split(", ").each do |line| %>
@@ -67,9 +67,9 @@
         <div class="col-lg-3 col-lg-offset-1">
           <% if !movie.producer.empty? %>
             <% if movie.producer.split(',').length > 1 %>
-              <h5>Producers</h5>
+              <h5>PRODUCERS</h5>
             <% else %>
-              <h5>Producer</h5>
+              <h5>PRODUCER</h5>
             <% end %>
             <ul>
             <% movie.producer.split(", ").each do |line| %>
@@ -82,6 +82,13 @@
           <% end %>
         </div>
       </div>
+      <% if !movie.studio.empty? %>
+        <div class="studio">
+          <h5>STUDIO</h5>
+          <hr/>
+          <p><%= movie.studio %></p>
+        </div>
+      <% end %>
     </div>
   </div>
 </div>

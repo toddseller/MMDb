@@ -191,7 +191,29 @@
 
 .description-details h5
 {
-  font-size: 1.1em;
+  font-weight: 600;
+}
+
+#info-body {
+  min-height: 600px;
+}
+
+.studio
+{
+  position: absolute;
+  width: 770px;
+  right: 0;
+  bottom: 25px;
+}
+
+.studio h5
+{
+  font-weight: 600;
+}
+
+.studio p
+{
+  margin-top: -10px;
 }
 
 .description-poster
