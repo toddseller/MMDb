@@ -1,4 +1,4 @@
-class CreateMoviesUsers < ActiveRecord::Migration
+class CreateMoviesUsers < ActiveRecord::Migration[5.1]
   def change
     create_table :movies_users, id: false do |t|
       t.belongs_to :movie, index: true
