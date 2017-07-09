@@ -41,15 +41,11 @@ class Movie < ActiveRecord::Base
     average = self.ratings.length > 0 ? (sum.to_f / self.ratings.count).round : 0
   end
 
-  def self.filter_movies(t, u)
-    title = t.downcase
+  def self.filter_movies(f, u)
     user = User.find(u)
-    movies = user.movies.where('search_name LIKE ?', "%#{title}%")
-  end
-
-  def self.search_by_name(n, u)
-    user = User.find(u)
-    movies = user.movies.where('actors LIKE ? OR director LIKE ? OR producer LIKE ? OR writer LIKE ?', "%#{n}%", "%#{n}%", "%#{n}%", "%#{n}%")
+    title = f.downcase
+    f = f.split.map(&:capitalize).join(' ')
+    movies = user.movies.where('search_name LIKE ? OR actors LIKE ? OR director LIKE ? OR producer LIKE ? OR writer LIKE ?', "%#{title}%", "%#{f}%", "%#{f}%", "%#{f}%", "%#{f}%")
   end
 
   private
