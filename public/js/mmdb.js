@@ -35,6 +35,7 @@ var dynamicListener = function () {
   $('#user-page').on('click', '#delete-button', deleteMovie)
   $('#user-page').on('click', '.rating-input', ratingSubmit)
   $('#user-page').on('click', '.description-details a', searchByName)
+  $('#user-page').on('click', '.studio a', searchByName)
   $('#logIn').on('click', '#update-submit', userUpdateSubmit)
   $('#logIn').on('keyup', '#confirm', testPassword)
   $('#logIn').on('change', '#current', deactivateSubmit)
