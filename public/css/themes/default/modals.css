@@ -205,6 +205,17 @@
   color: #c9302c;
 }
 
+.studio a
+{
+  color: #333;
+  text-decoration: none;
+}
+
+.studio a:hover
+{
+  color: #c9302c;
+}
+
 #info-body {
   min-height: 575px;
 }

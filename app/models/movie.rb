@@ -44,8 +44,8 @@ class Movie < ActiveRecord::Base
   def self.filter_movies(f, u)
     user = User.find(u)
     title = f.downcase
-    f = f.split.map(&:capitalize).join(' ')
-    movies = user.movies.where('search_name LIKE ? OR actors LIKE ? OR director LIKE ? OR producer LIKE ? OR writer LIKE ?', "%#{title}%", "%#{f}%", "%#{f}%", "%#{f}%", "%#{f}%")
+    f = f.split.length == 1 ? f.split.map(&:capitalize).join(' ') : f == f.split.join(' ') ? f : f.split.map(&:capitalize).join(' ')
+    movies = user.movies.where('search_name LIKE ? OR actors LIKE ? OR director LIKE ? OR producer LIKE ? OR writer LIKE ? OR studio LIKE ?', "%#{title}%", "%#{f}%", "%#{f}%", "%#{f}%", "%#{f}%", "%#{f}%")
   end
 
   private
