@@ -39,3 +39,9 @@ get '/api/movies/new' do
 
   json movies
 end
+
+get '/api/movies/new' do
+  movies = Movie.filter_movies(params[:filter], params[:user_key]).sorted_list
+
+  json movies
+end
