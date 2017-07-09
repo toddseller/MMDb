@@ -1,5 +1,6 @@
 var lastPos = 0
 var timeoutId = 0
+var filterValue = ''
 
 var bindListeners = function () {
   $('#sign-in-form').on('submit', validate)
@@ -41,11 +42,10 @@ var dynamicListener = function () {
 }
 
 var filterMovies = function (event) {
-  //event.preventDefault()
 
-  var filter = $('#search-movie-title').val()
+  filterValue = $('#search-movie-title').val()
   var id = window.location.href.substr(window.location.href.lastIndexOf('/') + 1)
-  var data = $.param({title:filter, id:id})
+  var data = $.param({filter:filterValue, id:id})
   var route = '/movies/filter'
 
   var request = $.ajax({
@@ -104,6 +104,7 @@ var clearFilter = function () {
   $('.truncate').fadeIn(400, 'linear')
   $('.lazy').removeClass('notransition').removeClass('active')
   $('#unwatched').removeClass('active')
+  filterValue = ''
 }
 
 var animateMenu = function (event) {
@@ -335,10 +336,13 @@ var movieToDB = function (event) {
 
 var searchByName = function (event) {
   event.preventDefault()
-  var name = $(this).text()
+
+  $('#filter-input').trigger('reset')
+
+  filterValue = $(this).text()
   var id = window.location.href.substr(window.location.href.lastIndexOf('/') + 1)
-  var data = $.param({name:name, id:id})
-  var route = '/movies/search'
+  var data = $.param({filter:filterValue, id:id})
+  var route = '/movies/filter'
 
   var request = $.ajax({
     url: route,
@@ -510,7 +514,7 @@ var displayEditForm = function (response) {
 var submitUpdate = function (event) {
   event.preventDefault()
   var formRoute = $(this).parent().attr('action')
-  var formData = $(this).parent().serialize() + '&filter=' + $('#search-movie-title').val()
+  var formData = $(this).parent().serialize() + '&filter=' + filterValue
   var response = $.ajax({
     url: formRoute,
     type: 'PUT',
@@ -551,7 +555,7 @@ var deleteMovie = function (event) {
   var route = $(parentForm[0]).attr('action')
   var newRoute = $(this).attr('action', route)
   var formRoute = $(newRoute).attr('action')
-  var data = $.param({filter:$('#search-movie-title').val()})
+  var data = $.param({filter:filterValue})
   $.ajax({
     url: formRoute,
     type: 'DELETE',
