@@ -181,6 +181,47 @@ img
   color: #ff0000;
 }
 
+#profile-wrapper
+{
+  display: none;
+}
+
+#profile-wrapper.active
+{
+  display: block;
+  margin-top: 110px;
+  height: 301px;
+  width: 100vw;
+  margin-left: calc(-50vw + 50%);
+  margin-right: calc(-50vw + 50%);
+  margin-bottom: -75px;
+}
+
+#profile-header
+{
+  padding-top: 20px;
+}
+
+#profile-image
+{
+  position: relative;
+  left: 35%;
+  width: 174px;
+  height: 261px;
+  background-size: 100%;
+  border-radius: 4px;
+}
+
+#profile-name
+{
+  position: relative;
+  left: 47%;
+  margin-top: -165px;
+  font-size: 4em;
+  font-weight: 900;
+  color: #f3f3f3;
+}
+
 .checkbox .edit-hd, .checkbox .edit-isnew
 {
   font-weight: 700;

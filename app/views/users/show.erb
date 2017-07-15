@@ -27,6 +27,12 @@
   </div>
 </div>
 <div class="row">
+  <div id="profile-wrapper">
+    <div id="profile-header">
+      <img id="profile-image" src=""/>
+      <h1 id="profile-name"></h1>
+    </div>
+  </div>
   <div id="movie-list" class="col-xs-12">
     <% @my_movies.each do |movie| %>
       <%= erb :'/partials/_my_movies', locals: {movie: movie, user: @user}, layout: false %>

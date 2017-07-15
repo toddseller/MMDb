@@ -96,6 +96,7 @@ var filteredWithInfo = function (array) {
 var clearFilter = function () {
   var route = window.location.pathname
   $.get(route).done(function (response) {
+    $('#profile-wrapper').removeClass('active')
     $('#movie-list').empty().append(response.page)
     $('img.lazy').lazyload()
   })
@@ -350,7 +351,17 @@ var searchByName = function (event) {
     data: data
   })
   request.done(function (response) {
-    $('#movie-list').empty().append(response)
+    console.log(response.url)
+    if (response.url === "no-image") {
+      $('#profile-image').hide()
+      $('#profile-name').css({'margin-top':'100px', 'left':'0','text-align':'center'})
+    } else {
+      $('#profile-image').attr('src',response.url).show()
+      $('#profile-name').attr('style','')
+    }
+    $('#profile-name').text(filterValue)
+    $('#profile-wrapper').addClass('active')
+    $('#movie-list').empty().append(response.page)
   })
 }
 
