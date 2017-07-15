@@ -32,6 +32,11 @@ class Movie < ActiveRecord::Base
     movie_array.sort_by {|k| k[:year]}
   end
 
+  def self.search_person(n)
+    person_response = HTTParty.get('https://api.themoviedb.org/3/search/person?api_key=' + ENV['TMDB_KEY'] + '&query=' + n)
+    person_response['results'] == [] ? nil : 'https://image.tmdb.org/t/p/w342' + person_response['results'][0]['profile_path']
+  end
+
   def self.user_count
     self.all.sort_by { |movie| [movie.users.count, movie[:sort_name]] }.reverse![0, 6]
   end
