@@ -16,8 +16,9 @@ end
 get '/users/:user_id/movies/:id' do
   user = current_user if current_user == User.find(params[:user_id])
   movie = Movie.find(params[:id])
+  link = URI::encode(movie.title)
   if request.xhr?
-    page = erb :'/partials/_info', locals: {movie: movie, user: user}, layout: false
+    page = erb :'/partials/_info', locals: {movie: movie, user: user, link: link}, layout: false
     json page
   end
 end
@@ -37,9 +38,11 @@ put '/users/:user_id/movies/:id' do
   @movie = Movie.find(params[:id])
   @movie.update(params[:movie])
   @user = current_user
+  link = URI::encode(@movie.title)
   if request.xhr?
     @my_movies = Movie.filter_movies(params[:filter], @user.id).sorted_list
-    page = erb :'/partials/_info', locals: {movie: @movie, user: @user}, layout: false
+
+    page = erb :'/partials/_info', locals: {movie: @movie, user: @user, link: link}, layout: false
     list = erb :'/partials/_filtered_list', locals: {movie: @my_movies, user: @user}, layout: false
     json page: page, query: list, id: @movie.id
   else
