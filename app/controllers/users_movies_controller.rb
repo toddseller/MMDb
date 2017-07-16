@@ -14,7 +14,7 @@ post '/users/:user_id/movies' do
 end
 
 get '/users/:user_id/movies/:id' do
-  user = current_user if current_user == User.find(params[:user_id])
+  user = current_user == User.find(params[:user_id]) ? current_user : params[:user_id]
   movie = Movie.find(params[:id])
   link = URI::encode(movie.title)
   if request.xhr?

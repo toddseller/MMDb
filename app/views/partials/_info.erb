@@ -1,13 +1,13 @@
 <div id="meta-data">
   <div class="modal-header">
-    <% if user %>
+    <% if user != '1' && current_user == user.id %>
       <a class="movie-edit" href=<%= "/users/#{user.id}/movies/#{movie.id}/edit" %>><span class="glyphicon glyphicon-option-horizontal"></span></a>
     <% end %>
   </div>
   <div class="modal-body">
     <div id="info-body" class="row">
       <div class="col-lg-4 description-poster">
-        <% if user.id == 1 %>
+        <% if user == '1' || user.id = 1 %>
           <% if movie.hd %>
             <a href=<%= "https://quickconnect.to/ONYX-DS2415?launchApp=SYNO.SDS.VideoPlayer2.Application&launchParam=ieMode%3D9%26path%3D%252FiTunes%252FiTunes%252FiTunes%2520Media%252FMovies%252F#{link}%252F#{link}%2520(1080p%2520HD).m4v%26file_id%3D%252FiTunes%252FiTunes%252FiTunes%2520Media%252FMovies%252F#{link}%252F#{link}%2520(1080p%2520HD).m4v&ieMode=9" %> target="_blank">
           <% else %>
