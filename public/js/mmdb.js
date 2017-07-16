@@ -344,7 +344,7 @@ var searchByName = function (event) {
   filterValue = $(this).text()
   var id = window.location.href.substr(window.location.href.lastIndexOf('/') + 1)
   var data = $.param({filter:filterValue, id:id})
-  var route = '/movies/filter'
+  var route = '/movies/search'
 
   var request = $.ajax({
     url: route,
