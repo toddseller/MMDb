@@ -14,7 +14,7 @@ class Movie < ActiveRecord::Base
   scope :sorted_list, -> { order(:sort_name, :year) }
   scope :recently_added, -> { order(created_at: :desc) }
 
-  def self.search_title(t)
+  def self.get_titles(t)
     movie_array = Movie.where("search_name LIKE ?", "%#{t}%").sorted_list.first(10)
 
     title_response = HTTParty.get('https://api.themoviedb.org/3/search/movie?api_key=' + ENV['TMDB_KEY'] + '&query=' + t)
@@ -34,8 +34,8 @@ class Movie < ActiveRecord::Base
 
   def self.search_person(n)
     person_response = HTTParty.get('https://api.themoviedb.org/3/search/person?api_key=' + ENV['TMDB_KEY'] + '&query=' + n)
-    p person_response['results'][0]
-    person_response['results'] == [] || person_response['results'][0]['profile_path'] == nil ? nil : 'https://image.tmdb.org/t/p/w342' + person_response['results'][0]['profile_path']
+    p person_response['results'].length
+    person_response['results'].length == 0 || person_response['results'][0]['profile_path'] == nil ? nil : 'https://image.tmdb.org/t/p/w342' + person_response['results'][0]['profile_path']
   end
 
   def self.user_count
@@ -50,8 +50,13 @@ class Movie < ActiveRecord::Base
   def self.filter_movies(f, u)
     user = User.find(u)
     title = f.downcase
+    movies = user.movies.where('search_name LIKE ?', "%#{title}%")
+  end
+
+  def self.search(f, u)
+    user = User.find(u)
     f = f.split.length == 1 ? f.split.map(&:capitalize).join(' ') : f == f.split.join(' ') ? f : f.split.map(&:capitalize).join(' ')
-    movies = user.movies.where('search_name LIKE ? OR actors LIKE ? OR director LIKE ? OR producer LIKE ? OR writer LIKE ? OR studio LIKE ?', "%#{title}%", "%#{f}%", "%#{f}%", "%#{f}%", "%#{f}%", "%#{f}%")
+    movies = user.movies.where('actors LIKE ? OR director LIKE ? OR producer LIKE ? OR writer LIKE ? OR studio LIKE ?', "%#{f}%", "%#{f}%", "%#{f}%", "%#{f}%", "%#{f}%")
   end
 
   private

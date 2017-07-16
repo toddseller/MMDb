@@ -1,13 +1,48 @@
 <div id="meta-data">
   <div class="modal-header">
-    <% if user %>
+    <% if user.is_a?(User) %>
       <a class="movie-edit" href=<%= "/users/#{user.id}/movies/#{movie.id}/edit" %>><span class="glyphicon glyphicon-option-horizontal"></span></a>
     <% end %>
   </div>
   <div class="modal-body">
     <div id="info-body" class="row">
+
+    <!-- <div class="portfolio-image">
+      <a href="http://example.com/full-image.jpg" class="foobox"><img src="http://example.com/thumbnail-image.jpg" alt=""></a>
+
+      <div class="overlay">
+        <a href="http://example.com/full-image.jpg" class="magnifying-glass-icon foobox">
+          <i class="fa fa-search"></i>
+        </a>
+      </div>
+    </div> -->
       <div class="col-lg-4 description-poster">
-        <img src=<%= "#{movie.poster}" %> alt=<%= "#{movie.title} Poster" %>>
+        <% if current_user && library_key %>
+          <% if movie.hd == 1 %>
+            <a href=<%= "https://quickconnect.to/ONYX-DS2415?launchApp=SYNO.SDS.VideoPlayer2.Application&launchParam=ieMode%3D9%26path%3D%252FiTunes%252FiTunes%252FiTunes%2520Media%252FMovies%252F#{link}%252F#{link}%2520(1080p%2520HD).m4v%26file_id%3D%252FiTunes%252FiTunes%252FiTunes%2520Media%252FMovies%252F#{link}%252F#{link}%2520(1080p%2520HD).m4v&ieMode=9" %> target="_blank">
+          <% elsif movie.hd == 2 %>
+            <a href=<%= "https://quickconnect.to/ONYX-DS2415?launchApp=SYNO.SDS.VideoPlayer2.Application&launchParam=ieMode%3D9%26path%3D%252FiTunes%252FiTunes%252FiTunes%2520Media%252FMovies%252F#{link}%252F#{link}%2520(HD).m4v%26file_id%3D%252FiTunes%252FiTunes%252FiTunes%2520Media%252FMovies%252F#{link}%252F#{link}%2520(HD).m4v&ieMode=9" %> target="_blank">
+          <% else %>
+            <a href=<%= "https://quickconnect.to/ONYX-DS2415?launchApp=SYNO.SDS.VideoPlayer2.Application&launchParam=ieMode%3D9%26path%3D%252FiTunes%252FiTunes%252FiTunes%2520Media%252FMovies%252F#{link}%252F#{link}.m4v%26file_id%3D%252FiTunes%252FiTunes%252FiTunes%2520Media%252FMovies%252F#{link}%252F#{link}.m4v&ieMode=9" %> target="_blank">
+          <% end %>
+              <div class="description-poster-overlay">
+                <img src=<%= "#{movie.poster}" %> alt=<%= "#{movie.title} Poster" %>>
+              </div>
+            </a>
+            <div>
+              <% if movie.hd == 1 %>
+                <a class="magnifying-glass-icon" href=<%= "https://quickconnect.to/ONYX-DS2415?launchApp=SYNO.SDS.VideoPlayer2.Application&launchParam=ieMode%3D9%26path%3D%252FiTunes%252FiTunes%252FiTunes%2520Media%252FMovies%252F#{link}%252F#{link}%2520(1080p%2520HD).m4v%26file_id%3D%252FiTunes%252FiTunes%252FiTunes%2520Media%252FMovies%252F#{link}%252F#{link}%2520(1080p%2520HD).m4v&ieMode=9" %> target="_blank">
+              <% elsif movie.hd == 2 %>
+                <a class="magnifying-glass-icon" href=<%= "https://quickconnect.to/ONYX-DS2415?launchApp=SYNO.SDS.VideoPlayer2.Application&launchParam=ieMode%3D9%26path%3D%252FiTunes%252FiTunes%252FiTunes%2520Media%252FMovies%252F#{link}%252F#{link}%2520(HD).m4v%26file_id%3D%252FiTunes%252FiTunes%252FiTunes%2520Media%252FMovies%252F#{link}%252F#{link}%2520(HD).m4v&ieMode=9" %> target="_blank">
+              <% else %>
+                <a class="magnifying-glass-icon" href=<%= "https://quickconnect.to/ONYX-DS2415?launchApp=SYNO.SDS.VideoPlayer2.Application&launchParam=ieMode%3D9%26path%3D%252FiTunes%252FiTunes%252FiTunes%2520Media%252FMovies%252F#{link}%252F#{link}.m4v%26file_id%3D%252FiTunes%252FiTunes%252FiTunes%2520Media%252FMovies%252F#{link}%252F#{link}.m4v&ieMode=9" %> target="_blank">
+              <% end %>
+                <span class="glyphicon glyphicon-play"></span>
+              </a>
+            </div>
+        <% else %>
+            <img src=<%= "#{movie.poster}" %> alt=<%= "#{movie.title} Poster" %>>
+        <% end %>
       </div>
       <div class="col-lg-8 description-details">
         <h2 class="modal-title"><%= movie.title %></h2>
@@ -16,7 +51,7 @@
           <span class="spacing"><%= movie.year %></span>
           <span class="spacing"><%= movie.genre %></span>
           <span class="spacing" id="description-rating"><%= movie.rating %></span>
-          <% if movie.hd %>
+          <% if movie.hd > 0 %>
             <span class="spacing" id="description-hd">HD</span>
           <% end %>
           <div id="ratings-container">
