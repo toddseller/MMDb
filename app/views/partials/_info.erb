@@ -9,9 +9,9 @@
       <div class="col-lg-4 description-poster">
         <% if user.id == 1 %>
           <% if movie.hd %>
-            <a href=<%= "https://QuickConnect.to/onyx-ds2415/?_dc=1500101145797&launchApp=SYNO.SDS.VideoPlayer2.Application&SynoToken=gK8wPl5Ty1ZU.&launchParam=ieMode%3D9%26path%3D%252FiTunes%252FiTunes%252FiTunes%2520Media%252FMovies%252F#{link}%252F#{link}%2520(1080p%2520HD).m4v%26file_id%3D%252FiTunes%252FiTunes%252FiTunes%2520Media%252FMovies%252F#{link}%252F#{link}%2520(1080p%2520HD).m4v&ieMode=9" %> target="_blank">
+            <a href=<%= "http://mmdb-online.synology.me:5000/?launchApp=SYNO.SDS.VideoPlayer2.Application&launchParam=ieMode%3D9%26path%3D%252FiTunes%252FiTunes%252FiTunes%2520Media%252FMovies%252F#{link}%252F#{link}%2520(1080p%2520HD).m4v%26file_id%3D%252FiTunes%252FiTunes%252FiTunes%2520Media%252FMovies%252F#{link}%252F#{link}%2520(1080p%2520HD).m4v&ieMode=9" %> target="_blank">
           <% else %>
-            <a href=<%= "https://QuickConnect.to/onyx-ds2415/?_dc=1500101145797&launchApp=SYNO.SDS.VideoPlayer2.Application&SynoToken=gK8wPl5Ty1ZU.&launchParam=ieMode%3D9%26path%3D%252FiTunes%252FiTunes%252FiTunes%2520Media%252FMovies%252F#{link}%252F#{link}.m4v%26file_id%3D%252FiTunes%252FiTunes%252FiTunes%2520Media%252FMovies%252F#{link}%252F#{link}.m4v&ieMode=9" %> target="_blank">
+            <a href=<%= "http://mmdb-online.synology.me:5000/?launchApp=SYNO.SDS.VideoPlayer2.Application&launchParam=ieMode%3D9%26path%3D%252FiTunes%252FiTunes%252FiTunes%2520Media%252FMovies%252F#{link}%252F#{link}.m4v%26file_id%3D%252FiTunes%252FiTunes%252FiTunes%2520Media%252FMovies%252F#{link}%252F#{link}.m4v&ieMode=9" %> target="_blank">
           <% end %>
             <img src=<%= "#{movie.poster}" %> alt=<%= "#{movie.title} Poster" %>>
           </a>
