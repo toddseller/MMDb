@@ -227,15 +227,16 @@ img
   font-weight: 700;
 }
 
-.chebox.hd, .checkbox.isnew
+.chebox.hd
 {
   padding-top: 0;
 }
 
-.form-horizontal .checkbox.hd, .form-horizontal .checkbox.isnew
+.form-horizontal .checkbox.hd
 {
   min-height: 0;
   padding-top: 0;
+  margin-top: -3px;
 }
 
 .movie-edit

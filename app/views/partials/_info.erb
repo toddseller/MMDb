@@ -1,22 +1,24 @@
 <div id="meta-data">
   <div class="modal-header">
-    <% if current_user == user %>
+    <% if user.is_a?(User) %>
       <a class="movie-edit" href=<%= "/users/#{user.id}/movies/#{movie.id}/edit" %>><span class="glyphicon glyphicon-option-horizontal"></span></a>
     <% end %>
   </div>
   <div class="modal-body">
     <div id="info-body" class="row">
       <div class="col-lg-4 description-poster">
-        <% if user == '1' || user.id = 1 %>
-          <% if movie.hd %>
+        <% if user == 'guest' || current_user.id != 1 %>
+          <img src=<%= "#{movie.poster}" %> alt=<%= "#{movie.title} Poster" %>>
+        <% elsif user.is_a?(User) || user == 'user' && current_user.id != 1 %>
+          <% if movie.hd == 1 %>
             <a href=<%= "https://quickconnect.to/ONYX-DS2415?launchApp=SYNO.SDS.VideoPlayer2.Application&launchParam=ieMode%3D9%26path%3D%252FiTunes%252FiTunes%252FiTunes%2520Media%252FMovies%252F#{link}%252F#{link}%2520(1080p%2520HD).m4v%26file_id%3D%252FiTunes%252FiTunes%252FiTunes%2520Media%252FMovies%252F#{link}%252F#{link}%2520(1080p%2520HD).m4v&ieMode=9" %> target="_blank">
+          <% elsif movie.hd == 2 %>
+            <a href=<%= "https://quickconnect.to/ONYX-DS2415?launchApp=SYNO.SDS.VideoPlayer2.Application&launchParam=ieMode%3D9%26path%3D%252FiTunes%252FiTunes%252FiTunes%2520Media%252FMovies%252F#{link}%252F#{link}%2520(HD).m4v%26file_id%3D%252FiTunes%252FiTunes%252FiTunes%2520Media%252FMovies%252F#{link}%252F#{link}%2520(HD).m4v&ieMode=9" %> target="_blank">
           <% else %>
             <a href=<%= "https://quickconnect.to/ONYX-DS2415?launchApp=SYNO.SDS.VideoPlayer2.Application&launchParam=ieMode%3D9%26path%3D%252FiTunes%252FiTunes%252FiTunes%2520Media%252FMovies%252F#{link}%252F#{link}.m4v%26file_id%3D%252FiTunes%252FiTunes%252FiTunes%2520Media%252FMovies%252F#{link}%252F#{link}.m4v&ieMode=9" %> target="_blank">
           <% end %>
             <img src=<%= "#{movie.poster}" %> alt=<%= "#{movie.title} Poster" %>>
           </a>
-        <% else %>
-          <img src=<%= "#{movie.poster}" %> alt=<%= "#{movie.title} Poster" %>>
         <% end %>
       </div>
       <div class="col-lg-8 description-details">
@@ -26,7 +28,7 @@
           <span class="spacing"><%= movie.year %></span>
           <span class="spacing"><%= movie.genre %></span>
           <span class="spacing" id="description-rating"><%= movie.rating %></span>
-          <% if movie.hd %>
+          <% if movie.hd > 0 %>
             <span class="spacing" id="description-hd">HD</span>
           <% end %>
           <div id="ratings-container">

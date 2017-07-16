@@ -36,10 +36,18 @@ var dynamicListener = function () {
   $('#user-page').on('click', '.rating-input', ratingSubmit)
   $('#user-page').on('click', '.description-details a', searchByName)
   $('#user-page').on('click', '.studio a', searchByName)
+  $('#user-page').on('change', '.hd input:checkbox', toggleHD)
   $('#logIn').on('click', '#update-submit', userUpdateSubmit)
   $('#logIn').on('keyup', '#confirm', testPassword)
   $('#logIn').on('change', '#current', deactivateSubmit)
   $('#logIn').on('click', '#myonoffswitch', changeTheme)
+}
+
+var toggleHD = function () {
+  if (this.checked) {
+    var checkname = $(this).attr("name");
+    $("input:checkbox[name='" + checkname + "']").not(this).removeAttr("checked");
+  }
 }
 
 var filterMovies = function (event) {
