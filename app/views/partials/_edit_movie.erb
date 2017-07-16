@@ -56,15 +56,15 @@
                 <div class="checkbox hd">
                   <label class="edit-hd">
                     <input id="movie-hd" type="hidden" name="movie[hd]" value="0">
-                    <% if @movie.hd == 1 %>
-                      <input id="movie-hd" type="checkbox" name="movie[hd]" value="1" checked="checked"> 1080
-                      <input id="movie-hd" type="checkbox" name="movie[hd]" value="2"> 720
-                    <% elsif @movie.hd == 2 %>
-                      <input id="movie-hd" type="checkbox" name="movie[hd]" value="1"> 1080
-                      <input id="movie-hd" type="checkbox" name="movie[hd]" value="2" checked="checked"> 720
+                    <% if @movie.hd == 1080 %>
+                      <input id="movie-hd" type="checkbox" name="movie[hd]" value="1080" checked="checked"> 1080
+                      <input id="movie-hd" type="checkbox" name="movie[hd]" value="720"> 720
+                    <% elsif @movie.hd == 720 %>
+                      <input id="movie-hd" type="checkbox" name="movie[hd]" value="1080"> 1080
+                      <input id="movie-hd" type="checkbox" name="movie[hd]" value="720" checked="checked"> 720
                     <% else %>
-                      <input id="movie-hd" type="checkbox" name="movie[hd]" value="1"> 1080
-                      <input id="movie-hd" type="checkbox" name="movie[hd]" value="2"> 720
+                      <input id="movie-hd" type="checkbox" name="movie[hd]" value="1080"> 1080
+                      <input id="movie-hd" type="checkbox" name="movie[hd]" value="720"> 720
                     <% end %>
                   </label>
                 </div>
