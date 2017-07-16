@@ -270,16 +270,19 @@ a.magnifying-glass-icon
   transform: translate(-50%, -50%);
   font-size: 10em;
   opacity: 0;
+  transition: opacity .2s ease-in-out
 }
 
 .description-poster:hover .description-poster-overlay
 {
   opacity: .75;
+  transition: all .2s ease-in-out
 }
 
 .description-poster:hover a.magnifying-glass-icon {
   color: #fff;
   opacity: .8;
+  transition: all .2s ease-in-out
 }
 
 .filler
