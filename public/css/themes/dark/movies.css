@@ -200,23 +200,22 @@ img
 #profile-header
 {
   padding-top: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 #profile-image
 {
-  position: relative;
-  left: 35%;
   width: 174px;
   height: 261px;
   background-size: 100%;
   border-radius: 4px;
+  margin-right: 25px;
 }
 
 #profile-name
 {
-  position: relative;
-  left: 47%;
-  margin-top: -165px;
   font-size: 4em;
   font-weight: 900;
   color: #f3f3f3;
