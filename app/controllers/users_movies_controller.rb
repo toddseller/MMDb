@@ -39,10 +39,10 @@ put '/users/:user_id/movies/:id' do
   @movie = Movie.find(params[:id])
   @movie.update(params[:movie])
   @user = current_user
-  link = URI::encode(@movie.title)
+  link = link = URI::encode(@movie.title.gsub(/[*:;\/]/,'_'))
   library_key = params[:user_id] == ENV['LIBRARY_KEY']
   if request.xhr?
-    @my_movies = Movie.filter_movies(params[:filter], @user.id).sorted_list
+    @my_movies = params[:filter] != nil ? Movie.filter_movies(params[:filter], @user.id).sorted_list : Movie.search(params[:name], @user.id).sorted_list
 
     page = erb :'/partials/_info', locals: {movie: @movie, user: @user, link: link, library_key: library_key}, layout: false
     list = erb :'/partials/_filtered_list', locals: {movie: @my_movies, user: @user}, layout: false
@@ -57,7 +57,7 @@ delete '/users/:user_id/movies/:id' do
   @user = current_user
   @movie.users.destroy(@user)
   if request.xhr?
-    @my_movies = Movie.filter_movies(params[:filter], @user.id).sorted_list
+    @my_movies = params[:filter] != nil ? Movie.filter_movies(params[:filter], @user.id).sorted_list : Movie.search(params[:name], @user.id).sorted_list
     page = erb :'/partials/_filtered_list', locals: {movie: @my_movies, user: @user}, layout: false
     json status: "true", page: page
   else

@@ -34,7 +34,7 @@ class Movie < ActiveRecord::Base
 
   def self.search_person(n)
     person_response = HTTParty.get('https://api.themoviedb.org/3/search/person?api_key=' + ENV['TMDB_KEY'] + '&query=' + n)
-    p person_response['results'].length
+    person_response['results'].length
     person_response['results'].length == 0 || person_response['results'][0]['profile_path'] == nil ? nil : 'https://image.tmdb.org/t/p/w342' + person_response['results'][0]['profile_path']
   end
 
