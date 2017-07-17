@@ -107,6 +107,8 @@ var clearFilter = function () {
     $('#profile-wrapper').removeClass('active')
     $('#movie-list').empty().append(response.page)
     $('img.lazy').lazyload()
+    $('#profile-image').empty()
+    $('#profile-name').empty()
   })
   $('#filter-input').trigger('reset')
   $('.info').remove()
@@ -359,7 +361,6 @@ var searchByName = function (event) {
     data: data
   })
   request.done(function (response) {
-    console.log(response.url)
     if (response.url === "no-image") {
       $('#profile-image').hide()
       $('#profile-name').css({'margin-top':'100px', 'left':'0','text-align':'center'})
@@ -515,7 +516,6 @@ var activateModal = function (event) {
 }
 
 var displayMovieModal = function (response) {
-  console.log(response)
   $('#movie .modal-content').empty().append(response)
   $('#movie').modal('show')
 }
@@ -534,7 +534,7 @@ var displayEditForm = function (response) {
 var submitUpdate = function (event) {
   event.preventDefault()
   var formRoute = $(this).parent().attr('action')
-  var formData = $(this).parent().serialize() + '&filter=' + filterValue
+  var formData = $('#search-movie-title').val().length > 0 ? $(this).parent().serialize() + '&filter=' + filterValue : $(this).parent().serialize() + '&name=' + filterValue
   var response = $.ajax({
     url: formRoute,
     type: 'PUT',
@@ -575,7 +575,7 @@ var deleteMovie = function (event) {
   var route = $(parentForm[0]).attr('action')
   var newRoute = $(this).attr('action', route)
   var formRoute = $(newRoute).attr('action')
-  var data = $.param({filter:filterValue})
+  var data = $('#search-movie-title').val().length > 0 ? $.param({filter:filterValue}) : $.param({name:filterValue})
   $.ajax({
     url: formRoute,
     type: 'DELETE',
