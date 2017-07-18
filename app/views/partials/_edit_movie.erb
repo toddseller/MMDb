@@ -8,22 +8,45 @@
           <form class="form-horizontal edit-form" action=<%= "/users/#{@user.id}/movies/#{@movie.id}" %> method="POST">
             <input type="hidden" name="_method" value="PUT">
             <div class="form-group row">
-              <label class="col-sm-2 control-label text-right" for="movie_title">Title</label>
-              <div class="col-sm-9">
-                <textarea id="movie_title" name="movie[title]" class="form-control" rows="1"><%= @movie.title %></textarea>
-              </div>
-              <div class="col-sm-1">
-                <div class="checkbox isnew">
-                  <label class="edit-isnew">
-                    <input id="movie-isnew" type="hidden" name="movie[isnew]" value="false">
-                    <% if @movie.isnew %>
-                      <input id="movie-isnew" type="checkbox" name="movie[isnew" value="true" checked="checked"> New
-                    <% else %>
-                      <input id="movie-isnew" type="checkbox" name="movie[isnew]" value="true"> New
-                    <% end %>
-                  </label>
+              <% if current_user.id == ENV['LIBRARY_KEY'].to_i %>
+                <label class="col-sm-2 control-label text-right" for="movie_title">Title</label>
+                <div class="col-sm-4">
+                  <textarea id="movie_title" name="movie[title]" class="form-control" rows="1"><%= @movie.title %></textarea>
                 </div>
-              </div>
+                <label class="col-sm-1 control-label text-right" for="movie_title">File</label>
+                <div class="col-sm-4">
+                  <textarea id="movie_file_name" name="movie[file_name]" class="form-control" rows="1"><%= @movie.file_name %></textarea>
+                </div>
+                <div class="col-sm-1">
+                  <div class="checkbox isnew">
+                    <label class="edit-isnew">
+                      <input id="movie-isnew" type="hidden" name="movie[isnew]" value="false">
+                      <% if @movie.isnew %>
+                        <input id="movie-isnew" type="checkbox" name="movie[isnew" value="true" checked="checked"> New
+                      <% else %>
+                        <input id="movie-isnew" type="checkbox" name="movie[isnew]" value="true"> New
+                      <% end %>
+                    </label>
+                  </div>
+                </div>
+              <% else %>
+                <label class="col-sm-2 control-label text-right" for="movie_title">Title</label>
+                <div class="col-sm-9">
+                  <textarea id="movie_title" name="movie[title]" class="form-control" rows="1"><%= @movie.title %></textarea>
+                </div>
+                <div class="col-sm-1">
+                  <div class="checkbox isnew">
+                    <label class="edit-isnew">
+                      <input id="movie-isnew" type="hidden" name="movie[isnew]" value="false">
+                      <% if @movie.isnew %>
+                        <input id="movie-isnew" type="checkbox" name="movie[isnew" value="true" checked="checked"> New
+                      <% else %>
+                        <input id="movie-isnew" type="checkbox" name="movie[isnew]" value="true"> New
+                      <% end %>
+                    </label>
+                  </div>
+                </div>
+              <% end %>
             </div>
             <div class="form-group row">
               <label class="col-sm-2 control-label text-right" for="movie_sort_name">Sort Name</label>
