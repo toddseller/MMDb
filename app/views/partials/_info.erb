@@ -9,11 +9,11 @@
       <div class="col-lg-4 description-poster">
         <% if current_user && library_key %>
           <% if movie.hd == 1080 %>
-            <a href=<%= "https://quickconnect.to/ONYX-DS2415?launchApp=SYNO.SDS.VideoPlayer2.Application&launchParam=ieMode%3D9%26path%3D%252FiTunes%252FiTunes%252FiTunes%2520Media%252FMovies%252F#{link}%252F#{file}%2520(1080p%2520HD).m4v%26file_id%3D%252FiTunes%252FiTunes%252FiTunes%2520Media%252FMovies%252F#{link}%252F#{file}%2520(1080p%2520HD).m4v&ieMode=9" %> target="_blank">
+            <a href=<%= "https://quickconnect.to/ONYX-DS2415?launchApp=SYNO.SDS.VideoPlayer2.Application&launchParam=ieMode%3D9%26path%3D%252FiTunes%252FiTunes%252FiTunes%2520Media%252FMovies%252F#{link}%252F#{link}%2520(1080p%2520HD).m4v%26file_id%3D%252FiTunes%252FiTunes%252FiTunes%2520Media%252FMovies%252F#{link}%252F#{link}%2520(1080p%2520HD).m4v&ieMode=9" %> target="_blank">
           <% elsif movie.hd == 720 %>
-            <a href=<%= "https://quickconnect.to/ONYX-DS2415?launchApp=SYNO.SDS.VideoPlayer2.Application&launchParam=ieMode%3D9%26path%3D%252FiTunes%252FiTunes%252FiTunes%2520Media%252FMovies%252F#{link}%252F#{file}%2520(HD).m4v%26file_id%3D%252FiTunes%252FiTunes%252FiTunes%2520Media%252FMovies%252F#{link}%252F#{file}%2520(HD).m4v&ieMode=9" %> target="_blank">
+            <a href=<%= "https://quickconnect.to/ONYX-DS2415?launchApp=SYNO.SDS.VideoPlayer2.Application&launchParam=ieMode%3D9%26path%3D%252FiTunes%252FiTunes%252FiTunes%2520Media%252FMovies%252F#{link}%252F#{link}%2520(HD).m4v%26file_id%3D%252FiTunes%252FiTunes%252FiTunes%2520Media%252FMovies%252F#{link}%252F#{link}%2520(HD).m4v&ieMode=9" %> target="_blank">
           <% else %>
-            <a href=<%= "https://quickconnect.to/ONYX-DS2415?launchApp=SYNO.SDS.VideoPlayer2.Application&launchParam=ieMode%3D9%26path%3D%252FiTunes%252FiTunes%252FiTunes%2520Media%252FMovies%252F#{link}%252F#{file}.m4v%26file_id%3D%252FiTunes%252FiTunes%252FiTunes%2520Media%252FMovies%252F#{link}%252F#{file}.m4v&ieMode=9" %> target="_blank">
+            <a href=<%= "https://quickconnect.to/ONYX-DS2415?launchApp=SYNO.SDS.VideoPlayer2.Application&launchParam=ieMode%3D9%26path%3D%252FiTunes%252FiTunes%252FiTunes%2520Media%252FMovies%252F#{link}%252F#{link}.m4v%26file_id%3D%252FiTunes%252FiTunes%252FiTunes%2520Media%252FMovies%252F#{link}%252F#{link}.m4v&ieMode=9" %> target="_blank">
           <% end %>
               <div class="description-poster-overlay">
                 <img src=<%= "#{movie.poster}" %> alt=<%= "#{movie.title} Poster" %>>
@@ -21,11 +21,11 @@
             </a>
             <div>
               <% if movie.hd == 1080 %>
-                <a class="magnifying-glass-icon" href=<%= "https://quickconnect.to/ONYX-DS2415?launchApp=SYNO.SDS.VideoPlayer2.Application&launchParam=ieMode%3D9%26path%3D%252FiTunes%252FiTunes%252FiTunes%2520Media%252FMovies%252F#{link}%252F#{file}%2520(1080p%2520HD).m4v%26file_id%3D%252FiTunes%252FiTunes%252FiTunes%2520Media%252FMovies%252F#{link}%252F#{file}%2520(1080p%2520HD).m4v&ieMode=9" %> target="_blank">
+                <a class="magnifying-glass-icon" href=<%= "https://quickconnect.to/ONYX-DS2415?launchApp=SYNO.SDS.VideoPlayer2.Application&launchParam=ieMode%3D9%26path%3D%252FiTunes%252FiTunes%252FiTunes%2520Media%252FMovies%252F#{link}%252F#{link}%2520(1080p%2520HD).m4v%26file_id%3D%252FiTunes%252FiTunes%252FiTunes%2520Media%252FMovies%252F#{link}%252F#{link}%2520(1080p%2520HD).m4v&ieMode=9" %> target="_blank">
               <% elsif movie.hd == 720 %>
-                <a class="magnifying-glass-icon" href=<%= "https://quickconnect.to/ONYX-DS2415?launchApp=SYNO.SDS.VideoPlayer2.Application&launchParam=ieMode%3D9%26path%3D%252FiTunes%252FiTunes%252FiTunes%2520Media%252FMovies%252F#{link}%252F#{file}%2520(HD).m4v%26file_id%3D%252FiTunes%252FiTunes%252FiTunes%2520Media%252FMovies%252F#{link}%252F#{file}%2520(HD).m4v&ieMode=9" %> target="_blank">
+                <a class="magnifying-glass-icon" href=<%= "https://quickconnect.to/ONYX-DS2415?launchApp=SYNO.SDS.VideoPlayer2.Application&launchParam=ieMode%3D9%26path%3D%252FiTunes%252FiTunes%252FiTunes%2520Media%252FMovies%252F#{link}%252F#{link}%2520(HD).m4v%26file_id%3D%252FiTunes%252FiTunes%252FiTunes%2520Media%252FMovies%252F#{link}%252F#{link}%2520(HD).m4v&ieMode=9" %> target="_blank">
               <% else %>
-                <a class="magnifying-glass-icon" href=<%= "https://quickconnect.to/ONYX-DS2415?launchApp=SYNO.SDS.VideoPlayer2.Application&launchParam=ieMode%3D9%26path%3D%252FiTunes%252FiTunes%252FiTunes%2520Media%252FMovies%252F#{link}%252F#{file}.m4v%26file_id%3D%252FiTunes%252FiTunes%252FiTunes%2520Media%252FMovies%252F#{link}%252F#{file}.m4v&ieMode=9" %> target="_blank">
+                <a class="magnifying-glass-icon" href=<%= "https://quickconnect.to/ONYX-DS2415?launchApp=SYNO.SDS.VideoPlayer2.Application&launchParam=ieMode%3D9%26path%3D%252FiTunes%252FiTunes%252FiTunes%2520Media%252FMovies%252F#{link}%252F#{link}.m4v%26file_id%3D%252FiTunes%252FiTunes%252FiTunes%2520Media%252FMovies%252F#{link}%252F#{link}.m4v&ieMode=9" %> target="_blank">
               <% end %>
                 <span class="glyphicon glyphicon-play"></span>
               </a>

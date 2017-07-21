@@ -14,6 +14,7 @@ gem 'thin'
 
 gem 'activesupport'
 gem 'activerecord'
+gem 'newrelic_rpm'
 
 gem 'rake'
 

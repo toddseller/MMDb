@@ -29,6 +29,7 @@ GEM
     minitest (5.10.1)
     multi_json (1.12.1)
     multi_xml (0.6.0)
+    newrelic_rpm (4.1.0.333)
     pg (0.20.0)
     rack (1.6.5)
     rack-cors (0.4.1)
@@ -83,6 +84,7 @@ DEPENDENCIES
   faker
   httparty
   json
+  newrelic_rpm
   pg
   rack-cors (~> 0.4.1)
   rake
