@@ -458,10 +458,7 @@ a.movie-edit:hover
     position: relative;
 
     width: 174px;
-    height: 261px;
     margin-right: 2em;
-
-    background-color: #080808;
 }
 
 .index-preview:nth-child(7n)
@@ -478,6 +475,7 @@ a.movie-edit:hover
     transition: all .3s ease-in-out;
 
     border-radius: 4px;
+    background-color: #080808;
 }
 
 .index-preview img.active
