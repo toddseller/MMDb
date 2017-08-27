@@ -453,6 +453,11 @@ a.movie-edit:hover
     width: 81px;
 }
 
+.movie-modal
+{
+    height: 261px;
+}
+
 .index-preview
 {
     position: relative;
