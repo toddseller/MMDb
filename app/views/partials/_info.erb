@@ -58,32 +58,32 @@
         <div class="col-lg-3">
           <h5>STARRING</h5>
           <ul>
-            <% movie.actors.split(/(?<!,),(?!\s\w\w\.)/).each do |line| %>
+            <% movie.actors.split(/(?<!,),(?!\sJr\.)/).each do |line| %>
               <li><a href=""><%= line %></a></li>
             <% end %>
           </ul>
         </div>
         <div class="col-lg-3 col-lg-offset-1">
           <% if !movie.director.empty? %>
-            <% if movie.director.split(/(?<!,),(?!\s\w\w\.)/).length > 1 %>
+            <% if movie.director.split(/(?<!,),(?!\sJr\.)/).length > 1 %>
               <h5>DIRECTORS</h5>
             <% else %>
               <h5>DIRECTOR</h5>
             <% end %>
             <ul>
-            <% movie.director.split(/(?<!,),(?!\s\w\w\.)/).each do |line| %>
+            <% movie.director.split(/(?<!,),(?!\sJr\.)/).each do |line| %>
               <li><a href=""><%= line %></a></li>
             <% end %>
           </ul>
           <% end %>
           <% if !movie.writer.empty? %>
-            <% if movie.writer.split(/(?<!,),(?!\s\w\w\.)/).length > 1 %>
+            <% if movie.writer.split(/(?<!,),(?!\sJr\.)/).length > 1 %>
               <h5>SCREENWRITERS</h5>
             <% else %>
               <h5>SCREENWRITER</h5>
             <% end %>
             <ul>
-            <% movie.writer.split(/(?<!,),(?!\s\w\w\.)/).each do |line| %>
+            <% movie.writer.split(/(?<!,),(?!\sJr\.)/).each do |line| %>
               <li><a href=""><%= line %></a></li>
             <% end %>
           </ul>
@@ -91,13 +91,13 @@
         </div>
         <div class="col-lg-3 col-lg-offset-1">
           <% if !movie.producer.empty? %>
-            <% if movie.producer.split(/(?<!,),(?!\s\w\w\.)/).length > 1 %>
+            <% if movie.producer.split(/(?<!,),(?!\sJr\.)/).length > 1 %>
               <h5>PRODUCERS</h5>
             <% else %>
               <h5>PRODUCER</h5>
             <% end %>
             <ul>
-            <% movie.producer.split(/(?<!,),(?!\s\w\w\.)/).each do |line| %>
+            <% movie.producer.split(/(?<!,),(?!\sJr\.)/).each do |line| %>
               <li><a href=""><%= line %></a></li>
             <% end %>
           </ul>
