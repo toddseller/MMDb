@@ -3,7 +3,7 @@
     <% if movie.isnew %>
       <div class="new-label"><span class="new-text">New</span></div>
     <% end %>
-    <a class="movie-modal" id=<%="#{movie.id}"%>><img class="lazy" src=<%= "#{movie.poster}" %> alt='<%="#{movie.title}" %> Poster' width='174' height='261'></a>
+    <a class="movie-modal" id=<%="#{movie.id}"%>><img class="lazy" src=<%= "#{movie.poster}" %> alt='<%="#{movie.title}" %> Poster' width='174' height='261' style='display: inline-block !important;'></a>
     <p class="truncate"><%= movie.title %></p>
     <div class="pointer"></div>
     </div>
