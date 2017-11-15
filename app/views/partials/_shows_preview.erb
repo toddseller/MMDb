@@ -1,0 +1,21 @@
+<%@show_previews.each do |show| %>
+  <% if show[:poster] != 'NA' %>
+    <div class="show-preview">
+      <form id="create-show" action=<%="/users/#{@user.id}/shows"%> method="POST">
+        <input type="hidden" name="show[title]" value="<%="#{show[:title]}"%>">
+        <input type="hidden" name="show[year]" value="<%="#{show[:year]}"%>">
+        <input type="hidden" name="show[rating]" value="<%="#{show[:rating]}"%>">
+        <input type="hidden" name="show[genre]" value="<%="#{show[:genre]}"%>">
+        <input type="hidden" name="season[season]" value="<%="#{show[:season]}"%>">
+        <input type="hidden" name="season[plot]" value="<%="#{show[:plot]}"%>">
+        <input type="hidden" name="season[poster]" value="<%="#{show[:poster]}"%>">
+        <input type="hidden" name="season[collectionId]" value="<%="#{show[:collectionId]}"%>">
+        <input type="hidden" name="season[collectionName]" value="<%="#{show[:collectionName]}"%>">
+        <input type="image" id="show-poster" name="submit" src="<%="#{show[:poster]}"%>" border="0" alt="<%="#{show[:title]} Poster"%>">
+        <p class="preview-truncate"><%="#{show[:collectionName]}"%></p>
+        <p id="year"><%="#{show[:year]}"%></p>
+      </form>
+    </div>
+  <% end %>
+<% end %>
+

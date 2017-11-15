@@ -148,6 +148,63 @@
   transition: all .4s ease-in-out;
 }
 
+#user-profile
+{
+  font-size: 18px;
+
+  width: 100%;
+  margin: 0;
+  padding: .5em;
+  padding-left: 1.5em;
+}
+
+#user-profile > span.glyphicon.glyphicon-user
+{
+  margin-right: 15px;
+}
+
+#user-profile > .glyphicon-triangle-bottom
+{
+  margin-left: 2em;
+  transition: all .4s ease-in-out;
+}
+
+#user-profile > .glyphicon-triangle-bottom.active
+{
+  transform: rotate(180deg);
+}
+
+
+
+#drop-down-submenu
+{
+  overflow: hidden;
+  width: 100%;
+  max-height: 0;
+  transition: max-height 0.4s ease-in-out;
+}
+
+#drop-down-submenu > ul > a > li > span
+{
+  margin-left: 1.89em;
+}
+
+#drop-down-submenu.active
+{
+  top: 0;
+  overflow: auto;
+  height: auto;
+  max-height: 86px;
+}
+
+#user-profile:hover
+{
+  transition: all .4s ease-in-out;
+
+  color: #fff;
+  background-color: #f00;
+}
+
 #drop-down a
 {
   text-decoration: none;
