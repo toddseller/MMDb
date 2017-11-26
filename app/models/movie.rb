@@ -103,7 +103,7 @@ class Movie < ActiveRecord::Base
     end
 
     def adjust_url
-      if self.poster =~ /http/
+      if self.poster =~ /http/ && self.poster =~ /mzstatic/
         self.poster.gsub!(/^(http)/, 'https')
         self.poster.gsub!(/(\.mzstatic)/, '-ssl.mzstatic')
       end
