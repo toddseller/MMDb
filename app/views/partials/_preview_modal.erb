@@ -26,32 +26,32 @@
         <div class="col-lg-3">
           <h5>Starring</h5>
           <ul>
-            <% movie.actors.split(", ").each do |line| %>
+            <% movie.actors.split(/(?<!,),(?!\sJr\.)/).each do |line| %>
               <li><%= line %></li>
             <% end %>
           </ul>
         </div>
         <div class="col-lg-3 col-lg-offset-1">
           <% if !movie.director.empty? %>
-            <% if movie.director.split(',').length > 1 %>
+            <% if movie.director.split(/(?<!,),(?!\sJr\.)/).length > 1 %>
               <h5>Directors</h5>
             <% else %>
               <h5>Director</h5>
             <% end %>
             <ul>
-            <% movie.director.split(", ").each do |line| %>
+            <% movie.director.split(/(?<!,),(?!\sJr\.)/).each do |line| %>
               <li><%= line %></li>
             <% end %>
           </ul>
           <% end %>
           <% if !movie.writer.empty? %>
-            <% if movie.writer.split(',').length > 1 %>
+            <% if movie.writer.split(/(?<!,),(?!\sJr\.)/).length > 1 %>
               <h5>Screenwriters</h5>
             <% else %>
               <h5>Screenwriter</h5>
             <% end %>
             <ul>
-            <% movie.writer.split(", ").each do |line| %>
+            <% movie.writer.split(/(?<!,),(?!\sJr\.)/).each do |line| %>
               <li><%= line %></li>
             <% end %>
           </ul>
@@ -59,13 +59,13 @@
         </div>
         <div class="col-lg-3 col-lg-offset-1">
           <% if !movie.producer.empty? %>
-            <% if movie.producer.split(',').length > 1 %>
+            <% if movie.producer.split(/(?<!,),(?!\sJr\.)/).length > 1 %>
               <h5>Producers</h5>
             <% else %>
               <h5>Producer</h5>
             <% end %>
             <ul>
-            <% movie.producer.split(", ").each do |line| %>
+            <% movie.producer.split(/(?<!,),(?!\sJr\.)/).each do |line| %>
               <li><%= line %></li>
             <% end %>
           </ul>
