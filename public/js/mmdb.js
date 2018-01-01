@@ -71,6 +71,7 @@ var unwatched = function (evenet) {
   event.preventDefault()
 
   $('#unwatched').addClass('active')
+  $('#four-k').removeClass('active')
   var route = $(this).attr('href')
   var request = $.ajax({
     url: route
@@ -84,6 +85,7 @@ var fourK = function (evenet) {
   event.preventDefault()
 
   $('#four-k').addClass('active')
+  $('#unwatched').removeClass('active')
   var route = $(this).attr('href')
   var request = $.ajax({
     url: route

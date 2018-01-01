@@ -651,6 +651,7 @@ a.index-user:hover,
 #unwatched
 {
     margin-left: 5px;
+    margin-right: 5px;
     padding: 7px 13px;
 
     color: #333;
