@@ -688,3 +688,44 @@ a.index-user:hover,
     border-radius: 4px;
     background-color: #d9534f;
 }
+
+#four-k
+{
+    margin-left: 5px;
+    padding: 7px 13px;
+
+    color: #333;
+}
+
+#four-k:hover
+{
+    padding: 6px 12px;
+
+    text-decoration: none;
+
+    border: 1px solid rgba(0,0,0,.01);
+    border-radius: 4px;
+    background: rgba(0,0,0,.1);
+}
+
+#four-k:focus
+{
+    text-decoration: none;
+
+    color: #f3f3f3;
+    border: 1px solid #d43f3a;
+    border-radius: 4px;
+    background-color: #d9534f;
+}
+
+#four-k.active
+{
+    padding: 6px 12px;
+
+    cursor: default;
+
+    color: #f3f3f3;
+    border: 1px solid #d43f3a;
+    border-radius: 4px;
+    background-color: #d9534f;
+}
