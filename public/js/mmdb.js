@@ -132,6 +132,7 @@ var clearFilter = function () {
   $('.truncate').fadeIn(400, 'linear')
   $('.lazy').removeClass('notransition').removeClass('active')
   $('#unwatched').removeClass('active')
+  $('#four-k').removeClass('active')
   filterValue = ''
 }
 
