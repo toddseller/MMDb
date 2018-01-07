@@ -18,6 +18,7 @@ var bindListeners = function () {
   $('#scroll-right').on('click', scrollRight)
   $('#scroll-left').on('click', scrollLeft)
   $('#unwatched').on('click', unwatched)
+  $('#four-k').on('click', fourK)
   $('#library').on('click', clearFilter)
 }
 
@@ -70,6 +71,21 @@ var unwatched = function (evenet) {
   event.preventDefault()
 
   $('#unwatched').addClass('active')
+  $('#four-k').removeClass('active')
+  var route = $(this).attr('href')
+  var request = $.ajax({
+    url: route
+  })
+  request.done(function (response) {
+    $('#movie-list').empty().append(response)
+  })
+}
+
+var fourK = function (evenet) {
+  event.preventDefault()
+
+  $('#four-k').addClass('active')
+  $('#unwatched').removeClass('active')
   var route = $(this).attr('href')
   var request = $.ajax({
     url: route
@@ -116,6 +132,7 @@ var clearFilter = function () {
   $('.truncate').fadeIn(400, 'linear')
   $('.lazy').removeClass('notransition').removeClass('active')
   $('#unwatched').removeClass('active')
+  $('#four-k').removeClass('active')
   filterValue = ''
 }
 
