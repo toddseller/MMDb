@@ -43,7 +43,7 @@
           <span class="spacing" id="description-rating"><%= movie.rating %></span>
           <% if movie.hd == 4 %>
             <span class="spacing" id="description-hd">4K</span>
-          <% elsif movie.hd == 1080 || 720 %>
+          <% elsif movie.hd == 1080 || movie.hd == 720 %>
             <span class="spacing" id="description-hd">HD</span>
           <% end %>
           <div id="ratings-container">
