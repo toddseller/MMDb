@@ -72,6 +72,7 @@ var openMenu = function () {
 var closeMenu = function () {
   $('#nav-toggle').removeClass('active')
   $('#drop-down').removeClass('active')
+}
 
 var goToProfile = function (event) {
   event.preventDefault()
