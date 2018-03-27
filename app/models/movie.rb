@@ -14,7 +14,7 @@ class Movie < ActiveRecord::Base
   scope :sorted_list, -> { order(:sort_name, :year) }
   scope :recently_added, -> { order(created_at: :desc) }
 
-  def self.search_title(t)
+  def self.get_titles(t)
     movie_array = Movie.where("search_name LIKE ?", "%#{t}%").sorted_list.first(10)
 
     title_response = HTTParty.get('https://api.themoviedb.org/3/search/movie?api_key=' + ENV['TMDB_KEY'] + '&query=' + t)
@@ -26,12 +26,17 @@ class Movie < ActiveRecord::Base
       runtime = movie_response['runtime'] != nil ? movie_response['runtime'].to_s : '0'
       year = movie_response['release_date'] != nil ? movie['release_date'].split('-').slice(0,1).join() : ''
       poster = movie_response['poster_path'] != nil ? 'https://image.tmdb.org/t/p/w342' + movie['poster_path'] : 'NA'
-      test_movie = {title: movie['title'], plot: movie['overview'], poster: poster, year: year, actors: get_actors(movie_response), director: get_director(movie_response), genre: get_genres(movie_response), producer: get_producers(movie_response), rating: get_rating(movie_response), runtime: runtime, writer: get_writers(movie_response)}
+      test_movie = {title: movie['title'], plot: movie['overview'], poster: poster, year: year, actors: get_actors(movie_response), director: get_director(movie_response), genre: get_genres(movie_response), producer: get_producers(movie_response), rating: get_rating(movie_response), runtime: runtime, studio: get_studio(movie_response), writer: get_writers(movie_response)}
       movie_array << test_movie if movie_array.all? {|el| el[:year] != year || el[:director] != get_director(movie_response)}
     end
     movie_array.sort_by {|k| k[:year]}
   end
 
+  def self.search_person(n)
+    person_response = HTTParty.get('https://api.themoviedb.org/3/search/person?api_key=' + ENV['TMDB_KEY'] + '&query=' + n)
+    person_response['results'].length
+    person_response['results'].length == 0 || person_response['results'][0]['profile_path'] == nil ? nil : 'https://image.tmdb.org/t/p/w342' + person_response['results'][0]['profile_path']
+  end
 
   def self.user_count
     self.all.sort_by { |movie| [movie.users.count, movie[:sort_name]] }.reverse![0, 6]
@@ -42,10 +47,16 @@ class Movie < ActiveRecord::Base
     average = self.ratings.length > 0 ? (sum.to_f / self.ratings.count).round : 0
   end
 
-  def self.filter_movies(t, u)
-    title = t.downcase
+  def self.filter_movies(f, u)
     user = User.find(u)
+    title = f.downcase
     movies = user.movies.where('search_name LIKE ?', "%#{title}%")
+  end
+
+  def self.search(f, u)
+    user = User.find(u)
+    f = f.split.length == 1 ? f.split.map(&:capitalize).join(' ') : f == f.split.join(' ') ? f : f.split.map(&:capitalize).join(' ')
+    movies = user.movies.where('actors LIKE ? OR director LIKE ? OR producer LIKE ? OR writer LIKE ? OR studio LIKE ?', "%#{f}%", "%#{f}%", "%#{f}%", "%#{f}%", "%#{f}%")
   end
 
   private
@@ -118,6 +129,12 @@ class Movie < ActiveRecord::Base
       rating = ''
       r['releases']['countries'].each { |k| rating = k['certification'] if k['iso_3166_1'] == 'US' } if r['releases']['countries'] != nil
       rating != '' ? rating : 'NR'
+    end
+
+    def self.get_studio(r)
+      studio = []
+      r['production_companies'].each { |k| studio << k['name'] } if r['production_companies']
+      studio.length != 0 ? studio.first(1).join() : ''
     end
 
     def self.get_writers(r)

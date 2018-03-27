@@ -1,13 +1,38 @@
 <div id="meta-data">
   <div class="modal-header">
-    <% if user %>
+    <% if user.is_a?(User) %>
       <a class="movie-edit" href=<%= "/users/#{user.id}/movies/#{movie.id}/edit" %>><span class="glyphicon glyphicon-option-horizontal"></span></a>
     <% end %>
   </div>
   <div class="modal-body">
-    <div class="row">
+    <div id="info-body" class="row">
       <div class="col-lg-4 description-poster">
-        <img src=<%= "#{movie.poster}" %> alt=<%= "#{movie.title} Poster" %>>
+        <% if current_user && library_key %>
+          <% if movie.hd == 1080 %>
+            <a href=<%= "https://quickconnect.to/ONYX-DS2415?launchApp=SYNO.SDS.VideoPlayer2.Application&launchParam=ieMode%3D9%26path%3D%252FiTunes%252FiTunes%252FiTunes%2520Media%252FMovies%252F#{link}%252F#{file}%2520(1080p%2520HD).m4v%26file_id%3D%252FiTunes%252FiTunes%252FiTunes%2520Media%252FMovies%252F#{link}%252F#{file}%2520(1080p%2520HD).m4v&ieMode=9" %> target="_blank">
+          <% elsif movie.hd == 720 %>
+            <a href=<%= "https://quickconnect.to/ONYX-DS2415?launchApp=SYNO.SDS.VideoPlayer2.Application&launchParam=ieMode%3D9%26path%3D%252FiTunes%252FiTunes%252FiTunes%2520Media%252FMovies%252F#{link}%252F#{file}%2520(HD).m4v%26file_id%3D%252FiTunes%252FiTunes%252FiTunes%2520Media%252FMovies%252F#{link}%252F#{file}%2520(HD).m4v&ieMode=9" %> target="_blank">
+          <% else %>
+            <a href=<%= "https://quickconnect.to/ONYX-DS2415?launchApp=SYNO.SDS.VideoPlayer2.Application&launchParam=ieMode%3D9%26path%3D%252FiTunes%252FiTunes%252FiTunes%2520Media%252FMovies%252F#{link}%252F#{file}.m4v%26file_id%3D%252FiTunes%252FiTunes%252FiTunes%2520Media%252FMovies%252F#{link}%252F#{file}.m4v&ieMode=9" %> target="_blank">
+          <% end %>
+              <div class="description-poster-overlay">
+                <img src=<%= "#{movie.poster}" %> alt=<%= "#{movie.title} Poster" %>>
+              </div>
+            </a>
+            <div>
+              <% if movie.hd == 1080 %>
+                <a class="magnifying-glass-icon" href=<%= "https://quickconnect.to/ONYX-DS2415?launchApp=SYNO.SDS.VideoPlayer2.Application&launchParam=ieMode%3D9%26path%3D%252FiTunes%252FiTunes%252FiTunes%2520Media%252FMovies%252F#{link}%252F#{file}%2520(1080p%2520HD).m4v%26file_id%3D%252FiTunes%252FiTunes%252FiTunes%2520Media%252FMovies%252F#{link}%252F#{file}%2520(1080p%2520HD).m4v&ieMode=9" %> target="_blank">
+              <% elsif movie.hd == 720 %>
+                <a class="magnifying-glass-icon" href=<%= "https://quickconnect.to/ONYX-DS2415?launchApp=SYNO.SDS.VideoPlayer2.Application&launchParam=ieMode%3D9%26path%3D%252FiTunes%252FiTunes%252FiTunes%2520Media%252FMovies%252F#{link}%252F#{file}%2520(HD).m4v%26file_id%3D%252FiTunes%252FiTunes%252FiTunes%2520Media%252FMovies%252F#{link}%252F#{file}%2520(HD).m4v&ieMode=9" %> target="_blank">
+              <% else %>
+                <a class="magnifying-glass-icon" href=<%= "https://quickconnect.to/ONYX-DS2415?launchApp=SYNO.SDS.VideoPlayer2.Application&launchParam=ieMode%3D9%26path%3D%252FiTunes%252FiTunes%252FiTunes%2520Media%252FMovies%252F#{link}%252F#{file}.m4v%26file_id%3D%252FiTunes%252FiTunes%252FiTunes%2520Media%252FMovies%252F#{link}%252F#{file}.m4v&ieMode=9" %> target="_blank">
+              <% end %>
+                <span class="glyphicon glyphicon-play"></span>
+              </a>
+            </div>
+        <% else %>
+            <img src=<%= "#{movie.poster}" %> alt=<%= "#{movie.title} Poster" %>>
+        <% end %>
       </div>
       <div class="col-lg-8 description-details">
         <h2 class="modal-title"><%= movie.title %></h2>
@@ -16,7 +41,7 @@
           <span class="spacing"><%= movie.year %></span>
           <span class="spacing"><%= movie.genre %></span>
           <span class="spacing" id="description-rating"><%= movie.rating %></span>
-          <% if movie.hd %>
+          <% if movie.hd > 0 %>
             <span class="spacing" id="description-hd">HD</span>
           <% end %>
           <div id="ratings-container">
@@ -31,49 +56,49 @@
         <h4>Cast and Crew</h4>
         <hr/>
         <div class="col-lg-3">
-          <h5>Starring</h5>
+          <h5>STARRING</h5>
           <ul>
-            <% movie.actors.split(", ").each do |line| %>
-              <li><%= line %></li>
+            <% movie.actors.split(/(?<!,),(?!\sJr\.)/).each do |line| %>
+              <li><a href=""><%= line %></a></li>
             <% end %>
           </ul>
         </div>
         <div class="col-lg-3 col-lg-offset-1">
           <% if !movie.director.empty? %>
-            <% if movie.director.split(',').length > 1 %>
-              <h5>Directors</h5>
+            <% if movie.director.split(/(?<!,),(?!\sJr\.)/).length > 1 %>
+              <h5>DIRECTORS</h5>
             <% else %>
-              <h5>Director</h5>
+              <h5>DIRECTOR</h5>
             <% end %>
             <ul>
-            <% movie.director.split(", ").each do |line| %>
-              <li><%= line %></li>
+            <% movie.director.split(/(?<!,),(?!\sJr\.)/).each do |line| %>
+              <li><a href=""><%= line %></a></li>
             <% end %>
           </ul>
           <% end %>
           <% if !movie.writer.empty? %>
-            <% if movie.writer.split(',').length > 1 %>
-              <h5>Screenwriters</h5>
+            <% if movie.writer.split(/(?<!,),(?!\sJr\.)/).length > 1 %>
+              <h5>SCREENWRITERS</h5>
             <% else %>
-              <h5>Screenwriter</h5>
+              <h5>SCREENWRITER</h5>
             <% end %>
             <ul>
-            <% movie.writer.split(", ").each do |line| %>
-              <li><%= line %></li>
+            <% movie.writer.split(/(?<!,),(?!\sJr\.)/).each do |line| %>
+              <li><a href=""><%= line %></a></li>
             <% end %>
           </ul>
           <% end %>
         </div>
         <div class="col-lg-3 col-lg-offset-1">
           <% if !movie.producer.empty? %>
-            <% if movie.producer.split(',').length > 1 %>
-              <h5>Producers</h5>
+            <% if movie.producer.split(/(?<!,),(?!\sJr\.)/).length > 1 %>
+              <h5>PRODUCERS</h5>
             <% else %>
-              <h5>Producer</h5>
+              <h5>PRODUCER</h5>
             <% end %>
             <ul>
-            <% movie.producer.split(", ").each do |line| %>
-              <li><%= line %></li>
+            <% movie.producer.split(/(?<!,),(?!\sJr\.)/).each do |line| %>
+              <li><a href=""><%= line %></a></li>
             <% end %>
           </ul>
           <% end %>
@@ -82,6 +107,13 @@
           <% end %>
         </div>
       </div>
+      <% if !movie.studio.empty? %>
+        <div class="studio">
+          <h5>STUDIO</h5>
+          <hr/>
+          <p><a href=""><%= movie.studio %></a></p>
+        </div>
+      <% end %>
     </div>
   </div>
 </div>

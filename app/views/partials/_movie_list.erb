@@ -1,8 +1,10 @@
 <% @my_movies.each do |movie| %>
   <div class="index-preview text-center" id=<%="#{user.id}"%>>
-    <a class="movie-modal" id=<%="#{movie.id}"%>><img class="lazy" data-original=<%= "#{movie.poster}" %> alt='<%="#{movie.title}" %> Poster' ></a>
+    <% if movie.isnew %>
+      <div class="new-label"><span class="new-text">New</span></div>
+    <% end %>
+    <a class="movie-modal" id=<%="#{movie.id}"%>><img class="lazy" data-original=<%= "#{movie.poster}" %> alt='<%="#{movie.title}" %> Poster' width='174' height='261' style='display: inline-block !important;'></a>
     <p class="truncate"><%= movie.title %></p>
     <div class="pointer"></div>
-    </div>
   </div>
 <% end %>

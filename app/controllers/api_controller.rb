@@ -11,6 +11,15 @@ use Rack::Cors do |config|
       :headers => :any,
       :max_age => 0
   end
+
+  config.allow do |allow|
+
+    allow.origins 'http://youmightnotneedindustryjargon.com', 'http://www.youmightnotneedindustryjargon.com'
+    allow.resource '/api/year',
+      :methods => [:get],
+      :headers => :any,
+      :max_age => 0
+  end
 end
 
 get '/api/movies' do
@@ -31,4 +40,17 @@ get '/api/year' do
   year = DateTime.now.year
 
   json year
+end
+
+get '/api/movies/new' do
+  user = User.find(params[:user_key])
+  movies = user.movies.where('isnew').sorted_list
+
+  json movies
+end
+
+get '/api/movies/filter' do
+  movies = Movie.filter_movies(params[:filter], params[:user_key]).sorted_list
+
+  json movies
 end

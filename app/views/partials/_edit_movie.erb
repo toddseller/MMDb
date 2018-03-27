@@ -8,15 +8,54 @@
           <form class="form-horizontal edit-form" action=<%= "/users/#{@user.id}/movies/#{@movie.id}" %> method="POST">
             <input type="hidden" name="_method" value="PUT">
             <div class="form-group row">
-              <label class="col-sm-2 control-label text-right" for="movie_title">Title</label>
-              <div class="col-sm-10">
-                <textarea id="movie_title" name="movie[title]" class="form-control" rows="1"><%= @movie.title %></textarea>
-              </div>
+              <% if current_user.id == ENV['LIBRARY_KEY'].to_i %>
+                <label class="col-sm-2 control-label text-right" for="movie_title">Title</label>
+                <div class="col-sm-4">
+                  <textarea id="movie_title" name="movie[title]" class="form-control" rows="1"><%= @movie.title %></textarea>
+                </div>
+                <label class="col-sm-1 control-label text-right" for="movie_title">File</label>
+                <div class="col-sm-4">
+                  <textarea id="movie_file_name" name="movie[file_name]" class="form-control" rows="1"><%= @movie.file_name %></textarea>
+                </div>
+                <div class="col-sm-1">
+                  <div class="checkbox isnew">
+                    <label class="edit-isnew">
+                      <input id="movie-isnew" type="hidden" name="movie[isnew]" value="false">
+                      <% if @movie.isnew %>
+                        <input id="movie-isnew" type="checkbox" name="movie[isnew]" value="true" checked="checked"> New
+                      <% else %>
+                        <input id="movie-isnew" type="checkbox" name="movie[isnew]" value="true"> New
+                      <% end %>
+                    </label>
+                  </div>
+                </div>
+              <% else %>
+                <label class="col-sm-2 control-label text-right" for="movie_title">Title</label>
+                <div class="col-sm-9">
+                  <textarea id="movie_title" name="movie[title]" class="form-control" rows="1"><%= @movie.title %></textarea>
+                </div>
+                <div class="col-sm-1">
+                  <div class="checkbox isnew">
+                    <label class="edit-isnew">
+                      <input id="movie-isnew" type="hidden" name="movie[isnew]" value="false">
+                      <% if @movie.isnew %>
+                        <input id="movie-isnew" type="checkbox" name="movie[isnew" value="true" checked="checked"> New
+                      <% else %>
+                        <input id="movie-isnew" type="checkbox" name="movie[isnew]" value="true"> New
+                      <% end %>
+                    </label>
+                  </div>
+                </div>
+              <% end %>
             </div>
             <div class="form-group row">
               <label class="col-sm-2 control-label text-right" for="movie_sort_name">Sort Name</label>
-              <div class="col-sm-10">
+              <div class="col-sm-5">
                 <textarea id="movie_title" name="movie[sort_name]" class="form-control" rows="1"><%= @movie.sort_name %></textarea>
+              </div>
+              <label class="col-sm-1 control-label text-right" for="movie[studio]">Studio</label>
+              <div class="col-sm-4">
+                <textarea id="movie_studio" name="movie[studio]" class="form-control" rows="1"><%= @movie.studio %></textarea>
               </div>
             </div>
             <div class="form-group row">
@@ -37,13 +76,18 @@
                 <textarea name="movie[genre]" class="form-control" rows="1"><%= @movie.genre %></textarea>
               </div>
               <div class="col-sm-1">
-                <div class="checkbox">
+                <div class="checkbox hd">
                   <label class="edit-hd">
-                    <input id="movie-hd" type="hidden" name="movie[hd]" value="false">
-                    <% if @movie.hd %>
-                      <input id="movie-hd" type="checkbox" name="movie[hd]" value="true" checked="checked"> HD
+                    <input id="movie-hd" type="hidden" name="movie[hd]" value="0">
+                    <% if @movie.hd == 1080 %>
+                      <input id="movie-hd" type="checkbox" name="movie[hd]" value="1080" checked="checked"> 1080
+                      <input id="movie-hd" type="checkbox" name="movie[hd]" value="720"> 720
+                    <% elsif @movie.hd == 720 %>
+                      <input id="movie-hd" type="checkbox" name="movie[hd]" value="1080"> 1080
+                      <input id="movie-hd" type="checkbox" name="movie[hd]" value="720" checked="checked"> 720
                     <% else %>
-                      <input id="movie-hd" type="checkbox" name="movie[hd]" value="true"> HD
+                      <input id="movie-hd" type="checkbox" name="movie[hd]" value="1080"> 1080
+                      <input id="movie-hd" type="checkbox" name="movie[hd]" value="720"> 720
                     <% end %>
                   </label>
                 </div>

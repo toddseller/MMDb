@@ -214,12 +214,58 @@
 
 .description-details h5
 {
-  font-size: 1.1em;
+  font-weight: 600;
+}
+
+.description-details a
+{
+  color: #f3f3f3;
+  text-decoration: none;
+}
+
+.description-details a:hover
+{
+  color: #c9302c;
+}
+
+.studio a
+{
+  color: #f3f3f3;
+  text-decoration: none;
+}
+
+.studio a:hover
+{
+  color: #c9302c;
+}
+
+#info-body {
+  min-height: 575px;
+}
+
+.studio
+{
+  position: absolute;
+  width: 770px;
+  right: 0;
+  bottom: 25px;
+}
+
+.studio h5
+{
+  font-weight: 600;
+}
+
+.studio p
+{
+  margin-top: -10px;
 }
 
 .description-poster
 {
   margin-bottom: 30px;
+  position: relative;
+  display: inline-block;
 }
 
 .description-poster img
@@ -229,6 +275,36 @@
 
   border: none;
   border-radius: 6px;
+  vertical-align: top;
+}
+
+a.magnifying-glass-icon
+{
+  color: #fff;
+  text-align: center;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  -webkit-transform: translate(-50%, -50%);
+  -moz-transform: translate(-50%, -50%);
+  -ms-transform: translate(-50%, -50%);
+  -o-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+  font-size: 10em;
+  opacity: 0;
+  transition: opacity .2s ease-in-out
+}
+
+.description-poster:hover .description-poster-overlay
+{
+  opacity: .75;
+  transition: all .2s ease-in-out
+}
+
+.description-poster:hover a.magnifying-glass-icon {
+  color: #fff;
+  opacity: .8;
+  transition: all .2s ease-in-out
 }
 
 .filler

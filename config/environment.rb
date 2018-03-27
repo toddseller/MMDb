@@ -16,7 +16,6 @@ require 'active_record'
 require 'logger'
 
 require 'sinatra'
-require 'newrelic_rpm'
 require "sinatra/reloader" if development?
 require 'sinatra/json'
 require 'tilt/erb'

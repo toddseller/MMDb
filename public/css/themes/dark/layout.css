@@ -16,3 +16,9 @@ body
   margin-bottom: 75px;
   width: 60%;
 }
+
+@media (min-width: 1200px) {
+  .col-lg-3 {
+      width: 27%;
+  }
+}

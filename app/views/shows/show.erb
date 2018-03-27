@@ -9,14 +9,10 @@
       </div>
     </form>
     <% if session[:user_id] == @user.id %>
-      <button id="add" class="btn btn-danger pull-right">Add Movie</button>
+      <button id="add-show" class="btn btn-danger pull-right">Add TV Show</button>
     <% end %>
     <div id="search" class="pull-right">
-      <%= erb :'/partials/_add_movie', layout: false %>
-    </div>
-    <div class="library">
-      <a href="#" id="library">Library</a>
-      <a href="/movies/new/<%=@user.id%>" id="unwatched">Unwatched</a>
+      <%= erb :'/partials/_add_show', layout: false %>
     </div>
     <div class="preview-wrapper">
       <div class="col-lg-12" id="preview"></div>
@@ -33,9 +29,9 @@
       <h1 id="profile-name"></h1>
     </div>
   </div>
-  <div id="movie-list" class="col-xs-12">
-    <% @my_movies.each do |movie| %>
-      <%= erb :'/partials/_my_movies', locals: {movie: movie, user: @user}, layout: false %>
+  <div id="show-list" class="col-xs-12">
+    <% @my_shows.each do |show| %>
+      <%= erb :'/partials/_my_shows', locals: {show: show, user: @user}, layout: false %>
     <% end %>
   </div>
 </div>

@@ -6,6 +6,7 @@ class User < ActiveRecord::Base
   before_save :sanitize_input
 
   has_and_belongs_to_many :movies, counter_cache: true
+  has_and_belongs_to_many :shows, counter_cache: true
   has_many :ratings
 
   def self.movie_count
