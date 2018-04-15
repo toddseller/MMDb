@@ -79,6 +79,13 @@
           <p><%= movie.runtime %></p>
         </div>
       </div>
+      <% if !movie.studio.empty? %>
+        <div class="studio">
+          <h5>STUDIO</h5>
+          <hr/>
+          <p><a href=""><%= movie.studio %></a></p>
+        </div>
+      <% end %>
     </div>
     <div class="col-lg-4 description-poster">
       <img src=<%= "#{movie.poster}" %> alt=<%= "#{movie.title} Poster" %>>
