@@ -108,6 +108,7 @@
 .movie-content
 {
   background: #222;
+  height: 600px;
 }
 
 .movie-content .close
@@ -121,6 +122,13 @@
 .movie-content .close:focus
 {
   color: #f00;
+}
+
+.modal-studio
+{
+  position: absolute;
+  width: 702px;
+  bottom: -100px;
 }
 
 .glyphicon-option-vertical
