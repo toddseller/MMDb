@@ -131,9 +131,14 @@
   bottom: -100px;
 }
 
-.modal-studio h5
+.modal-studio p
 {
-  margin-bottom: -10px;
+  margin-top: -10px;
+}
+
+.modal-body hr
+{
+  margin-top: 10px;
 }
 
 .glyphicon-option-vertical
