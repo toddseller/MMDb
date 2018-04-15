@@ -131,6 +131,11 @@
   bottom: -100px;
 }
 
+.modal-studio h5
+{
+  margin-bottom: -10px;
+}
+
 .glyphicon-option-vertical
 {
   font-size: 21px;
