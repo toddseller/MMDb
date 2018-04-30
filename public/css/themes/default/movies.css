@@ -345,7 +345,8 @@ img
     margin-left: 25px;
 }
 
-#add
+#add,
+#add-show
 {
     margin-right: 25px;
 }
