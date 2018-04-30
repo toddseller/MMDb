@@ -16,8 +16,8 @@ var bindListeners = function () {
   $('#sign-in-form').on('submit', validate)
   $('.close').on('click', clearForm)
   $('.modal').on('shown.bs.modal', autoFocus)
-  //$('#menu-toggle').on('click', animateMenu)
-  $('#menu-toggle').hoverIntent(openMenu, closeMenu)
+  $('#menu-toggle').on('click', animateMenu)
+  // $('#menu-toggle').hoverIntent(openMenu, closeMenu)
   $('#logout').on('click', logout)
   $('#update').on('click', updateUser)
   $('#search-movie-title').on('keyup', function () {
