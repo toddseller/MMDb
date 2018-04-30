@@ -35,6 +35,161 @@
   color: #fff;
 }
 
+.modal#edit-show
+{
+  width: 450px;
+  height: 800px;
+}
+
+#edit-show .modal-header
+{
+  text-align: left;
+
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
+  background-color: #e4e4e4;
+}
+
+#edit-show .modal-body
+{
+  text-align: left;
+
+  background-color: #fff;
+  height: 600px;
+}
+
+#edit-show .modal-footer
+{
+  height: 50px;
+
+  border-bottom-left-radius: 5px;
+  border-bottom-right-radius: 5px;
+  background-color: #fff;
+  border: none;
+  padding: 0 15px;
+}
+
+#edit-show .modal-footer .glyphicon
+{
+  margin-right: 0;
+}
+
+#edit-show .modal-footer > .btn-group
+{
+  float: left;
+}
+
+.btn.btn-default.disabled.edit-next,
+.btn.btn-default.disabled.edit-next:hover
+{
+  background-color: #e0e0e0 !important;
+}
+
+#episode-delete
+{
+  float: right;
+  margin-top: 15px;
+}
+
+#edit-show .control-label
+{
+  font-weight: 300;
+  color: inherit;
+}
+
+#edit-show .edit-poster img
+{
+  width: 120px;
+  margin-left: -15px;
+  border-radius: 0;
+}
+
+#edit-show .show-title
+{
+  padding-left: 25px;
+  margin-top: 22px;
+}
+
+#edit-show .show-title h4
+{
+  font-weight: 400;
+  font-size: 22px;
+}
+
+#edit-show .show-title p
+{
+  margin-top: -10px;
+  font-size: .9em;
+}
+
+#edit-show .tab-container
+{
+  display: flex;
+  justify-content: center;
+}
+
+#edit-show .btn
+{
+  padding: 3px 12px;
+}
+
+#edit-show button.btn.btn-default.active,
+#edit-show button.btn.btn-default.active:hover
+{
+  background-color: #757575 !important;
+  color: #fff !important;
+  border-color: #757575 !important;
+}
+
+#edit-show button:hover
+{
+  cursor: default;
+}
+
+#edit-show .btn.active:focus,
+#edit-show .btn:focus
+{
+  outline: none;
+  outline-offset: none;
+  background-color: inherit;
+  border-color: #ccc;
+  color: inherit;
+}
+
+#edit-show .btn-default:hover
+{
+  background-color: inherit;
+  border-color: #ccc;
+  cursor: default;
+}
+
+#edit-show .edit-container
+{
+  margin-top: 20px;
+}
+
+#edit-show .form-group
+{
+  margin-bottom: 5px;
+}
+
+#edit-show a
+{
+  text-decoration: none;
+  color: inherit;
+}
+
+#artwork img
+{
+  width: 450px;
+  margin-left: -15px;
+}
+
+#artwork .form-control
+{
+  margin-top: 15px;
+}
+
 #meta-data
 {
   width: 1170px;
@@ -158,7 +313,7 @@
 
 #description-rating
 {
-  font-family: 'Times New Roman', serif;
+  font-family: 'Gotham Bold', serif;
   font-weight: bolder;
 
   padding: 1px 3px;

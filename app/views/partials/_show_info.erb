@@ -1,0 +1,80 @@
+<div id="meta-data" style="width: 1386px;">
+  <div class="modal-header">
+  </div>
+  <div class="modal-body">
+    <div id="info-header" class="row">
+      <% if user.is_a?(User) %>
+        <a class="show-edit" href=<%= "/users/#{user.id}/shows/#{show.id}/edit" %>><span class="glyphicon glyphicon-option-horizontal"></span></a>
+      <% end %>
+      <div class="col-lg-4 description-poster">
+        <img src=<%= "#{season.poster}" %> alt=<%= "#{show.title} Poster" %>>
+        <% if show.seasons.count == 1 && show.episode_count == 1 %>
+          <p id="counts">1 season, 1 episode</p>
+        <% elsif show.seasons.count == 1 && show.episode_count > 1 %>
+          <p id="counts">1 season, <%= "#{show.episode_count}" %> episodes</p>
+        <% elsif show.seasons.count > 1 && show.episode_count == 1 %>
+          <p id="counts"><%= "#{show.seasons.count}" %> seasons, 1 episode</p>
+        <% else %>
+          <p id="counts"><%= "#{show.seasons.count}" %> seasons, <%= "#{show.episode_count}" %> episodes</p>
+        <% end %>
+      </div>
+      <div class="col-lg-7 series-info">
+        <h1><%= show.title %></h1>
+        <% if show.seasons.count > 1 %>
+          <p id="series-count"><%= "Seasons #{show.season_numbers}" %></p>
+        <% else %>
+          <p id="series-count"><%= "Season #{show.season_numbers}" %></p>
+        <% end %>
+        <span class="spacing"><%= show.genre %></span>
+        <span class="spacing"><%= show.year %></span>
+        <span class="spacing" id="description-rating"><%= show.rating %></span>
+        <% if show.hd > 0 %>
+          <span class="spacing" id="description-hd">HD</span>
+        <% end %>
+        <div class="season-plot"><%= season.plot %></div>
+      </div>
+      <div class="col-lg-8">
+        <div id="season-selector">
+          <hr/>
+          SEASON:
+          <form id="season-default" action=<%="/users/#{user.id}/shows/#{show.id}/seasons/"%> method="POST">
+            <% show.seasons.sorted_seasons.each do |s| %>
+              <% if s.is_active %>
+                <input class="season-submit" id="active-season" type="submit" name="season[:id]" value="<%="#{s.season}"%>">
+              <% else %>
+                <input class="season-submit" type="submit" name="season[:id]" value="<%="#{s.season}"%>">
+              <% end %>
+            <% end %>
+          </form>
+          <hr/>
+        </div>
+        <div class="episode-list">
+          <% episodes.each do |e| %>
+            <% if episodes[0].tv_episode == e.tv_episode %>
+              <div class="col-lg-11 episode-description">
+                <p class="tv-episode"><span>EPISODE <%= e.tv_episode %></span><span class="aired"><%= e.date %></p>
+                <p class="episode-title"><%= e.title %></p>
+                <p class="episode-runtime"><%= e.runtime %></p>
+                <p class="plot-truncate"><%= e.plot %></p>
+                <% if e.plot.length > 130 %>
+                  <p class="expand-plot">more</p>
+                <% end %>
+              </div>
+            <% else %>
+              <hr class="col-lg-12"/>
+              <div class="col-lg-11 episode-description">
+                <p class="tv-episode"><span>EPISODE <%= e.tv_episode %></span><span class="aired"><%= e.date %></p>
+                <p class="episode-title"><%= e.title %></p>
+                <p class="episode-runtime"><%= e.runtime %></p>
+                <p class="plot-truncate"><%= e.plot %></p>
+                <% if e.plot.length > 130 %>
+                  <p class="expand-plot">more</p>
+                <% end %>
+              </div>
+            <% end %>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

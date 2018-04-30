@@ -1,0 +1,138 @@
+<div class="modal-header">
+  <div class="row">
+    <div class="col-sm-12 edit-show">
+      <div class="col-sm-3 edit-poster">
+        <img class="text-right" src=<%= "#{@show.poster}" %> alt="">
+      </div>
+      <div class="col-sm-9 show-title">
+        <h4><%= @show.title %></h4>
+        <% if @count > 1 || @count == 0 %>
+          <p>Season <%= "#{@season.season}" %>, <%= "#{@count}" %> episodes selected</p>
+        <% else %>
+          <p>Season <%= "#{@season.season}" %>, <%= "#{@count}" %> episode selected</p>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal-body">
+  <div class="row">
+    <div class="col-sm-12 tab-container">
+      <div class="btn-group" role="group">
+        <button type="button" class="btn btn-default active" data-toggle="tab" href="#detail">Details</button>
+        <button type="button" class="btn btn-default" data-toggle="tab" href="#artwork">Artwork</button>
+        <button type="button" class="btn btn-default" data-toggle="tab" href="#season">Season</button>
+        <button type="button" class="btn btn-default" data-toggle="tab" href="#sorting">Sorting</button>
+      </div>
+    </div>
+    <div class="col-sm-12 edit-container tab-content">
+      <div id="detail" class="tab-pane in active">
+        <form class="form-horizontal show-data" id=<%="#{@episode.id}"%> action=<%= "/users/#{@user.id}/shows/#{@show.id}" %> method="POST">
+          <div class="form-group row">
+            <label class="col-sm-2 control-label text-right" for="episode_title">title</label>
+            <div class="col-sm-10">
+              <textarea id="episode_title" name="episode[title]" class="form-control" rows="1"><%= @episode.title %></textarea>
+            </div>
+          </div>
+          <div class="form-group row">
+            <label class="col-sm-2 control-label text-right" for="tv_episode">episode</label>
+            <div class="col-sm-3">
+              <input id="tv_episode" type="text" class="form-control" name="episode[tv_episode]" value=<%= "#{@episode.tv_episode}" %>>
+            </div>
+          </div>
+          <div class="form-group row">
+            <label class="col-sm-2 control-label text-right" for="episode_date">date</label>
+            <div class="col-sm-4">
+              <textarea id="episode_date" name="episode[date]" class="form-control" rows="1"><%= @episode.date %></textarea>
+            </div>
+          </div>
+          <div class="form-group row">
+            <label class="col-sm-2 control-label text-right" for="episode_plot">plot</label>
+            <div class="col-sm-10">
+              <textarea id="episode_plot" name="episode[plot]" class="form-control" rows="8"><%= @episode.plot %></textarea>
+            </div>
+          </div>
+        </form>
+        <button id="episode-delete" class="btn btn-danger" href=<%="/users/#{@user.id}/shows/#{@show.id}/seasons/#{@season.id}/episodes/#{@episode.id}"%>>Delete Episode</button>
+      </div>
+      <div id="artwork" class="tab-pane">
+        <form class="form-horizontal show-data" action=<%= "/users/#{@user.id}/shows/#{@show.id}" %> method="POST">
+          <img src=<%="#{@season.poster}"%>>
+          <div class="form-group row">
+            <div class="col-sm-12">
+              <input type="text" class="form-control" name="season[poster]" value=<%= "#{@season.poster}" %>>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div id="season" class="tab-pane">
+        <form class="form-horizontal show-data" action=<%= "/users/#{@user.id}/shows/#{@show.id}" %> method="POST">
+          <div class="form-group row">
+            <label class="col-sm-2 control-label text-right" for="season">season</label>
+            <div class="col-sm-3">
+              <input id="season" type="text" class="form-control" name="season[season]" value=<%= "#{@season.season}" %>>
+            </div>
+          </div><div class="form-group row">
+            <label class="col-sm-2 control-label text-right" for="rating">rating</label>
+            <div class="col-sm-3">
+              <input id="rating" type="text" class="form-control" name="show[rating]" value=<%= "#{@show.rating}" %>>
+            </div>
+          </div><div class="form-group row">
+            <label class="col-sm-2 control-label text-right" for="genre">genre</label>
+            <div class="col-sm-4">
+              <input id="genre" type="text" class="form-control" name="show[genre]" value=<%= "#{@show.genre}" %>>
+            </div>
+          </div>
+          <div class="form-group row">
+            <label class="col-sm-2 control-label text-right" for="show_year">year</label>
+            <div class="col-sm-4">
+              <input id="show_year" type="text" class="form-control" name="show[year]" value=<%= "#{@show.year}" %>>
+            </div>
+          </div>
+          <div class="form-group row">
+            <label class="col-sm-2 control-label text-right" for="plot">plot</label>
+            <div class="col-sm-10">
+              <textarea id="plot" name="season[plot]" class="form-control" rows="8"><%= @season.plot %></textarea>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div id="sorting" class="tab-pane">
+        <form class="form-horizontal show-data" action=<%= "/users/#{@user.id}/shows/#{@show.id}" %> method="POST">
+          <div class="form-group row">
+            <label class="col-sm-2 control-label text-right" for="show_title">title</label>
+            <div class="col-sm-10">
+              <textarea id="show_title" name="show[title]" class="form-control" rows="1"><%= @show.title %></textarea>
+            </div>
+          </div>
+          <div class="form-group row">
+            <label class="col-sm-2 control-label text-right" for="sort_as">sort as</label>
+            <div class="col-sm-10">
+              <textarea id="sort_as" name="show[sort_name]" class="form-control" rows="1"><%= @show.sort_name %></textarea>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal-footer">
+  <div class="btn-group" role="group">
+    <% if @previous_episode %>
+      <button type="button" class="btn btn-default edit-next" href=<%="/users/#{@user.id}/shows/#{@show.id}/seasons/#{@season.id}/episodes/#{@previous_episode.id}/edit"%>>
+        <span class="glyphicon glyphicon-menu-left"></span>
+      </button>
+    <% else %>
+      <button type="button" class="btn btn-default disabled edit-next" disabled="disabled"><span class="glyphicon glyphicon-menu-left"></span></button>
+    <% end %>
+    <% if @next_episode %>
+      <button type="button" class="btn btn-default edit-next" href=<%="/users/#{@user.id}/shows/#{@show.id}/seasons/#{@season.id}/episodes/#{@next_episode.id}/edit"%>>
+        <span class="glyphicon glyphicon-menu-right"></span>
+      </button>
+    <% else %>
+      <button type="button" class="btn btn-default disabled edit-next" disabled="disabled"><span class="glyphicon glyphicon-menu-right"></span></button>
+    <% end %>
+  </div>
+  <button id="cancel" class="btn btn-default">Cancel</button>
+  <button id="ok" class="btn btn-danger">OK</button>
+</div>

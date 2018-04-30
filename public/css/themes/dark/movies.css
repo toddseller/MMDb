@@ -38,12 +38,224 @@ img
     margin: 0 auto;
 }
 
-.pointer
+#info-header
+{
+    margin-top: 20px;
+}
+
+#info-header > .show-edit
+{
+    margin-top: 25px;
+}
+
+.description-poster > #counts
+{
+    font-size: .9em;;
+
+    margin-top: 10px;
+
+    color: rgba(243,243,243,.7);
+}
+
+#info-header > .description-poster img
+{
+    width: 447px;
+
+    border: rgba(243,243,243,.1) 1px solid;
+    background: none;
+}
+
+.series-info
+{
+    margin-left: 5px;
+}
+
+.series-info h1
+{
+    font-size: 30px;
+    font-weight: 700;
+
+    margin-top: 5px;
+}
+
+.series-info #series-count
+{
+    margin-top: -8px;
+    margin-bottom: -3px;
+    color: rgba(243,243,243,.7);
+}
+
+.series-info .spacing
+{
+    margin-right: 5px;
+    color:rgba(243,243,243,.7);
+}
+
+.series-info #description-rating
+{
+    font-family: inherit;
+    font-weight: bolder;
+    padding: 0 3px;
+    border: 2px solid rgba(243,243,243,.7);
+    border-radius: 3px;
+}
+
+.series-info #description-hd
+{
+    background: rgba(243,243,243,.7);
+    color: #333;
+    padding: 0 3px 1px;
+    border-radius: 3px;
+    font-weight: bolder;
+    position: relative;
+    top: 0;
+}
+
+.tv-episode
+{
+    color: rgba(243,243,243,.7);
+    font-size: .8em;
+    font-weight: 500;
+    margin: 10px 0 0;
+}
+
+.episode-title
+{
+    margin: 3px 0;
+    font-weight: 500;
+    font-size: .9em;
+}
+
+.episode-runtime
+{
+    text-align: right;
+    font-size: .9em;
+    margin-top: -20px;
+    margin-bottom: 0;
+    margin-right: -40px;
+    color: rgba(243,243,243,.7);
+}
+
+.aired
+{
+    margin-left: 20px;
+}
+
+.plot-truncate
+{
+    color: rgba(243,243,243,.7);
+    font-size: .9em;
+    overflow: hidden;
+
+    margin: 0 auto;
+
+    white-space: nowrap;
+    text-overflow: ellipsis;
+
+    transition: all .4s ease-in-out;
+}
+
+.plot-truncate.active
+{
+    white-space: pre-wrap;
+    text-overflow: unset;
+    overflow: auto;
+    transition: all .4s ease-in-out;
+}
+
+.episode-list > div
+{
+    padding-left: 5px;
+}
+
+.expand-plot
+{
+    font-size: .95em;
+    text-align: right;
+    margin-right: -40px;
+    margin-top: -18px;
+    margin-bottom: 0;
+    color: #d9534f;
+}
+
+.expand-plot:hover
+{
+    cursor: default;
+    color: #f3f3f3;
+}
+
+.episode-list hr
+{
+    margin-left: 5px;
+    margin-top: 15px !important;
+    margin-bottom: 5px;
+}
+
+#season-selector
+{
+    color: rgba(243,243,243,.7);
+    font-size: .9em;
+    margin-left: 5px;
+}
+
+#season-selector hr
+{
+    margin-bottom: 8px;
+}
+
+#season-default
+{
+    display: inline-block;
+}
+
+.season-plot
+{
+    margin: 15px 0;
+}
+
+.season-submit:hover
+{
+    cursor: default;
+}
+
+.season-submit:focus
+{
+    border: none;
+    background: rgba(243,243,243,.7);
+    color: #fff;
+    border-radius: 4px;
+}
+
+.season-submit
+{
+    border: none;
+    background: none;
+    color: rgba(243,243,243,.7);
+    padding: 3px 10px;
+    display: inline-block;
+}
+
+.season-submit#active-season
+{
+    border: none;
+    background: #d9534f;
+    color: #fff;
+    border-radius: 4px;
+}
+
+.episode-description:last-of-type
+{
+    margin-bottom: 50px;
+}
+
+.pointer,
+.show-pointer
 {
     height: 0;
 }
 
-.pointer.active
+.pointer.active,
+.show-pointer.active
 {
     width: 15px;
     height: 15px;
@@ -61,6 +273,11 @@ img
     background: #222;
 }
 
+.show-pointer.active
+{
+    margin-bottom: -9px;
+}
+
 #movie-search
 {
     width: 100%;
@@ -76,6 +293,20 @@ img
 }
 
 #poster:hover
+{
+    box-shadow: 0 0 7px #f00;
+}
+
+#show-poster
+{
+    width: 200px;
+    height: auto;
+    margin-top: 3px;
+
+    border-radius: 4px;
+}
+
+#show-poster:hover
 {
     box-shadow: 0 0 7px #f00;
 }
@@ -133,6 +364,16 @@ img
 }
 
 .movie-preview-title
+{
+    float: right;
+}
+
+.show-preview
+{
+    margin-right: 1em;
+}
+
+.show-preview-title
 {
     float: right;
 }
@@ -251,7 +492,8 @@ img
     padding-top: 0;
 }
 
-.movie-edit
+.movie-edit,
+.show-edit
 {
     float: right;
 
@@ -263,7 +505,8 @@ img
     background: #d9534f;
 }
 
-.movie-edit .glyphicon
+.movie-edit .glyphicon,
+.show-edit .glyphicon
 {
     font-size: 1.5em;
 
@@ -499,6 +742,79 @@ a.movie-edit:hover
     box-shadow: 0 15px 25px #000;
 }
 
+.index-preview-show
+{
+    position: relative;
+
+    width: 213px;
+    height: auto;
+    margin-right: 1.53em;
+}
+
+.index-preview-show:nth-child(6n)
+{
+    margin-right: 0;
+}
+
+.index-preview-show img
+{
+    width: 213px;
+    height: auto;
+    margin-top: 20px;
+
+    transition: all .3s ease-in-out;
+
+    border-radius: 4px;
+    background-color: #080808;
+}
+
+#episode-video
+{
+    height: 169px;
+    margin-right: 1.5em;
+    padding: 0;
+
+    border: none;
+    background: none;
+}
+
+.episode-preview
+{
+    height: 300px;
+    margin-right: 1.5em;
+}
+
+.episode-preview:last-of-type
+{
+    margin-right: 0;
+}
+
+#create-episode
+{
+    width: 300px;
+}
+
+.add-all
+{
+    height: 168.812px;
+    width: 300px;
+    border: none;
+    background-color: rgba(0,0,0,.4);
+}
+
+.add-all .glyphicon
+{
+    margin-right: 0;
+    font-size: 3em;
+    color: rgba(255,255,255,.8);
+}
+
+.add-all p
+{
+    color: rgba(255,255,255,.8);
+    font-size: 1.2em;
+}
+
 .new-label
 {
     position: absolute;
@@ -575,6 +891,41 @@ a.movie-edit:hover
     text-overflow: ellipsis;
 }
 
+.episode-truncate
+{
+    overflow: hidden;
+
+    width: 300px;
+    margin: 2px 0 -3px;
+    margin-top: 2px;
+
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.show-truncate
+{
+    overflow: hidden;
+
+    width: 174px;
+    margin: 0 auto;
+    margin-top: 2px;
+    margin-left: 0;
+
+    text-align: left;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.season
+{
+    font-size: .9em;
+
+    text-align: left;
+
+    color: rgba(243,243,243,.7);
+}
+
 .preview-truncate
 {
     margin: 2px 0 -3px;
@@ -590,7 +941,8 @@ a.movie-edit:hover
     display: none;
 }
 
-#movie-list
+#movie-list,
+#show-list
 {
     display: flex;
 

@@ -12,8 +12,8 @@ gem 'dotenv'
 # Use Thin for our web server
 gem 'thin'
 
-gem 'activesupport'
-gem 'activerecord'
+gem 'activesupport', '~> 5.1.0'
+gem 'activerecord', '~> 5.1.0'
 
 gem 'rake'
 

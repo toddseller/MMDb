@@ -1,0 +1,41 @@
+<div id="search-boxes">
+  <div id="search-wrapper">
+    <form id="filter-input" action="/movies/filter" method="GET">
+      <div id="search-movies" class="pull-left col-sm-3 input-group">
+        <input id="search-movie-title" class="form-control" name="title" type="text" placeholder="Search Collection">
+        <span class="input-group-btn" id="clear-btn">
+          <input type="reset" class="btn btn-danger" value="Clear">
+        </span>
+      </div>
+    </form>
+    <% if session[:user_id] == @user.id %>
+      <button id="add" class="btn btn-danger pull-right">Add Movie</button>
+    <% end %>
+    <div id="search" class="pull-right">
+      <%= erb :'/partials/_add_movie', layout: false %>
+    </div>
+    <div class="library">
+      <a href="#" id="library">Library</a>
+      <a href="/movies/new/<%=@user.id%>" id="unwatched">Unwatched</a>
+    </div>
+    <div class="preview-wrapper">
+      <div class="col-lg-12" id="preview"></div>
+      <a class="pull-right" id="dismiss" href="#"><span class="glyphicon glyphicon-remove"></span></a>
+      <div id="scroll-left"><span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span></div>
+      <div id="scroll-right"><span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span></div>
+    </div>
+  </div>
+</div>
+<div class="row">
+  <div id="profile-wrapper">
+    <div id="profile-header">
+      <img id="profile-image" src=""/>
+      <h1 id="profile-name"></h1>
+    </div>
+  </div>
+  <div id="movie-list" class="col-xs-12">
+    <% @my_movies.each do |movie| %>
+      <%= erb :'/partials/_my_movies', locals: {movie: movie, user: @user}, layout: false %>
+    <% end %>
+  </div>
+</div>
