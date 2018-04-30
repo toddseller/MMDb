@@ -10,6 +10,7 @@ class Movie < ActiveRecord::Base
   before_create :create_duration
   before_save :create_search_name
   before_update :sanitize_input
+  before_update :adjust_url
 
   scope :sorted_list, -> { order(:sort_name, :year) }
   scope :recently_added, -> { order(created_at: :desc) }
@@ -99,6 +100,13 @@ class Movie < ActiveRecord::Base
       self.runtime.gsub!(/\s*\<.*\/.*\>/, '')
       self.poster.gsub!(/\s*\<.*\/.*\>/, '')
       self.sort_name.gsub!(/\s*\<.*\/.*\>/, '')
+    end
+
+    def adjust_url
+      if self.poster =~ /http:/ && !(self.poster =~ /-ssl.mzstatic/)
+        self.poster.gsub!(/^(http)/, 'https')
+        self.poster.gsub!(/(\.mzstatic)/, '-ssl.mzstatic')
+      end
     end
 
     def self.get_actors(r)

@@ -1,7 +1,7 @@
 use Rack::Cors do |config|
   config.allow do |allow|
 
-    allow.origins 'http://toddseller.com', 'http://www.toddseller.com'
+    allow.origins 'http://toddseller.com', 'http://www.toddseller.com', 'http://test.toddseller.com', 'http://www.test.toddseller.com'
     allow.resource '/api/movies/count',
       :methods => [:get],
       :headers => :any,
