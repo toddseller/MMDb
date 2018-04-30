@@ -163,15 +163,15 @@
   margin-right: 15px;
 }
 
-#user-profile > .glyphicon-triangle-bottom
+#user-profile > .glyphicon-triangle-right
 {
   margin-left: 2em;
   transition: all .4s ease-in-out;
 }
 
-#user-profile > .glyphicon-triangle-bottom.active
+#user-profile > .glyphicon-triangle-right.active
 {
-  transform: rotate(180deg);
+  transform: rotate(90deg);
 }
 
 

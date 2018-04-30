@@ -39,6 +39,7 @@ var dynamicListener = function () {
   $('#user-page').on('click', '.show-modal', getMovieModal)
   $('#user-page').on('click', '.close', closeInfo)
   $('#user-page').on('click', '.movie-edit', editMovie)
+  $('#user-page').on('click', '.show-edit', editShow)
   $('#user-page').on('click', '#edit-button', submitUpdate)
   $('#user-page').on('click', '#delete-button', deleteMovie)
   $('#user-page').on('click', '.rating-input', ratingSubmit)
@@ -51,6 +52,9 @@ var dynamicListener = function () {
   $('#logIn').on('keyup', '#confirm', testPassword)
   $('#logIn').on('change', '#current', deactivateSubmit)
   $('#logIn').on('click', '#myonoffswitch', changeTheme)
+  $('#edit-show').on('click', 'button', toggleActive)
+  $('#edit-show').on('change', 'input[name="season[poster]"]', updatePoster)
+  $('#edit-show').on('click', '#episode-delete', deleteEpisode)
 }
 
 var goToProfile = function (event) {
@@ -159,7 +163,7 @@ var animateMenu = function (event) {
 var toggleProfile = function (event) {
   event.preventDefault()
   $('#drop-down-submenu').toggleClass('active')
-  $('#user-profile > span.glyphicon.glyphicon-triangle-bottom').toggleClass('active')
+  $('#user-profile > span.glyphicon.glyphicon-triangle-right').toggleClass('active')
 }
 
 var logout = function (event) {
@@ -455,7 +459,7 @@ var showToDB = function (event) {
 
 var episodeToDB = function (event) {
   event.preventDefault()
-  var title = $(this).find('input[name="episode[title]"]').val()
+  var title = !$(this).find('button[type="submit"] > span').hasClass('glyphicon') ? $(this).find('input[name="episode[title]"]').val() : 'Season ' + $(this).find('button[type="submit"]').attr('id')
   var movie = $(this).serialize() + '&filter=' + $('#search-movie-title').val()
   $('#preview').empty().slideDown(300, 'linear').append('<div id="loading"><h3>Adding ' + title + ' to Your Collection...</h3><div class="loader"></div></div>').css('display','block')
   $('#scroll-right').hide()
@@ -697,12 +701,92 @@ var displayMovieModal = function (response) {
 var editMovie = function (event) {
   event.preventDefault()
   var route = $(this).attr('href')
+  console.log(route)
   $.get(route, displayEditForm)
+}
+
+var toggleActive = function (event) {
+  console.log($(this).text() === 'Cancel')
+  console.log($('button#cancel.btn.btn-default').text() === 'Cancel')
+  if ($(this).text() === 'Cancel') {
+    $('#edit-show').modal('toggle')
+  } else if ($(this).text() === 'OK') {
+    var route = $('.show-data').attr('action')
+    var data = $('.show-data').serialize() + '&show%5Bposter%5D=' + encodeURIComponent($('input[name="season[poster]"]').val()) + '&form%5Bid%5D=' + $('.edit-container > div > form').attr('id')
+    var request = $.ajax({
+      url: route,
+      type: 'PUT',
+      data: data
+    })
+    request.done(function (response) {
+      $('.info-wrapper').empty().append(response)
+    })
+    $('#edit-show').modal('toggle')
+  } else if ($(this).hasClass('edit-next')) {
+    var route = $(this).attr('href')
+    var request1 = $.ajax({
+      url: route
+    })
+    var formRoute = $('.show-data').attr('action')
+    var data = $('.show-data').serialize() + '&show%5Bposter%5D=' + encodeURIComponent($('input[name="season[poster]"]').val()) + '&form%5Bid%5D=' + $('.edit-container > div > form').attr('id')
+    var request2 = $.ajax({
+      url: formRoute,
+      type: 'PUT',
+      data: data
+    })
+    $.when(request1, request2).done(function (r1, r2) {
+      $('#edit-show').empty().append(r1)
+      $('.info-wrapper').empty().append(r2)
+    })
+  } else {
+    $('button.btn.btn-default.active').toggleClass('active')
+    $(this).addClass('active')
+    var route = $('.show-data').attr('action')
+    var data = $('.show-data').serialize() + '&show%5Bposter%5D=' + encodeURIComponent($('input[name="season[poster]"]').val()) + '&form%5Bid%5D=' + $('.edit-container > div > form').attr('id')
+    var request = $.ajax({
+      url: route,
+      type: 'PUT',
+      data: data
+    })
+    request.done(function (response) {
+      $('.info-wrapper').empty().append(response)
+    })
+  }
+}
+
+var deleteEpisode = function (event) {
+  var route = $(this).attr('href')
+  var request = $.ajax({
+    url: route,
+    type: 'DELETE'
+  })
+  request.done(function (response) {
+    $('#edit-show').empty().append(response)
+  })
+}
+
+var updatePoster = function (event) {
+  var poster = $('input[name="season[poster]"]').val()
+  $('.modal-header img').attr('src', poster)
+  $('#artwork > form > img').attr('src', poster)
+  $('.description-poster > img').attr('src', poster)
+  $('.lazy.active').attr('src', poster)
+}
+
+var editShow = function (event) {
+  event.preventDefault()
+  var route = $(this).attr('href')
+  $.get(route, displayShowEditForm)
 }
 
 var displayEditForm = function (response) {
   $('.modal-body').replaceWith(response)
   $('.modal-footer').hide()
+}
+
+var displayShowEditForm = function (response) {
+  $('#edit-show').empty().append(response)
+  $('#edit-show').modal('show')
 }
 
 var submitUpdate = function (event) {

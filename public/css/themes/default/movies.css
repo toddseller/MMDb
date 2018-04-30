@@ -800,6 +800,27 @@ a.movie-edit:hover
     width: 300px;
 }
 
+.add-all
+{
+    height: 168.812px;
+    width: 300px;
+    border: none;
+    background-color: rgba(0,0,0,.4);
+}
+
+.add-all .glyphicon
+{
+    margin-right: 0;
+    font-size: 3em;
+    color: rgba(255,255,255,.8);
+}
+
+.add-all p
+{
+    color: rgba(255,255,255,.8);
+    font-size: 1.2em;
+}
+
 .new-label
 {
     position: absolute;

@@ -17,9 +17,8 @@ post '/users/:user_id/shows' do
     @show.users << @user if !@show.users.include?(@user)
     if @season.save
       if @show.seasons.length == 1
-        p '*' * 80
         @season.update(is_active: true)
-        p @season
+        @season
       end
       @episodes_previews = Show.get_episodes(@season.collectionId)
     end
@@ -35,14 +34,9 @@ end
 
 get '/users/:user_id/shows/:id' do
   user = current_user if current_user == User.find(params[:user_id])
-  # library_key = params[:user_id] == ENV['LIBRARY_KEY']
   show = Show.find(params[:id])
-  p '*' * 80
-  p season = show.seasons.find_by(is_active: true)
-  p episodes = season.episodes.sorted_list
-  # link = URI::encode(movie.title.gsub(/[*:;\/]/,'_'))
-  # file = movie.file_name.length > 0 ? URI::encode(movie.file_name.gsub(/[*:;\/]/,'_')) : URI::encode(movie.title.gsub(/[*:;\/]/,'_'))
-  # link: link, file: file, library_key: library_key
+  season = show.seasons.find_by(is_active: true)
+  episodes = season.episodes.sorted_list
   if request.xhr?
     page = erb :'/partials/_show_info', locals: {show: show, user: user, season: season, episodes: episodes}, layout: false
     json page
@@ -50,29 +44,34 @@ get '/users/:user_id/shows/:id' do
 end
 
 get '/users/:user_id/shows/:id/edit' do
-  @movie = Movie.find(params[:id])
+  @show = Show.find(params[:id])
+  @season = @show.seasons.find_by(is_active: true)
+  @episodes = @season.episodes.sorted_list
+  @episode = @episodes[0]
+  @count = @episodes.count
+  @next_episode = @episodes[1] if @episodes.count > 1
   @user = current_user
   if request.xhr?
-    page = erb :'/partials/_edit_movie', locals: {movie: @movie, user: @user}, layout: false
+    page = erb :'/partials/_edit_show', locals: {show: @show, user: @user, season: @season, episode: @episode, count: @count, next_episode: @next_episode}, layout: false
     json page
   else
-    erb :'/partials/_edit_movie', layout: false
+    erb :'/partials/_edit_show', layout: false
   end
 end
 
 put '/users/:user_id/shows/:id' do
-  @movie = Movie.find(params[:id])
-  @movie.update(params[:movie])
-  @user = current_user
-  link = URI::encode(@movie.title.gsub(/[*:;\/]/,'_'))
-  file = @movie.file_name.length > 0 ? URI::encode(@movie.file_name.gsub(/[*:;\/]/,'_')) : URI::encode(@movie.title.gsub(/[*:;\/]/,'_'))
-  library_key = params[:user_id] == ENV['LIBRARY_KEY']
-  if request.xhr?
-    @my_movies = params[:filter] != nil ? Movie.filter_movies(params[:filter], @user.id).sorted_list : Movie.search(params[:name], @user.id).sorted_list
+  @show = Show.find(params[:id])
+  @show.update(params[:show])
+  @season = @show.seasons.find_by(is_active: true)
+  @season.update(params[:season])
+  @episode = @season.episodes.find(params[:form]['id'])
+  @episode.update(params[:episode])
+  @episodes = @season.episodes.sorted_list
 
-    page = erb :'/partials/_info', locals: {movie: @movie, user: @user, link: link, file: file, library_key: library_key}, layout: false
-    list = erb :'/partials/_filtered_list', locals: {movie: @my_movies, user: @user}, layout: false
-    json page: page, query: list, id: @movie.id
+  @user = current_user
+  if request.xhr?
+    page = erb :'/partials/_show_info', locals: {show: @show, user: @user, season: @season, episodes: @episodes}, layout: false
+    json page
   else
     erb :'/users/show'
   end

@@ -17,3 +17,22 @@
     </div>
   <% end %>
 <% end %>
+<div class="episode-preview">
+  <form id="create-episode" action=<%="/users/#{@user.id}/shows/#{@show.id}/seasons/#{@season.id}/episodes"%> method="POST">
+    <%@episodes_previews.each do |episode| %>
+      <% if episode[:preview] != 'NA' %>
+        <input type="hidden" name="episodes[][title]" value="<%="#{episode[:title]}"%>">
+        <input type="hidden" name="episodes[][date]" value="<%="#{episode[:date]}"%>">
+        <input type="hidden" name="episodes[][plot]" value="<%="#{episode[:plot]}"%>">
+        <input type="hidden" name="episodes[][preview]" value="<%="#{episode[:preview]}"%>">
+        <input type="hidden" name="episodes[][runtime]" value="<%="#{episode[:runtime]}"%>">
+        <input type="hidden" name="episodes[][tv_episode]" value="<%="#{episode[:tv_episode]}"%>">
+      <% end %>
+    <% end %>
+    <button type="submit" id="<%="#{@season.season}"%>" class="add-all">
+      <span class="glyphicon glyphicon-plus"></span>
+      <p>Add All Episodes</p>
+    </button>
+  </form>
+</div>
+

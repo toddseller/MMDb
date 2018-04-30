@@ -15,21 +15,13 @@ class Show < ActiveRecord::Base
 
     series_response = JSON.parse(HTTParty.get('https://itunes.apple.com/search?term=' + t + '&media=tvShow&entity=tvSeason'))
 
-    if series_response.length == 0
       series_response['results'].each do |s|
         year = s['releaseDate'] != nil ? s['releaseDate'].split('-').slice(0,1).join() : ''
         rating = s['contentAdvisoryRating'] ? s['contentAdvisoryRating'] : ''
         details = {title: s['artistName'], collectionName: s['collectionName'], collectionId: s['collectionId'], season: get_season(s['collectionName']), poster: set_image(s['artworkUrl100']), rating: rating, year: year, plot: get_plot(s['longDescription']), genre: s['primaryGenreName']}
         series << details
       end
-    else
-      token_request = token.length > 1 ? JSON.parse(`curl -X GET --header 'Accept: application/json' --header 'Authorization: Bearer #{token}' 'https://api.thetvdb.com/refresh_token'`) : JSON.parse(`curl -X POST --header 'Content-Type: application/json' --header 'Accept: application/json' -d '{"apikey": "#{ENV['TVDB_KEY']}","username":"#{ENV['TVDB_USER']}","userkey":"#{ENV['TVDB_USER_KEY']}"}
-' 'https://api.thetvdb.com/login'`)
-      p '+' * 80
-      p token = token_request['token']
-      t = URI::encode(t)
-      p series_response = JSON.parse(`curl -X GET --header 'Accept: application/json' --header 'Authorization: Bearer "#{token}"' 'https://api.thetvdb.com/search/series?name="#{t}"'`)
-    end
+
     series.sort_by {|k| k[:year]}
   end
 
@@ -41,7 +33,7 @@ class Show < ActiveRecord::Base
 
     episodes_response['results'].each do |e|
       episode = {title: e['trackName'], date: convert_date(e['releaseDate']), plot: e['longDescription'], runtime: e['trackTimeMillis'], tv_episode: e['trackNumber'], preview: e['previewUrl']}
-      episodes << episode if e['trackId']
+      episodes << episode if e['trackId'] && e['trackNumber'].to_i < 100
     end
     episodes.sort_by {|k| k[:tv_episode]}
   end
@@ -49,7 +41,7 @@ class Show < ActiveRecord::Base
   def season_numbers
     numbers = []
     self.seasons.each {|s| numbers << s.season.to_i}
-    numbers.sort.each_cons(2).all? { |x,y| y == x + 1 } && numbers.length >= 3 ? numbers.sort.values_at(0,-1).join('–') : numbers.length >= 2 ? numbers.sort.join(', ') : numbers.sort.join()
+    numbers.sort.each_cons(2).all? { |x,y| y == x + 1 } && numbers.length == 3 || numbers.length == 4 ? numbers.sort.values_at(0,-1).join('–') : numbers.length < 5 ? numbers.sort.join(', ') : numbers.length
   end
 
   def episode_count
@@ -69,8 +61,8 @@ class Show < ActiveRecord::Base
   end
 
   def self.set_image(p)
-    p.gsub!(/^(http)/, 'https')
-    p.gsub!(/(is\d)/, 'is5-ssl')
+    # p.gsub!(/^(http)/, 'https')
+    # p.gsub!(/(is\d)/, 'is5-ssl')
     p.gsub!(/100x100/, '600x600')
   end
 
