@@ -104,7 +104,7 @@ var toggleHD = function () {
 var filterMovies = function (event) {
 
   filterValue = $('#search-movie-title').val()
-  var id = window.location.href.substr(window.location.href.lastIndexOf('/') + 1)
+  var id = window.location.href.split('/')[4]
   var data = $.param({filter:filterValue, id:id})
   var route = '/movies/filter'
 
