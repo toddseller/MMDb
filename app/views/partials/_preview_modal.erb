@@ -13,7 +13,9 @@
           <span class="spacing"><%= movie.year %></span>
           <span class="spacing"><%= movie.genre %></span>
           <span class="spacing" id="description-rating"><%= movie.rating %></span>
-          <% if movie.hd %>
+          <% if movie.hd == 4 %>
+            <span class="spacing" id="description-hd">4K</span>
+          <% elsif movie.hd == 1080 || 720 %>
             <span class="spacing" id="description-hd">HD</span>
           <% end %>
           <div id="ratings-container">
@@ -74,6 +76,13 @@
             <p class="filler"></p>
           <% end %>
         </div>
+        <% if !movie.studio.empty? %>
+        <div class="modal-studio">
+          <h5>STUDIO</h5>
+          <hr/>
+          <p><%= movie.studio %></p>
+        </div>
+      <% end %>
       </div>
     </div>
   </div>

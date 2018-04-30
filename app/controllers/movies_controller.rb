@@ -40,3 +40,11 @@ get '/movies/new/:id' do
     erb :"/partials/_filtered_list", layout: false, locals: {user: user}
   end
 end
+
+get '/movies/4k/:id' do
+  user = User.find(params[:id])
+  @my_movies = user.movies.where(hd: '4').sorted_list
+  if request.xhr?
+    erb :"/partials/_filtered_list", layout: false, locals: {user: user}
+  end
+end
