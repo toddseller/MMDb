@@ -1,12 +1,3 @@
-/*!
- * hoverIntent v1.9.0 // 2017.09.01 // jQuery v1.7.0+
- * http://briancherne.github.io/jquery-hoverIntent/
- *
- * You may use hoverIntent under the terms of the MIT license. Basically that
- * means you are free to use hoverIntent as long as this header is left intact.
- * Copyright 2007-2017 Brian Cherne
- */
-!function(factory){"use strict";"function"==typeof define&&define.amd?define(["jquery"],factory):jQuery&&!jQuery.fn.hoverIntent&&factory(jQuery)}(function($){"use strict";var cX,cY,_cfg={interval:100,sensitivity:6,timeout:0},INSTANCE_COUNT=0,track=function(ev){cX=ev.pageX,cY=ev.pageY},compare=function(ev,$el,s,cfg){if(Math.sqrt((s.pX-cX)*(s.pX-cX)+(s.pY-cY)*(s.pY-cY))<cfg.sensitivity)return $el.off(s.event,track),delete s.timeoutId,s.isActive=!0,ev.pageX=cX,ev.pageY=cY,delete s.pX,delete s.pY,cfg.over.apply($el[0],[ev]);s.pX=cX,s.pY=cY,s.timeoutId=setTimeout(function(){compare(ev,$el,s,cfg)},cfg.interval)},delay=function(ev,$el,s,out){return delete $el.data("hoverIntent")[s.id],out.apply($el[0],[ev])};$.fn.hoverIntent=function(handlerIn,handlerOut,selector){var instanceId=INSTANCE_COUNT++,cfg=$.extend({},_cfg);$.isPlainObject(handlerIn)?(cfg=$.extend(cfg,handlerIn),$.isFunction(cfg.out)||(cfg.out=cfg.over)):cfg=$.isFunction(handlerOut)?$.extend(cfg,{over:handlerIn,out:handlerOut,selector:selector}):$.extend(cfg,{over:handlerIn,out:handlerIn,selector:handlerOut});var handleHover=function(e){var ev=$.extend({},e),$el=$(this),hoverIntentData=$el.data("hoverIntent");hoverIntentData||$el.data("hoverIntent",hoverIntentData={});var state=hoverIntentData[instanceId];state||(hoverIntentData[instanceId]=state={id:instanceId}),state.timeoutId&&(state.timeoutId=clearTimeout(state.timeoutId));var mousemove=state.event="mousemove.hoverIntent.hoverIntent"+instanceId;if("mouseenter"===e.type){if(state.isActive)return;state.pX=ev.pageX,state.pY=ev.pageY,$el.off(mousemove,track).on(mousemove,track),state.timeoutId=setTimeout(function(){compare(ev,$el,state,cfg)},cfg.interval)}else{if(!state.isActive)return;$el.off(mousemove,track),state.timeoutId=setTimeout(function(){delay(ev,$el,state,cfg.out)},cfg.timeout)}};return this.on({"mouseenter.hoverIntent":handleHover,"mouseleave.hoverIntent":handleHover},cfg.selector)}});
 var lastPos = 0
 var timeoutId = 0
 var filterValue = ''
@@ -47,7 +38,7 @@ var dynamicListener = function () {
   $('#user-page').on('submit', '#create-episode', episodeToDB)
   $('#user-page').on('click', '#more', showYear)
   $('#user-page').on('click', '.movie-modal', getMovieModal)
-  $('#user-page').on('click', '.show-modal', getShowModal)
+  $('#user-page').on('click', '.show-modal', getMovieModal)
   $('#user-page').on('click', '.close', closeInfo)
   $('#user-page').on('click', '.movie-edit', editMovie)
   $('#user-page').on('click', '.show-edit', editShow)
@@ -631,69 +622,11 @@ var getMovieModal = function (event) {
         activeItem = id
         $('.info').remove()
         switchInfoDiv(posterArt, title)
-        endOfRow.after('<div class="info"></div>')
-        $(that).nextAll('div.info').toggleClass('active').append('<div class="info-wrapper">' + response + '</div>')
-        $('#movie-list').length > 0 ? $(that).find('.pointer').addClass('notransition').addClass('active') : $(that).find('.show-pointer').addClass('notransition').addClass('active')
-        $(that).find('.new-label').addClass('active').addClass('notransition')
-        $(that).find('.new-text').addClass('active').addClass('notransition')
-      } else {
-        activeItem = id
-        var filteredList = c.filter('.index-preview')
-        filtered(filteredList)
-        endOfRow.after('<div class="info"></div>')
-        $(posterArt).toggleClass('active')
-        if ($('#movie-list').length > 0) {
-          $(title).hide()
+        if (window.location.href.substr(window.location.href.lastIndexOf('/') + 1) === 'shows') {
+          endOfRow.after('<div class="info" style="margin-top: 1px; max-height: 100%;"></div>')
+        } else {
+          endOfRow.after('<div class="info"></div>')
         }
-        $('#movie-list').length > 0 ? $(that).find('.pointer').toggleClass('active') : $(that).find('.show-pointer').toggleClass('active')
-        $(that).find('.new-label').toggleClass('active')
-        $(that).find('.new-text').toggleClass('active')
-        $(that).nextAll('div.info').first().toggleClass('active').append('<div class="info-wrapper">' + response + '</div>')
-      }
-    })
-  } else {
-    var removeInfoClass = function () {
-      $('.info').remove()
-    }
-    pointer.removeClass('notransition').removeClass('active').removeAttr('style')
-    $('.info').removeClass('active')
-    $('.truncate').fadeIn(400, 'linear')
-    $('.new-label').removeClass('active').removeClass('notransition')
-    $('.new-text').removeClass('active').removeClass('notransition')
-    $('.lazy').removeClass('notransition').removeClass('active')
-    setTimeout(removeInfoClass, 1000)
-    activeItem = $('body')
-  }
-}
-
-var getShowModal = function (event) {
-  event.preventDefault()
-
-  var user = $(this).parent().attr('id')
-  var id = $(this).attr('id')
-  var indexPreview = $('#movie-list').length > 0 ? $('.index-preview') : $('.index-preview-show')
-  var route = $('#movie-list').length > 0 ? '/users/' + user + '/movies/' + id : '/users/' + user + '/shows/' + id
-  var pointer = $('#movie-list').length > 0 ? $('.pointer') : $('.show-pointer')
-  var that = $(this).parent('div')
-  var posterArt = $(this).children('img')
-  var title = $(this).siblings('p')
-  var index = $(that).index()
-  var itemsPerRow = $('#movie-list').length > 0 ? 7 : 6
-  var col = (index % itemsPerRow) + 1
-  var endOfRow = indexPreview.eq(index + itemsPerRow - col)
-  if (!endOfRow.length) endOfRow = indexPreview.last()
-
-  if (id != activeItem) {
-    var request = $.ajax({
-      url: route
-    })
-    request.done(function (response) {
-      var c = $('#movie-list').length > 0 ? $('#movie-list > div') : $('#show-list > div')
-      if (c.hasClass('info')) {
-        activeItem = id
-        $('.info').remove()
-        switchInfoDiv(posterArt, title)
-        endOfRow.after('<div class="info" style="margin-top: 1px; max-height: 100%;"></div>')
         $(that).nextAll('div.info').toggleClass('active').append('<div class="info-wrapper">' + response + '</div>')
         $('#movie-list').length > 0 ? $(that).find('.pointer').addClass('notransition').addClass('active') : $(that).find('.show-pointer').addClass('notransition').addClass('active')
         $(that).find('.new-label').addClass('active').addClass('notransition')
@@ -702,7 +635,11 @@ var getShowModal = function (event) {
         activeItem = id
         var filteredList = c.filter('.index-preview')
         filtered(filteredList)
-        endOfRow.after('<div class="info" style="margin-top: 1px; max-height: 100%;"></div>')
+        if (window.location.href.substr(window.location.href.lastIndexOf('/') + 1) === 'shows') {
+          endOfRow.after('<div class="info" style="margin-top: 1px; max-height: 100%;"></div>')
+        } else {
+          endOfRow.after('<div class="info"></div>')
+        }
         $(posterArt).toggleClass('active')
         if ($('#movie-list').length > 0) {
           $(title).hide()
