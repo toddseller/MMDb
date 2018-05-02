@@ -9,9 +9,17 @@ get '/users/:user_id/shows' do
   end
 end
 
+get '/users/:user_id/shows/new' do
+  @user = current_user
+  page = erb :"/partials/_create_show",locals: {user: @user}, layout: false
+  if request.xhr?
+    json page: page
+  end
+end
+
 post '/users/:user_id/shows' do
   @user = current_user
-  @show = Show.find_by("title = ?", params[:show]['title']) || Show.new(title: params[:show]['title'], year: params[:show]['year'], rating: params[:show]['rating'], genre: params[:show]['genre'], poster: params[:season]['poster'])
+  p @show = Show.find_by("title = ?", params[:show]['title']) || Show.new(title: params[:show]['title'], year: params[:show]['year'], rating: params[:show]['rating'], genre: params[:show]['genre'], poster: params[:season]['poster'])
   @season = Season.find_by(collectionId: params[:season]['collectionId']) || @show.seasons.new(params[:season])
   if @show.save
     @show.users << @user if !@show.users.include?(@user)
