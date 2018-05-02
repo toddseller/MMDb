@@ -109,10 +109,15 @@
   border-radius: 0;
 }
 
+#edit-show .modal-header .edit-show
+{
+  display: flex;
+  align-items: center;
+}
+
 #edit-show .show-title
 {
   padding-left: 25px;
-  margin-top: 22px;
 }
 
 #edit-show .show-title h4
