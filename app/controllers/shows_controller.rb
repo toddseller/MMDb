@@ -24,6 +24,7 @@ post '/shows' do
     @show.users << @user if !@show.users.include?(@user)
   end
   if @season.save
+    new_season = @season.season
     if @show.seasons.length == 1
       @season.update(is_active: true)
     end
@@ -31,12 +32,13 @@ post '/shows' do
   @episode = @season.episodes.find_by(tv_episode: params[:episode]['tv_episode']) || @season.episodes.new(params[:episode])
   if @episode.save
     @season.episodes << @episode if !@season.episodes.include?(@episode)
+    count = @season.episodes.count
   end
   if request.xhr?
     if params[:new]
       form = erb :"/partials/_new_episode", layout: false
       page = erb :'/partials/_updated_show_list', locals: {show: @my_shows, user: @user}, layout: false
-      json page: page, form: form
+      json page: page, form: form, season: new_season, count: count
     else
       p '+' * 50
       p 'FUCKING NOT NEW'
