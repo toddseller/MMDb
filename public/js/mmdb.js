@@ -610,7 +610,7 @@ var closePreview = function (event) {
   $('#dismiss').hide()
   $('#scroll-right').hide()
   $('#scroll-left').hide()
-  if ($('#movie-list')) {
+  if ($('#movie-list').length == 1) {
     $('#add').show()
   } else {
     $('#add-show').show()
