@@ -799,6 +799,11 @@ var toggleActive = function (event) {
     })
     request.done(function (response) {
       $('#episode').empty().append(response.form)
+      if (response.count > 1) {
+        $('#edit-show .modal-header p').text('Season ' + response.season + ', ' + response.count + ' episodes added')
+      } else {
+        $('#edit-show .modal-header p').text('Season ' + response.season + ', ' + response.count + ' episode added')
+      }
       $('#show-list').empty().append(response.page)
     })
   } else if ($(this).hasClass('edit-next')) {
@@ -850,7 +855,9 @@ var deleteEpisode = function (event) {
 
 var updatePoster = function (event) {
   var poster = $('input[name="season[poster]"]').val()
+  var title = $('textarea[name="show[title]"]').val()
   $('.modal-header img').attr('src', poster)
+  $('#edit-show .modal-header h4').text(title)
   $('#artwork > form > img').attr('src', poster)
   $('.description-poster > img').attr('src', poster)
   $('.lazy.active').attr('src', poster)
