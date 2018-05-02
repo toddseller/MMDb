@@ -610,7 +610,11 @@ var closePreview = function (event) {
   $('#dismiss').hide()
   $('#scroll-right').hide()
   $('#scroll-left').hide()
-  $('#add').show()
+  if ($('#movie-list')) {
+    $('#add').show()
+  } else {
+    $('#add-show').show()
+  }
   $('#search').hide()
   $('#search-year').hide()
   $('#search-title').css('right', '0')
