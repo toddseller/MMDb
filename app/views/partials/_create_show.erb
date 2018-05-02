@@ -1,0 +1,94 @@
+<div class="modal-header">
+  <div class="row">
+    <div class="col-sm-12 edit-show">
+      <div class="col-sm-3 edit-poster">
+        <img class="text-right" src="" alt="">
+      </div>
+      <div class="col-sm-9 show-title">
+        <h4></h4>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal-body">
+  <div class="row">
+    <div class="col-sm-12 tab-container">
+      <div class="btn-group" role="group">
+        <button type="button" class="btn btn-default active" data-toggle="tab" href="#show">Show</button>
+        <button type="button" class="btn btn-default" data-toggle="tab" href="#season">Season</button>
+        <button type="button" class="btn btn-default" data-toggle="tab" href="#episode">Episode</button>
+      </div>
+    </div>
+    <div class="col-sm-12 edit-container tab-content">
+      <div id="show" class="tab-pane in active">
+        <form class="form-horizontal show-data new-show" action=<%= "/shows" %> method="POST">
+          <div class="form-group row">
+            <label class="col-sm-2 control-label text-right" for="show_title">title</label>
+            <div class="col-sm-10">
+              <textarea id="episode_title" name="show[title]" class="form-control" rows="1"></textarea>
+            </div>
+          </div>
+          <div class="form-group row">
+            <label class="col-sm-2 control-label text-right" for="show_year">year</label>
+            <div class="col-sm-3">
+              <input id="show_year" type="text" class="form-control" name="show[year]">
+            </div>
+          </div>
+          <div class="form-group row">
+            <label class="col-sm-2 control-label text-right" for="rating">rating</label>
+            <div class="col-sm-4">
+              <input id="rating" type="text" class="form-control" name="show[rating]">
+            </div>
+          </div>
+          <div class="form-group row">
+            <label class="col-sm-2 control-label text-right" for="genre">genre</label>
+            <div class="col-sm-4">
+              <input id="genre" type="text" class="form-control" name="show[genre]">
+            </div>
+          </div>
+          <div class="form-group row">
+            <label class="col-sm-2 control-label text-right" for="show_poster">poster</label>
+            <div class="col-sm-10">
+              <input id="show_poster" type="text" class="form-control" name="season[poster]">
+            </div>
+          </div>
+        </form>
+      </div>
+      <div id="season" class="tab-pane">
+        <form class="form-horizontal show-data new-show" action=<%= "/shows" %> method="POST">
+          <div class="form-group row">
+            <label class="col-sm-2 control-label text-right" for="show_collectionName">collection</label>
+            <div class="col-sm-10">
+              <textarea id="show_collectionName" name="season[collectionName]" class="form-control" rows="1"></textarea>
+            </div>
+          </div>
+          <div class="form-group row">
+            <label class="col-sm-2 control-label text-right" for="season">season</label>
+            <div class="col-sm-3">
+              <input id="season" type="text" class="form-control" name="season[season]">
+            </div>
+          </div>
+          <div class="form-group row">
+            <label class="col-sm-2 control-label text-right" for="season_plot">plot</label>
+            <div class="col-sm-10">
+              <textarea id="season_plot" name="season[plot]" class="form-control" rows="8"></textarea>
+            </div>
+          </div>
+          <div class="form-group row">
+            <label class="col-sm-2 control-label text-right" for="show_poster">poster</label>
+            <div class="col-sm-10">
+              <input id="show_poster" type="text" class="form-control" name="season[poster]">
+            </div>
+          </div>
+        </form>
+      </div>
+      <div id="episode" class="tab-pane">
+        <%= erb :'/partials/_new_episode', layout: false %>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal-footer">
+  <button id="cancel" class="btn btn-default">Cancel</button>
+  <button id="ok" class="btn btn-danger">OK</button>
+</div>

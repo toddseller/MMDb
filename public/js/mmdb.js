@@ -33,6 +33,7 @@ var dynamicListener = function () {
   $('#user-page').on('click', '#add-show', showSearchBar2)
   $('#user-page').on('submit', '#movie-search', checkDatabase)
   $('#user-page').on('submit', '#show-search', checkDatabase2)
+  $('#user-page').on('click', '#create-new', createShow)
   $('#user-page').on('submit', '#create-movie', movieToDB)
   $('#user-page').on('submit', '#create-show', showToDB)
   $('#user-page').on('submit', '#create-episode', episodeToDB)
@@ -368,7 +369,7 @@ var checkDatabase2 = function (event) {
     success: previewShow,
     error: (function(jqXHR, textStatus, errorThrown) {
       if (jqXHR.status == 500) {
-        $('#preview').empty().slideDown(300, 'linear').append('<div style="width: 174px; height: auto;"><img src="/imgs/loading_image.svg" width: 174 height: auto></div>').css({'display':'block','justify-content':'center','height':'300px'})
+        $('#preview').empty().slideDown(300, 'linear').append('<button type="submit" id="create-new" class="add-all"><span class="glyphicon glyphicon-plus"></span><p>Create New Show</p></button>').css({'display':'flex','justify-content':'center','height':'300px'})
       }
     })
   })
@@ -377,6 +378,31 @@ var checkDatabase2 = function (event) {
   $('#dismiss').show()
   $('#scroll-right').hide()
   $('#scroll-left').hide()
+}
+
+var createShow = function (event) {
+  event.preventDefault()
+  var id = window.location.href.split('/')[4]
+  console.log('id: ', id)
+  var route = '/users/' + id + '/shows/new'
+  console.log('route: ', route)
+  $.get(route, displayCreateShow)
+}
+
+var displayCreateShow = function (response) {
+  $('#preview').slideUp(500, 'linear')
+  $('#dismiss').hide()
+  $('#scroll-right').hide()
+  $('#scroll-left').hide()
+  $('#add-show').show()
+  $('#search').hide()
+  $('#search-year').hide()
+  $('#search-title').css('right', '0')
+  $('.input-group-btn').css('top', '0')
+  $('#show-list').css('top', '0')
+  $('#more').show()
+  $('#edit-show').empty().append(response.page)
+  $('#edit-show').modal('show')
 }
 
 var seasonDefault = function (event) {
@@ -750,18 +776,34 @@ var toggleActive = function (event) {
     $('#edit-show').modal('toggle')
   } else if ($(this).text() === 'OK') {
     var route = $('.show-data').attr('action')
+    var type = $('.show-data').hasClass('new-show') ? $('.show-data').attr('method') : 'PUT'
     var data = $('.show-data').serialize() + '&show%5Bposter%5D=' + encodeURIComponent($('input[name="season[poster]"]').val()) + '&form%5Bid%5D=' + $('.edit-container > div > form').attr('id')
     var request = $.ajax({
       url: route,
-      type: 'PUT',
+      type: type,
       data: data
     })
     request.done(function (response) {
       $('.info-wrapper').empty().append(response)
     })
     $('#edit-show').modal('toggle')
+  } else if ($(this).attr('id') === 'add-new-episode') {
+    var route = $('.show-data').attr('action')
+    var type = $('.show-data').hasClass('new-show') ? $('.show-data').attr('method') : 'PUT'
+    var data = $('.show-data').serialize() + '&new=true'
+
+    var request = $.ajax({
+      url: route,
+      type: type,
+      data: data
+    })
+    request.done(function (response) {
+      $('#episode').empty().append(response.form)
+      $('#show-list').empty().append(response.page)
+    })
   } else if ($(this).hasClass('edit-next')) {
     var route = $(this).attr('href')
+    var type = $('.show-data').hasClass('new-show') ? $('.show-data').attr('method') : 'PUT'
     var request1 = $.ajax({
       url: route
     })
@@ -769,7 +811,7 @@ var toggleActive = function (event) {
     var data = $('.show-data').serialize() + '&show%5Bposter%5D=' + encodeURIComponent($('input[name="season[poster]"]').val()) + '&form%5Bid%5D=' + $('.edit-container > div > form').attr('id')
     var request2 = $.ajax({
       url: formRoute,
-      type: 'PUT',
+      type: type,
       data: data
     })
     $.when(request1, request2).done(function (r1, r2) {
@@ -780,15 +822,18 @@ var toggleActive = function (event) {
     $('button.btn.btn-default.active').toggleClass('active')
     $(this).addClass('active')
     var route = $('.show-data').attr('action')
+    var type = $('.show-data').hasClass('new-show') ? $('.show-data').attr('method') : 'PUT'
     var data = $('.show-data').serialize() + '&show%5Bposter%5D=' + encodeURIComponent($('input[name="season[poster]"]').val()) + '&form%5Bid%5D=' + $('.edit-container > div > form').attr('id')
-    var request = $.ajax({
-      url: route,
-      type: 'PUT',
-      data: data
-    })
-    request.done(function (response) {
-      $('.info-wrapper').empty().append(response)
-    })
+    if (type == 'PUT') {
+      var request = $.ajax({
+        url: route,
+        type: type,
+        data: data
+      })
+      request.done(function (response) {
+        $('.info-wrapper').empty().append(response)
+      })
+    }
   }
 }
 

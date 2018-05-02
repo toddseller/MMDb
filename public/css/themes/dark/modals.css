@@ -195,6 +195,17 @@
   margin-top: 15px;
 }
 
+#add-new-episode
+{
+  float: right;
+  margin-top: 15px;
+}
+
+#add-new-episode .glyphicon
+{
+  margin-right: 0;
+}
+
 #meta-data
 {
   width: 1170px;

@@ -1,0 +1,35 @@
+<form class="form-horizontal show-data new-show" action=<%= "/shows" %> method="POST">
+  <div class="form-group row">
+    <label class="col-sm-2 control-label text-right" for="episode_title">title</label>
+    <div class="col-sm-10">
+      <textarea id="episode_title" name="episode[title]" class="form-control" rows="1"></textarea>
+    </div>
+  </div>
+  <div class="form-group row">
+    <label class="col-sm-2 control-label text-right" for="episode">episode</label>
+    <div class="col-sm-3">
+      <input id="episode" type="text" class="form-control" name="episode[tv_episode]">
+    </div>
+  </div>
+  <div class="form-group row">
+    <label class="col-sm-2 control-label text-right" for="episode_date">date</label>
+    <div class="col-sm-4">
+      <textarea id="episode_date" name="episode[date]" class="form-control" rows="1"></textarea>
+    </div>
+  </div>
+  <div class="form-group row">
+    <label class="col-sm-2 control-label text-right" for="episode_time">runtime</label>
+    <div class="col-sm-3">
+      <input id="episode_time" type="text" class="form-control" name="episode[runtime]">
+    </div>
+  </div>
+  <div class="form-group row">
+    <label class="col-sm-2 control-label text-right" for="episode_plot">plot</label>
+    <div class="col-sm-10">
+      <textarea id="episode_plot" name="episode[plot]" class="form-control" rows="8"></textarea>
+    </div>
+  </div>
+</form>
+<button id="add-new-episode" class="btn btn-default">
+  <span class="glyphicon glyphicon-plus"></span>
+</button>
