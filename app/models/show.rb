@@ -23,6 +23,7 @@ class Show < ActiveRecord::Base
       end
 
     series.count != 0 ? series.sort_by {|k| k[:year]} : 'test'
+
   end
 
   def self.get_episodes(id)
