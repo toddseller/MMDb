@@ -56,7 +56,7 @@
                 <p class="episode-title"><%= e.title %></p>
                 <p class="episode-runtime"><%= e.runtime %></p>
                 <p class="plot-truncate"><%= e.plot %></p>
-                <% if e.plot.length > 130 %>
+                <% if e.plot.length && e.plot.length > 130 %>
                   <p class="expand-plot">more</p>
                 <% end %>
               </div>
@@ -67,7 +67,7 @@
                 <p class="episode-title"><%= e.title %></p>
                 <p class="episode-runtime"><%= e.runtime %></p>
                 <p class="plot-truncate"><%= e.plot %></p>
-                <% if e.plot.length > 130 %>
+                <% if e.plot.length && e.plot.length > 130 %>
                   <p class="expand-plot">more</p>
                 <% end %>
               </div>
