@@ -11,6 +11,7 @@ class Show < ActiveRecord::Base
   scope :sorted_list, -> { order(:sort_name, :year) }
 
   def self.get_series(t)
+    p URI.encode(t)
     series = []
 
     series_response = JSON.parse(HTTParty.get('https://itunes.apple.com/search?term=' + t + '&media=tvShow&entity=tvSeason'))
@@ -22,19 +23,115 @@ class Show < ActiveRecord::Base
         series << details
       end
 
-    series.count != 0 ? series.sort_by {|k| k[:year]} : 'test'
+    if series.count == 0
+      uri = URI.parse("https://api.thetvdb.com/refresh_token")
+      request = Net::HTTP::Get.new(uri)
+      request["Accept"] = "application/json"
+      request["Authorization"] = "Bearer " + ENV['TVDB_TOKEN']
 
+      req_options = {
+        use_ssl: uri.scheme == "https",
+      }
+
+      token_response = Net::HTTP.start(uri.hostname, uri.port, req_options) do |http|
+        http.request(request)
+      end
+      token_response = JSON.parse(token_response.body)
+
+      uri = URI.parse("https://api.heroku.com/apps/mmdb-online/config-vars")
+      request = Net::HTTP::Patch.new(uri)
+      request.content_type = "application/json"
+      request["Accept"] = "application/vnd.heroku+json; version=3"
+      request["Authorization"] = "Bearer " + ENV['HEROKU_KEY']
+      request.body = JSON.dump({
+        'TVDB_TOKEN' => token_response['token']
+      })
+
+      req_options = {
+        use_ssl: uri.scheme == "https",
+      }
+
+      response = Net::HTTP.start(uri.hostname, uri.port, req_options) do |http|
+        http.request(request)
+      end
+
+      uri = URI.parse("https://api.thetvdb.com/search/series?name=" + URI.encode(t))
+      request = Net::HTTP::Get.new(uri)
+      request["Accept"] = "application/json"
+      request["Authorization"] = "Bearer " + ENV['TVDB_TOKEN']
+
+      req_options = {
+        use_ssl: uri.scheme == "https",
+      }
+
+      response1 = Net::HTTP.start(uri.hostname, uri.port, req_options) do |http|
+        http.request(request)
+      end
+
+      first_response = JSON.parse(response1.body)
+
+      first_response['data'].each do |s|
+        if s['seriesName'].downcase == t
+          uri = URI.parse("https://api.thetvdb.com/series/" + s['id'].to_s + "/episodes/summary")
+          request = Net::HTTP::Get.new(uri)
+          request["Accept"] = "application/json"
+          request["Authorization"] = "Bearer " + ENV['TVDB_TOKEN']
+
+          req_options = {
+            use_ssl: uri.scheme == "https",
+          }
+
+          response2 = Net::HTTP.start(uri.hostname, uri.port, req_options) do |http|
+            http.request(request)
+          end
+          second_response = JSON.parse(response2.body)
+
+          second_response['data']['airedSeasons'].each do |a|
+            season_number = second_response['data']['airedSeasons'].index(a) + 1
+            year = s['firstAired'] != nil ? s['firstAired'].split('-').slice(0,1).join() : ''
+            details = {title: s['seriesName'], collectionName: get_collection_name(s['seriesName'], season_number.to_s), collectionId: get_collection_id(s['id'], season_number.to_s), season: season_number.to_s, poster: 'https://s3-us-west-2.amazonaws.com/toddseller/tedflix/imgs/Artboard+1-196x196.jpg', rating: '', year: year, plot: s['overview'], genre: ''}
+            series << details
+          end
+        end
+        return series.sort_by {|k| k[:season].to_i}
+      end
+    else
+      series.sort_by {|k| k[:year]}
+    end
   end
 
-  def self.get_episodes(id)
+  def self.get_episodes(id, season)
     episodes = []
 
-    episodes_response = JSON.parse(HTTParty.get('https://itunes.apple.com/lookup?id=' + id + '&country=us&entity=tvEpisode'))
-    return nil if episodes_response.length == 0
+    if id.include? 'tvdb'
+      id = id.gsub(/tvdb/,'')
+      id = id[0...-season.to_s.length]
+      uri = URI.parse("https://api.thetvdb.com/series/" + id.to_s + "/episodes/query?airedSeason=" + season.to_s)
+      request = Net::HTTP::Get.new(uri)
+      request["Accept"] = "application/json"
+      request["Authorization"] = "Bearer " + ENV['TVDB_TOKEN']
 
-    episodes_response['results'].each do |e|
-      episode = {title: e['trackName'], date: convert_date(e['releaseDate']), plot: e['longDescription'], runtime: e['trackTimeMillis'], tv_episode: e['trackNumber'], preview: e['previewUrl']}
-      episodes << episode if e['trackId'] && e['trackNumber'].to_i < 100
+      req_options = {
+        use_ssl: uri.scheme == "https",
+      }
+
+      response = Net::HTTP.start(uri.hostname, uri.port, req_options) do |http|
+        http.request(request)
+      end
+
+      puts formatted_response = JSON.parse(response.body)
+      formatted_response['data'].each do |e|
+        episode = {title: e['episodeName'], date: convert_date(e['firstAired']), plot: e['overview'], tv_episode: e['airedEpisodeNumber'], preview: ''}
+        episodes << episode
+      end
+    else
+      episodes_response = JSON.parse(HTTParty.get('https://itunes.apple.com/lookup?id=' + id + '&country=us&entity=tvEpisode'))
+      return nil if episodes_response.length == 0
+
+      episodes_response['results'].each do |e|
+        episode = {title: e['trackName'], date: convert_date(e['releaseDate']), plot: e['longDescription'], runtime: e['trackTimeMillis'], tv_episode: e['trackNumber'], preview: e['previewUrl']}
+        episodes << episode if e['trackId'] && e['trackNumber'].to_i < 100
+      end
     end
     episodes.sort_by {|k| k[:tv_episode]}
   end
@@ -84,4 +181,11 @@ class Show < ActiveRecord::Base
     s.gsub(/.*(Season\s)/) {''}
   end
 
+  def self.get_collection_name(s, i)
+    collection_name = s + ', Season ' + i
+  end
+
+  def self.get_collection_id(s, i)
+    p collection_id = "tvdb#{s}#{i}"
+  end
 end
