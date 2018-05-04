@@ -28,7 +28,7 @@ post '/users/:user_id/shows' do
         @season.update(is_active: true)
         @season
       end
-      @episodes_previews = Show.get_episodes(@season.collectionId)
+      @episodes_previews = Show.get_episodes(@season.collectionId, @season.season)
     end
 
     if request.xhr?
