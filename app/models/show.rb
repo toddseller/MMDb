@@ -36,23 +36,61 @@ class Show < ActiveRecord::Base
       token_response = Net::HTTP.start(uri.hostname, uri.port, req_options) do |http|
         http.request(request)
       end
-      token_response = JSON.parse(token_response.body)
+      if token_response.code == '200'
+        token_response = JSON.parse(token_response.body)
 
-      uri = URI.parse("https://api.heroku.com/apps/mmdb-online/config-vars")
-      request = Net::HTTP::Patch.new(uri)
-      request.content_type = "application/json"
-      request["Accept"] = "application/vnd.heroku+json; version=3"
-      request["Authorization"] = "Bearer " + ENV['HEROKU_KEY']
-      request.body = JSON.dump({
-        'TVDB_TOKEN' => token_response['token']
-      })
+        uri = URI.parse("https://api.heroku.com/apps/mmdb-online/config-vars")
+        request = Net::HTTP::Patch.new(uri)
+        request.content_type = "application/json"
+        request["Accept"] = "application/vnd.heroku+json; version=3"
+        request["Authorization"] = "Bearer " + ENV['HEROKU_KEY']
+        request.body = JSON.dump({
+          'TVDB_TOKEN' => token_response['token']
+        })
 
-      req_options = {
-        use_ssl: uri.scheme == "https",
-      }
+        req_options = {
+          use_ssl: uri.scheme == "https",
+        }
 
-      response = Net::HTTP.start(uri.hostname, uri.port, req_options) do |http|
-        http.request(request)
+        response = Net::HTTP.start(uri.hostname, uri.port, req_options) do |http|
+          http.request(request)
+        end
+      else
+        uri = URI.parse("https://api.thetvdb.com/login")
+        request = Net::HTTP::Post.new(uri)
+        request.content_type = "application/json"
+        request["Accept"] = "application/json"
+        request["Authorization"] = "Bearer " + + ENV['TVDB_TOKEN']
+        request.body = JSON.dump({
+          "apikey" => ENV['TVDB_APIKEY'],
+          "userkey" => ENV['TVDB_USERKEY'],
+          "username" => ENV['TVDB_USERNAME']
+        })
+
+        req_options = {
+          use_ssl: uri.scheme == "https",
+        }
+
+        token_response = Net::HTTP.start(uri.hostname, uri.port, req_options) do |http|
+          http.request(request)
+        end
+
+        uri = URI.parse("https://api.heroku.com/apps/mmdb-online/config-vars")
+        request = Net::HTTP::Patch.new(uri)
+        request.content_type = "application/json"
+        request["Accept"] = "application/vnd.heroku+json; version=3"
+        request["Authorization"] = "Bearer " + ENV['HEROKU_KEY']
+        request.body = JSON.dump({
+          'TVDB_TOKEN' => token_response['token']
+        })
+
+        req_options = {
+          use_ssl: uri.scheme == "https",
+        }
+
+        response = Net::HTTP.start(uri.hostname, uri.port, req_options) do |http|
+          http.request(request)
+        end
       end
 
       uri = URI.parse("https://api.thetvdb.com/search/series?name=" + URI.encode(t))
@@ -64,15 +102,31 @@ class Show < ActiveRecord::Base
         use_ssl: uri.scheme == "https",
       }
 
-      response1 = Net::HTTP.start(uri.hostname, uri.port, req_options) do |http|
+      first_response = Net::HTTP.start(uri.hostname, uri.port, req_options) do |http|
         http.request(request)
       end
 
-      first_response = JSON.parse(response1.body)
+      first_response = JSON.parse(first_response.body)
 
       first_response['data'].each do |s|
-        if s['seriesName'].downcase == t
-          uri = URI.parse("https://api.thetvdb.com/series/" + s['id'].to_s + "/episodes/summary")
+        uri = URI.parse("https://api.thetvdb.com/series/" + s['id'].to_s + "/episodes/summary")
+        request = Net::HTTP::Get.new(uri)
+        request["Accept"] = "application/json"
+        request["Authorization"] = "Bearer " + ENV['TVDB_TOKEN']
+
+        req_options = {
+          use_ssl: uri.scheme == "https",
+        }
+
+        second_response = Net::HTTP.start(uri.hostname, uri.port, req_options) do |http|
+          http.request(request)
+        end
+        second_response = JSON.parse(second_response.body)
+
+        second_response['data']['airedSeasons'].each do |a|
+          season_number = second_response['data']['airedSeasons'].index(a) + 1
+
+          uri = URI.parse("https://api.thetvdb.com/series/" + s['id'].to_s + "/images/query?keyType=poster")
           request = Net::HTTP::Get.new(uri)
           request["Accept"] = "application/json"
           request["Authorization"] = "Bearer " + ENV['TVDB_TOKEN']
@@ -81,22 +135,21 @@ class Show < ActiveRecord::Base
             use_ssl: uri.scheme == "https",
           }
 
-          response2 = Net::HTTP.start(uri.hostname, uri.port, req_options) do |http|
+          third_response = Net::HTTP.start(uri.hostname, uri.port, req_options) do |http|
             http.request(request)
           end
-          second_response = JSON.parse(response2.body)
 
-          second_response['data']['airedSeasons'].each do |a|
-            season_number = second_response['data']['airedSeasons'].index(a) + 1
-            year = s['firstAired'] != nil ? s['firstAired'].split('-').slice(0,1).join() : ''
-            details = {title: s['seriesName'], collectionName: get_collection_name(s['seriesName'], season_number.to_s), collectionId: get_collection_id(s['id'], season_number.to_s), season: season_number.to_s, poster: 'https://s3-us-west-2.amazonaws.com/toddseller/tedflix/imgs/Artboard+1-196x196.jpg', rating: '', year: year, plot: s['overview'], genre: ''}
-            series << details
-          end
+          third_response = JSON.parse(third_response.body)
+          poster = third_response['data'][0]['fileName'] ? 'https://www.thetvdb.com/banners/' + third_response['data'][0]['fileName'] : 'https://s3-us-west-2.amazonaws.com/toddseller/tedflix/imgs/Artboard+1-196x196.jpg'
+          year = s['firstAired'] != nil ? s['firstAired'].split('-').slice(0,1).join() : ''
+          details = {title: s['seriesName'], collectionName: get_collection_name(s['seriesName'], season_number.to_s), collectionId: get_collection_id(s['id'], season_number.to_s), season: season_number.to_s, poster: poster, rating: '', year: year, plot: s['overview'], genre: ''}
+          series << details
         end
-        return series.sort_by {|k| k[:season].to_i}
       end
-    else
-      series.sort_by {|k| k[:year]}
+        return series.sort_by {|k| k[:season].to_i}
+      # end
+    # else
+    #   series.sort_by {|k| k[:year]}
     end
   end
 
@@ -115,13 +168,29 @@ class Show < ActiveRecord::Base
         use_ssl: uri.scheme == "https",
       }
 
-      response = Net::HTTP.start(uri.hostname, uri.port, req_options) do |http|
+      first_response = Net::HTTP.start(uri.hostname, uri.port, req_options) do |http|
         http.request(request)
       end
 
-      puts formatted_response = JSON.parse(response.body)
-      formatted_response['data'].each do |e|
-        episode = {title: e['episodeName'], date: convert_date(e['firstAired']), plot: e['overview'], tv_episode: e['airedEpisodeNumber'], preview: ''}
+      uri = URI.parse("https://api.thetvdb.com/series/" + id.to_s + "/images/query?keyType=fanart")
+      request = Net::HTTP::Get.new(uri)
+      request["Accept"] = "application/json"
+      request["Authorization"] = "Bearer " + ENV['TVDB_TOKEN']
+
+      req_options = {
+        use_ssl: uri.scheme == "https",
+      }
+
+      second_response = Net::HTTP.start(uri.hostname, uri.port, req_options) do |http|
+        http.request(request)
+      end
+
+      first_response = JSON.parse(first_response.body)
+      second_response = JSON.parse(second_response.body)
+
+      first_response['data'].each do |e|
+        p preview = second_response['data'][0]['fileName'] ? 'https://www.thetvdb.com/banners/' + second_response['data'][0]['fileName'] : ''
+        episode = {title: e['episodeName'], date: convert_date(e['firstAired']), plot: e['overview'], tv_episode: e['airedEpisodeNumber'], preview: preview}
         episodes << episode
       end
     else
