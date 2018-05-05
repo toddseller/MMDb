@@ -11,8 +11,8 @@ class Show < ActiveRecord::Base
   scope :sorted_list, -> { order(:sort_name, :year) }
 
   def self.get_series(t)
-    p URI.encode(t)
     series = []
+    new_t = URI.encode(t)
 
     series_response = JSON.parse(HTTParty.get('https://itunes.apple.com/search?term=' + t + '&media=tvShow&entity=tvSeason'))
 
@@ -123,9 +123,15 @@ class Show < ActiveRecord::Base
         end
         second_response = JSON.parse(second_response.body)
 
+        second_response['data']['airedSeasons'].delete('0') if second_response['data']['airedSeasons'].include?('0')
+
         second_response['data']['airedSeasons'].each do |a|
           season_number = second_response['data']['airedSeasons'].index(a) + 1
-
+          new_t = URI.encode(t + ' season ' + season_number.to_s)
+          doc = HTTParty.get('http://squaredtvart.tumblr.com/search/' + new_t)
+          parsed_doc ||= Nokogiri::HTML(doc)
+          p parsed_doc.css('p')[0].text.include?('No search')
+          p poster = parsed_doc.css('img')[0]['src'].gsub(/_250.jpg/,'_1280.jpg')
           uri = URI.parse("https://api.thetvdb.com/series/" + s['id'].to_s + "/images/query?keyType=poster")
           request = Net::HTTP::Get.new(uri)
           request["Accept"] = "application/json"
@@ -140,7 +146,7 @@ class Show < ActiveRecord::Base
           end
 
           third_response = JSON.parse(third_response.body)
-          poster = third_response['data'][0]['fileName'] ? 'https://www.thetvdb.com/banners/' + third_response['data'][0]['fileName'] : 'https://s3-us-west-2.amazonaws.com/toddseller/tedflix/imgs/Artboard+1-196x196.jpg'
+          poster = parsed_doc.css('p')[0].text.include?('No search') ? 'https://www.thetvdb.com/banners/' + third_response['data'][0]['fileName'] : parsed_doc.css('img')[0]['src'].gsub(/_250.jpg/,'_1280.jpg')
           year = s['firstAired'] != nil ? s['firstAired'].split('-').slice(0,1).join() : ''
           details = {title: s['seriesName'], collectionName: get_collection_name(s['seriesName'], season_number.to_s), collectionId: get_collection_id(s['id'], season_number.to_s), season: season_number.to_s, poster: poster, rating: '', year: year, plot: s['overview'], genre: ''}
           series << details
@@ -148,8 +154,8 @@ class Show < ActiveRecord::Base
       end
         return series.sort_by {|k| k[:season].to_i}
       # end
-    # else
-    #   series.sort_by {|k| k[:year]}
+    else
+      series.sort_by {|k| k[:year]}
     end
   end
 

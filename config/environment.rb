@@ -28,6 +28,7 @@ Dotenv.load
 require 'erb'
 require 'bcrypt'
 require 'httparty'
+require 'nokogiri'
 
 # Some helper constants for path-centric logic
 APP_ROOT = Pathname.new(File.expand_path('../../', __FILE__))
