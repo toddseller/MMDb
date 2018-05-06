@@ -52,7 +52,7 @@ class Show < ActiveRecord::Base
           series << details
         end
       end
-        return series.sort_by {|k| k[:season].to_i}
+        return series.sort {|a, b| [a[:title], a[:season].to_i] <=> [b[:title], b[:season].to_i]}
     else
       series.sort_by {|k| k[:year]}
     end
