@@ -53,7 +53,6 @@ class Show < ActiveRecord::Base
         end
       end
         return series.sort_by {|k| k[:season].to_i}
-      # end
     else
       series.sort_by {|k| k[:year]}
     end
@@ -109,8 +108,6 @@ class Show < ActiveRecord::Base
   end
 
   def self.set_image(p)
-    # p.gsub!(/^(http)/, 'https')
-    # p.gsub!(/(is\d)/, 'is5-ssl')
     p.gsub!(/100x100/, '600x600')
   end
 
