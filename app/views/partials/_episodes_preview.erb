@@ -9,7 +9,11 @@
         <input type="hidden" name="episode[runtime]" value="<%="#{episode[:runtime]}"%>">
         <input type="hidden" name="episode[tv_episode]" value="<%="#{episode[:tv_episode]}"%>">
         <button type="submit" id="episode-video" border="0">
-          <video src="<%="#{episode[:preview]}"%>" width='300'></video>
+          <% if episode[:preview].include?('video') %>
+            <video src="<%="#{episode[:preview]}"%>" width='300'></video>
+          <% else %>
+            <img src="<%="#{episode[:preview]}"%>" width='300'>
+          <% end %>
         </button>
         <p class="episode-truncate"><%="#{episode[:title]}"%></p>
         <p id="episode"><%="Episode #{episode[:tv_episode]}"%></p>
