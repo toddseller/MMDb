@@ -10,6 +10,13 @@
     </form>
     <% if session[:user_id] == @user.id %>
       <button id="add-show" class="btn btn-danger pull-right">Add TV Show</button>
+    <% elsif @user.shows %>
+      <a href=<%="/users/#{@user.id}"%>>
+        <button id="switch" class="btn btn-danger pull-right">
+          <span class="glyphicon glyphicon-film"></span>
+          Movies
+        </button>
+      </a>
     <% end %>
     <div id="search" class="pull-right">
       <%= erb :'/partials/_add_show', layout: false %>
