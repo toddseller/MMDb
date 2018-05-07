@@ -45,7 +45,7 @@ class Show < ActiveRecord::Base
             new_t = URI.encode(t + ' season ' + season_number.to_s)
             doc = HTTParty.get('http://squaredtvart.tumblr.com/search/' + new_t)
             parsed_doc ||= Nokogiri::HTML(doc)
-            puts third_response = tvdb_call("https://api.thetvdb.com/series/" + s['id'].to_s + "/images/query?keyType=poster") if second_response[:code] == '200'
+            third_response = tvdb_call("https://api.thetvdb.com/series/" + s['id'].to_s + "/images/query?keyType=poster") if second_response[:code] == '200'
 
             poster = !parsed_doc.css('p')[0].text.include?('No search') ? parsed_doc.css('img')[0]['src'].gsub(/_250.jpg/,'_1280.jpg') : third_response[:code] == '200' && third_response[:body]['data'][0]['fileName'] ? 'https://www.thetvdb.com/banners/' + third_response[:body]['data'][0]['fileName'] : 'https://s3-us-west-2.amazonaws.com/toddseller/tedflix/imgs/Artboard+1-196x196.jpg'
             year = s['firstAired'] != nil ? s['firstAired'].split('-').slice(0,1).join() : ''
