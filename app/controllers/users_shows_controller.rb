@@ -1,8 +1,9 @@
 get '/users/:user_id/shows' do
   @user = User.find(params[:user_id])
   @my_shows = @user.shows.sorted_list
+  @movies = @user.movies
   if request.xhr?
-    page = erb :'/partials/_show_list', locals: {show: @my_shows, user: @user}, layout: false
+    page = erb :'/partials/_show_list', locals: {show: @my_shows, user: @user, movies: @movies}, layout: false
     json status: "true", page: page
   else
     erb :'/shows/show'
