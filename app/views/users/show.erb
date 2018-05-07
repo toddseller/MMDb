@@ -10,7 +10,7 @@
     </form>
     <% if session[:user_id] == @user.id %>
       <button id="add" class="btn btn-danger pull-right">Add Movie</button>
-    <% elsif @shows %>
+    <% elsif @shows.length != 0 %>
       <a href=<%="/users/#{@user.id}/shows"%>>
         <button id="switch" class="btn btn-danger pull-right">
           <span class="glyphicon glyphicon-blackboard"></span>
