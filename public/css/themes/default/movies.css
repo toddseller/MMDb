@@ -346,9 +346,15 @@ img
 }
 
 #add,
-#add-show
+#add-show,
+#switch
 {
     margin-right: 25px;
+}
+
+#switch .glyphicon
+{
+    margin-right: 5px;
 }
 
 #search
