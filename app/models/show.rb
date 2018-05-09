@@ -24,13 +24,13 @@ class Show < ActiveRecord::Base
       end
 
     if series.count == 0
-      token_response = tvdb_call("https://api.thetvdb.com/refresh_token")
-      if token_response[:code] == '200'
-        heroku_call(token_response[:body]['token'])
-      else
-        token_response = tvdb_auth()
-        heroku_call(token_response[:body]['token'])
-      end
+      # token_response = tvdb_call("https://api.thetvdb.com/refresh_token")
+      # if token_response[:code] == '200'
+      #   heroku_call(token_response[:body]['token'])
+      # else
+      #   token_response = tvdb_auth()
+      #   heroku_call(token_response[:body]['token'])
+      # end
 
       first_response = tvdb_call("https://api.thetvdb.com/search/series?name=" + URI.encode(t))
 
@@ -70,9 +70,8 @@ class Show < ActiveRecord::Base
       first_response = tvdb_call("https://api.thetvdb.com/series/" + id.to_s + "/episodes/query?airedSeason=" + season.to_s)
 
       first_response[:body]['data'].each do |e|
-        puts e
         preview = "https://www.thetvdb.com/banners/episodes/" + id.to_s + "/" + e['id'].to_s + ".jpg"
-        episode = {title: e['episodeName'], date: convert_date(e['firstAired']), plot: e['overview'], tv_episode: e['airedEpisodeNumber'], preview: preview}
+        episode = {title: e['episodeName'], date: convert_date(e['firstAired']), plot: get_plot(e['overview']), tv_episode: e['airedEpisodeNumber'], preview: preview}
         episodes << episode
       end
     else
@@ -80,6 +79,7 @@ class Show < ActiveRecord::Base
       return nil if episodes_response.length == 0
 
       episodes_response['results'].each do |e|
+        e['longDescription']
         episode = {title: e['trackName'], date: convert_date(e['releaseDate']), plot: get_plot(e['longDescription']), runtime: e['trackTimeMillis'], tv_episode: e['trackNumber'], preview: e['previewUrl']}
         episodes << episode if e['trackId'] && e['trackNumber'].to_i < 100
       end
@@ -114,12 +114,12 @@ class Show < ActiveRecord::Base
   end
 
   def self.get_plot(p)
-    p.gsub!(/\<[i|b]\>|\<\/[i|b]\>/, '')
-    p.gsub!(/\'/, '&#39;')
-    p.gsub!(/\"/, '&#34;')
-    p.gsub!(/\r|\n/, '')
-    p.gsub!(/—|-/, '&#8211;')
-    p.gsub!(/""/, '\"')
+    new_p = p.gsub(/\<[i|b]\>|\<\/[i|b]\>/, '')
+    new_p = p.gsub(/\'/, '&#39;')
+    new_p = p.gsub(/\"/, '&#34;')
+    new_p = p.gsub(/\r|\n/, '')
+    new_p = p.gsub(/—|-/, '&#8211;')
+    new_p = p.gsub(/\"\"/, '&#34;')
   end
 
   def self.convert_date(d)
