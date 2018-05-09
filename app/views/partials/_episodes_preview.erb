@@ -12,7 +12,7 @@
           <% if episode[:preview].include?('video') %>
             <video src="<%="#{episode[:preview]}"%>" width='300'></video>
           <% else %>
-            <img src="<%="#{episode[:preview]}"%>" width='300'>
+            <img src="<%="#{episode[:preview]}"%>" onError="this.onerror=null;this.src='https://s3-us-west-2.amazonaws.com/toddseller/tedflix/imgs/Artboard+1-196x196.jpg';" width='300'>
           <% end %>
         </button>
         <p class="episode-truncate"><%="#{episode[:title]}"%></p>
