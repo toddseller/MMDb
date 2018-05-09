@@ -791,6 +791,11 @@ a.movie-edit:hover
     background: rgba(0,0,0,.4);;
 }
 
+#episode-video img
+{
+    height: 169px;
+}
+
 .episode-preview
 {
     height: 300px;
