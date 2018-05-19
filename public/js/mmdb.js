@@ -201,7 +201,7 @@ var logout = function (event) {
   event.preventDefault()
   var id = $(this).attr('href')
   var route = '/sessions/' + id
-  $.post(route, function () {window.location.replace('/users')})
+  $.post(route, function () {window.location.replace('/')})
 }
 
 var updateUser = function (event) {
