@@ -44,7 +44,7 @@ post '/users/:user_id/shows' do
 end
 
 get '/users/:user_id/shows/:id' do
-  user = current_user if current_user == User.find(params[:user_id])
+  user = User.find(params[:user_id])
   show = Show.find(params[:id])
   season = show.seasons.find_by(is_active: true)
   episodes = season.episodes.sorted_list
