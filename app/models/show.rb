@@ -25,12 +25,12 @@ class Show < ActiveRecord::Base
 
     if series.count == 0
       token_response = tvdb_call("https://api.thetvdb.com/refresh_token")
-      # if token_response[:code] == '200'
-      #   heroku_call(token_response[:body]['token'])
-      # else
-      #   token_response = tvdb_auth()
-      #   heroku_call(token_response[:body]['token'])
-      # end
+      if token_response[:code] == '200'
+        heroku_call(token_response[:body]['token'])
+      else
+        token_response = tvdb_auth()
+        heroku_call(token_response[:body]['token'])
+      end
 
       first_response = tvdb_call("https://api.thetvdb.com/search/series?name=" + URI.encode(t))
 
