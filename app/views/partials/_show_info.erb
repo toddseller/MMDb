@@ -3,7 +3,7 @@
   </div>
   <div class="modal-body">
     <div id="info-header" class="row">
-      <% if user.is_a?(User) %>
+      <% if user.is_a?(User) && user == current_user %>
         <a class="show-edit" href=<%= "/users/#{user.id}/shows/#{show.id}/edit" %>><span class="glyphicon glyphicon-option-horizontal"></span></a>
       <% end %>
       <div class="col-lg-4 description-poster">
