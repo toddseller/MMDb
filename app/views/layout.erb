@@ -19,21 +19,11 @@
   <!-- End Google Tag Manager -->
   <script src="//cdn.optimizely.com/js/7859721234.js"></script>
 
-  <script>
-    <!--
-    function getStylesheet() {
-      var theme = "<%= session[:theme] %>"
-      if (theme === 'dark') {
-       document.write("<link rel='stylesheet' href='/css/dark.css' type='text/css'>");
-      } else {
-       document.write("<link rel='stylesheet' href='/css/default.css' type='text/css'>");
-      }
-    }
-
-    getStylesheet();
-      -->
-  </script>
-  <noscript><link rel="stylesheet" href="/css/default.css"></noscript>
+  <% if session[:theme] == 'dark' %>
+    <link rel='stylesheet' href='/css/dark.css' type='text/css'>
+  <% else %>
+    <link rel='stylesheet' href='/css/default.css' type='text/css'>
+  <% end %>
   <title></title>
 </head>
 <body>
