@@ -62,7 +62,8 @@ class Show < ActiveRecord::Base
 
   def self.get_episodes(id, season)
     episodes = []
-
+    p id
+    p season
     if id.include? 'tvdb'
       id = id.gsub(/tvdb/,'')
       id = id[0...-season.to_s.length]
@@ -71,8 +72,9 @@ class Show < ActiveRecord::Base
 
       first_response[:body]['data'].each do |e|
         preview = "https://www.thetvdb.com/banners/episodes/" + id.to_s + "/" + e['id'].to_s + ".jpg"
-        episode = {title: e['episodeName'], date: convert_date(e['firstAired']), plot: get_plot(e['overview']), tv_episode: e['airedEpisodeNumber'], preview: preview}
-        episodes << episode
+        plot = e['overview'] ? get_plot(e['overview']) : ''
+        episode = {title: e['episodeName'], date: convert_date(e['firstAired']), plot: plot, tv_episode: e['airedEpisodeNumber'], preview: preview}
+        episodes << episode if Date.parse(e['firstAired']).past?
       end
     else
       episodes_response = JSON.parse(HTTParty.get('https://itunes.apple.com/lookup?id=' + id + '&country=us&entity=tvEpisode'))

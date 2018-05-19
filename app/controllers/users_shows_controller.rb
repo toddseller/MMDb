@@ -31,11 +31,12 @@ post '/users/:user_id/shows' do
       end
       p ' * ' * 50
       p @episodes_previews = Show.get_episodes(@season.collectionId, @season.season)
+      count = @episodes_previews.length
     end
 
     if request.xhr?
       page = erb :'/partials/_episodes_preview', locals: {episode: @episodes_previews, user: @user, show: @show, season: @season}, layout: false
-      json status: "true", page: page
+      json status: "true", page: page, count: count
     else
       erb :'/shows/show'
     end

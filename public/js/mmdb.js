@@ -574,7 +574,11 @@ var listEpisode = function (response) {
     $('#preview').slideDown(300, 'linear')
     $('#dismiss').show()
     $('#preview').scroll(addArrow)
-    $('#preview').empty().append(response.page).attr('style', 'display: flex; justify-content: space-between; height: 300px;')
+    if (response.count >= 5) {
+      $('#preview').empty().append(response.page).attr('style', 'display: flex; justify-content: space-between; height: 300px;')
+    } else {
+      $('#preview').empty().append(response.page).attr('style', 'display: flex; justify-content: center; height: 300px;')
+    }
     if ($('#preview > div').size() <= 6) {
       $('#scroll-right').hide()
     } else {
