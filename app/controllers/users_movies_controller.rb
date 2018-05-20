@@ -75,7 +75,8 @@ delete '/users/:user_id/movies/:id' do
   if request.xhr?
     @my_movies = params[:filter] != nil ? Movie.filter_movies(params[:filter], @user.id).sorted_list : Movie.search(params[:name], @user.id).sorted_list
     page = erb :'/partials/_filtered_list', locals: {movie: @my_movies, user: @user}, layout: false
-    json status: "true", page: page
+    movie_count = @user.movies.count.to_s.reverse.gsub(/(\d{3})(?=\d)/, '\1,').reverse
+    json status: "true", page: page, movie_count: movie_count
   else
     @my_movies = @user.movies.sorted_list
     erb :'/users/show'
