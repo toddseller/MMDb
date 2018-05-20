@@ -23,9 +23,10 @@ get '/users/:id' do
   @user = User.find(params[:id])
   @my_movies = @user.movies.sorted_list
   @shows = @user.shows
+  @count = @my_movies.to_s.reverse.gsub(/(\d{3})(?=\d)/, '\1,').reverse
   if request.xhr?
     page = erb :'/movies/show', layout: false
-    movie_count = @user.movies.count
+    movie_count = @user.movies.count.to_s.reverse.gsub(/(\d{3})(?=\d)/, '\1,').reverse
     json status: "true", page: page, movie_count: movie_count
   else
     erb :'/users/show'

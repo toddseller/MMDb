@@ -12,7 +12,7 @@ class Episode < ActiveRecord::Base
     total_count = []
     user = User.find(u)
     user.shows.each {|show| show.seasons.each {|s| total_count << s.episodes.count}}
-    total_count.reduce(:+)
+    total_count.reduce(:+).to_s.reverse.gsub(/(\d{3})(?=\d)/, '\1,').reverse
   end
 
   private
