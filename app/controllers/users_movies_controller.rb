@@ -19,7 +19,8 @@ post '/users/:user_id/movies' do
     @my_movies = Movie.filter_movies(params[:filter], @user.id).sorted_list
     if request.xhr?
       page = erb :'/partials/_movie_list', locals: {movie: @my_movies, user: @user}, layout: false
-      json status: "true", page: page
+      movie_count = @my_movies.count.to_s.reverse.gsub(/(\d{3})(?=\d)/, '\1,').reverse
+      json status: "true", page: page, movie_count: movie_count
     else
       erb :'/users/show'
     end
