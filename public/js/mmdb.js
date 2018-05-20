@@ -972,7 +972,7 @@ var getUser = function (event) {
     $('#user-profile > span.glyphicon.glyphicon-triangle-right').removeClass('active')
     $('#user-page').empty().append(response.page)
     if (response.show_count) {
-      $('.footer').empty().append(response.show_count + ' TV Shows, ' + response.episode_count + ' Episodes')
+      $('.footer').empty().append(response.show_count + ' TV Shows &#8212; ' + response.episode_count + ' Episodes')
     } else {
       $('.footer').empty().append(response.movie_count + ' Movies')
     }
