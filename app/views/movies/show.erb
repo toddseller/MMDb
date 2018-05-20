@@ -10,6 +10,13 @@
     </form>
     <% if session[:user_id] == @user.id %>
       <button id="add" class="btn btn-danger pull-right">Add Movie</button>
+    <% elsif @shows.length != 0 %>
+      <a id="user-shows" href=<%="/users/#{@user.id}/shows"%>>
+        <button id="switch" class="btn btn-danger pull-right">
+          <span class="glyphicon glyphicon-blackboard"></span>
+          TV Shows
+        </button>
+      </a>
     <% end %>
     <div id="search" class="pull-right">
       <%= erb :'/partials/_add_movie', layout: false %>
@@ -17,6 +24,7 @@
     <div class="library">
       <a href="#" id="library">Library</a>
       <a href="/movies/new/<%=@user.id%>" id="unwatched">Unwatched</a>
+      <a href="/movies/4k/<%=@user.id%>" id="four-k">4K</a>
     </div>
     <div class="preview-wrapper">
       <div class="col-lg-12" id="preview"></div>
@@ -34,8 +42,7 @@
     </div>
   </div>
   <div id="movie-list" class="col-xs-12">
-    <% @my_movies.each do |movie| %>
-      <%= erb :'/partials/_my_movies', locals: {movie: movie, user: @user}, layout: false %>
-    <% end %>
+      <%= erb :'/partials/_movie_list', locals: {user: @user}, layout: false %>
   </div>
 </div>
+<footer><div class="footer"><%= @my_movies.count %> Movies</div></footer>

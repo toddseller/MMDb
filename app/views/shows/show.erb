@@ -11,7 +11,7 @@
     <% if session[:user_id] == @user.id %>
       <button id="add-show" class="btn btn-danger pull-right">Add TV Show</button>
     <% elsif @movies.length != 0 %>
-      <a href=<%="/users/#{@user.id}"%>>
+      <a id="user-movies" href=<%="/users/#{@user.id}"%>>
         <button id="switch" class="btn btn-danger pull-right">
           <span class="glyphicon glyphicon-film"></span>
           Movies
@@ -42,3 +42,4 @@
     <% end %>
   </div>
 </div>
+<footer><div class="footer"></div></footer>

@@ -8,7 +8,6 @@ var bindListeners = function () {
   $('.close').on('click', clearForm)
   $('.modal').on('shown.bs.modal', autoFocus)
   $('#menu-toggle').on('click', animateMenu)
-  // $('#menu-toggle').hoverIntent(openMenu, closeMenu)
   $('#logout').on('click', logout)
   $('#update').on('click', updateUser)
   $('#search-movie-title').on('keyup', function () {
@@ -23,10 +22,13 @@ var bindListeners = function () {
   $('#four-k').on('click', fourK)
   $('#library').on('click', clearFilter)
   $('#user-profile').on('click', toggleProfile)
-  //$('#drop-down-submenu > ul > a').on('click', goToProfile)
+  $('#user-shows').on('click', getUser)
+  $('#user-movies').on('click', getUser)
 }
 
 var dynamicListener = function () {
+  $(document).on('click', '#user-movies', getUser)
+  $(document).on('click', '#user-shows', getUser)
   $('#search-boxes').on('click', '#dismiss', closePreview)
   $('#user-page').on('click', '.top-preview', activateModal)
   $('#user-page').on('click', '#add', showSearchBar)
@@ -639,6 +641,7 @@ var getMovieModal = function (event) {
   var pointer = $('#movie-list').length > 0 ? $('.pointer') : $('.show-pointer')
   var that = $(this).parent('div')
   var posterArt = $(this).children('img')
+  console.log('**** ', posterArt)
   var title = $(this).siblings('p')
   var index = $(that).index()
   var itemsPerRow = $('#movie-list').length > 0 ? 7 : 6
@@ -651,12 +654,13 @@ var getMovieModal = function (event) {
       url: route
     })
     request.done(function (response) {
+      $('.footer').fadeOut()
       var c = $('#movie-list').length > 0 ? $('#movie-list > div') : $('#show-list > div')
       if (c.hasClass('info')) {
         activeItem = id
         $('.info').remove()
         switchInfoDiv(posterArt, title)
-        if (window.location.href.substr(window.location.href.lastIndexOf('/') + 1) === 'shows') {
+        if ($('#show-list').length > 0) {
           endOfRow.after('<div class="info" style="margin-top: 1px; max-height: 100%;"></div>')
         } else {
           endOfRow.after('<div class="info"></div>')
@@ -669,7 +673,7 @@ var getMovieModal = function (event) {
         activeItem = id
         var filteredList = c.filter('.index-preview')
         filtered(filteredList)
-        if (window.location.href.substr(window.location.href.lastIndexOf('/') + 1) === 'shows') {
+        if ($('#show-list').length > 0) {
           endOfRow.after('<div class="info" style="margin-top: 1px; max-height: 100%;"></div>')
         } else {
           endOfRow.after('<div class="info"></div>')
@@ -696,6 +700,7 @@ var getMovieModal = function (event) {
     $('.lazy').removeClass('notransition').removeClass('active')
     setTimeout(removeInfoClass, 1000)
     activeItem = $('body')
+    $('.footer').fadeIn()
   }
 }
 
@@ -951,4 +956,25 @@ var deleteMovie = function (event) {
   pointer.css('border-top', '#fff').css('border-left', '#fff')
   setTimeout(removePointerClass, 100)
 
+}
+
+var getUser = function (event) {
+  event.preventDefault()
+  var route = $(this).attr('href')
+  console.log('**** ', this)
+  var request = $.ajax({
+    url: route
+  })
+  request.done(function(response) {
+    $('#nav-toggle').removeClass('active')
+    $('#drop-down').removeClass('active')
+    $('#drop-down-submenu').removeClass('active')
+    $('#user-profile > span.glyphicon.glyphicon-triangle-right').removeClass('active')
+    $('#user-page').empty().append(response.page)
+    if (response.show_count) {
+      $('.footer').empty().append(response.show_count + ' TV Shows, ' + response.episode_count + ' Episodes')
+    } else {
+      $('.footer').empty().append(response.movie_count + ' Movies')
+    }
+  })
 }
