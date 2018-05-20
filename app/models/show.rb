@@ -74,7 +74,7 @@ class Show < ActiveRecord::Base
         preview = "https://www.thetvdb.com/banners/episodes/" + id.to_s + "/" + e['id'].to_s + ".jpg"
         plot = e['overview'] ? get_plot(e['overview']) : ''
         episode = {title: e['episodeName'], date: convert_date(e['firstAired']), plot: plot, tv_episode: e['airedEpisodeNumber'], preview: preview}
-        episodes << episode if Date.parse(e['firstAired']).past?
+        episodes << episode if !Date.parse(e['firstAired']).future?
       end
     else
       episodes_response = JSON.parse(HTTParty.get('https://itunes.apple.com/lookup?id=' + id + '&country=us&entity=tvEpisode'))
