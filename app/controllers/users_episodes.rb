@@ -19,7 +19,7 @@ post '/users/:user_id/shows/:show_id/seasons/:season_id/episodes' do
   if request.xhr?
     page = erb :'/partials/_show_list', locals: {show: @my_shows, user: @user}, layout: false
     show_count = @my_shows.count.to_s.reverse.gsub(/(\d{3})(?=\d)/, '\1,').reverse
-    episode_count = Episode.total_episodes(@user.id)
+    episode_count = Episode.all.count.to_s.reverse.gsub(/(\d{3})(?=\d)/, '\1,').reverse
     json status: "true", page: page, show_count: show_count, episode_count: episode_count
   else
     erb :'/shows/show'
@@ -58,7 +58,7 @@ delete '/users/:user_id/shows/:show_id/seasons/:season_id/episodes/:id' do
   if request.xhr?
     page = erb :'/partials/_edit_show', locals: {show: @show, user: @user, season: @season, episode: @episode, count: @count, next_episode: @next_episode, previous_episode: @previous_episode}, layout: false
     show_count = @user.shows.count.to_s.reverse.gsub(/(\d{3})(?=\d)/, '\1,').reverse
-    episode_count = Episode.total_episodes(@user.id)
+    episode_count = Episode.all.count.to_s.reverse.gsub(/(\d{3})(?=\d)/, '\1,').reverse
     json page: page, show_count: show_count, episode_count: episode_count
   else
     erb :'/partials/_edit_show', layout: false

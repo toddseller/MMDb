@@ -3,7 +3,7 @@ get '/users/:user_id/shows' do
   @my_shows = @user.shows.sorted_list
   @movies = @user.movies
   @show_count = @user.shows.count.to_s.reverse.gsub(/(\d{3})(?=\d)/, '\1,').reverse
-  @episode_count = Episode.total_episodes(@user.id)
+  @episode_count = Episode.all.count.to_s.reverse.gsub(/(\d{3})(?=\d)/, '\1,').reverse
   if request.xhr?
     page = erb :'/shows/show', layout: false
     json status: "true", page: page, show_count: @show_count, episode_count: @episode_count
