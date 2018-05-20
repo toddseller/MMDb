@@ -48,17 +48,18 @@ delete '/users/:user_id/shows/:show_id/seasons/:season_id/episodes/:id' do
   @season = @show.seasons.find(params[:season_id])
   @episodes = @season.episodes.sorted_list
   @episode = @season.episodes.find(params[:id])
-  p '+' * 50
-  p episode_number = @episodes.index(@episode)
+  episode_number = @episodes.index(@episode)
   @episode.destroy()
   @count = @episodes.count
-  p @episode = episode_number != @count ? @episodes[episode_number + 1] : @episodes[episode_number - 1]
+  @episode = episode_number != @count ? @episodes[episode_number + 1] : @episodes[episode_number - 1]
   @next_episode = @episodes[@episodes.index(@episode) + 1] if @episode.tv_episode.to_i != @episodes.count
   @previous_episode = @episodes[@episodes.index(@episode) - 1] if @episode.tv_episode.to_i != 1 && @episode.tv_episode != @episodes[0].tv_episode
   @user = current_user
   if request.xhr?
     page = erb :'/partials/_edit_show', locals: {show: @show, user: @user, season: @season, episode: @episode, count: @count, next_episode: @next_episode, previous_episode: @previous_episode}, layout: false
-    json page
+    show_count = @user.shows.count.to_s.reverse.gsub(/(\d{3})(?=\d)/, '\1,').reverse
+    episode_count = Episode.total_episodes(@user.id)
+    json page: page, show_count: show_count, episode_count: episode_count
   else
     erb :'/partials/_edit_show', layout: false
   end

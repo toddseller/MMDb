@@ -567,7 +567,7 @@ var listMovie = function (response) {
     $('#movie-list').css('top', '0')
     $('#more').show()
     $('#movie-list').empty().append(response.page)
-    $('.footer').empty().append(response.movie_count + ' Movies')
+    $('.footer').empty().append(response.movie_count + ' Movies').fadeIn()
     $('img.lazy').lazyload()
   }
 }
@@ -799,7 +799,8 @@ var toggleActive = function (event) {
       data: data
     })
     request.done(function (response) {
-      $('.info-wrapper').empty().append(response)
+      console.log(response)
+      // $('.info-wrapper').empty().append(response)
     })
     $('#edit-show').modal('toggle')
   } else if ($(this).attr('id') === 'add-new-episode') {
@@ -864,7 +865,8 @@ var deleteEpisode = function (event) {
     type: 'DELETE'
   })
   request.done(function (response) {
-    $('#edit-show').empty().append(response)
+    $('#edit-show').empty().append(response.page)
+    $('.footer').empty().append(response.show_count + ' TV Shows &#8212; ' + response.episode_count + ' Episodes')
   })
 }
 
