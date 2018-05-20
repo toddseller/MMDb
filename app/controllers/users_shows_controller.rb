@@ -2,9 +2,11 @@ get '/users/:user_id/shows' do
   @user = User.find(params[:user_id])
   @my_shows = @user.shows.sorted_list
   @movies = @user.movies
+  @show_count = @user.shows.count
+  @episode_count = Episode.total_episodes(@user.id)
   if request.xhr?
-    page = erb :'/partials/_show_list', locals: {show: @my_shows, user: @user, movies: @movies}, layout: false
-    json status: "true", page: page
+    page = erb :'/shows/show', layout: false
+    json status: "true", page: page, show_count: @show_count, episode_count: @episode_count
   else
     erb :'/shows/show'
   end

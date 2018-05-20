@@ -61,10 +61,10 @@
         </a>
         <div id="drop-down-submenu">
           <ul>
-            <a href=<%="/users/#{session[:user_id]}"%>>
+            <a id="user-movies" href=<%="/users/#{session[:user_id]}"%>>
               <li><span class="glyphicon glyphicon-film"></span>Movies</li>
             </a>
-            <a href=<%="/users/#{session[:user_id]}/shows"%>>
+            <a id="user-shows" href=<%="/users/#{session[:user_id]}/shows"%>>
               <li><span class="glyphicon glyphicon-blackboard"></span>TV Shows</li>
             </a>
           </ul>

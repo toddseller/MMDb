@@ -1,5 +1,5 @@
 <div class="index-preview-show text-center" id=<%="#{user.id}"%>>
-  <a class="show-modal" id=<%="#{show.id}"%>><img class="lazy" data-original='<%= "#{show.poster}" %>' alt='<%="#{show.title}" %> Poster' width='200' height='200' style='display: inline-block !important;'></a>
+  <a class="show-modal" id=<%="#{show.id}"%>><img src='<%= "#{show.poster}" %>' alt='<%="#{show.title}" %> Poster' width='200' height='200' style='display: inline-block !important;'></a>
   <p class="show-truncate"><%= show.title %></p>
   <p class="season">
     <% if show.seasons.count > 1 && show.seasons.count < 5 %>
