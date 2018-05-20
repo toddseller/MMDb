@@ -2,7 +2,7 @@ get '/users/:user_id/shows' do
   @user = User.find(params[:user_id])
   @my_shows = @user.shows.sorted_list
   @movies = @user.movies
-  @show_count = @user.shows.count
+  @show_count = @user.shows.count.to_s.reverse.gsub(/(\d{3})(?=\d)/, '\1,').reverse
   @episode_count = Episode.total_episodes(@user.id)
   if request.xhr?
     page = erb :'/shows/show', layout: false

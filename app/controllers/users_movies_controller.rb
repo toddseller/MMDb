@@ -4,7 +4,7 @@ get '/users/:user_id/movies' do
   @shows = @user.shows
   if request.xhr?
     page = erb :'/users/show', layout: false
-    movie_count = @user.movies.count
+    movie_count = @user.movies.count.to_s.reverse.gsub(/(\d{3})(?=\d)/, '\1,').reverse
     json status: "true", page: page, movie_count: movie_count
   else
     erb :'/movies/show'

@@ -47,4 +47,4 @@
     <% end %>
   </div>
 </div>
-<footer><div class="footer"><%= @my_movies.count %> Movies</div></footer>
+<footer><div class="footer"><%= @my_movies.count.to_s.reverse.gsub(/(\d{3})(?=\d)/, '\1,').reverse %> Movies</div></footer>
