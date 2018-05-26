@@ -12,6 +12,14 @@ class Show < ActiveRecord::Base
 
   def self.get_series(t)
     series = []
+    show_array =  Show.where("search_name LIKE ?", "%#{t}%").sorted_list
+    show_array.each do |show|
+      show.seasons.each do |season|
+        db_season = season.attributes.symbolize_keys
+        db_season.store(:title, show.title)
+        series << db_season
+      end
+    end
     new_t = URI.encode(t)
 
     series_response = JSON.parse(HTTParty.get('https://itunes.apple.com/search?term=' + t + '&media=tvShow&entity=tvSeason'))
@@ -20,7 +28,7 @@ class Show < ActiveRecord::Base
         year = s['releaseDate'] != nil ? s['releaseDate'].split('-').slice(0,1).join() : ''
         rating = s['contentAdvisoryRating'] ? s['contentAdvisoryRating'] : ''
         details = {title: s['artistName'], collectionName: s['collectionName'], collectionId: s['collectionId'], season: get_season(s['collectionName']), poster: set_image(s['artworkUrl100']), rating: rating, year: year, plot: get_plot(s['longDescription']), genre: s['primaryGenreName']}
-        series << details
+        series << details if series.all? {|el| el[:collectionName] != s['collectionName']}
       end
 
       token_response = tvdb_call("https://api.thetvdb.com/refresh_token")
