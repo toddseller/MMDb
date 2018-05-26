@@ -23,7 +23,6 @@ class Show < ActiveRecord::Base
         series << details
       end
 
-    if series.count == 0
       token_response = tvdb_call("https://api.thetvdb.com/refresh_token")
       if token_response[:code] == '200'
         heroku_call(token_response[:body]['token'])
@@ -46,34 +45,31 @@ class Show < ActiveRecord::Base
             doc = HTTParty.get('http://squaredtvart.tumblr.com/search/' + new_t)
             parsed_doc ||= Nokogiri::HTML(doc)
             third_response = tvdb_call("https://api.thetvdb.com/series/" + s['id'].to_s + "/images/query?keyType=poster") if second_response[:code] == '200'
-
             poster = !parsed_doc.css('p')[0].text.include?('No search') ? parsed_doc.css('img')[0]['src'].gsub(/_250.jpg/,'_1280.jpg') : third_response[:code] == '200' && third_response[:body]['data'][0]['fileName'] ? 'https://www.thetvdb.com/banners/' + third_response[:body]['data'][0]['fileName'] : 'https://s3-us-west-2.amazonaws.com/toddseller/tedflix/imgs/Artboard+1-196x196.jpg'
             year = s['firstAired'] != nil ? s['firstAired'].split('-').slice(0,1).join() : ''
             details = {title: s['seriesName'], collectionName: get_collection_name(s['seriesName'], season_number.to_s), collectionId: get_collection_id(s['id'], season_number.to_s), season: season_number.to_s, poster: poster, rating: '', year: year, plot: s['overview'], genre: ''}
-            series << details
+            series << details if series.all? {|el| el[:collectionName] != get_collection_name(s['seriesName'], season_number.to_s)}
           end
         end
       end
-        return series.sort {|a, b| [a[:title], a[:season].to_i] <=> [b[:title], b[:season].to_i]}
-    else
-      series.sort_by {|k| k[:year]}
-    end
+    series.sort {|a, b| [a[:title], a[:season].to_i] <=> [b[:title], b[:season].to_i]}
   end
 
   def self.get_episodes(id, season)
     episodes = []
-    p id
-    p season
     if id.include? 'tvdb'
       id = id.gsub(/tvdb/,'')
       id = id[0...-season.to_s.length]
+
+      get_runtime = tvdb_call("https://api.thetvdb.com/series/" + id.to_s)
+      runtime = get_runtime[:body]['data']['runtime'].to_i * 1000 * 60
 
       first_response = tvdb_call("https://api.thetvdb.com/series/" + id.to_s + "/episodes/query?airedSeason=" + season.to_s)
 
       first_response[:body]['data'].each do |e|
         preview = "https://www.thetvdb.com/banners/episodes/" + id.to_s + "/" + e['id'].to_s + ".jpg"
         plot = e['overview'] ? get_plot(e['overview']) : ''
-        episode = {title: e['episodeName'], date: convert_date(e['firstAired']), plot: plot, tv_episode: e['airedEpisodeNumber'], preview: preview}
+        episode = {title: e['episodeName'], date: convert_date(e['firstAired']), plot: plot, runtime: runtime, tv_episode: e['airedEpisodeNumber'], preview: preview}
         episodes << episode if !Date.parse(e['firstAired']).future?
       end
     else
