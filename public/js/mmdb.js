@@ -24,7 +24,7 @@ var bindListeners = function () {
 var dynamicListener = function () {
   $(document).on('click', '#user-movies', getUser)
   $(document).on('click', '#user-shows', getUser)
-  $('#search-boxes').on('click', '#dismiss', closePreview)
+  $('#user-page').on('click', '#dismiss', closePreview)
   $('#user-page').on('keyup', '#search-movie-title', function () {
     clearTimeout(timeoutId)
     timeoutId = setTimeout(filterMovies, 300)
@@ -387,9 +387,7 @@ var checkDatabase2 = function (event) {
 var createShow = function (event) {
   event.preventDefault()
   var id = window.location.href.split('/')[4]
-  console.log('id: ', id)
   var route = '/users/' + id + '/shows/new'
-  console.log('route: ', route)
   $.get(route, displayCreateShow)
 }
 
@@ -645,7 +643,6 @@ var getMovieModal = function (event) {
   var pointer = $('#movie-list').length > 0 ? $('.pointer') : $('.show-pointer')
   var that = $(this).parent('div')
   var posterArt = $(this).children('img')
-  console.log('**** ', posterArt)
   var title = $(this).siblings('p')
   var index = $(that).index()
   var itemsPerRow = $('#movie-list').length > 0 ? 7 : 6
@@ -709,7 +706,6 @@ var getMovieModal = function (event) {
 }
 
 var expandPlot = function () {
-  console.log('in expandPlot')
   $(this).prev('p').toggleClass('active')
   if ($(this).prev('p').hasClass('active')) {
     $(this).text('less')
@@ -782,13 +778,10 @@ var displayMovieModal = function (response) {
 var editMovie = function (event) {
   event.preventDefault()
   var route = $(this).attr('href')
-  console.log(route)
   $.get(route, displayEditForm)
 }
 
 var toggleActive = function (event) {
-  console.log($(this).text() === 'Cancel')
-  console.log($('button#cancel.btn.btn-default').text() === 'Cancel')
   if ($(this).text() === 'Cancel') {
     $('#edit-show').modal('toggle')
   } else if ($(this).text() === 'OK') {
@@ -801,8 +794,7 @@ var toggleActive = function (event) {
       data: data
     })
     request.done(function (response) {
-      console.log(response)
-      // $('.info-wrapper').empty().append(response)
+      $('.info-wrapper').empty().append(response)
     })
     $('#edit-show').modal('toggle')
   } else if ($(this).attr('id') === 'add-new-episode') {
@@ -967,7 +959,6 @@ var deleteMovie = function (event) {
 var getUser = function (event) {
   event.preventDefault()
   var route = $(this).attr('href')
-  console.log('**** ', this)
   var request = $.ajax({
     url: route
   })
