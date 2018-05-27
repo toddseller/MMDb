@@ -620,14 +620,15 @@ var closePreview = function (event) {
   $('#scroll-left').hide()
   if ($('#movie-list').length == 1) {
     $('#add').show()
+    $('#movie-list').css('top', '0')
   } else {
     $('#add-show').show()
+    $('#show-list').css('top', '0')
   }
   $('#search').hide()
   $('#search-year').hide()
   $('#search-title').css('right', '0')
   $('.input-group-btn').css('top', '0')
-  $('#movie-list').css('top', '0')
   $('#more').show()
 }
 
