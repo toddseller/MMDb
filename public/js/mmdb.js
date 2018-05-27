@@ -10,12 +10,7 @@ var bindListeners = function () {
   $('#menu-toggle').on('click', animateMenu)
   $('#logout').on('click', logout)
   $('#update').on('click', updateUser)
-  $('#search-movie-title').on('keyup', function () {
-    clearTimeout(timeoutId)
-    timeoutId = setTimeout(filterMovies, 300)
-  })
   $('.registration #confirm').on('keyup', checkPassword)
-  $('#clear-btn').on('click', clearFilter)
   $('#scroll-right').on('click', scrollRight)
   $('#scroll-left').on('click', scrollLeft)
   $('#unwatched').on('click', unwatched)
@@ -30,6 +25,11 @@ var dynamicListener = function () {
   $(document).on('click', '#user-movies', getUser)
   $(document).on('click', '#user-shows', getUser)
   $('#search-boxes').on('click', '#dismiss', closePreview)
+  $('#user-page').on('keyup', '#search-movie-title', function () {
+    clearTimeout(timeoutId)
+    timeoutId = setTimeout(filterMovies, 300)
+  })
+  $('#user-page').on('click', '#clear-btn', clearFilter)
   $('#user-page').on('click', '.top-preview', activateModal)
   $('#user-page').on('click', '#add', showSearchBar)
   $('#user-page').on('click', '#add-show', showSearchBar2)
@@ -98,7 +98,7 @@ var toggleHD = function () {
 var filterMovies = function (event) {
 
   filterValue = $('#search-movie-title').val()
-  var routePath = window.location.href.substr(window.location.href.lastIndexOf('/') + 1) === 'shows' ? 'shows' : 'movies'
+  var routePath = $('#movie-list').length > 0 ? 'movies' : 'shows'
   var id = window.location.href.split('/')[4]
   var data = $.param({filter:filterValue, id:id})
   var route = '/' + routePath + '/filter'
@@ -108,7 +108,8 @@ var filterMovies = function (event) {
     data: data
   })
   request.done(function (response) {
-    $('#movie-list').empty().append(response);
+    $('#movie-list').empty().append(response.page);
+    $('.footer').empty().append(response.count + ' Movies').fadeIn()
   })
 }
 
@@ -168,7 +169,8 @@ var clearFilter = function () {
   var route = window.location.pathname
   $.get(route).done(function (response) {
     $('#profile-wrapper').removeClass('active')
-    $('#movie-list').empty().append(response.page)
+    $('#user-page').empty().append(response.page)
+    $('.footer').empty().append(response.movie_count + ' Movies').fadeIn()
     $('img.lazy').lazyload()
     $('#profile-image').empty()
     $('#profile-name').empty()

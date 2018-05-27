@@ -8,6 +8,15 @@ class Episode < ActiveRecord::Base
 
   scope :sorted_list, -> { order(:tv_episode) }
 
+  def self.episode_count(u)
+    user = User.find(u)
+    episodes = []
+    user.shows.each do |show|
+      show.seasons.each {|season| episodes << season.episodes.count}
+    end
+    episodes.reduce(:+).to_s.reverse.gsub(/(\d{3})(?=\d)/, '\1,').reverse
+  end
+
   private
 
   def create_duration

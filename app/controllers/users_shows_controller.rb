@@ -3,7 +3,7 @@ get '/users/:user_id/shows' do
   @my_shows = @user.shows.sorted_list
   @movies = @user.movies
   @show_count = @user.shows.count.to_s.reverse.gsub(/(\d{3})(?=\d)/, '\1,').reverse
-  @episode_count = Episode.all.count.to_s.reverse.gsub(/(\d{3})(?=\d)/, '\1,').reverse
+  @episode_count = Episode.episode_count(@user.id)
   if request.xhr?
     page = erb :'/shows/show', layout: false
     json status: "true", page: page, show_count: @show_count, episode_count: @episode_count
@@ -31,8 +31,7 @@ post '/users/:user_id/shows' do
         @season.update(is_active: true)
         @season
       end
-      p ' * ' * 50
-      p @episodes_previews = Show.get_episodes(@season.collectionId, @season.season)
+      @episodes_previews = Show.get_episodes(@season.collectionId, @season.season)
       count = @episodes_previews.length
     end
 
@@ -97,7 +96,8 @@ delete '/users/:user_id/shows/:id' do
   if request.xhr?
     @my_movies = params[:filter] != nil ? Movie.filter_movies(params[:filter], @user.id).sorted_list : Movie.search(params[:name], @user.id).sorted_list
     page = erb :'/partials/_filtered_list', locals: {movie: @my_movies, user: @user}, layout: false
-    json status: "true", page: page
+    count = Episode.episode_count(@user.id)
+    json status: "true", page: page, count: count
   else
     @my_movies = @user.movies.sorted_list
     erb :'/users/show'
