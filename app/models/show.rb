@@ -32,13 +32,13 @@ class Show < ActiveRecord::Base
         series << details if series.all? {|el| el[:collectionName] != s['collectionName']}
       end
 
-      # token_response = tvdb_call("https://api.thetvdb.com/refresh_token")
-      # if token_response[:code] == '200'
-      #   heroku_call(token_response[:body]['token'])
-      # else
-      #   token_response = tvdb_auth()
-      #   heroku_call(token_response[:body]['token'])
-      # end
+      token_response = tvdb_call("https://api.thetvdb.com/refresh_token")
+      if token_response[:code] == '200'
+        heroku_call(token_response[:body]['token'])
+      else
+        token_response = tvdb_auth()
+        heroku_call(token_response[:body]['token'])
+      end
 
       first_response = tvdb_call("https://api.thetvdb.com/search/series?name=" + URI.encode(t))
 
