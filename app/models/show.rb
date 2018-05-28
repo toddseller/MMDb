@@ -27,23 +27,24 @@ class Show < ActiveRecord::Base
       series_response['results'].each do |s|
         year = s['releaseDate'] != nil ? s['releaseDate'].split('-').slice(0,1).join() : ''
         rating = s['contentAdvisoryRating'] ? s['contentAdvisoryRating'] : ''
+        # p get_plot(s['longDescription'])
         details = {title: s['artistName'], collectionName: s['collectionName'], collectionId: s['collectionId'], season: get_season(s['collectionName']), poster: set_image(s['artworkUrl100']), rating: rating, year: year, plot: get_plot(s['longDescription']), genre: s['primaryGenreName']}
         series << details if series.all? {|el| el[:collectionName] != s['collectionName']}
       end
 
-      token_response = tvdb_call("https://api.thetvdb.com/refresh_token")
-      if token_response[:code] == '200'
-        heroku_call(token_response[:body]['token'])
-      else
-        token_response = tvdb_auth()
-        heroku_call(token_response[:body]['token'])
-      end
+      # token_response = tvdb_call("https://api.thetvdb.com/refresh_token")
+      # if token_response[:code] == '200'
+      #   heroku_call(token_response[:body]['token'])
+      # else
+      #   token_response = tvdb_auth()
+      #   heroku_call(token_response[:body]['token'])
+      # end
 
       first_response = tvdb_call("https://api.thetvdb.com/search/series?name=" + URI.encode(t))
 
       first_response[:body]['data'].each do |s|
         squared = true
-        second_response = tvdb_call("https://api.thetvdb.com/series/" + s['id'].to_s + "/episodes/summary") if s['seriesName'].downcase == t.downcase
+        second_response = tvdb_call("https://api.thetvdb.com/series/" + s['id'].to_s + "/episodes/summary") if s['seriesName'] != nil && s['seriesName'].downcase == t.downcase
         second_response[:body]['data']['airedSeasons'].delete('0') if second_response && second_response[:body]['data']['airedSeasons'].include?('0')
 
         if second_response && second_response[:code] == '200'
@@ -132,11 +133,11 @@ class Show < ActiveRecord::Base
 
   def self.get_plot(p)
     new_p = p.gsub(/\<[i|b]\>|\<\/[i|b]\>/, '')
-    new_p = p.gsub(/\'/, '&#39;')
-    new_p = p.gsub(/\"/, '&#34;')
-    new_p = p.gsub(/\r|\n/, '')
-    new_p = p.gsub(/—|-/, '&#8211;')
-    new_p = p.gsub(/\"\"/, '&#34;')
+    new_p = new_p.gsub(/\'/, '&#39;')
+    new_p = new_p.gsub(/\"/, '&#34;')
+    new_p = new_p.gsub(/\r|\n/, '')
+    new_p = new_p.gsub(/—|-/, '&#8211;')
+    new_p = new_p.gsub(/\"\"/, '&#34;')
   end
 
   def self.convert_date(d)
