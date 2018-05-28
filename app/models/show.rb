@@ -43,31 +43,29 @@ class Show < ActiveRecord::Base
 
       first_response[:body]['data'].each do |s|
         squared = true
-        second_response = tvdb_call("https://api.thetvdb.com/series/" + s['id'].to_s + "/episodes/summary")
+        second_response = tvdb_call("https://api.thetvdb.com/series/" + s['id'].to_s + "/episodes/summary") if s['seriesName'].downcase == t.downcase
+        second_response[:body]['data']['airedSeasons'].delete('0') if second_response && second_response[:body]['data']['airedSeasons'].include?('0')
 
-        second_response[:body]['data']['airedSeasons'].delete('0') if second_response[:body]['data']['airedSeasons'].include?('0')
-
-        if second_response[:code] == '200'
+        if second_response && second_response[:code] == '200'
           second_response[:body]['data']['airedSeasons'].each do |a|
             season_number = second_response[:body]['data']['airedSeasons'].index(a) + 1
-            if series.all? {|el| el[:collectionName] != get_collection_name(s['seriesName'], season_number.to_s)}
+            collection_name = get_collection_name(s['seriesName'], season_number.to_s)
+            if series.all? {|el| el[:collectionName] != collection_name}
               if squared
                 new_t = URI.encode(t + ' season ' + season_number.to_s)
                 doc = HTTParty.get('http://squaredtvart.tumblr.com/search/' + new_t)
                 parsed_doc ||= Nokogiri::HTML(doc)
-                third_response = tvdb_call("https://api.thetvdb.com/series/" + s['id'].to_s + "/images/query?keyType=poster") if second_response[:code] == '200'
                 if !parsed_doc.css('p')[0].text.include?('No search')
                   poster = parsed_doc.css('img')[0]['src'].gsub(/_250.jpg/,'_1280.jpg')
                 else
-                  poster = third_response[:code] == '200' && third_response[:body]['data'][0]['fileName'] ? 'https://www.thetvdb.com/banners/' + third_response[:body]['data'][0]['fileName'] : 'https://s3-us-west-2.amazonaws.com/toddseller/tedflix/imgs/Artboard+1-196x196.jpg'
+                  poster = 'https://s3-us-west-2.amazonaws.com/toddseller/tedflix/imgs/Artboard+1-196x196.jpg'
                   squared = false
                 end
               else
-                third_response = tvdb_call("https://api.thetvdb.com/series/" + s['id'].to_s + "/images/query?keyType=poster") if second_response[:code] == '200'
-                poster = third_response[:code] == '200' && third_response[:body]['data'][0]['fileName'] ? 'https://www.thetvdb.com/banners/' + third_response[:body]['data'][0]['fileName'] : 'https://s3-us-west-2.amazonaws.com/toddseller/tedflix/imgs/Artboard+1-196x196.jpg'
+                poster = 'https://s3-us-west-2.amazonaws.com/toddseller/tedflix/imgs/Artboard+1-196x196.jpg'
               end
               year = s['firstAired'] != nil ? s['firstAired'].split('-').slice(0,1).join() : ''
-              details = {title: s['seriesName'], collectionName: get_collection_name(s['seriesName'], season_number.to_s), collectionId: get_collection_id(s['id'], season_number.to_s), season: season_number.to_s, poster: poster, rating: '', year: year, plot: s['overview'], genre: ''}
+              details = {title: s['seriesName'], collectionName: collection_name, collectionId: get_collection_id(s['id'], season_number.to_s), season: season_number.to_s, poster: poster, rating: '', year: year, plot: s['overview'], genre: ''}
               series << details
             end
           end
@@ -151,7 +149,7 @@ class Show < ActiveRecord::Base
   end
 
   def self.get_collection_name(s, i)
-    collection_name = s + ', Season ' + i
+    collection_name = s + ', Season ' + i if s != nil && i != nil
   end
 
   def self.get_collection_id(s, i)
