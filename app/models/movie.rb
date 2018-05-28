@@ -24,11 +24,13 @@ class Movie < ActiveRecord::Base
 
     title_response['results'].each do |movie|
       movie_response = HTTParty.get('https://api.themoviedb.org/3/movie/' + movie['id'].to_s + '?api_key=' + ENV['TMDB_KEY'] + '&append_to_response=credits,releases')
-      runtime = movie_response['runtime'] != nil ? movie_response['runtime'].to_s : '0'
-      year = movie_response['release_date'] != nil ? movie['release_date'].split('-').slice(0,1).join() : ''
-      poster = movie_response['poster_path'] != nil ? 'https://image.tmdb.org/t/p/w342' + movie['poster_path'] : 'NA'
-      test_movie = {title: movie['title'], plot: movie['overview'], poster: poster, year: year, actors: get_actors(movie_response), director: get_director(movie_response), genre: get_genres(movie_response), producer: get_producers(movie_response), rating: get_rating(movie_response), runtime: runtime, studio: get_studio(movie_response), writer: get_writers(movie_response)}
-      movie_array << test_movie if movie_array.all? {|el| el[:year] != year || el[:director] != get_director(movie_response)}
+      if movie_response.code == 200
+        runtime = movie_response['runtime'] != nil ? movie_response['runtime'].to_s : '0'
+        year = movie_response['release_date'] != nil ? movie['release_date'].split('-').slice(0,1).join() : ''
+        poster = movie_response['poster_path'] != nil ? 'https://image.tmdb.org/t/p/w342' + movie['poster_path'] : 'NA'
+        test_movie = {title: movie['title'], plot: movie['overview'], poster: poster, year: year, actors: get_actors(movie_response), director: get_director(movie_response), genre: get_genres(movie_response), producer: get_producers(movie_response), rating: get_rating(movie_response), runtime: runtime, studio: get_studio(movie_response), writer: get_writers(movie_response)}
+        movie_array << test_movie if movie_array.all? {|el| el[:year] != year || el[:director] != get_director(movie_response)}
+      end
     end
     movie_array.sort_by {|k| k[:year]}
   end
