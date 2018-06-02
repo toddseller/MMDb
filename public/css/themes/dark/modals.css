@@ -691,7 +691,8 @@ li
   bottom: 12px;
 }
 
-.onoffswitch
+.onoffswitch,
+.showonoffswitch
 {
   position: relative;
 
@@ -700,6 +701,11 @@ li
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
+}
+
+.showonoffswitch
+{
+  width: 135px;
 }
 
 .onoffswitch-checkbox
@@ -746,7 +752,8 @@ li
   color: white;
 }
 
-.onoffswitch-inner:before
+.onoffswitch-inner:before,
+.showonoffswitch-inner:before
 {
   padding-left: 10px;
 
@@ -756,7 +763,8 @@ li
   background-color: #2b2b2b;
 }
 
-.onoffswitch-inner:after
+.onoffswitch-inner:after,
+.showonoffswitch-inner:after
 {
   padding-right: 10px;
 
@@ -767,7 +775,21 @@ li
   background-color: #e4e4e4;
 }
 
-.onoffswitch-switch
+.showonoffswitch-inner:before
+{
+  content: 'HD';
+}
+
+.showonoffswitch-inner:after
+{
+  content: 'Standard';
+
+  color: #e4e4e4;
+  background-color: #2b2b2b;
+}
+
+.onoffswitch-switch,
+.showonoffswitch-switch
 {
   position: absolute;
   right: 56px;
@@ -785,7 +807,13 @@ li
   background: #fff;
 }
 
-.onoffswitch-checkbox:checked + .onoffswitch-label .onoffswitch-inner
+.showonoffswitch-switch
+{
+  right: 83px;
+}
+
+.onoffswitch-checkbox:checked + .onoffswitch-label .onoffswitch-inner,
+.onoffswitch-checkbox:checked + .onoffswitch-label .showonoffswitch-inner
 {
   margin-left: 0;
 }
@@ -793,6 +821,12 @@ li
 .onoffswitch-checkbox:checked + .onoffswitch-label .onoffswitch-switch
 {
   right: 0;
+}
+
+
+.onoffswitch-checkbox:checked + .onoffswitch-label .showonoffswitch-switch
+{
+  right: 15px;
 }
 
 @media (max-width: 768px)
