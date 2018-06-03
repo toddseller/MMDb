@@ -73,7 +73,13 @@ end
 
 put '/users/:user_id/shows/:id' do
   @show = Show.find(params[:id])
-  @show.update(params[:show])
+  if params[:show][:hd]
+    @show.update(params[:show])
+  else
+    @show.update(rating: params[:show][:rating], genre: params[:show][:genre], year: params[:show][:year], hd: 480, title: params[:show][:title], sort_name: params[:show][:sort_name], poster: params[:show][:poster])
+  end
+  p ' * ' * 50
+  p @show
   @season = @show.seasons.find_by(is_active: true)
   @season.update(params[:season])
   @episode = @season.episodes.find(params[:form]['id'])
