@@ -417,8 +417,7 @@ var seasonDefault = function (event) {
   })
   request.done(function (response) {
     $('.info-wrapper').empty().append(response.page)
-    $('.lazy.active').attr('src', response.poster)
-    $('.lazy.active').attr('data-original', response.poster)
+    $('img.active').attr('src', response.poster)
   })
 }
 
