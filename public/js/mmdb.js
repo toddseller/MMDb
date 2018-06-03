@@ -660,6 +660,7 @@ var getMovieModal = function (event) {
       if (c.hasClass('info')) {
         activeItem = id
         $('.info').remove()
+        $('img.active').removeClass('active')
         switchInfoDiv(posterArt, title)
         if ($('#show-list').length > 0) {
           endOfRow.after('<div class="info" style="margin-top: 1px; max-height: 100%;"></div>')
