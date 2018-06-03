@@ -699,7 +699,7 @@ var getMovieModal = function (event) {
     $('.truncate').fadeIn(400, 'linear')
     $('.new-label').removeClass('active').removeClass('notransition')
     $('.new-text').removeClass('active').removeClass('notransition')
-    $('.lazy').removeClass('notransition').removeClass('active')
+    $('img.active').removeClass('notransition').removeClass('active')
     setTimeout(removeInfoClass, 1000)
     activeItem = $('body')
     $('.footer').fadeIn()
