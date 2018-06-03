@@ -28,7 +28,7 @@
         <span class="spacing"><%= show.genre %></span>
         <span class="spacing"><%= show.year %></span>
         <span class="spacing" id="description-rating"><%= show.rating %></span>
-        <% if show.hd > 0 %>
+        <% if show.hd == 1080 %>
           <span class="spacing" id="description-hd">HD</span>
         <% end %>
         <div class="season-plot"><%= season.plot %></div>
