@@ -100,6 +100,7 @@ var filterMovies = function (event) {
   filterValue = $('#search-movie-title').val()
   var routePath = $('#movie-list').length > 0 ? 'movies' : 'shows'
   var id = $('.index-preview').attr('id')
+  window.sessionStorage.setItem('id', id)
   var data = $.param({filter:filterValue, id:id})
   var route = '/' + routePath + '/filter'
 
@@ -166,7 +167,8 @@ var filteredWithInfo = function (array) {
  }
 
 var clearFilter = function () {
-  var route = window.location.pathname
+  var id = window.sessionStorage.id
+  var route = '/users/' + id
   $.get(route).done(function (response) {
     $('#profile-wrapper').removeClass('active')
     $('#user-page').empty().append(response.page)
