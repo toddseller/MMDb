@@ -99,7 +99,7 @@ var filterMovies = function (event) {
 
   filterValue = $('#search-movie-title').val()
   var routePath = $('#movie-list').length > 0 ? 'movies' : 'shows'
-  var id = window.location.href.split('/')[4]
+  var id = $('.index-preview').attr('id')
   var data = $.param({filter:filterValue, id:id})
   var route = '/' + routePath + '/filter'
 
