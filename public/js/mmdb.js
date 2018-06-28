@@ -388,7 +388,7 @@ var checkDatabase2 = function (event) {
 
 var createShow = function (event) {
   event.preventDefault()
-  var id = window.location.href.split('/')[4]
+  var id = $('.index-preview') > 0 ? $('.index-preview').attr('id') : window.sessionStorage.id
   var route = '/users/' + id + '/shows/new'
   $.get(route, displayCreateShow)
 }
@@ -532,7 +532,7 @@ var searchByName = function (event) {
   $('#filter-input').trigger('reset')
 
   filterValue = $(this).text()
-  var id = window.location.href.substr(window.location.href.lastIndexOf('/') + 1)
+  var id = $('.index-preview').length > 0 ? $('.index-preview').attr('id') : window.sessionStorage.id
   var data = $.param({filter:filterValue, id:id})
   var route = '/movies/search'
 
