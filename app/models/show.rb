@@ -27,12 +27,12 @@ class Show < ActiveRecord::Base
       series_response['results'].each do |s|
         year = s['releaseDate'] != nil ? s['releaseDate'].split('-').slice(0,1).join() : ''
         rating = s['contentAdvisoryRating'] ? s['contentAdvisoryRating'] : ''
-        # p get_plot(s['longDescription'])
         details = {title: s['artistName'], collectionName: s['collectionName'], collectionId: s['collectionId'], season: get_season(s['collectionName']), poster: set_image(s['artworkUrl100']), rating: rating, year: year, plot: get_plot(s['longDescription']), genre: s['primaryGenreName']}
         series << details if series.all? {|el| el[:collectionName] != s['collectionName']}
       end
 
       token_response = tvdb_call("https://api.thetvdb.com/refresh_token")
+
       if token_response[:code] == '200'
         heroku_call(token_response[:body]['token'])
       else

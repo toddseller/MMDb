@@ -99,8 +99,10 @@ var filterMovies = function (event) {
 
   filterValue = $('#search-movie-title').val()
   var routePath = $('#movie-list').length > 0 ? 'movies' : 'shows'
-  var id = $('.index-preview').attr('id')
-  window.sessionStorage.setItem('id', id)
+  var id = $('.index-preview').attr('id') ? $('.index-preview').attr('id') : window.sessionStorage.id
+  if (window.sessionStorage.id != id || !window.sessionStorage.id) {
+    window.sessionStorage.setItem('id', id)
+  }
   var data = $.param({filter:filterValue, id:id})
   var route = '/' + routePath + '/filter'
 
