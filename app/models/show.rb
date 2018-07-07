@@ -87,10 +87,12 @@ class Show < ActiveRecord::Base
       first_response = tvdb_call("https://api.thetvdb.com/series/" + id.to_s + "/episodes/query?airedSeason=" + season.to_s)
 
       first_response[:body]['data'].each do |e|
-        preview = "https://www.thetvdb.com/banners/episodes/" + id.to_s + "/" + e['id'].to_s + ".jpg"
-        plot = e['overview'] ? get_plot(e['overview']) : ''
-        episode = {title: e['episodeName'], date: convert_date(e['firstAired']), plot: plot, runtime: runtime, tv_episode: e['airedEpisodeNumber'], preview: preview}
-        episodes << episode if !Date.parse(e['firstAired']).future?
+        if e['firstAired'] != ''
+          preview = "https://www.thetvdb.com/banners/episodes/" + id.to_s + "/" + e['id'].to_s + ".jpg"
+          plot = e['overview'] ? get_plot(e['overview']) : ''
+          episode = {title: e['episodeName'], date: convert_date(e['firstAired']), plot: plot, runtime: runtime, tv_episode: e['airedEpisodeNumber'], preview: preview}
+          episodes << episode if !Date.parse(e['firstAired']).future?
+        end
       end
     else
       episodes_response = JSON.parse(HTTParty.get('https://itunes.apple.com/lookup?id=' + id + '&country=us&entity=tvEpisode'))
