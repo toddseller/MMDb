@@ -69,6 +69,7 @@ class Show < ActiveRecord::Base
               details = {title: s['seriesName'], collectionName: collection_name, collectionId: get_collection_id(s['id'], season_number.to_s), season: season_number.to_s, poster: poster, rating: '', year: year, plot: s['overview'], genre: ''}
               series.each do |el|
                 p '*' * 80
+                p is_number?(el[:season])
                 p el[:title] != s['seriesName'] && el[:season] != season_number && el[:collectionId] != get_collection_id(s['id'], season_number.to_s)
                 p '*' * 80
               end
@@ -220,6 +221,10 @@ class Show < ActiveRecord::Base
     response = Net::HTTP.start(uri.hostname, uri.port, req_options) do |http|
       http.request(request)
     end
+  end
+
+  def is_number?(string)
+    true if Float(string) rescue false
   end
 
 end
