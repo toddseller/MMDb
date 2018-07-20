@@ -74,7 +74,7 @@ class Show < ActiveRecord::Base
                 p '-' * 80
                 p s['seriesName']
                 p season_number.to_s
-                p el[:title] == s['seriesName'] && el[:season] == season_number.to_s
+                p el[:title] == s['seriesName'] && el[:season] == season_number
                 p '*' * 80
               end
               series << details if series.all? {|el| el[:collectionName] != collection_name}
