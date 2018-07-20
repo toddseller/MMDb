@@ -67,12 +67,6 @@ class Show < ActiveRecord::Base
               end
               year = s['firstAired'] != nil ? s['firstAired'].split('-').slice(0,1).join() : ''
               details = {title: s['seriesName'], collectionName: collection_name, collectionId: get_collection_id(s['id'], season_number.to_s), season: season_number.to_s, poster: poster, rating: '', year: year, plot: s['overview'], genre: ''}
-              series.each do |el|
-                p '*' * 80
-                p is_number?(el[:season])
-                p el[:title] != s['seriesName'] && el[:season] != season_number && el[:collectionId] != get_collection_id(s['id'], season_number.to_s)
-                p '*' * 80
-              end
               series << details if series.all? {|el| el[:title] != s['seriesName'] && el[:season] != season_number && el[:collectionId] != get_collection_id(s['id'], season_number.to_s)}
             end
           end
