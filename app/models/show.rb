@@ -69,15 +69,10 @@ class Show < ActiveRecord::Base
               details = {title: s['seriesName'], collectionName: collection_name, collectionId: get_collection_id(s['id'], season_number.to_s), season: season_number.to_s, poster: poster, rating: '', year: year, plot: s['overview'], genre: ''}
               series.each do |el|
                 p '*' * 80
-                p el[:title]
-                p el[:season]
-                p '-' * 80
-                p s['seriesName']
-                p season_number.to_s
-                p el[:title] == s['seriesName'] && el[:season] == season_number
+                p el[:title] != s['seriesName'] && el[:season] != season_number && el[:collectionId] != get_collection_id(s['id'], season_number.to_s)
                 p '*' * 80
               end
-              series << details if series.all? {|el| el[:collectionName] != collection_name}
+              series << details if series.all? {|el| el[:title] != s['seriesName'] && el[:season] != season_number && el[:collectionId] != get_collection_id(s['id'], season_number.to_s)}
             end
           end
         end
