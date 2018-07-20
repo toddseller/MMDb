@@ -223,7 +223,7 @@ class Show < ActiveRecord::Base
     end
   end
 
-  def is_number?(string)
+  def self.is_number?(string)
     true if Float(string) rescue false
   end
 
