@@ -11,8 +11,6 @@ var bindListeners = function () {
   $('#logout').on('click', logout)
   $('#update').on('click', updateUser)
   $('.registration #confirm').on('keyup', checkPassword)
-  $('#scroll-right').on('click', scrollRight)
-  $('#scroll-left').on('click', scrollLeft)
   $('#unwatched').on('click', unwatched)
   $('#four-k').on('click', fourK)
   $('#library').on('click', clearFilter)
@@ -29,6 +27,8 @@ var dynamicListener = function () {
     clearTimeout(timeoutId)
     timeoutId = setTimeout(filterMovies, 300)
   })
+  $('#user-page').on('click', '#scroll-right', scrollRight)
+  $('#user-page').on('click', '#scroll-left', scrollLeft)
   $('#user-page').on('click', '#clear-btn', clearFilter)
   $('#user-page').on('click', '.top-preview', activateModal)
   $('#user-page').on('click', '#add', showSearchBar)
@@ -436,6 +436,10 @@ var previewMovie = function (response) {
     $('#dismiss').show()
     $('#preview').scroll(addArrow)
     $('#preview').empty().append(response.page).attr('style', 'display: flex !important; justify-content: space-between;')
+    $('#scroll-left').removeAttr('style')
+    $('#scroll-right').removeAttr('style')
+    $('.glyphicon-chevron-left').removeAttr('style')
+    $('.glyphicon-chevron-right').removeAttr('style')
     if ($('#preview > div').size() <= 6) {
       $('#scroll-right').hide()
     } else {
@@ -455,6 +459,10 @@ var previewShow = function (response) {
     $('#dismiss').show()
     $('#preview').scroll(addArrow)
     $('#preview').empty().append(response.page).attr('style', 'display: flex; justify-content: space-between; height: 300px;')
+    $('#scroll-left').attr('style', 'height: 200px; top: 87px;')
+    $('#scroll-right').attr('style', 'height: 200px; top: 87px;')
+    $('.glyphicon-chevron-left').attr('style', 'line-height: 4em;')
+    $('.glyphicon-chevron-right').attr('style', 'line-height: 4em;')
     if ($('#preview > div').size() <= 6) {
       $('#scroll-right').hide()
     } else {
