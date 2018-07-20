@@ -20,8 +20,6 @@ class Show < ActiveRecord::Base
         series << db_season
       end
     end
-    p '*' *
-    puts series
     new_t = URI.encode(t)
 
     series_response = JSON.parse(HTTParty.get('https://itunes.apple.com/search?term=' + t + '&media=tvShow&entity=tvSeason'))
