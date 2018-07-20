@@ -71,6 +71,7 @@ class Show < ActiveRecord::Base
                 p '*' * 80
                 p el[:collectionName]
                 p collection_name
+                p el[:collectionName] == collection_name
                 p '*' * 80
               end
               series << details if series.all? {|el| el[:collectionName] != collection_name}
