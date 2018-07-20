@@ -70,7 +70,10 @@ class Show < ActiveRecord::Base
               series.each do |el|
                 p '*' * 80
                 p el[:title]
+                p el[:season]
+                p '-' * 80
                 p s['seriesName']
+                p season_number.to_s
                 p el[:title] == s['seriesName'] && el[:season] == season_number.to_s
                 p '*' * 80
               end
