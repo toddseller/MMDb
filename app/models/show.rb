@@ -24,6 +24,8 @@ class Show < ActiveRecord::Base
 
     series_response = JSON.parse(HTTParty.get('https://itunes.apple.com/search?term=' + t + '&media=tvShow&entity=tvSeason'))
 
+    puts series_response
+
       series_response['results'].each do |s|
         year = s['releaseDate'] != nil ? s['releaseDate'].split('-').slice(0,1).join() : ''
         rating = s['contentAdvisoryRating'] ? s['contentAdvisoryRating'] : ''
@@ -101,7 +103,7 @@ class Show < ActiveRecord::Base
       episodes_response['results'].each do |e|
         e['longDescription']
         episode = {title: e['trackName'], date: convert_date(e['releaseDate']), plot: get_plot(e['longDescription']), runtime: e['trackTimeMillis'], tv_episode: e['trackNumber'], preview: e['previewUrl']}
-        episodes << episode if e['trackId'] && e['trackNumber'].to_i < 100
+        episodes << episode if e['trackId'] && e['trackNumber'].to_i < 100 && !Date.parse(e['releaseDate']).future?
       end
     end
     episodes.sort_by {|k| k[:tv_episode]}
@@ -148,7 +150,9 @@ class Show < ActiveRecord::Base
   end
 
   def self.get_season(s)
-    s.gsub(/.*(Season\s)/) {''}
+    new_s = s.gsub(/.*(Season\s)/) {''}
+    new_s = new_s.gsub(/.*(Series\s)/) {''}
+    new_s = new_s.gsub(/\W.*/) {''}
   end
 
   def self.get_collection_name(s, i)
