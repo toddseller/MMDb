@@ -128,7 +128,7 @@ class Show < ActiveRecord::Base
   end
 
   def create_search_name
-    self.search_name = self.title.downcase if self.sort_same != 'mash'
+    self.search_name = self.title.downcase if self.title != 'M*A*S*H'
   end
 
   def self.set_image(p)
