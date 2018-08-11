@@ -20,18 +20,20 @@ class Movie < ActiveRecord::Base
 
     itunes_response = JSON.parse(HTTParty.get('https://itunes.apple.com/search?term=' + t + '&media=movie&entity=movie'))
     itunes = []
-    itunes_response['results'].each do |movie|
-      title = movie['trackName'] != nil ? movie['trackName'].gsub(/\s\(\d*\)/, '') : ''
-      plot = movie['longDescription'] != nil ? movie['longDescription'] : ''
-      poster = movie['artworkUrl100'] != nil ? movie['artworkUrl100'].gsub!(/100x100bb/, '1200x630bb') : ''
-      director = movie['artistName'] != nil ? movie['artistName'].split(' & ').join(', ') : ''
-      genre = movie['primaryGenreName'] != nil ? movie['primaryGenreName'] : ''
-      rating = movie['contentAdvisoryRating'] != nil ? movie['contentAdvisoryRating'] : ''
-      doc = HTTParty.get(movie['trackViewUrl'])
-      parsed_doc ||= Nokogiri::HTML(doc)
-      studio = itunes_studio(parsed_doc.xpath('//*[dt[contains(.,"Studio")]]/dd')) if parsed_doc.xpath('//*[dt[contains(.,"Studio")]]/dd')
-      test_movie = {title: title, plot: plot, poster: poster, director: director, genre: genre,rating: rating, studio: studio}
-      itunes << test_movie
+    if itunes_response['results'] != []
+      itunes_response['results'].each do |movie|
+        title = movie['trackName'] != nil ? movie['trackName'].gsub(/\s\(\d*\)/, '') : ''
+        plot = movie['longDescription'] != nil ? get_plot(movie['longDescription']) : ''
+        poster = movie['artworkUrl100'] != nil ? movie['artworkUrl100'].gsub!(/100x100bb/, '1200x630bb') : ''
+        director = movie['artistName'] != nil ? movie['artistName'].split(' & ').join(', ') : ''
+        genre = movie['primaryGenreName'] != nil ? movie['primaryGenreName'] : ''
+        rating = movie['contentAdvisoryRating'] != nil ? movie['contentAdvisoryRating'] : ''
+        doc = HTTParty.get(movie['trackViewUrl'])
+        parsed_doc ||= Nokogiri::HTML(doc)
+        studio = itunes_studio(parsed_doc.xpath('//*[dt[contains(.,"Studio")]]/dd')) if parsed_doc.xpath('//*[dt[contains(.,"Studio")]]/dd')
+        test_movie = {title: title, plot: plot, poster: poster, director: director, genre: genre,rating: rating, studio: studio}
+        itunes << test_movie
+      end
     end
 
     title_response = HTTParty.get('https://api.themoviedb.org/3/search/movie?api_key=' + ENV['TMDB_KEY'] + '&query=' + t)
@@ -51,7 +53,7 @@ class Movie < ActiveRecord::Base
           studio = get_itunes_info(itunes, movie['title'], :studio)
         else
           title = movie['title']
-          plot = movie['overview']
+          plot = get_plot(movie['overview'])
           poster = movie['poster_path'] != nil ? 'https://image.tmdb.org/t/p/w342' + movie['poster_path'] : 'NA'
           director = get_director(movie_response)
           genre = get_genres(movie_response)
@@ -166,6 +168,15 @@ class Movie < ActiveRecord::Base
       genres.length != 0 ? genres.first(2).join(', ') : ''
     end
 
+    def self.get_plot(p)
+      new_p = p.gsub(/\<[i|b]\>|\<\/[i|b]\>/, '')
+      new_p = new_p.gsub(/\'/, '&#39;')
+      new_p = new_p.gsub(/\"/, '&#34;')
+      new_p = new_p.gsub(/\r|\n/, '')
+      new_p = new_p.gsub(/—|-/, '&#8211;')
+      new_p = new_p.gsub(/\"\"/, '&#34;')
+    end
+
     def self.get_producers(r)
       producers = []
       r['credits']['crew'].each { |k| producers << k['name'] if k['job'] == 'Producer' }
@@ -176,6 +187,12 @@ class Movie < ActiveRecord::Base
       rating = ''
       r['releases']['countries'].each { |k| rating = k['certification'] if k['iso_3166_1'] == 'US' } if r['releases']['countries'] != nil
       rating != '' ? rating : 'NR'
+    end
+
+    def self.itunes_studio(r)
+      studio = []
+      r.each { |s| studio << s.text.gsub(/\n\s*/,'')}
+      studio.length != 0 ? studio.first(1).join() : ''
     end
 
     def self.get_studio(r)
