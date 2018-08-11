@@ -18,6 +18,22 @@ class Movie < ActiveRecord::Base
   def self.get_titles(t)
     movie_array = Movie.where("search_name LIKE ?", "%#{t}%").sorted_list.first(10)
 
+    itunes_response = JSON.parse(HTTParty.get('https://itunes.apple.com/search?term=' + t + '&media=movie&entity=movie'))
+    itunes = []
+    itunes_response['results'].each do |movie|
+      title = movie['trackName'] != nil ? movie['trackName'].gsub(/\s\(\d*\)/, '') : ''
+      plot = movie['longDescription'] != nil ? movie['longDescription'] : ''
+      poster = movie['artworkUrl100'] != nil ? movie['artworkUrl100'].gsub!(/100x100bb/, '1200x630bb') : ''
+      director = movie['artistName'] != nil ? movie['artistName'].split(' & ').join(', ') : ''
+      genre = movie['primaryGenreName'] != nil ? movie['primaryGenreName'] : ''
+      rating = movie['contentAdvisoryRating'] != nil ? movie['contentAdvisoryRating'] : ''
+      doc = HTTParty.get(movie['trackViewUrl'])
+      parsed_doc ||= Nokogiri::HTML(doc)
+      studio = itunes_studio(parsed_doc.xpath('//*[dt[contains(.,"Studio")]]/dd')) if parsed_doc.xpath('//*[dt[contains(.,"Studio")]]/dd')
+      test_movie = {title: title, plot: plot, poster: poster, director: director, genre: genre,rating: rating, studio: studio}
+      itunes << test_movie
+    end
+
     title_response = HTTParty.get('https://api.themoviedb.org/3/search/movie?api_key=' + ENV['TMDB_KEY'] + '&query=' + t)
 
     return nil if title_response['results'] == []
@@ -25,10 +41,26 @@ class Movie < ActiveRecord::Base
     title_response['results'].each do |movie|
       movie_response = HTTParty.get('https://api.themoviedb.org/3/movie/' + movie['id'].to_s + '?api_key=' + ENV['TMDB_KEY'] + '&append_to_response=credits,releases')
       if movie_response.code == 200
-        runtime = movie_response['runtime'] != nil ? movie_response['runtime'].to_s : '0'
+        if itunes.any? {|m| m[:title] == movie['title']}
+          title = get_itunes_info(itunes, movie['title'], :title)
+          plot = get_itunes_info(itunes, movie['title'], :plot)
+          poster = get_itunes_info(itunes, movie['title'], :poster)
+          director = get_itunes_info(itunes, movie['title'], :director)
+          genre = get_itunes_info(itunes, movie['title'], :genre)
+          rating = get_itunes_info(itunes, movie['title'], :rating)
+          studio = get_itunes_info(itunes, movie['title'], :studio)
+        else
+          title = movie['title']
+          plot = movie['overview']
+          poster = movie['poster_path'] != nil ? 'https://image.tmdb.org/t/p/w342' + movie['poster_path'] : 'NA'
+          director = get_director(movie_response)
+          genre = get_genres(movie_response)
+          rating = get_rating(movie_response)
+          studio = get_studio(movie_response)
+        end
         year = movie_response['release_date'] != nil ? movie['release_date'].split('-').slice(0,1).join() : ''
-        poster = movie_response['poster_path'] != nil ? 'https://image.tmdb.org/t/p/w342' + movie['poster_path'] : 'NA'
-        test_movie = {title: movie['title'], plot: movie['overview'], poster: poster, year: year, actors: get_actors(movie_response), director: get_director(movie_response), genre: get_genres(movie_response), producer: get_producers(movie_response), rating: get_rating(movie_response), runtime: runtime, studio: get_studio(movie_response), writer: get_writers(movie_response)}
+        runtime = movie_response['runtime'] != nil ? movie_response['runtime'].to_s : '0'
+        test_movie = {title: title, plot: plot, poster: poster, year: year, actors: get_actors(movie_response), director: director, genre: genre, producer: get_producers(movie_response), rating: rating, runtime: runtime, studio: studio, writer: get_writers(movie_response)}
         movie_array << test_movie if movie_array.all? {|el| el[:year] != year || el[:director] != get_director(movie_response)}
       end
     end
@@ -109,6 +141,11 @@ class Movie < ActiveRecord::Base
         self.poster.gsub!(/^(http)/, 'https')
         self.poster.gsub!(/(\.mzstatic)/, '-ssl.mzstatic')
       end
+    end
+
+    def self.get_itunes_info(a,n,e)
+     t = a.detect {|x| x[:title] == n }
+     t[e]
     end
 
     def self.get_actors(r)
