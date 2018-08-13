@@ -106,14 +106,14 @@
 {
   position: fixed;
   z-index: 10;
-  top: -181px;
+  top: -500px;
   right: 0;
 
   width: 225px;
   height: auto;
   margin-top: 50px;
 
-  transition: all .5s ease-in-out;
+  transition: all .7s ease-in-out;
 
   background: rgba(255, 255, 255, .95);
 }
@@ -126,7 +126,7 @@
 
   padding: 1.5em 0;
 
-  transition: top .5s ease-in-out;
+  transition: top .7s ease-in-out;
 }
 
 #drop-down ul
