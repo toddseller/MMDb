@@ -437,6 +437,8 @@
     color: #c9302c;
 }
 
+
+
 .studio a
 {
     text-decoration: none;
@@ -461,8 +463,8 @@
 
 .studio
 {
-    margin-left: -15px;
     margin-bottom: 25px;
+    margin-left: -15px;
 }
 
 .studio h5
@@ -543,6 +545,15 @@ a.magnifying-glass-icon
 .description-plot
 {
     margin: 20px 0;
+}
+
+#movie .description-plot
+{
+    display: -webkit-box;
+    overflow: hidden;
+
+    -webkit-line-clamp: 5;
+    -webkit-box-orient: vertical;
 }
 
 .edit-movie

@@ -474,6 +474,15 @@ a.magnifying-glass-icon
   margin: 20px 0;
 }
 
+#movie .description-plot
+{
+    display: -webkit-box;
+    overflow: hidden;
+
+    -webkit-line-clamp: 5;
+    -webkit-box-orient: vertical;
+}
+
 .edit-movie
 {
   margin-top: 30px;
