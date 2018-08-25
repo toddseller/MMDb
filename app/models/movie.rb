@@ -22,7 +22,6 @@ class Movie < ActiveRecord::Base
     itunes = []
     if itunes_response['results'] != []
       itunes_response['results'].each do |movie|
-        puts movie
         title = movie['trackName'] != nil ? movie['trackName'].gsub(/\s\(\d*\)/, '') : ''
         plot = movie['longDescription'] != nil ? get_plot(movie['longDescription']) : ''
         poster = movie['artworkUrl100'] != nil ? movie['artworkUrl100'].gsub!(/100x100bb/, '1200x630bb') : ''
