@@ -38,7 +38,7 @@ class Movie < ActiveRecord::Base
           runtime = movie['trackTimeMillis'] != nil ? (movie['trackTimeMillis'] / (1000 * 60)).to_s : '0'
           director_check = director != '' ? director.split(' ').slice(-1, 1).join() : ''
           test_movie = {title: title, plot: plot, poster: poster, year: year, actors: actors, director: director, genre: genre, producer: producer, rating: rating, runtime: runtime, studio: studio, writer: writer, director_check: director_check}
-          movie_array << test_movie if movie_array.all? {|el| el[:title] != title && el[:year] != year || el[:director_check] != director_check}
+          movie_array << test_movie if movie_array.all? {|el| el[:title] != title && el[:year] != year || el[:director_check] != director_check || el[:poster] != poster}
         end
       end
     end
