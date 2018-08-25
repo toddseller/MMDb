@@ -9,6 +9,7 @@ class Movie < ActiveRecord::Base
   before_create :create_sort_name
   before_create :create_duration
   before_save :create_search_name
+  before_save :create_director_check
   before_update :sanitize_input
   before_update :adjust_url
 
@@ -17,54 +18,48 @@ class Movie < ActiveRecord::Base
 
   def self.get_titles(t)
     movie_array = Movie.where("search_name LIKE ?", "%#{t}%").sorted_list.first(10)
-
     itunes_response = JSON.parse(HTTParty.get('https://itunes.apple.com/search?term=' + t + '&media=movie&entity=movie'))
-    itunes = []
     if itunes_response['results'] != []
       itunes_response['results'].each do |movie|
-        title = movie['trackName'] != nil ? movie['trackName'].gsub(/\s\(\d*\)/, '') : ''
-        plot = movie['longDescription'] != nil ? get_plot(movie['longDescription']) : ''
-        poster = movie['artworkUrl100'] != nil ? movie['artworkUrl100'].gsub!(/100x100bb/, '1200x630bb') : ''
-        director = movie['artistName'] != nil ? movie['artistName'].split(' & ').join(', ') : ''
-        genre = movie['primaryGenreName'] != nil ? movie['primaryGenreName'] : ''
-        rating = movie['contentAdvisoryRating'] != nil ? movie['contentAdvisoryRating'] : ''
-        year = movie['releaseDate'] != nil ? movie['releaseDate'].split('-').slice(0,1).join() : ''
-        doc = HTTParty.get(movie['trackViewUrl'])
-        parsed_doc ||= Nokogiri::HTML(doc)
-        studio = itunes_studio(parsed_doc.xpath('//*[dt[contains(.,"Studio")]]/dd')) if parsed_doc.xpath('//*[dt[contains(.,"Studio")]]/dd')
-        test_movie = {title: title, plot: plot, poster: poster, director: director, genre: genre,rating: rating, studio: studio, year: year}
-        itunes << test_movie
+        if !movie['collectionType']
+          title = movie['trackName'] != nil ? movie['trackName'].gsub(/\s\(\d*\)/, '') : ''
+          plot = movie['longDescription'] != nil ? get_plot(movie['longDescription']) : ''
+          poster = movie['artworkUrl100'] != nil ? movie['artworkUrl100'].gsub!(/100x100bb/, '1200x630bb') : ''
+          director = movie['artistName'] != nil ? movie['artistName'].split(' & ').join(', ') : ''
+          genre = movie['primaryGenreName'] != nil ? movie['primaryGenreName'] : ''
+          rating = movie['contentAdvisoryRating'] != nil ? movie['contentAdvisoryRating'] : ''
+          year = movie['releaseDate'] != nil ? movie['releaseDate'].split('-').slice(0,1).join() : ''
+          doc = HTTParty.get(movie['trackViewUrl'])
+          parsed_doc ||= Nokogiri::HTML(doc)
+          actors = parsed_doc.xpath('//*[dt[contains(.,"Cast")]]/dd') ? itunes_info(parsed_doc.xpath('//*[dt[contains(.,"Cast")]]/dd')) : ''
+          producer = parsed_doc.xpath('//*[dt[contains(.,"Producers")]]/dd') ? itunes_info(parsed_doc.xpath('//*[dt[contains(.,"Producers")]]/dd')) : ''
+          writer = parsed_doc.xpath('//*[dt[contains(.,"Screenwriter")]]/dd') ? itunes_info(parsed_doc.xpath('//*[dt[contains(.,"Screenwriter")]]/dd')) : ''
+          studio = parsed_doc.xpath('//*[dt[contains(.,"Studio")]]/dd') ? itunes_studio(parsed_doc.xpath('//*[dt[contains(.,"Studio")]]/dd')) : ''
+          runtime = movie['trackTimeMillis'] != nil ? (movie['trackTimeMillis'] / (1000 * 60)).to_s : '0'
+          director_check = director != '' ? director.split(' ').slice(-1, 1).join() : ''
+          test_movie = {title: title, plot: plot, poster: poster, year: year, actors: actors, director: director, genre: genre, producer: producer, rating: rating, runtime: runtime, studio: studio, writer: writer, director_check: director_check}
+          movie_array << test_movie if movie_array.all? {|el| el[:title] != title && el[:year] != year || el[:director_check] != director_check}
+        end
       end
     end
-
     title_response = HTTParty.get('https://api.themoviedb.org/3/search/movie?api_key=' + ENV['TMDB_KEY'] + '&query=' + t)
 
     return nil if title_response['results'] == []
-
     title_response['results'].each do |movie|
       movie_response = HTTParty.get('https://api.themoviedb.org/3/movie/' + movie['id'].to_s + '?api_key=' + ENV['TMDB_KEY'] + '&append_to_response=credits,releases')
       if movie_response.code == 200
         year = movie_response['release_date'] != nil ? movie['release_date'].split('-').slice(0,1).join() : ''
         runtime = movie_response['runtime'] != nil ? movie_response['runtime'].to_s : '0'
-        if itunes.any? {|m| m[:title] == movie['title'] && m[:year] == year}
-          title = get_itunes_info(itunes, movie['title'], :title)
-          plot = get_itunes_info(itunes, movie['title'], :plot)
-          poster = get_itunes_info(itunes, movie['title'], :poster)
-          director = get_itunes_info(itunes, movie['title'], :director)
-          genre = get_itunes_info(itunes, movie['title'], :genre)
-          rating = get_itunes_info(itunes, movie['title'], :rating)
-          studio = get_itunes_info(itunes, movie['title'], :studio)
-        else
-          title = movie['title']
-          plot = get_plot(movie['overview'])
-          poster = movie['poster_path'] != nil ? 'https://image.tmdb.org/t/p/w342' + movie['poster_path'] : 'NA'
-          director = get_director(movie_response)
-          genre = get_genres(movie_response)
-          rating = get_rating(movie_response)
-          studio = get_studio(movie_response)
-        end
-        test_movie = {title: title, plot: plot, poster: poster, year: year, actors: get_actors(movie_response), director: director, genre: genre, producer: get_producers(movie_response), rating: rating, runtime: runtime, studio: studio, writer: get_writers(movie_response)}
-        movie_array << test_movie if movie_array.all? {|el| el[:year] != year || el[:director] != get_director(movie_response)}
+        title = movie['title']
+        plot = get_plot(movie['overview'])
+        poster = movie['poster_path'] != nil ? 'https://image.tmdb.org/t/p/w342' + movie['poster_path'] : 'NA'
+        director = get_director(movie_response)
+        genre = get_genres(movie_response)
+        rating = get_rating(movie_response)
+        studio = get_studio(movie_response)
+        director_check = director != '' ? director.split(' ').slice(-1, 1).join() : ''
+        test_movie = {title: title, plot: plot, poster: poster, year: year, actors: get_actors(movie_response), director: director, genre: genre, producer: get_producers(movie_response), rating: rating, runtime: runtime, studio: studio, writer: get_writers(movie_response), director_check: director_check}
+        movie_array << test_movie if movie_array.all? {|el| el[:title] != test_movie[:title] && el[:year] != year || el[:director_check] != test_movie[:director_check]}
       end
     end
     movie_array.sort_by {|k| k[:year]}
@@ -107,6 +102,10 @@ class Movie < ActiveRecord::Base
       self.search_name = self.title.downcase
     end
 
+    def create_director_check
+      self.director_check = self.director != '' ? self.director.split(' ').slice(-1, 1).join() : ''
+    end
+
     def set_image
       self.poster.gsub!(/^(http)/, 'https')
     end
@@ -146,8 +145,13 @@ class Movie < ActiveRecord::Base
       end
     end
 
-    def self.get_itunes_info(a,n,e)
+    def self.get_itunes_info_by_title(a,n,e)
      t = a.detect {|x| x[:title] == n }
+     t[e]
+    end
+
+    def self.get_itunes_info_by_year(a,y,e)
+     t = a.detect {|x| x[:year] == y }
      t[e]
     end
 
@@ -188,6 +192,12 @@ class Movie < ActiveRecord::Base
       rating = ''
       r['releases']['countries'].each { |k| rating = k['certification'] if k['iso_3166_1'] == 'US' } if r['releases']['countries'] != nil
       rating != '' ? rating : 'NR'
+    end
+
+    def self.itunes_info(r)
+      info = []
+      r.each { |i| info << i.text.gsub(/\n\s*/,'')}
+      info.length != 0 ? info.first(6).join(', ') : ''
     end
 
     def self.itunes_studio(r)
