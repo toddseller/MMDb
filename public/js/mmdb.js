@@ -362,7 +362,7 @@ var checkDatabase = function (event) {
   })
   $(this).trigger('reset')
   $('#preview').empty().slideDown(300, 'linear').append('<div id="loading"><h3>Searching Our Database...</h3><div class="loader"></div></div>').css({'display':'flex','justify-content':'center'})
-  $('#dismiss').show()
+  $('#dismiss').attr('style','top: 0;').show()
   $('#scroll-right').hide()
   $('#scroll-left').hide()
 }
@@ -428,12 +428,12 @@ var seasonDefault = function (event) {
 var previewMovie = function (response) {
   if (response.query.length <= 6) {
     $('#preview').slideDown(300, 'linear')
-    $('#dismiss').show()
+    $('#dismiss').attr('style','top: 0;').show()
     $('#scroll-right').hide()
     $('#preview').empty().append(response.page).attr('style', 'display: flex !important; justify-content: center;')
   } else {
     $('#preview').slideDown(300, 'linear')
-    $('#dismiss').show()
+    $('#dismiss').attr('style','top: 0;').show()
     $('#preview').scroll(addArrow)
     $('#preview').empty().append(response.page).attr('style', 'display: flex !important; justify-content: space-between;')
     $('#scroll-left').removeAttr('style')
@@ -567,7 +567,7 @@ var searchByName = function (event) {
 var listMovie = function (response) {
   if (response.status === 'true') {
     $('#preview').slideUp(500, 'linear')
-    $('#dismiss').hide()
+    $('#dismiss').removeAttr('style').hide()
     $('#scroll-right').hide()
     $('#scroll-left').hide()
     $('#add').show()
