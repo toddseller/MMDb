@@ -57,7 +57,7 @@
         <p class="description-plot"><%= movie.plot %></p>
         <h4>Cast and Crew</h4>
         <hr/>
-        <div class="col-lg-3 starring">
+        <div class="col-lg-3 studio-margin">
           <h5>STARRING</h5>
           <ul>
             <% movie.actors.split(/(?<!,),(?!\sJr\.)/).each do |line| %>
@@ -65,7 +65,7 @@
             <% end %>
           </ul>
         </div>
-        <div class="col-lg-3 col-lg-offset-1">
+        <div class="col-lg-3 col-lg-offset-1 studio-margin">
           <% if !movie.director.empty? %>
             <% if movie.director.split(/(?<!,),(?!\sJr\.)/).length > 1 %>
               <h5>DIRECTORS</h5>
@@ -91,7 +91,7 @@
           </ul>
           <% end %>
         </div>
-        <div class="col-lg-3 col-lg-offset-1">
+        <div class="col-lg-3 col-lg-offset-1 studio-margin">
           <% if !movie.producer.empty? %>
             <% if movie.producer.split(/(?<!,),(?!\sJr\.)/).length > 1 %>
               <h5>PRODUCERS</h5>
