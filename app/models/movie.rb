@@ -34,7 +34,7 @@ class Movie < ActiveRecord::Base
           actors = parsed_doc.xpath('//*[dt[contains(.,"Cast")]]/dd') ? itunes_info(parsed_doc.xpath('//*[dt[contains(.,"Cast")]]/dd')) : ''
           producer = parsed_doc.xpath('//*[dt[contains(.,"Producers")]]/dd') ? itunes_info(parsed_doc.xpath('//*[dt[contains(.,"Producers")]]/dd')) : ''
           writer = parsed_doc.xpath('//*[dt[contains(.,"Screenwriter")]]/dd') ? itunes_info(parsed_doc.xpath('//*[dt[contains(.,"Screenwriter")]]/dd')) : ''
-          studio = parsed_doc.xpath('//*[dt[contains(.,"Studio")]]/dd') ? itunes_studio(parsed_doc.xpath('//*[dt[contains(.,"Studio")]]/dd')) : ''
+          p studio = parsed_doc.xpath('//*[dt[contains(.,"Studio")]]/dd') ? itunes_studio(parsed_doc.xpath('//*[dt[contains(.,"Studio")]]/dd')) : ''
           runtime = movie['trackTimeMillis'] != nil ? (movie['trackTimeMillis'] / (1000 * 60)).to_s : '0'
           director_check = director != '' ? director.split(' ').slice(-1, 1).join() : ''
           test_movie = {title: title, plot: plot, poster: poster, year: year, actors: actors, director: director, genre: genre, producer: producer, rating: rating, runtime: runtime, studio: studio, writer: writer, director_check: director_check}
@@ -202,8 +202,8 @@ class Movie < ActiveRecord::Base
 
     def self.itunes_studio(r)
       studio = []
-      studio = r.text.gsub(/\n\s*/,'').split('; ')
-      studio.each { |s| studio << s.gsub(/; /,'')}
+      new_studio = r.text.gsub(/\n\s*/,'')
+      studio = new_studio.split('; ')
       studio.length != 0 ? studio.first(1).join() : ''
     end
 
