@@ -202,8 +202,8 @@ class Movie < ActiveRecord::Base
 
     def self.itunes_studio(r)
       studio = []
-      studio = r.text.gsub(/\n\s*/,'').split('; ')
-      studio.each { |s| studio << s.gsub(/; /,'')}
+      new_studio = r.text.gsub(/\n\s*/,'')
+      studio = new_studio.split('; ')
       studio.length != 0 ? studio.first(1).join() : ''
     end
 
