@@ -10,11 +10,13 @@ class Movie < ActiveRecord::Base
   before_create :create_duration
   before_save :create_search_name
   before_save :create_director_check
+  before_save :update_user_count
   before_update :sanitize_input
   before_update :adjust_url
 
   scope :sorted_list, -> { order(:sort_name, :year) }
   scope :recently_added, -> { order(created_at: :desc) }
+  scope :top_movies, -> { order(user_count: :desc)}
 
   def self.get_titles(t)
     movie_array = Movie.where("search_name LIKE ?", "%#{t}%").sorted_list.first(10)
@@ -71,9 +73,9 @@ class Movie < ActiveRecord::Base
     person_response['results'].length == 0 || person_response['results'][0]['profile_path'] == nil ? nil : 'https://image.tmdb.org/t/p/w342' + person_response['results'][0]['profile_path']
   end
 
-  def self.user_count
-    self.all.sort_by { |movie| [movie.users.count, movie[:sort_name]] }.reverse![0, 6]
-  end
+  # def self.user_count
+  #   self.all.sort_by { |movie| [movie.users.count, movie[:sort_name]] }.reverse![0, 6]
+  # end
 
   def get_average
     sum = self.ratings.map(&:stars).inject(:+)
@@ -104,6 +106,10 @@ class Movie < ActiveRecord::Base
 
     def create_director_check
       self.director_check = self.director != '' ? self.director.split(' ').slice(-1, 1).join() : ''
+    end
+
+    def update_user_count
+      self.user_count = self.users.count
     end
 
     def set_image
