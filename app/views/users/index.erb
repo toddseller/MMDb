@@ -3,12 +3,10 @@
       <div class="col-sm-9">
         <img id="main-logo" class="center-block" src="/imgs/logo.svg" alt="MMDb logo">
         <h3>Most Popular Movies</h3>
-        <% @movies.user_count.each do |movie| %>
-          <%= erb :'/partials/_top_movies', locals: { movie: movie }, layout: false %>
-        <% end %>
+        <%= erb :'/partials/_top_movies', layout: false %>
         <h3>Recently Added Movies</h3>
         <% @movies.recently_added[0, 6].each do |movie| %>
-          <%= erb :'/partials/_top_movies', locals: { movie: movie }, layout: false %>
+          <%= erb :'/partials/_recent_movies', locals: { movie: movie }, layout: false %>
         <% end %>
       </div>
       <div class="col-sm-3">
