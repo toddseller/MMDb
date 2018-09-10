@@ -13,7 +13,7 @@
       </div>
       <div class="col-sm-3">
         <% @users.movie_count.each do |user| %>
-          <% if user.movies.count > 1 %>
+          <% if user.movies.count > 10 %>
             <%= erb :'/partials/_users', locals: { user: user }, layout: false %>
           <% end %>
         <% end %>
