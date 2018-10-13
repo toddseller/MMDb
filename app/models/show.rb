@@ -13,24 +13,23 @@ class Show < ActiveRecord::Base
   def self.get_series(t)
     series = []
     show_array =  Show.where("search_name LIKE ?", "%#{t}%").sorted_list
-    show_array.each do |show|
-      show.seasons.each do |season|
-        db_season = season.attributes.symbolize_keys
-        db_season.store(:title, show.title)
-        series << db_season
+    if show_array.length > 0
+      show_array.each do |show|
+        show.seasons.each do |season|
+          db_season = season.attributes.symbolize_keys
+          db_season.store(:title, show.title)
+          series << db_season
+        end
       end
     end
-    new_t = URI.encode(t)
 
     series_response = JSON.parse(HTTParty.get('https://itunes.apple.com/search?term=' + t + '&media=tvShow&entity=tvSeason'))
-
-    puts series_response
 
       series_response['results'].each do |s|
         year = s['releaseDate'] != nil ? s['releaseDate'].split('-').slice(0,1).join() : ''
         rating = s['contentAdvisoryRating'] ? s['contentAdvisoryRating'] : ''
-        details = {title: s['artistName'], collectionName: s['collectionName'], collectionId: s['collectionId'], season: get_season(s['collectionName']), poster: set_image(s['artworkUrl100']), rating: rating, year: year, plot: get_plot(s['longDescription']), genre: s['primaryGenreName']}
-        series << details if series.all? {|el| el[:collectionName] != s['collectionName'] && is_number?(get_season(s['collectionName']))}
+        details = {title: s['artistName'], collectionName: get_collection_name(s['artistName'], get_season(s['collectionName'])), collectionId: s['collectionId'], season: get_season(s['collectionName']), poster: set_image(s['artworkUrl100']), rating: rating, year: year, plot: get_plot(s['longDescription']), genre: s['primaryGenreName']}
+        series << details if series.all? {|el| el[:collectionName] != get_collection_name(s['artistName'], get_season(s['collectionName'])) && is_number?(get_season(s['collectionName']))}
       end
 
       token_response = tvdb_call("https://api.thetvdb.com/refresh_token")
@@ -69,7 +68,7 @@ class Show < ActiveRecord::Base
               end
               year = s['firstAired'] != nil ? s['firstAired'].split('-').slice(0,1).join() : ''
               details = {title: s['seriesName'], collectionName: collection_name, collectionId: get_collection_id(s['id'], season_number.to_s), season: season_number.to_s, poster: poster, rating: '', year: year, plot: s['overview'], genre: ''}
-              series << details if series.all? {|el| el[:title] != s['seriesName'] && el[:season] != season_number && el[:collectionId] != get_collection_id(s['id'], season_number.to_s)}
+              series << details if series.all? {|el| el[:collectionName] != collection_name}
             end
           end
         end
