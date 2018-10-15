@@ -29,7 +29,7 @@ class Movie < ActiveRecord::Base
           poster = movie['artworkUrl100'] != nil ? movie['artworkUrl100'].gsub!(/100x100bb/, '1200x630bb') : ''
           director = movie['artistName'] != nil ? movie['artistName'].split(' & ').join(', ') : ''
           genre = movie['primaryGenreName'] != nil ? movie['primaryGenreName'] : ''
-          rating = movie['contentAdvisoryRating'] != nil ? movie['contentAdvisoryRating'] : ''
+          rating = movie['contentAdvisoryRating'] != nil ? movie['contentAdvisoryRating'].upcase : ''
           year = movie['releaseDate'] != nil ? movie['releaseDate'].split('-').slice(0,1).join() : ''
           doc = HTTParty.get(movie['trackViewUrl'])
           parsed_doc ||= Nokogiri::HTML(doc)
@@ -197,7 +197,7 @@ class Movie < ActiveRecord::Base
     def self.get_rating(r)
       rating = ''
       r['releases']['countries'].each { |k| rating = k['certification'] if k['iso_3166_1'] == 'US' } if r['releases']['countries'] != nil
-      rating != '' ? rating : 'NR'
+      rating != '' ? rating.upcase : 'NR'
     end
 
     def self.itunes_info(r)
