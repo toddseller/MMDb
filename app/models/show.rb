@@ -27,7 +27,7 @@ class Show < ActiveRecord::Base
 
       series_response['results'].each do |s|
         year = s['releaseDate'] != nil ? s['releaseDate'].split('-').slice(0,1).join() : ''
-        rating = s['contentAdvisoryRating'] ? s['contentAdvisoryRating'] : ''
+        rating = s['contentAdvisoryRating'] ? s['contentAdvisoryRating'].upcase : ''
         details = {title: s['artistName'], collectionName: get_collection_name(s['artistName'], get_season(s['collectionName'])), collectionId: s['collectionId'], season: get_season(s['collectionName']), poster: set_image(s['artworkUrl100']), rating: rating, year: year, plot: get_plot(s['longDescription']), genre: s['primaryGenreName']}
         series << details if series.all? {|el| el[:collectionName] != get_collection_name(s['artistName'], get_season(s['collectionName'])) && is_number?(get_season(s['collectionName']))}
       end
