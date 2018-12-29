@@ -254,6 +254,19 @@
   background-color: #000;
 }
 
+.modal-studio
+{
+    position: absolute;
+    bottom: -100px;
+
+    width: 702px;
+}
+
+.modal-studio p
+{
+    margin-top: -10px;
+}
+
 .modal-body .col-lg-3
 {
   padding-left: 0;
