@@ -23,6 +23,7 @@ gem 'json'
 gem 'httparty'
 gem 'rack-cors', '~> 1.0', '>= 1.0.2'
 gem 'nokogiri'
+gem 'rack', '>= 2.0.6'
 
 group :test do
   gem 'faker'
