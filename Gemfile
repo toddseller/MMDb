@@ -21,7 +21,7 @@ gem 'shotgun'
 gem 'bcrypt'
 gem 'json'
 gem 'httparty'
-gem 'rack-cors', '~> 0.4.1'
+gem 'rack-cors', '~> 1.0', '>= 1.0.2'
 gem 'nokogiri'
 
 group :test do
