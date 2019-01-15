@@ -1,6 +1,6 @@
-use JwtAuth
-
 namespace '/api/v2' do
+  use JwtAuth
+
   before do
     content_type 'application/json'
   end
