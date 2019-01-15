@@ -35,5 +35,5 @@ class JwtAuth
   #   rescue JWT::InvalidIatError
   #     [403, { 'Content-Type' => 'text/plain' }, ['The token does not have a valid "issued at" time.']]
   #   end
-  end
+  # end
 end
