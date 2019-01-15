@@ -16,21 +16,19 @@ namespace '/api/v2' do
     user = User.find(params[:user_key])
     user.movies.sorted_list.to_json
   end
+  def token user
+    JWT.encode payload(user), ENV['JWT_SECRET'], 'HS256'
+  end
 
-end
-
-def token user
-  JWT.encode payload(user), ENV['JWT_SECRET'], 'HS256'
-end
-
-def payload user
-  {
-      exp: Time.now.to_i + 60 * 60,
-      iat: Time.now.to_i,
-      iss: ENV['JWT_ISSUER'],
-      user: {
-          username: user.user_name,
-          fullname: user.full_name
-      }
-  }
+  def payload user
+    {
+        exp: Time.now.to_i + 60 * 60,
+        iat: Time.now.to_i,
+        iss: ENV['JWT_ISSUER'],
+        user: {
+            username: user.user_name,
+            fullname: user.full_name
+        }
+    }
+  end
 end
