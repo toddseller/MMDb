@@ -45,7 +45,7 @@ namespace '/api/v2' do
 
   def payload u
     {
-        exp: Time.now.to_i + 60 * 60,
+        exp: Time.now.to_i + 60 * 1440,
         iat: Time.now.to_i,
         iss: ENV['JWT_ISSUER'],
         user: {
