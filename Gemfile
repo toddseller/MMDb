@@ -1,5 +1,5 @@
 source 'https://rubygems.org'
-ruby '2.3.1'
+ruby '2.5.1'
 
 # PostgreSQL driver
 gem 'pg'
@@ -21,9 +21,10 @@ gem 'shotgun'
 gem 'bcrypt'
 gem 'json'
 gem 'httparty'
-gem 'rack-cors', '~> 0.4.1'
 gem 'jwt'
+gem 'rack-cors', '~> 1.0', '>= 1.0.2'
 gem 'nokogiri'
+gem 'rack', '>= 2.0.6'
 
 group :test do
   gem 'faker'

@@ -254,6 +254,19 @@
   background-color: #000;
 }
 
+.modal-studio
+{
+    position: absolute;
+    bottom: -100px;
+
+    width: 702px;
+}
+
+.modal-studio p
+{
+    margin-top: -10px;
+}
+
 .modal-body .col-lg-3
 {
   padding-left: 0;
@@ -392,22 +405,30 @@
   min-height: 575px;
 }
 
+.studio-margin
+{
+    margin-bottom: 15px;
+}
+
 .studio
 {
-  position: absolute;
-  width: 770px;
-  right: 0;
-  bottom: 25px;
+    margin-left: -15px;
+    margin-bottom: 25px;
 }
 
 .studio h5
 {
-  font-weight: 600;
+    font-weight: 600;
 }
 
 .studio p
 {
-  margin-top: -10px;
+    margin-top: -10px;
+}
+
+.studio hr
+{
+    width: 770px;
 }
 
 .description-poster
@@ -464,6 +485,15 @@ a.magnifying-glass-icon
 .description-plot
 {
   margin: 20px 0;
+}
+
+#movie .description-plot
+{
+    display: -webkit-box;
+    overflow: hidden;
+
+    -webkit-line-clamp: 5;
+    -webkit-box-orient: vertical;
 }
 
 .edit-movie

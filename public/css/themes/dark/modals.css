@@ -437,6 +437,8 @@
     color: #c9302c;
 }
 
+
+
 .studio a
 {
     text-decoration: none;
@@ -454,13 +456,15 @@
     min-height: 575px;
 }
 
+.studio-margin
+{
+    margin-bottom: 15px;
+}
+
 .studio
 {
-    position: absolute;
-    right: 0;
-    bottom: 25px;
-
-    width: 770px;
+    margin-bottom: 25px;
+    margin-left: -15px;
 }
 
 .studio h5
@@ -471,6 +475,11 @@
 .studio p
 {
     margin-top: -10px;
+}
+
+.studio hr
+{
+    width: 770px;
 }
 
 .description-poster
@@ -536,6 +545,15 @@ a.magnifying-glass-icon
 .description-plot
 {
     margin: 20px 0;
+}
+
+#movie .description-plot
+{
+    display: -webkit-box;
+    overflow: hidden;
+
+    -webkit-line-clamp: 5;
+    -webkit-box-orient: vertical;
 }
 
 .edit-movie
