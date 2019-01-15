@@ -4,17 +4,16 @@ class JwtAuth
     JWT.encode payload(u), ENV['JWT_SECRET'], 'HS256'
   end
 
-  private
   def payload(u)
-   return {
+     {
         exp: Time.now.to_i + 60 * 1440,
         iat: Time.now.to_i,
         iss: ENV['JWT_ISSUER'],
         user: {
-            username: u.user_name,
-            fullname: u.full_name
+          username: u.user_name,
+          fullname: u.full_name
         }
-    }
+     }
   end
   # def call env
   #   begin
