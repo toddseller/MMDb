@@ -1,7 +1,7 @@
 class JwtAuth
 
   def self.token(u)
-    JWT.encode payload(u), ENV['JWT_SECRET'], 'HS256'
+    JWT.encode self.payload(u), ENV['JWT_SECRET'], 'HS256'
   end
 
   private
