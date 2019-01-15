@@ -10,7 +10,7 @@ namespace '/api/v2' do
     # else
     #   halt 404
     # end
-    {message: "In authenticate route!"}.to_json
+    {message: "In authenticate route!", user_name: user.user_name}.to_json
   end
 
   get '/movies' do
