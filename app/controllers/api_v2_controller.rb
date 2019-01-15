@@ -14,7 +14,10 @@ namespace '/api/v2' do
   end
 
   get '/movies' do
-    user = request.env.values_at :user
+    options = { algorithm: 'HS256', iss: ENV['JWT_ISSUER'] }
+    bearer = env.fetch('HTTP_AUTHORIZATION', '').slice(7..-1)
+    payload, header = JWT.decode bearer, ENV['JWT_SECRET'], true, options
+    user = payload['user']
     valid_user = User.find_by(user_name: user['username'])
 
     if valid_user
