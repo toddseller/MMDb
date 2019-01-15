@@ -22,6 +22,7 @@ gem 'bcrypt'
 gem 'json'
 gem 'httparty'
 gem 'rack-cors', '~> 0.4.1'
+gem 'jwt'
 gem 'nokogiri'
 
 group :test do

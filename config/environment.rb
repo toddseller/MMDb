@@ -19,8 +19,11 @@ require 'logger'
 require 'sinatra'
 require "sinatra/reloader" if development?
 require 'sinatra/json'
+require 'sinatra/base'
+require 'sinatra/namespace'
 require 'tilt/erb'
 require 'rack/cors'
+require 'jwt'
 
 require 'dotenv'
 Dotenv.load
