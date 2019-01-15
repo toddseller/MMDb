@@ -7,7 +7,7 @@ namespace '/api/v2' do
   post '/authenticate' do
     user = User.find_by(email: params[:username_email]) || User.find_by(user_name: params[:username_email])
     if user && user.authenticate(params[:password])
-      {message: "You've logged in. Yay you!!", token: token(user)}.to_json
+      {message: "You've logged in. Yay you!!", token: JwtAuth.token(user)}.to_json
     else
       halt 404
     end
@@ -39,19 +39,19 @@ namespace '/api/v2' do
       halt 403
     end
   end
-  def token u
-    JWT.encode payload(u), ENV['JWT_SECRET'], 'HS256'
-  end
+  # def token u
+  #   JWT.encode payload(u), ENV['JWT_SECRET'], 'HS256'
+  # end
 
-  def payload u
-    {
-        exp: Time.now.to_i + 60 * 1440,
-        iat: Time.now.to_i,
-        iss: ENV['JWT_ISSUER'],
-        user: {
-            username: u.user_name,
-            fullname: u.full_name
-        }
-    }
-  end
+  # def payload u
+  #   {
+  #       exp: Time.now.to_i + 60 * 1440,
+  #       iat: Time.now.to_i,
+  #       iss: ENV['JWT_ISSUER'],
+  #       user: {
+  #           username: u.user_name,
+  #           fullname: u.full_name
+  #       }
+  #   }
+  # end
 end
