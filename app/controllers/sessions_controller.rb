@@ -9,7 +9,7 @@ post '/sessions' do
   #   else
   #     erb :'/users/show'
   #   end
-  # else
+  # elseName
   #   if request.xhr?
   #     json status: "false"
   #   end
