@@ -1,3 +1,5 @@
+use JwtAuth
+
 namespace '/api/v2' do
   before do
     content_type 'application/json'
@@ -13,21 +15,27 @@ namespace '/api/v2' do
   end
 
   get '/movies' do
-    user = User.find(params[:user_key])
-    user.movies.sorted_list.to_json
+    user = request.env.values_at :user
+    valid_user = User.find_by(user_name: user['username'])
+
+    if valid_user
+      valid_user.movies.sorted_list.to_json
+    else
+      halt 403
+    end
   end
-  def token user
-    JWT.encode payload(user), ENV['JWT_SECRET'], 'HS256'
+  def token u
+    JWT.encode payload(u), ENV['JWT_SECRET'], 'HS256'
   end
 
-  def payload user
+  def payload u
     {
         exp: Time.now.to_i + 60 * 60,
         iat: Time.now.to_i,
         iss: ENV['JWT_ISSUER'],
         user: {
-            username: user.user_name,
-            fullname: user.full_name
+            username: u.user_name,
+            fullname: u.full_name
         }
     }
   end
