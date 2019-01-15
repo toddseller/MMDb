@@ -1,10 +1,10 @@
 class JwtAuth
 
   def self.token(u)
-    JWT.encode payload(u), ENV['JWT_SECRET'], 'HS256'
+    JWT.encode self.payload(u), ENV['JWT_SECRET'], 'HS256'
   end
 
-  def payload(u)
+  def self.payload(u)
      {
         exp: Time.now.to_i + 60 * 1440,
         iat: Time.now.to_i,
