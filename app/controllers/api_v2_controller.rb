@@ -47,6 +47,6 @@ namespace '/api/v2' do
     @auth_payload, @auth_header = JwtAuth.decode(supplied_token)
 
   rescue JWT::DecodeError => e
-    halt 401, json(error: e, message: e.message)
+    halt 401, json(error: e.status, message: e.message)
   end
 end
