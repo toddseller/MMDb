@@ -19,8 +19,19 @@ namespace '/api/v2' do
     user = @auth_payload['user']
     valid_user = User.find_by(user_name: user['username'])
 
-    # valid_user.movies.sorted_list.to_json
-    @current_user.movies.sorted_list.to_json
+    valid_user.movies.sorted_list.to_json
+  end
+
+  get '/movies/:id' do
+    authenticate!
+
+    movie = Movie.find(params[:id])
+    movie.to_json
+  end
+
+  put '/movies/:id' do
+
+  end
   end
   # def token u
   #   JWT.encode payload(u), ENV['JWT_SECRET'], 'HS256'
@@ -42,8 +53,6 @@ namespace '/api/v2' do
     supplied_token = String(request.env['HTTP_AUTHORIZATION']).slice(7..-1)
 
     @auth_payload, @auth_header = JwtAuth.decode(supplied_token)
-    user = @auth_payload['user']
-    @current_user = User.find_by(user_name: user['user_name'])
 
   rescue JWT::DecodeError => e
     halt 401, json(message: e.message)
