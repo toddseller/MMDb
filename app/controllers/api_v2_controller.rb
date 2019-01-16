@@ -4,11 +4,11 @@ namespace '/api/v2' do
     content_type 'application/json'
   end
 
-  get 'popular' do
-    Movie.top_movies.first(10).to_json
+  get '/popular' do
+    Movie.all.top_movies.first(10).to_json
   end
 
-  get 'recent' do
+  get '/recent' do
     Movie.recently_added.first(10).to_json
   end
 
