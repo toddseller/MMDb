@@ -46,13 +46,7 @@ namespace '/api/v2' do
 
     @auth_payload, @auth_header = JwtAuth.decode(supplied_token)
 
-  rescue JWT::DecodeError
-    [401, { 'Content-Type' => 'text/plain' }, ['A token must be passed.']]
-  rescue JWT::ExpiredSignature
-    [403, { 'Content-Type' => 'text/plain' }, ['The token has expired.']]
-  rescue JWT::InvalidIssuerError
-    [403, { 'Content-Type' => 'text/plain' }, ['The token does not have a valid issuer.']]
-  rescue JWT::InvalidIatError
-    [403, { 'Content-Type' => 'text/plain' }, ['The token does not have a valid "issued at" time.']]
+  rescue JWT::DecodeError => e
+    halt 401, json(error: e, message: e.message)
   end
 end
