@@ -1,5 +1,5 @@
 namespace '/api/v2' do
-  # use JwtAuth
+
   before do
     content_type 'application/json'
   end
@@ -32,22 +32,7 @@ namespace '/api/v2' do
   put '/movies/:id' do
 
   end
-  end
-  # def token u
-  #   JWT.encode payload(u), ENV['JWT_SECRET'], 'HS256'
-  # end
 
-  # def payload u
-  #   {
-  #       exp: Time.now.to_i + 60 * 1440,
-  #       iat: Time.now.to_i,
-  #       iss: ENV['JWT_ISSUER'],
-  #       user: {
-  #           username: u.user_name,
-  #           fullname: u.full_name
-  #       }
-  #   }
-  # end
   def authenticate!
     # Extract <token> from the 'Bearer <token>' value of the Authorization header
     supplied_token = String(request.env['HTTP_AUTHORIZATION']).slice(7..-1)
