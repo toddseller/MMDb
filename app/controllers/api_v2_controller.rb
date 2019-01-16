@@ -14,7 +14,7 @@ namespace '/api/v2' do
   end
 
   get '/movies' do
-    JwtAuth.authenticate!
+    authenticate!
 
     user = @auth_payload['user']
     valid_user = User.find_by(user_name: user['username'])
@@ -23,14 +23,14 @@ namespace '/api/v2' do
   end
 
   get '/movies/:id' do
-    JwtAuth.authenticate!
+    authenticate!
 
     movie = Movie.find(params[:id])
     movie.to_json
   end
 
   put '/movies/:id' do
-    JwtAuth.authenticate!
+    authenticate!
 
     movie = Movie.find(params[:id])
     movie.update(params[:movie])
