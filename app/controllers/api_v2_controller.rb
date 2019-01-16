@@ -30,7 +30,9 @@ namespace '/api/v2' do
   end
 
   put '/movies/:id' do
-
+    movie = Movie.find(params[:id])
+    movie.update(params[:movie])
+    movie.to_json
   end
 
   def authenticate!
