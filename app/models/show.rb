@@ -9,6 +9,7 @@ class Show < ActiveRecord::Base
   before_save :create_search_name
 
   scope :sorted_list, -> { order(:sort_name, :year) }
+  scope :recently_added, -> {order(created_at: :desc)}
 
   def self.get_series(t)
     series = []
