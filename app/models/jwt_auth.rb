@@ -6,7 +6,7 @@ class JwtAuth
 
   def self.payload(u)
      {
-        exp: Time.now.to_i + 60 * 1440,
+        exp: Time.now.to_i + 60,
         iat: Time.now.to_i,
         iss: ENV['JWT_ISSUER'],
         user: {
