@@ -9,8 +9,8 @@ class Movie < ActiveRecord::Base
   before_create :create_sort_name
   before_create :create_duration
   before_save :create_search_name
-  # before_save :create_director_check
-  # before_save :update_user_count
+  before_save :create_director_check
+  before_save :update_user_count
   before_update :sanitize_input
   before_update :adjust_url
 
