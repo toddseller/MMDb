@@ -7,6 +7,7 @@ namespace '/api/v2' do
   post '/authenticate' do
     user = User.find_by(email: params[:username_email]) || User.find_by(user_name: params[:username_email])
     if user && user.authenticate(params[:password])
+      session[:user_id] = user.id
       {message: "You've logged in. Yay you!!", token: JwtAuth.token(user)}.to_json
     else
       halt 404
@@ -17,9 +18,10 @@ namespace '/api/v2' do
     authenticate!
 
     user = @auth_payload['user']
-    valid_user = User.find_by(user_name: user['username'])
+    # valid_user = User.find_by(user_name: user['username'])
 
-    valid_user.movies.sorted_list.to_json
+    # valid_user.movies.sorted_list.to_json
+    current_user.movies.sorted_list.to_json
   end
 
   get '/movies/:id' do
