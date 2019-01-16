@@ -15,6 +15,18 @@ class JwtAuth
         }
      }
   end
+
+  def self.decode(token)
+    options = { algorithm: 'HS256', iss: ENV['JWT_ISSUER'] }
+    JWT.decode token, ENV['JWT_SECRET'], true, options
+  end
+
+  private
+  def http_token
+    @http_token ||= if request.headers['Authorization'].present?
+      request.headers['Authorization'].split(' ').last
+    end
+  end
   # def call env
   #   begin
   #     options = { algorithm: 'HS256', iss: ENV['JWT_ISSUER'] }

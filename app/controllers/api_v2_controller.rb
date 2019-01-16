@@ -14,30 +14,16 @@ namespace '/api/v2' do
   end
 
   get '/movies' do
-      options = { algorithm: 'HS256', iss: ENV['JWT_ISSUER'] }
-      bearer = env.fetch('HTTP_AUTHORIZATION', '').slice(7..-1)
-      payload, header = JWT.decode bearer, ENV['JWT_SECRET'], true, options
+    authenticate!
 
-      # env[:scopes] = payload['scopes']
-      # @valid_user = payload['user']
-
-    # rescue JWT::DecodeError
-    #   [401, { 'Content-Type' => 'text/plain' }, ['A token must be passed.']]
-    # rescue JWT::ExpiredSignature
-    #   [403, { 'Content-Type' => 'text/plain' }, ['The token has expired.']]
-    # rescue JWT::InvalidIssuerError
-    #   [403, { 'Content-Type' => 'text/plain' }, ['The token does not have a valid issuer.']]
-    # rescue JWT::InvalidIatError
-    #   [403, { 'Content-Type' => 'text/plain' }, ['The token does not have a valid "issued at" time.']]
-
-    user = payload['user']
+    user = @auth_payload['user']
     valid_user = User.find_by(user_name: user['username'])
 
-    if valid_user
+    # if valid_user
       valid_user.movies.sorted_list.to_json
-    else
-      halt 403
-    end
+    # else
+    #   halt 403
+    # end
   end
   # def token u
   #   JWT.encode payload(u), ENV['JWT_SECRET'], 'HS256'
@@ -54,4 +40,13 @@ namespace '/api/v2' do
   #       }
   #   }
   # end
+  def authenticate!
+    # Extract <token> from the 'Bearer <token>' value of the Authorization header
+    supplied_token = String(request.env['HTTP_AUTHORIZATION']).slice(7..-1)
+
+    @auth_payload, @auth_header = JwtAuth.verify(supplied_token)
+
+  rescue JWT::DecodeError => e
+    halt 401, json(error: e.class, message: e.message)
+  end
 end
