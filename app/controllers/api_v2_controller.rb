@@ -37,13 +37,13 @@ namespace '/api/v2' do
     movie.to_json
   end
 
-  # def authenticate!
-  #   # Extract <token> from the 'Bearer <token>' value of the Authorization header
-  #   supplied_token = String(request.env['HTTP_AUTHORIZATION']).slice(7..-1)
-  #
-  #   @auth_payload, @auth_header = JwtAuth.decode(supplied_token)
-  #
-  # rescue JWT::DecodeError => e
-  #   halt 401, json(message: e.message)
-  # end
+  def authenticate!
+    # Extract <token> from the 'Bearer <token>' value of the Authorization header
+    supplied_token = String(request.env['HTTP_AUTHORIZATION']).slice(7..-1)
+
+    @auth_payload, @auth_header = JwtAuth.decode(supplied_token)
+
+  rescue JWT::DecodeError => e
+    halt 401, json(message: e.message)
+  end
 end
