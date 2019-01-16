@@ -1,6 +1,5 @@
 class JwtAuth
 
-
   def self.token(u)
     JWT.encode self.payload(u), ENV['JWT_SECRET'], 'HS256'
   end
@@ -12,7 +11,8 @@ class JwtAuth
         iss: ENV['JWT_ISSUER'],
         user: {
           username: u.user_name,
-          fullname: u.full_name
+          fullname: u.full_name,
+          theme: u.theme
         }
      }
   end

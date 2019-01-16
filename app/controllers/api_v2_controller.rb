@@ -15,19 +15,22 @@ namespace '/api/v2' do
   post '/authenticate' do
     user = User.find_by(email: params[:username_email]) || User.find_by(user_name: params[:username_email])
     if user && user.authenticate(params[:password])
-      {message: "You've logged in. Yay you!!", token: JwtAuth.token(user)}.to_json
+      session[:user_id] = user.id
+      {token: JwtAuth.token(user)}.to_json
     else
+      session[:user_id] = nil
       halt 404, json("Invalid login. Please check your credentials and try again.")
     end
+  end
+
+  post '/deauthenticate' do
+    session[:user_id] = nil
   end
 
   get '/movies' do
     authenticate!
 
-    user = @auth_payload['user']
-    valid_user = User.find_by(user_name: user['username'])
-
-    valid_user.movies.sorted_list.to_json
+    current_user.movies.sorted_list.to_json
   end
 
   get '/movies/:id' do
@@ -55,7 +58,6 @@ namespace '/api/v2' do
   end
 
   def authenticate!
-    # Extract <token> from the 'Bearer <token>' value of the Authorization header
     supplied_token = String(request.env['HTTP_AUTHORIZATION']).slice(7..-1)
 
     @auth_payload, @auth_header = JwtAuth.decode(supplied_token)
@@ -63,4 +65,5 @@ namespace '/api/v2' do
   rescue JWT::DecodeError => e
     halt 401, json(message: e.message)
   end
+
 end
