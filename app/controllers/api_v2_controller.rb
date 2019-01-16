@@ -4,23 +4,32 @@ namespace '/api/v2' do
     content_type 'application/json'
   end
 
+  get '/popular' do
+    Movie.all.top_movies.first(10).to_json
+  end
+
+  get '/recent' do
+    Movie.recently_added.first(10).to_json
+  end
+
   post '/authenticate' do
     user = User.find_by(email: params[:username_email]) || User.find_by(user_name: params[:username_email])
     if user && user.authenticate(params[:password])
       session[:user_id] = user.id
-      {message: "You've logged in. Yay you!!", token: JwtAuth.token(user)}.to_json
+      {token: JwtAuth.token(user)}.to_json
     else
-      halt 404
+      session[:user_id] = nil
+      halt 404, json("Invalid login. Please check your credentials and try again.")
     end
+  end
+
+  post '/deauthenticate' do
+    session[:user_id] = nil
   end
 
   get '/movies' do
     authenticate!
 
-    user = @auth_payload['user']
-    # valid_user = User.find_by(user_name: user['username'])
-
-    # valid_user.movies.sorted_list.to_json
     current_user.movies.sorted_list.to_json
   end
 
