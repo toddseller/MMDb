@@ -37,6 +37,15 @@ namespace '/api/v2' do
     movie.to_json
   end
 
+  get '/add_movies' do
+    authenticate!
+
+    title = params[:query].downcase
+    movie_previews = Movie.get_titles(title)
+
+    movie_previews.to_json
+  end
+
   def authenticate!
     # Extract <token> from the 'Bearer <token>' value of the Authorization header
     supplied_token = String(request.env['HTTP_AUTHORIZATION']).slice(7..-1)
