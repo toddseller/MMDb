@@ -6,6 +6,7 @@ class JwtAuth
 
   def self.payload(u)
      # {
+     #    sub: u.id,
      #    exp: Time.now.to_i + 60 * 1440,
      #    iat: Time.now.to_i,
      #    iss: ENV['JWT_ISSUER'],
@@ -16,6 +17,7 @@ class JwtAuth
      #    }
      # }
      {
+        sub: u.id,
         iat: Time.now.to_i,
         iss: ENV['JWT_ISSUER'],
         user: {
