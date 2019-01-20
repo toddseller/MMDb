@@ -1,11 +1,11 @@
 use Rack::Cors do |config|
   config.allow do |allow|
 
-    allow do
-      origins '*'
-      resource '/api/v2/*', headers: :any, methods: :any
-    end
-
+    allow.origins 'localhost:8080'
+    allow.resource '/api/v2/*',
+                   :methods => :any,
+                   :headers => :any,
+                   :max_age => 0
   end
 end
 
