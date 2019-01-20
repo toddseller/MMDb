@@ -1,14 +1,3 @@
-# use Rack::Cors do |config|
-#   config.allow do |allow|
-#
-#     allow.origins 'localhost:8080'
-#     allow.resource '/api/v2/*',
-#                    :methods => [:post],
-#                    :headers => :any,
-#                    :max_age => 0
-#   end
-# end
-
 namespace '/api/v2' do
 
   # use Rack::Cors do |config|
@@ -41,6 +30,7 @@ namespace '/api/v2' do
   post '/authenticate' do
     p 'In authenticate!'
     p request.body.read
+    p params
     user = User.find_by(email: params[:username_email]) || User.find_by(user_name: params[:username_email])
     if user && user.authenticate(params[:password])
       session[:user_id] = user.id

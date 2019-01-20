@@ -24,4 +24,6 @@ use Rack::Cors do
   end
 end
 
+use Rack::PostBodyContentTypeParser
+
 run Sinatra::Application
