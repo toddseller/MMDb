@@ -41,6 +41,8 @@ GEM
       mini_portile2 (~> 2.4.0)
     pg (1.1.4)
     rack (2.0.6)
+    rack-contrib (2.1.0)
+      rack (~> 2.0)
     rack-cors (1.0.2)
     rack-protection (2.0.5)
       rack
@@ -96,6 +98,7 @@ DEPENDENCIES
   nokogiri
   pg
   rack (>= 2.0.6)
+  rack-contrib
   rack-cors (~> 1.0, >= 1.0.2)
   rake
   rspec
