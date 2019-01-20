@@ -34,7 +34,7 @@ namespace '/api/v2' do
       {token: JwtAuth.token(user)}.to_json
     else
       session[:user_id] = nil
-      halt 404, json("Invalid login. Please check your credentials and try again.")
+      halt 401, json(errorMessage: "Invalid login. Please check your credentials and try again.")
     end
   end
 
