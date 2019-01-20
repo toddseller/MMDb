@@ -29,14 +29,14 @@ namespace '/api/v2' do
 
   post '/signup' do
     p params
-    # @user = User.create(params[:user])
-    # if @user.valid?
-    #   session[:user_id] = user.id
-    #   {token: JwtAuth.token(user)}.to_json
-    # else
-    #   session[:user_id] = nil
-    #   halt 422, json(errorMessage: "Email is already in use.")
-    # end
+    user = User.create(params)
+    if user.valid?
+      session[:user_id] = user.id
+      {token: JwtAuth.token(user)}.to_json
+    else
+      session[:user_id] = nil
+      halt 422, json(errorMessage: "Email is already in use.")
+    end
   end
 
   post '/authenticate' do
