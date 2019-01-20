@@ -1,3 +1,14 @@
+use Rack::Cors do |config|
+  config.allow do |allow|
+
+    allow do
+      origins '*'
+      resource '/api/v2/*', headers: :any, methods: :get
+    end
+
+  end
+end
+
 namespace '/api/v2' do
 
   before do
