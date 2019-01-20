@@ -12,4 +12,15 @@ configure do
   set :views, File.join(Sinatra::Application.root, "app", "views")
 end
 
+use Rack::Cors do
+  allow do
+    origins 'localhost:8080'
+
+    resource '/api/v2/*',
+             methods: [:get, :post, :delete, :put, :patch, :options, :head],
+             headers: :any,
+             max_age: 0
+  end
+end
+
 run Sinatra::Application
