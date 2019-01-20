@@ -40,7 +40,7 @@ namespace '/api/v2' do
 
   post '/authenticate' do
     p 'In authenticate!'
-    p request.body
+    p request.body.read
     user = User.find_by(email: params[:username_email]) || User.find_by(user_name: params[:username_email])
     if user && user.authenticate(params[:password])
       session[:user_id] = user.id
