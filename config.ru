@@ -19,6 +19,7 @@ use Rack::Cors do
     resource '/api/v2/*',
              methods: [:get, :post, :delete, :put, :patch, :options, :head],
              headers: :any,
+             :expose  => ['access-token', 'expiry', 'token-type', 'Authorization'],
              max_age: 0
   end
 end
