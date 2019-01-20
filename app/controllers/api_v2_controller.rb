@@ -1,16 +1,5 @@
 namespace '/api/v2' do
 
-  # use Rack::Cors do |config|
-  #   config.allow do |allow|
-  #
-  #     allow.origins 'localhost:8080'
-  #     allow.resource '/api/v2/*',
-  #                    :methods => [:get, :post, :delete, :put, :patch, :options, :head],
-  #                    :headers => :any,
-  #                    :max_age => 0
-  #   end
-  # end
-
   before do
     content_type 'application/json'
   end
@@ -28,7 +17,6 @@ namespace '/api/v2' do
   end
 
   post '/signup' do
-    p params
     user = User.create(params)
     if user.valid?
       session[:user_id] = user.id
@@ -41,7 +29,7 @@ namespace '/api/v2' do
   end
 
   post '/authenticate' do
-    user = User.find_by(email: params[:email]) || User.find_by(user_name: params[:email])
+    user = User.find_by(email: params[:username_email]) || User.find_by(user_name: params[:username_email])
     if user && user.authenticate(params[:password])
       session[:user_id] = user.id
       {token: JwtAuth.token(user)}.to_json
