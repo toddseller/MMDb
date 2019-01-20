@@ -52,3 +52,14 @@ Dir[APP_ROOT.join('app', 'helpers', '*.rb')].each { |file| require file }
 
 # Set up the database and models
 require APP_ROOT.join('config', 'database')
+
+use Rack::Cors do
+  allow do
+    origins 'localhost:8080'
+
+    resource '/api/v2/*',
+             methods: [:get, :post, :delete, :put, :patch, :options, :head],
+             headers: :any,
+             max_age: 0
+  end
+end
