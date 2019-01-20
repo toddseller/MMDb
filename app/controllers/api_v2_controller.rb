@@ -1,15 +1,26 @@
-# use Rack::Cors do |config|
-#   config.allow do |allow|
-#
-#     allow.origins 'localhost:8080'
-#     allow.resource '/api/v2/authenticate',
-#                    :methods => [:post],
-#                    :headers => :any,
-#                    :max_age => 0
-#   end
-# end
+use Rack::Cors do |config|
+  config.allow do |allow|
+
+    allow.origins 'localhost:8080'
+    allow.resource '/api/v2/*',
+                   :methods => [:post],
+                   :headers => :any,
+                   :max_age => 0
+  end
+end
 
 namespace '/api/v2' do
+
+  use Rack::Cors do |config|
+    config.allow do |allow|
+
+      allow.origins 'localhost:8080'
+      allow.resource '/api/v2/*',
+                     :methods => [:get, :post, :delete, :put, :patch, :options, :head],
+                     :headers => :any,
+                     :max_age => 0
+    end
+  end
 
   before do
     content_type 'application/json'
