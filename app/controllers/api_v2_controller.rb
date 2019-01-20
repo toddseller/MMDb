@@ -36,7 +36,7 @@ namespace '/api/v2' do
       {token: JwtAuth.token(user)}.to_json
     else
       session[:user_id] = nil
-      halt 422, json(errorMessage: "Email is already in use.")
+      halt 422, json(errorMessage: user.errors.full_messages.join(" and "))
     end
   end
 
