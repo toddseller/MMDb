@@ -28,10 +28,7 @@ namespace '/api/v2' do
   end
 
   post '/authenticate' do
-    p 'In authenticate!'
-    p request.body.read
-    p params
-    user = User.find_by(email: params[:username_email]) || User.find_by(user_name: params[:username_email])
+    user = User.find_by(email: params[:email]) || User.find_by(user_name: params[:email])
     if user && user.authenticate(params[:password])
       session[:user_id] = user.id
       {token: JwtAuth.token(user)}.to_json
