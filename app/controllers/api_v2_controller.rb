@@ -3,7 +3,7 @@ use Rack::Cors do |config|
 
     allow do
       origins '*'
-      resource '/api/v2/*', headers: :any, methods: :get
+      resource '/api/v2/*', headers: :any, methods: :any
     end
 
   end
