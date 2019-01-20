@@ -27,6 +27,18 @@ namespace '/api/v2' do
     Show.recently_added.first(10).to_json
   end
 
+  post '/signup' do
+    p params
+    # @user = User.create(params[:user])
+    # if @user.valid?
+    #   session[:user_id] = user.id
+    #   {token: JwtAuth.token(user)}.to_json
+    # else
+    #   session[:user_id] = nil
+    #   halt 422, json(errorMessage: "Email is already in use.")
+    # end
+  end
+
   post '/authenticate' do
     user = User.find_by(email: params[:email]) || User.find_by(user_name: params[:email])
     if user && user.authenticate(params[:password])
