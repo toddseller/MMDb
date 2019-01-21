@@ -47,7 +47,7 @@ namespace '/api/v2' do
     authenticate!
 
     p '*' * 80
-    p @auth_payload[:user]
+    p @auth_payload['sub']
 
     # current_user.movies.sorted_list.to_json
   end
