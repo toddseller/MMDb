@@ -45,9 +45,10 @@ namespace '/api/v2' do
 
   get '/movies' do
     authenticate!
-    user = User.find(@auth_payload[:sub])
 
-    user.movies.sorted_list.to_json
+    p @auth_payload[:sub]
+    p @user
+    # user.movies.sorted_list.to_json
   end
 
   get '/movies/:id' do
@@ -78,6 +79,9 @@ namespace '/api/v2' do
     supplied_token = String(request.env['HTTP_AUTHORIZATION']).slice(7..-1)
 
     @auth_payload, @auth_header = JwtAuth.decode(supplied_token)
+
+    p @auth_payload[:sub]
+    @user = User.find(@auth_payload[:sub])
 
   rescue JWT::DecodeError => e
     halt 401, json(message: e.message)
