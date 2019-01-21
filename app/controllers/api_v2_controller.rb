@@ -46,8 +46,8 @@ namespace '/api/v2' do
   get '/movies' do
     authenticate!
 
-    p @auth_payload[:sub]
-    p @user
+    p '+' * 80
+    p @auth_payload
     # user.movies.sorted_list.to_json
   end
 
@@ -80,8 +80,8 @@ namespace '/api/v2' do
 
     @auth_payload, @auth_header = JwtAuth.decode(supplied_token)
 
-    p @auth_payload[:sub]
-    @user = User.find(@auth_payload[:sub])
+    p '*' * 80
+    p @auth_payload.sub
 
   rescue JWT::DecodeError => e
     halt 401, json(message: e.message)
