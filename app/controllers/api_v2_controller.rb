@@ -46,10 +46,9 @@ namespace '/api/v2' do
   get '/movies' do
     authenticate!
 
-    p '*' * 80
-    p @auth_payload['sub']
+    user = User.find(@auth_payload['sub'])
 
-    # current_user.movies.sorted_list.to_json
+    user.movies.sorted_list.to_json
   end
 
   get '/movies/:id' do
