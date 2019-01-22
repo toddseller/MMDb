@@ -76,7 +76,7 @@ namespace '/api/v2' do
   end
 
   get '/shows' do
-    authenticate!
+    # authenticate!
 
     user = User.find(@auth_payload['sub'])
     json user.shows[1].to_json(
