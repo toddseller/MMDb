@@ -79,15 +79,7 @@ namespace '/api/v2' do
     # authenticate!
 
     user = User.find(@auth_payload['sub'])
-    json user.shows[1].to_json(
-                  :include => {
-                      :seasons => {
-                          :include => {
-                              :episodes
-                          }
-                      }
-                  }
-    )
+    json user.shows.join(:seasons).join(:episodes)
 
     # render :json => user.as_json(
     #     :include => { :user_events => {
