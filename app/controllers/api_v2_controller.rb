@@ -75,6 +75,29 @@ namespace '/api/v2' do
     movie_previews.to_json
   end
 
+  get '/shows' do
+    authenticate!
+
+    user = User.find(@auth_payload['sub'])
+    json user.shows[1].to_json(
+                  :include => {
+                      :seasons => {
+                          :include => {
+                              :episodes
+                          }
+                      }
+                  }
+    )
+
+    # render :json => user.as_json(
+    #     :include => { :user_events => {
+    #         :include => { :events => {
+    #             :include => [:location, :categories, :attendees]
+    #         } }
+    #     } }
+    # )
+  end
+
   def authenticate!
     supplied_token = String(request.env['HTTP_AUTHORIZATION']).slice(7..-1)
 
