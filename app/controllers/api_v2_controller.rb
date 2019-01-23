@@ -79,9 +79,8 @@ namespace '/api/v2' do
     authenticate!
 
     user = User.find(@auth_payload['sub'])
-    json user.shows.join(:seasons).join(:episodes)
-
-    Course.all.to_json( { include: [ lessons: { include: [ activities: { include: :task } ] } ] } )
+    user.shows.to_json({include: [seasons: {include: episodes}]})
+    # Course.all.to_json( { include: [ lessons: { include: [ activities: { include: :task } ] } ] } )
 
     # render :json => user.as_json(
     #     :include => { :user_events => {
