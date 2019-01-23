@@ -5,6 +5,8 @@ class Show < ActiveRecord::Base
   has_and_belongs_to_many :users
   has_many :seasons
 
+  accepts_nested_attributes_for :seasons
+
   before_create :create_sort_name
   before_save :create_search_name
 
