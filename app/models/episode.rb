@@ -2,7 +2,7 @@ class Episode < ActiveRecord::Base
 
   validates :title, presence: true
 
-  belongs_to :seasons
+  belongs_to :seasons, -> { order(tv_episode: :asc) }
 
   before_create :create_duration
 
