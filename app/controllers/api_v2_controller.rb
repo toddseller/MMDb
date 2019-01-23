@@ -79,7 +79,7 @@ namespace '/api/v2' do
     authenticate!
 
     user = User.find(@auth_payload['sub'])
-    user.shows.to_json( { include: [ seasons: { include: { :episodes } } ] } )
+    user.shows.to_json( { include: [ seasons: { include: :episodes } ] } )
     # ( { include: [ lessons: { include: { :task } } ] } )
 
     # render :json => user.as_json(
