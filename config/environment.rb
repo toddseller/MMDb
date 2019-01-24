@@ -35,6 +35,7 @@ require 'rack/cors'
 require 'rack/contrib'
 require 'jwt'
 require 'will_paginate'
+require 'will_paginate/active_record'
 
 require 'dotenv'
 Dotenv.load
