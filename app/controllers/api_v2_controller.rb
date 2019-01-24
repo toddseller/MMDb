@@ -48,7 +48,7 @@ namespace '/api/v2' do
 
     user = User.find(@auth_payload['sub'])
 
-    user.movies.sorted_list.to_json
+    user.movies.sorted_list.to_json( { include: :ratings } )
   end
 
   get '/movies/:id' do
