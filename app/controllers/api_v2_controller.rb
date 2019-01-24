@@ -48,7 +48,7 @@ namespace '/api/v2' do
 
     user = User.find(@auth_payload['sub'])
 
-    user.movies.sorted_list.to_json( { include: :ratings } ).paginate(:per_page => 100, :page => page)
+    user.movies.sorted_list.to_json( { include: :ratings } ).paginate(:per_page => 100, :page => params[:page])
   end
 
   get '/movies/:id' do
