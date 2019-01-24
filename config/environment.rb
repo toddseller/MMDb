@@ -34,6 +34,7 @@ require 'rack'
 require 'rack/cors'
 require 'rack/contrib'
 require 'jwt'
+require 'will_paginate'
 
 require 'dotenv'
 Dotenv.load
