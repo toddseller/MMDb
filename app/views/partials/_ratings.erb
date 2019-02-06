@@ -24,11 +24,11 @@
   <% else %>
     <span class="glyphicon-rating"></span>
   <% end %>
-  <% if movie.ratings.count > 1 %>
-    <p>Based on <%= movie.ratings.count %> User Ratings</p>
-  <% elsif movie.ratings.count == 1 %>
-    <p>Based on <%= movie.ratings.count %> User Rating</p>
-  <% else %>
-    <p>This Movie Has Not Been Rated</p>
-  <% end %>
 </div>
+<% if movie.ratings.count > 1 %>
+  <p>Based on <%= movie.ratings.count %> User Ratings</p>
+<% elsif movie.ratings.count == 1 %>
+  <p>Based on <%= movie.ratings.count %> User Rating</p>
+<% else %>
+  <p>This Movie Has Not Been Rated</p>
+<% end %>
