@@ -274,7 +274,9 @@
 
 .description-info
 {
-    position: relative;
+    display: inline-flex;
+    align-content: center;
+    align-items: center;
 }
 
 #meta-data .description-poster img
@@ -635,9 +637,16 @@ li
 
 #ratings-container
 {
-    position: absolute;
+    display: inline-flex;
+    height: 21px;
+}
 
-    display: inline-block;
+#ratings-container p
+{
+    font-size: 9px;
+    margin-left: 5px;
+    display: inline-flex;
+    align-items: center;
 }
 
 .rating:not(:checked) > input
@@ -718,19 +727,19 @@ li
     color: gold;
 }
 
-.rated p,
-.rating p
-{
-    font-size: 9px;
+/*.rated p,*/
+/*.rating p*/
+/*{*/
+    /*font-size: 9px;*/
 
-    position: absolute;
-    left: 95px;
+    /*position: absolute;*/
+    /*left: 95px;*/
 
-    display: inline-block;
+    /*display: inline-block;*/
 
-    width: 200px;
-    margin: 0;
-}
+    /*width: 200px;*/
+    /*margin: 0;*/
+/*}*/
 
 .rated p
 {
