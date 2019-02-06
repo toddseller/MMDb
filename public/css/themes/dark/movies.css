@@ -91,6 +91,17 @@ img
     color:rgba(243,243,243,.7);
 }
 
+.series-details
+{
+    display: inline-flex;
+    align-items: center;
+}
+
+.series-details .spacing
+{
+    margin-right: 10px;
+}
+
 .series-info #description-rating
 {
     font-family: inherit;
