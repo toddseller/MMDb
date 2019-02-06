@@ -422,6 +422,11 @@
     border-bottom: 1px solid #eaeaea;
 }
 
+.description-details > .modal-title
+{
+    margin-bottom: 0;
+}
+
 .description-details h5
 {
     font-weight: 600;
@@ -644,6 +649,7 @@ li
 #ratings-container p
 {
     font-size: 9px;
+    margin-bottom: 0;
     margin-left: 5px;
     display: inline-flex;
     align-items: center;
