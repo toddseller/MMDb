@@ -21,7 +21,7 @@
       <div class="col-lg-7 series-info">
         <h1><%= show.title %></h1>
         <% if show.seasons.count > 1 %>
-          <p id="series-count"><%= "Seasons #{show.season_numbers}" %></p>
+          <p id="series-count"><%= "#{show.season_numbers} seasons" %></p>
         <% else %>
           <p id="series-count"><%= "Season #{show.season_numbers}" %></p>
         <% end %>
