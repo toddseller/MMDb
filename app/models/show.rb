@@ -35,11 +35,7 @@ class Show < ActiveRecord::Base
         series << details if series.all? {|el| el[:collectionName] != get_collection_name(s['artistName'], get_season(s['collectionName'])) && is_number?(get_season(s['collectionName']))}
       end
 
-      token_response = tvdb_call("https://api.thetvdb.com/refresh_token")
-
-      if token_response[:code] == '200'
-        heroku_call(token_response[:body]['token'])
-      else
+      if !JwtAuth.is_valid_time?(ENV['TVDB_TOKEN'])
         token_response = tvdb_auth()
         heroku_call(token_response[:body]['token'])
       end

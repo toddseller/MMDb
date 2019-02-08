@@ -33,4 +33,11 @@ class JwtAuth
     JWT.decode token, ENV['JWT_SECRET'], true, options
   end
 
+  def self.is_valid_time?(token)
+    now = Time.now.to_i
+    payload, header = JWT.decode token, nil, false
+
+    payload['exp'] > now
+  end
+
 end
