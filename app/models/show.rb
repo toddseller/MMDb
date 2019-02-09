@@ -38,6 +38,9 @@ class Show < ActiveRecord::Base
       if JwtAuth.has_expired?(ENV['TVDB_TOKEN'])
         token_response = tvdb_auth()
         heroku_call(token_response[:body]['token'])
+      elsif JwtAuth.renew_token?(ENV['TVDB_TOKEN'])
+        token_response = tvdb_call("https://api.thetvdb.com/refresh_token")
+        heroku_call(token_response[:body]['token'])
       end
 
       first_response = tvdb_call("https://api.thetvdb.com/search/series?name=" + URI.encode(t))
@@ -56,8 +59,8 @@ class Show < ActiveRecord::Base
                 new_t = URI.encode(t + ' season ' + season_number.to_s)
                 doc = HTTParty.get('http://squaredtvart.tumblr.com/search/' + new_t)
                 parsed_doc ||= Nokogiri::HTML(doc)
-                if !parsed_doc.css('p')[0].text.include?('No search')
-                  poster = parsed_doc.css('img')[0]['src'].gsub(/_250.jpg/,'_1280.jpg')
+                if !parsed_doc.css('p')[1].text.include?('No results')
+                  poster = parsed_doc.css('a > img')[0]['src'].gsub(/_250.jpg/,'_1280.jpg')
                 else
                   poster = 'https://s3-us-west-2.amazonaws.com/toddseller/tedflix/imgs/Artboard+1-196x196.jpg'
                   squared = false

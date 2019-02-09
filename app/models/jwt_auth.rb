@@ -40,4 +40,11 @@ class JwtAuth
     payload['exp'] < now
   end
 
+  def self.renew_token?(token)
+    now = Time.now.to_i
+    payload, header = JWT.decode token, nil, false
+
+    payload['exp'] - 1200 <= now
+  end
+
 end
