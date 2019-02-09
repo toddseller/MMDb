@@ -35,7 +35,7 @@ class Show < ActiveRecord::Base
         series << details if series.all? {|el| el[:collectionName] != get_collection_name(s['artistName'], get_season(s['collectionName'])) && is_number?(get_season(s['collectionName']))}
       end
 
-      if !JwtAuth.is_valid_time?(ENV['TVDB_TOKEN'])
+      if JwtAuth.has_expired?(ENV['TVDB_TOKEN'])
         token_response = tvdb_auth()
         heroku_call(token_response[:body]['token'])
       end
@@ -164,9 +164,7 @@ class Show < ActiveRecord::Base
   def self.tvdb_auth
     uri = URI.parse("https://api.thetvdb.com/login")
     request = Net::HTTP::Post.new(uri)
-    request.content_type = "application/json"
     request["Accept"] = "application/json"
-    request["Authorization"] = "Bearer " + + ENV['TVDB_TOKEN']
     request.body = JSON.dump({
       "apikey" => ENV['TVDB_APIKEY'],
       "userkey" => ENV['TVDB_USERKEY'],
@@ -217,6 +215,7 @@ class Show < ActiveRecord::Base
     response = Net::HTTP.start(uri.hostname, uri.port, req_options) do |http|
       http.request(request)
     end
+    response.code
   end
 
   def self.is_number?(string)
