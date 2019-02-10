@@ -167,6 +167,7 @@ class Show < ActiveRecord::Base
   def self.tvdb_auth
     uri = URI.parse("https://api.thetvdb.com/login")
     request = Net::HTTP::Post.new(uri)
+    request.content_type = "application/json"
     request["Accept"] = "application/json"
     request.body = JSON.dump({
       "apikey" => ENV['TVDB_APIKEY'],
