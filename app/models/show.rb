@@ -38,9 +38,11 @@ class Show < ActiveRecord::Base
       if JwtAuth.has_expired?(ENV['TVDB_TOKEN'])
         token_response = tvdb_auth()
         heroku_call(token_response[:body]['token'])
+        sleep 0.5
       elsif JwtAuth.renew_token?(ENV['TVDB_TOKEN'])
         token_response = tvdb_call("https://api.thetvdb.com/refresh_token")
         heroku_call(token_response[:body]['token'])
+        sleep 0.5
       end
 
       first_response = tvdb_call("https://api.thetvdb.com/search/series?name=" + URI.encode(t))
