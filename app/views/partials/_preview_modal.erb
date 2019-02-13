@@ -56,20 +56,26 @@
         <p class="description-plot"><%= movie.plot %></p>
         <h4>Cast and Crew</h4>
         <hr/>
-        <div class="col-lg-3">
-          <h5>Starring</h5>
-          <ul>
-            <% movie.actors.split(/(?<!,),(?!\sJr\.)/).each do |line| %>
-              <li><%= line %></li>
-            <% end %>
-          </ul>
-        </div>
-        <div class="col-lg-3 col-lg-offset-1">
+        <% if !movie.actors.empty? %>
+          <div class="col-lg-3 studio-margin">
+            <h5>STARRING</h5>
+            <ul>
+              <% movie.actors.split(/(?<!,),(?!\sJr\.)/).each do |line| %>
+                <li><a href=""><%= line %></a></li>
+              <% end %>
+            </ul>
+          </div>
+        <% end %>
+        <% if !movie.actors.empty? %>
+          <div class="col-lg-3 col-lg-offset-1 studio-margin">
+        <% else %>
+          <div class="col-lg-3 studio-margin">
+        <% end %>
           <% if !movie.director.empty? %>
             <% if movie.director.split(/(?<!,),(?!\sJr\.)/).length > 1 %>
-              <h5>Directors</h5>
+              <h5>DIRECTORS</h5>
             <% else %>
-              <h5>Director</h5>
+              <h5>DIRECTOR</h5>
             <% end %>
             <ul>
             <% movie.director.split(/(?<!,),(?!\sJr\.)/).each do |line| %>
@@ -79,9 +85,9 @@
           <% end %>
           <% if !movie.writer.empty? %>
             <% if movie.writer.split(/(?<!,),(?!\sJr\.)/).length > 1 %>
-              <h5>Screenwriters</h5>
+              <h5>SCREENWRITERS</h5>
             <% else %>
-              <h5>Screenwriter</h5>
+              <h5>SCREENWRITER</h5>
             <% end %>
             <ul>
             <% movie.writer.split(/(?<!,),(?!\sJr\.)/).each do |line| %>
@@ -93,9 +99,9 @@
         <div class="col-lg-3 col-lg-offset-1">
           <% if !movie.producer.empty? %>
             <% if movie.producer.split(/(?<!,),(?!\sJr\.)/).length > 1 %>
-              <h5>Producers</h5>
+              <h5>PRODUCERS</h5>
             <% else %>
-              <h5>Producer</h5>
+              <h5>PRODUCER</h5>
             <% end %>
             <ul>
             <% movie.producer.split(/(?<!,),(?!\sJr\.)/).each do |line| %>
