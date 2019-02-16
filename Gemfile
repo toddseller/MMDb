@@ -30,6 +30,7 @@ gem 'will_paginate', '~> 3.1', '>= 3.1.6'
 gem 'sidekiq'
 gem 'sidekiq-client-cli'
 gem 'whenever', require: false
+gem 'redis'
 
 group :test do
   gem 'faker'
