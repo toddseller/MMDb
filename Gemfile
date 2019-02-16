@@ -9,8 +9,8 @@ gem 'sinatra'
 gem 'sinatra-contrib'
 gem 'dotenv'
 
-# Use Thin for our web server
-gem 'thin'
+# Use Puma for our web server
+gem 'puma'
 
 gem 'activesupport', '~> 5.1.0'
 gem 'activerecord', '~> 5.1.0'
