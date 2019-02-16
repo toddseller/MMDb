@@ -27,6 +27,9 @@ gem 'nokogiri'
 gem 'rack', '>= 2.0.6'
 gem 'rack-contrib'
 gem 'will_paginate', '~> 3.1', '>= 3.1.6'
+gem 'sidekiq'
+gem 'sidekiq-client-cli'
+gem 'whenever', require: false
 
 group :test do
   gem 'faker'

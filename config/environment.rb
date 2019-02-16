@@ -34,6 +34,7 @@ require 'rack'
 require 'rack/cors'
 require 'rack/contrib'
 require 'jwt'
+require 'sidekiq'
 require 'will_paginate'
 require 'will_paginate/active_record'
 
