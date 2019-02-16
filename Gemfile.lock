@@ -112,7 +112,6 @@ DEPENDENCIES
   rack-contrib
   rack-cors (~> 1.0, >= 1.0.2)
   rake
-  redis
   rspec
   shotgun
   sidekiq
