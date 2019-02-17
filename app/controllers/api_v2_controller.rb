@@ -4,17 +4,23 @@ namespace '/api/v2' do
     content_type 'application/json'
   end
 
-  get '/top_movies' do
-    Movie.top_movies.first(10).to_json
+  get 'homepage' do
+    topMovies = Movie.top_movies.first(10)
+    recentMovies = Movie.recently_added.first(10)
+    recentShows = Show.recently_added.first(10)
+    {topMovies: topMovies, recentMovies: recentMovies, recentShows: recentShows}.to_json
   end
-
-  get '/recent_movies' do
-    Movie.recently_added.first(10).to_json
-  end
-
-  get '/recent_shows' do
-    Show.recently_added.first(10).to_json
-  end
+  # get '/top_movies' do
+  #   Movie.top_movies.first(10).to_json
+  # end
+  #
+  # get '/recent_movies' do
+  #   Movie.recently_added.first(10).to_json
+  # end
+  #
+  # get '/recent_shows' do
+  #   Show.recently_added.first(10).to_json
+  # end
 
   post '/signup' do
     user = User.create(params)
