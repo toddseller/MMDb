@@ -1,4 +1,4 @@
-require 'sidekiq'
+# require 'sidekiq'
 
 Sidekiq.configure_client do |config|
   config.REDIS = { :size => 1 }
