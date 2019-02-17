@@ -31,8 +31,9 @@ namespace '/api/v2' do
   post '/authenticate' do
     user = User.find_by(email: params[:username_email]) || User.find_by(user_name: params[:username_email])
     if user && user.authenticate(params[:password])
+      currentUser = {id: user.id, firstName: user.first_name, userName: user.user_name, theme: user.theme}
       session[:user_id] = user.id
-      {token: JwtAuth.token(user)}.to_json
+      {token: JwtAuth.token(user), user: currentUser}.to_json
     else
       session[:user_id] = nil
       halt 401, json(errorMessage: "Invalid login. Please check your credentials and try again.")
@@ -80,15 +81,6 @@ namespace '/api/v2' do
 
     user = User.find(@auth_payload['sub'])
     user.shows.sorted_list.to_json( { include: [ seasons: { include: :episodes } ] } )
-    # ( { include: [ lessons: { include: { :task } } ] } )
-
-    # render :json => user.as_json(
-    #     :include => { :user_events => {
-    #         :include => { :events => {
-    #             :include => [:location, :categories, :attendees]
-    #         } }
-    #     } }
-    # )
   end
 
   def authenticate!
