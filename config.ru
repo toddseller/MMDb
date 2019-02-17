@@ -12,17 +12,17 @@ configure do
   set :views, File.join(Sinatra::Application.root, "app", "views")
 end
 
-# use Rack::Cors do
-#   allow do
-#     origins 'localhost:8080'
-#
-#     resource '/api/v2/*',
-#              methods: [:get, :post, :delete, :put, :patch, :options, :head],
-#              headers: :any,
-#              :expose  => ['access-token', 'expiry', 'token-type', 'Authorization'],
-#              max_age: 0
-#   end
-# end
+use Rack::Cors do
+  allow do
+    origins 'localhost:3000'
+
+    resource '/api/v2/*',
+             methods: [:get, :post, :delete, :put, :patch, :options, :head],
+             headers: :any,
+             :expose  => ['access-token', 'expiry', 'token-type', 'Authorization'],
+             max_age: 0
+  end
+end
 
 use Rack::PostBodyContentTypeParser
 
