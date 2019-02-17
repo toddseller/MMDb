@@ -7,7 +7,6 @@ gem 'pg'
 # Sinatra driver
 gem 'sinatra'
 gem 'sinatra-contrib'
-gem 'sinatra-initializers'
 gem 'dotenv'
 
 # Use Puma for our web server
@@ -28,10 +27,6 @@ gem 'nokogiri'
 gem 'rack', '>= 2.0.6'
 gem 'rack-contrib'
 gem 'will_paginate', '~> 3.1', '>= 3.1.6'
-gem 'sidekiq'
-gem 'sidekiq-client-cli'
-gem 'whenever', require: false
-gem 'redis'
 
 group :test do
   gem 'faker'

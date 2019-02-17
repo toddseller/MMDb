@@ -10,10 +10,6 @@ configure do
 
   # Set the views to 
   set :views, File.join(Sinatra::Application.root, "app", "views")
-
-  require 'redis'
-  uri = URI.parse(ENV["REDISTOGO_URL"])
-  $redis = Redis.new(:host => uri.host, :port => uri.port, :password => uri.password)
 end
 
 # use Rack::Cors do
