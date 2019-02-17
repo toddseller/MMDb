@@ -12,8 +12,7 @@ class JwtAuth
      #    iss: ENV['JWT_ISSUER'],
      #    user: {
      #      username: u.user_name,
-     #      fullname: u.full_name,
-     #      theme: u.theme
+     #      fullname: u.full_name
      #    }
      # }
      {
