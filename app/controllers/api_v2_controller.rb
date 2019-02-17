@@ -4,7 +4,7 @@ namespace '/api/v2' do
     content_type 'application/json'
   end
 
-  get 'homepage' do
+  get '/homepage' do
     topMovies = Movie.top_movies.first(10)
     recentMovies = Movie.recently_added.first(10)
     recentShows = Show.recently_added.first(10)
