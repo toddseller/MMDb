@@ -34,7 +34,6 @@ require 'rack'
 require 'rack/cors'
 require 'rack/contrib'
 require 'jwt'
-require 'sidekiq'
 require 'will_paginate'
 require 'will_paginate/active_record'
 
@@ -54,7 +53,6 @@ APP_NAME = APP_ROOT.basename.to_s
 # Set up the controllers and helpers
 Dir[APP_ROOT.join('app', 'controllers', '*.rb')].each { |file| require file }
 Dir[APP_ROOT.join('app', 'helpers', '*.rb')].each { |file| require file }
-Dir[APP_ROOT.join('app', 'workers', '*.rb')].each { |file| require file }
 
 # Set up the database and models
 require APP_ROOT.join('config', 'database')
