@@ -23,9 +23,10 @@ use Rack::Cors do
              max_age: 0
   end
 
-  origins 'https://myflix-stream.herokuapp.com/'
+  allow do
+    origins 'https://myflix-stream.herokuapp.com/'
 
-  resource '/api/v2/*',
+    resource '/api/v2/*',
            methods: [:get, :post, :delete, :put, :patch, :options, :head],
            headers: :any,
            :expose  => ['access-token', 'expiry', 'token-type', 'Authorization'],
