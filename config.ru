@@ -14,7 +14,7 @@ end
 
 use Rack::Cors do
   allow do
-    origins 'localhost:3000'
+    origins 'localhost:3000, https://myflix-stream.herokuapp.com/'
 
     resource '/api/v2/*',
              methods: [:get, :post, :delete, :put, :patch, :options, :head],
