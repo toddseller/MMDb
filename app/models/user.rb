@@ -13,6 +13,12 @@ class User < ActiveRecord::Base
     self.all.sort_by { |user| user.movies.count }.reverse!
   end
 
+  def self.top_users
+    users = []
+    self.movie_count.each { |u| users << {userName: u.user_name, movieCount: u.movies.count, showCount: u.shows.count} if u.movies.count >= 10}
+    users.first(10)
+  end
+
   def password
     @password ||= BCrypt::Password.new(password_hash)
   end
