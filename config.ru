@@ -14,23 +14,13 @@ end
 
 use Rack::Cors do
   allow do
-    origins 'localhost:3000'
+    origins 'localhost:3000', 'myflix-stream.herokuapp.com', 'www.myflix.stream'
 
     resource '/api/v2/*',
              methods: [:get, :post, :delete, :put, :patch, :options, :head],
              headers: :any,
              :expose  => ['access-token', 'expiry', 'token-type', 'Authorization'],
              max_age: 0
-  end
-
-  allow do
-    origins 'https://myflix-stream.herokuapp.com'
-
-    resource '/api/v2/*',
-           methods: [:get, :post, :delete, :put, :patch, :options, :head],
-           headers: :any,
-           :expose  => ['access-token', 'expiry', 'token-type', 'Authorization'],
-           max_age: 0
   end
 end
 
