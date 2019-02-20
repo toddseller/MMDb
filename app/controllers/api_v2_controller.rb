@@ -5,11 +5,14 @@ namespace '/api/v2' do
   end
 
   get '/homepage' do
-    topMovies = Movie.top_movies.first(10)
-    recentMovies = Movie.recently_added.first(10)
-    recentShows = Show.recently_added.first(10)
+    topMovies = []
+    recentMovies = []
+    recentShows = []
+    Movie.top_movies.first(10).each {|m| topMovies << m.poster}
+    Movie.recently_added.first(10).each {|m| recentMovies << m.poster}
+    Show.recently_added.first(10).each {|s| recentShows << s.poster}
     year = Time.now.year
-    {topMovies: topMovies, recentMovies: recentMovies, recentShows: recentShows, year: year}.to_json
+    {topMovies: topMovies, recentMovies: recentMovies, recentShows: recentShows, year: year, topUsers: User.top_users}.to_json
   end
 
   post '/signup' do
