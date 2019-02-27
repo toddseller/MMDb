@@ -15,7 +15,7 @@ class User < ActiveRecord::Base
 
   def self.top_users
     users = []
-    self.movie_count.each { |u| users << {userName: u.user_name, avatar: u.avatar, movieCount: u.movies.count, showCount: u.shows.count} if u.movies.count >= 10}
+    self.movie_count.each { |u| users << {id: u.id, userName: u.user_name, avatar: u.avatar, movieCount: u.movies.count, showCount: u.shows.count} if u.movies.count >= 10}
     users.first(10)
   end
 
