@@ -8,9 +8,9 @@ namespace '/api/v2' do
     topMovies = []
     recentMovies = []
     recentShows = []
-    Movie.top_movies.first(10).each {|m| topMovies << {poster: m.poster}}
-    Movie.recently_added.first(10).each {|m| recentMovies << {poster: m.poster}}
-    Show.recently_added.first(10).each {|s| recentShows << {poster: s.poster}}
+    Movie.top_movies.first(10).each {|m| topMovies << {id: m.id, poster: m.poster}}
+    Movie.recently_added.first(10).each {|m| recentMovies << {id: m.id, poster: m.poster}}
+    Show.recently_added.first(10).each {|s| recentShows << {id: s.id, poster: s.poster}}
     year = Time.now.year
     {topMovies: topMovies, recentMovies: recentMovies, recentShows: recentShows, year: year, topUsers: User.top_users}.to_json
   end
