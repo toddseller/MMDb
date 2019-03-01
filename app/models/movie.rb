@@ -14,9 +14,9 @@ class Movie < ActiveRecord::Base
   before_update :sanitize_input
   before_update :adjust_url
 
-  scope :sorted_list, -> { order(:sort_name, :year) }
-  scope :recently_added, -> { order(created_at: :desc) }
-  scope :top_movies, -> { order(user_count: :desc)}
+  scope :sorted_list, -> {order(:sort_name, :year)}
+  scope :recently_added, -> {order(created_at: :desc)}
+  scope :top_movies, -> {order(user_count: :desc)}
 
   def self.get_titles(t)
     movie_array = Movie.where("search_name LIKE ?", "%#{t}%").sorted_list.first(10)
@@ -30,7 +30,7 @@ class Movie < ActiveRecord::Base
           director = movie['artistName'] != nil ? movie['artistName'].split(' & ').join(', ') : ''
           genre = movie['primaryGenreName'] != nil ? movie['primaryGenreName'] : ''
           rating = movie['contentAdvisoryRating'] != nil ? movie['contentAdvisoryRating'].upcase : ''
-          year = movie['releaseDate'] != nil ? movie['releaseDate'].split('-').slice(0,1).join() : ''
+          year = movie['releaseDate'] != nil ? movie['releaseDate'].split('-').slice(0, 1).join() : ''
           doc = HTTParty.get(movie['trackViewUrl'])
           parsed_doc ||= Nokogiri::HTML(doc)
           actors = parsed_doc.xpath('//*[dt[contains(.,"Cast")]]/dd') ? itunes_info(parsed_doc.xpath('//*[dt[contains(.,"Cast")]]/dd')) : ''
@@ -50,7 +50,7 @@ class Movie < ActiveRecord::Base
     title_response['results'].each do |movie|
       movie_response = HTTParty.get('https://api.themoviedb.org/3/movie/' + movie['id'].to_s + '?api_key=' + ENV['TMDB_KEY'] + '&append_to_response=credits,releases')
       if movie_response.code == 200
-        year = movie_response['release_date'] != nil ? movie['release_date'].split('-').slice(0,1).join() : ''
+        year = movie_response['release_date'] != nil ? movie['release_date'].split('-').slice(0, 1).join() : ''
         runtime = movie_response['runtime'] != nil ? movie_response['runtime'].to_s : '0'
         title = movie['title']
         plot = get_plot(movie['overview'])
@@ -76,6 +76,12 @@ class Movie < ActiveRecord::Base
   # def self.user_count
   #   self.all.sort_by { |movie| [movie.users.count, movie[:sort_name]] }.reverse![0, 6]
   # end
+  def self.basic_info(u)
+    movies_list = []
+    user = User.find(u)
+    user.movies.each { |movie| movies_list << {id: movie.id, title: movie.title, sort_name: movie.sort_name, search_name: movie.search_name, poster: movie.poster} }
+    movies_list
+  end
 
   def get_average
     sum = self.ratings.map(&:stars).inject(:+)
@@ -96,132 +102,132 @@ class Movie < ActiveRecord::Base
 
   private
 
-    def create_sort_name
-      self.sort_name = self.title.gsub(/^(The\b*\W|A\b*\W|An\b*\W)/, '')
-    end
+  def create_sort_name
+    self.sort_name = self.title.gsub(/^(The\b*\W|A\b*\W|An\b*\W)/, '')
+  end
 
-    def create_search_name
-      self.search_name = self.title.downcase
-    end
+  def create_search_name
+    self.search_name = self.title.downcase
+  end
 
-    def create_director_check
-      self.director_check = self.director != '' ? self.director.split(' ').slice(-1, 1).join() : ''
-    end
+  def create_director_check
+    self.director_check = self.director != '' ? self.director.split(' ').slice(-1, 1).join() : ''
+  end
 
-    def update_user_count
-      self.user_count = self.users.count
-    end
+  def update_user_count
+    self.user_count = self.users.count
+  end
 
-    def set_image
+  def set_image
+    self.poster.gsub!(/^(http)/, 'https')
+  end
+
+  def create_duration
+    time = self.runtime.to_i
+    hour = time.round / 60
+    min = time % 60
+    if hour == 1
+      self.runtime = hour.to_s + ' hour, ' + min.to_s + ' minutes'
+    elsif hour > 1
+      self.runtime = hour.to_s + ' hours, ' + min.to_s + ' minutes'
+    else
+      self.runtime = min.to_s + ' minutes'
+    end
+  end
+
+  def sanitize_input
+    self.title.gsub!(/(\s*\<.*\/.*\>)/, '')
+    self.year.gsub!(/\s*\<.*\/.*\>/, '')
+    self.rating.gsub!(/\s*\<.*\/.*\>/, '')
+    self.plot.gsub!(/\s*\<.*\/.*\>/, '')
+    self.actors.gsub!(/\s*\<.*\/.*\>/, '')
+    self.director.gsub!(/\s*\<.*\/.*\>/, '')
+    self.writer.gsub!(/\s*\<.*\/.*\>/, '')
+    self.genre.gsub!(/\s*\<.*\/.*\>/, '')
+    self.producer.gsub!(/\s*\<.*\/.*\>/, '')
+    self.runtime.gsub!(/\s*\<.*\/.*\>/, '')
+    self.poster.gsub!(/\s*\<.*\/.*\>/, '')
+    self.sort_name.gsub!(/\s*\<.*\/.*\>/, '')
+  end
+
+  def adjust_url
+    if self.poster =~ /http:/ && !(self.poster =~ /-ssl.mzstatic/)
       self.poster.gsub!(/^(http)/, 'https')
+      self.poster.gsub!(/(\.mzstatic)/, '-ssl.mzstatic')
     end
+  end
 
-    def create_duration
-      time = self.runtime.to_i
-      hour = time.round / 60
-      min = time % 60
-      if hour == 1
-        self.runtime = hour.to_s + ' hour, ' + min.to_s + ' minutes'
-      elsif hour > 1
-        self.runtime = hour.to_s + ' hours, ' + min.to_s + ' minutes'
-      else
-        self.runtime = min.to_s + ' minutes'
-      end
-    end
+  def self.get_itunes_info_by_title(a, n, e)
+    t = a.detect {|x| x[:title] == n}
+    t[e]
+  end
 
-    def sanitize_input
-      self.title.gsub!(/(\s*\<.*\/.*\>)/, '')
-      self.year.gsub!(/\s*\<.*\/.*\>/, '')
-      self.rating.gsub!(/\s*\<.*\/.*\>/, '')
-      self.plot.gsub!(/\s*\<.*\/.*\>/, '')
-      self.actors.gsub!(/\s*\<.*\/.*\>/, '')
-      self.director.gsub!(/\s*\<.*\/.*\>/, '')
-      self.writer.gsub!(/\s*\<.*\/.*\>/, '')
-      self.genre.gsub!(/\s*\<.*\/.*\>/, '')
-      self.producer.gsub!(/\s*\<.*\/.*\>/, '')
-      self.runtime.gsub!(/\s*\<.*\/.*\>/, '')
-      self.poster.gsub!(/\s*\<.*\/.*\>/, '')
-      self.sort_name.gsub!(/\s*\<.*\/.*\>/, '')
-    end
+  def self.get_itunes_info_by_year(a, y, e)
+    t = a.detect {|x| x[:year] == y}
+    t[e]
+  end
 
-    def adjust_url
-      if self.poster =~ /http:/ && !(self.poster =~ /-ssl.mzstatic/)
-        self.poster.gsub!(/^(http)/, 'https')
-        self.poster.gsub!(/(\.mzstatic)/, '-ssl.mzstatic')
-      end
-    end
+  def self.get_actors(r)
+    actors = []
+    r['credits']['cast'].each {|k| actors << k['name']}
+    actors.length != 0 ? actors.first(6).join(', ') : ''
+  end
 
-    def self.get_itunes_info_by_title(a,n,e)
-     t = a.detect {|x| x[:title] == n }
-     t[e]
-    end
+  def self.get_director(r)
+    director = []
+    r['credits']['crew'].each {|k| director << k['name'] if k['job'] == 'Director'}
+    director.length != 0 ? director.first(6).join(', ') : ''
+  end
 
-    def self.get_itunes_info_by_year(a,y,e)
-     t = a.detect {|x| x[:year] == y }
-     t[e]
-    end
+  def self.get_genres(r)
+    genres = []
+    r['genres'].each {|k| genres << k['name']} if r['genres']
+    genres.length != 0 ? genres.first(2).join(', ') : ''
+  end
 
-    def self.get_actors(r)
-      actors = []
-      r['credits']['cast'].each { |k| actors << k['name'] }
-      actors.length != 0 ? actors.first(6).join(', ') : ''
-    end
+  def self.get_plot(p)
+    new_p = p.gsub(/\<[i|b]\>|\<\/[i|b]\>/, '')
+    new_p = new_p.gsub(/\'/, '&#39;')
+    new_p = new_p.gsub(/\"/, '&#34;')
+    new_p = new_p.gsub(/\r|\n/, '')
+    new_p = new_p.gsub(/—|-/, '&#8211;')
+    new_p = new_p.gsub(/\"\"/, '&#34;')
+  end
 
-    def self.get_director(r)
-      director = []
-      r['credits']['crew'].each { |k| director << k['name'] if k['job'] == 'Director' }
-      director.length != 0 ? director.first(6).join(', ') : ''
-    end
+  def self.get_producers(r)
+    producers = []
+    r['credits']['crew'].each {|k| producers << k['name'] if k['job'] == 'Producer'}
+    producers.length != 0 ? producers.first(6).join(', ') : ''
+  end
 
-    def self.get_genres(r)
-      genres = []
-      r['genres'].each { |k| genres << k['name'] } if r['genres']
-      genres.length != 0 ? genres.first(2).join(', ') : ''
-    end
+  def self.get_rating(r)
+    rating = ''
+    r['releases']['countries'].each {|k| rating = k['certification'] if k['iso_3166_1'] == 'US'} if r['releases']['countries'] != nil
+    rating != '' ? rating.upcase : 'NR'
+  end
 
-    def self.get_plot(p)
-      new_p = p.gsub(/\<[i|b]\>|\<\/[i|b]\>/, '')
-      new_p = new_p.gsub(/\'/, '&#39;')
-      new_p = new_p.gsub(/\"/, '&#34;')
-      new_p = new_p.gsub(/\r|\n/, '')
-      new_p = new_p.gsub(/—|-/, '&#8211;')
-      new_p = new_p.gsub(/\"\"/, '&#34;')
-    end
+  def self.itunes_info(r)
+    info = []
+    r.each {|i| info << i.text.gsub(/\n\s*/, '')}
+    info.length != 0 ? info.first(6).join(', ') : ''
+  end
 
-    def self.get_producers(r)
-      producers = []
-      r['credits']['crew'].each { |k| producers << k['name'] if k['job'] == 'Producer' }
-      producers.length != 0 ? producers.first(6).join(', ') : ''
-    end
+  def self.itunes_studio(r)
+    studio = []
+    new_studio = r.text.gsub(/\n\s*/, '')
+    studio = new_studio.include?(';') ? new_studio.split(';') : new_studio.split(',')
+    studio.length != 0 ? studio.first(1).join() : ''
+  end
 
-    def self.get_rating(r)
-      rating = ''
-      r['releases']['countries'].each { |k| rating = k['certification'] if k['iso_3166_1'] == 'US' } if r['releases']['countries'] != nil
-      rating != '' ? rating.upcase : 'NR'
-    end
+  def self.get_studio(r)
+    studio = []
+    r['production_companies'].each {|k| studio << k['name']} if r['production_companies']
+    studio.length != 0 ? studio.first(1).join() : ''
+  end
 
-    def self.itunes_info(r)
-      info = []
-      r.each { |i| info << i.text.gsub(/\n\s*/,'')}
-      info.length != 0 ? info.first(6).join(', ') : ''
-    end
-
-    def self.itunes_studio(r)
-      studio = []
-      new_studio = r.text.gsub(/\n\s*/,'')
-      studio = new_studio.include?(';') ? new_studio.split(';') : new_studio.split(',')
-      studio.length != 0 ? studio.first(1).join() : ''
-    end
-
-    def self.get_studio(r)
-      studio = []
-      r['production_companies'].each { |k| studio << k['name'] } if r['production_companies']
-      studio.length != 0 ? studio.first(1).join() : ''
-    end
-
-    def self.get_writers(r)
-      writers = []
-      r['credits']['crew'].each { |k| writers << k['name'] if k['job'] == 'Screenplay' || k['job'] == 'Writer' }
-      writers.length != 0 ? writers.first(6).join(', ') : ''
-    end
+  def self.get_writers(r)
+    writers = []
+    r['credits']['crew'].each {|k| writers << k['name'] if k['job'] == 'Screenplay' || k['job'] == 'Writer'}
+    writers.length != 0 ? writers.first(6).join(', ') : ''
+  end
 end
