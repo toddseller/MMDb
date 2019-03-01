@@ -47,7 +47,14 @@ namespace '/api/v2' do
     authenticate!
 
     user = User.find(@auth_payload['sub'])
+    # user.movies.sorted_list.to_json( { include: :ratings } )
+    Movie.basic_info(user).to_json
+  end
 
+  get '/movies_details' do
+    authenticate!
+
+    user = User.find(@auth_payload['sub'])
     user.movies.sorted_list.to_json( { include: :ratings } )
   end
 
