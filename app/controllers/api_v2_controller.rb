@@ -30,7 +30,7 @@ namespace '/api/v2' do
   post '/authenticate' do
     user = User.find_by(email: params[:username_email]) || User.find_by(user_name: params[:username_email])
     if user && user.authenticate(params[:password])
-      currentUser = {id: user.id, firstName: user.first_name, userName: user.user_name, theme: user.theme}
+      currentUser = {id: user.id, firstName: user.first_name, userName: user.user_name}
       session[:user_id] = user.id
       {token: JwtAuth.token(user), user: currentUser}.to_json
     else
