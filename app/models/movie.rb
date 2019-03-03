@@ -102,7 +102,7 @@ class Movie < ActiveRecord::Base
   private
 
   def create_sort_name
-    self.sort_name = self.title.gsub(/^(The\b*\W|A\b*\W|An\b*\W)/, '')
+    self.sort_name = self.title.gsub(/^(The\b*\W|A\b*\W|An\b*\W)/, '').downcase
   end
 
   def create_search_name
