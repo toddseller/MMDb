@@ -78,8 +78,8 @@ class Movie < ActiveRecord::Base
   # end
   def self.basic_info(u)
     movies_list = []
-    u.movies.each { |movie| movies_list << {id: movie.id, title: movie.title, sort_name: movie.sort_name, search_name: movie.search_name, poster: movie.poster, year: movie.year, isNew: movie.isnew} }
-    movies_list
+    u.movies.sorted_list.each { |movie| movies_list << {id: movie.id, title: movie.title, sort_name: movie.sort_name, search_name: movie.search_name, poster: movie.poster, year: movie.year, isNew: movie.isnew} }
+    movies_list.map {|movie| Hash[movie[:id], movie]}
   end
 
   def get_average
