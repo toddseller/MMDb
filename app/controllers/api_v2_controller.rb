@@ -74,6 +74,7 @@ namespace '/api/v2' do
   end
 
   get '/add_movies' do
+    p '*' * 100
     authenticate!
 
     p params
