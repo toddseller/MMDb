@@ -76,6 +76,7 @@ namespace '/api/v2' do
   get '/add_movies' do
     authenticate!
 
+    p params
     title = params[:query].downcase
     movie_previews = Movie.get_titles(title)
 
