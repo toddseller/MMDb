@@ -40,7 +40,7 @@ class Movie < ActiveRecord::Base
           runtime = movie['trackTimeMillis'] != nil ? (movie['trackTimeMillis'] / (1000 * 60)).to_s : '0'
           director_check = director != '' ? director.split(' ').slice(-1, 1).join() : ''
           test_movie = {title: title, plot: plot, poster: poster, year: year, actors: actors, director: director, genre: genre, producer: producer, rating: rating, runtime: runtime, studio: studio, writer: writer, director_check: director_check}
-          movie_array << test_movie if movie_array.all? {|el| poster != '' && el[:title] != title && el[:year] != year || el[:director_check] != director_check}
+          movie_array << test_movie if movie_array.all? {|el| el[:title] != title && el[:year] != year || el[:director_check] != director_check}
         end
       end
     end
@@ -49,19 +49,19 @@ class Movie < ActiveRecord::Base
     return nil if title_response['results'] == []
     title_response['results'].each do |movie|
       movie_response = HTTParty.get('https://api.themoviedb.org/3/movie/' + movie['id'].to_s + '?api_key=' + ENV['TMDB_KEY'] + '&append_to_response=credits,releases')
-      if movie_response.code == 200
+      if movie_response.code == 200 && movie['poster_path'] != nil
         year = movie_response['release_date'] != nil ? movie['release_date'].split('-').slice(0, 1).join() : ''
         runtime = movie_response['runtime'] != nil ? movie_response['runtime'].to_s : '0'
         title = movie['title']
         plot = get_plot(movie['overview'])
-        poster = movie['poster_path'] != nil ? 'https://image.tmdb.org/t/p/w342' + movie['poster_path'] : 'NA'
+        poster = 'https://image.tmdb.org/t/p/w342' + movie['poster_path']
         director = get_director(movie_response)
         genre = get_genres(movie_response)
         rating = get_rating(movie_response)
         studio = get_studio(movie_response)
         director_check = director != '' ? director.split(' ').slice(-1, 1).join() : ''
         test_movie = {title: title, plot: plot, poster: poster, year: year, actors: get_actors(movie_response), director: director, genre: genre, producer: get_producers(movie_response), rating: rating, runtime: runtime, studio: studio, writer: get_writers(movie_response), director_check: director_check}
-        movie_array << test_movie if movie_array.all? {|el| poster != 'NA' && el[:title] != test_movie[:title] && el[:year] != year || el[:director_check] != test_movie[:director_check]}
+        movie_array << test_movie if movie_array.all? {|el| el[:title] != test_movie[:title] && el[:year] != year || el[:director_check] != test_movie[:director_check]}
       end
     end
     movie_array.sort_by {|k| k[:year]}
