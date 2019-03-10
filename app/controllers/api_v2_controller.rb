@@ -85,7 +85,7 @@ namespace '/api/v2' do
   post '/add_movie' do
     authenticate!
 
-    user = User.find(@auth_payload['sub'])
+    p user = User.find(@auth_payload['sub'])
     p '*' * 100
     p params
     # movie = Movie.find_by("title = ? AND year = ?", params[:movie]['title'], params[:movie]['year']) || Movie.new(params[:movie])
