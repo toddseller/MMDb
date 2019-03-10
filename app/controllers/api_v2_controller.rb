@@ -91,7 +91,7 @@ namespace '/api/v2' do
       movie.users << user if !movie.users.include?(user)
       movie.save
     end
-    Movie.basic_info(user).to_json
+    movie.to_json
   end
 
   get '/shows' do
