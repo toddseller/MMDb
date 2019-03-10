@@ -73,13 +73,27 @@ namespace '/api/v2' do
     movie.to_json
   end
 
-  get '/add_movies' do
+  get '/add_movie' do
     authenticate!
 
     title = params[:query].downcase
     movie_previews = Movie.get_titles(title)
 
     movie_previews.to_json
+  end
+
+  post '/add_movie' do
+    authenticate!
+
+    user = User.find(@auth_payload['sub'])
+    p '*' * 100
+    p params
+    # movie = Movie.find_by("title = ? AND year = ?", params[:movie]['title'], params[:movie]['year']) || Movie.new(params[:movie])
+    # if movie.save
+    #   movie.users << user if !movie.users.include?(user)
+    #   movie.save
+    # end
+    # Movie.basic_info(user).to_json
   end
 
   get '/shows' do
