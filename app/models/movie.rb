@@ -6,7 +6,7 @@ class Movie < ActiveRecord::Base
   has_and_belongs_to_many :users
   has_many :ratings
 
-  before_create :create_sort_name
+  before_save :create_sort_name
   before_create :create_duration
   before_save :create_search_name
   before_save :create_director_check
