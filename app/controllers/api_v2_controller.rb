@@ -62,7 +62,7 @@ namespace '/api/v2' do
     authenticate!
 
     movie = Movie.find(params[:id])
-    movie.to_json
+    movie.to_json( { include: :ratings } )
   end
 
   put '/movies/:id' do
@@ -91,7 +91,7 @@ namespace '/api/v2' do
       movie.users << user if !movie.users.include?(user)
       movie.save
     end
-    movie.to_json
+    movie.to_json( { include: :ratings } )
   end
 
   get '/shows' do
