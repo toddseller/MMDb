@@ -78,7 +78,7 @@ class Movie < ActiveRecord::Base
   # end
   def self.basic_info(u)
     movies_list = []
-    u.movies.sorted_list.each { |movie| movies_list << {id: movie.id, title: movie.title, sort_name: movie.sort_name.downcase, search_name: movie.search_name, poster: movie.poster, year: movie.year, isnew: movie.isnew} }
+    u.movies.sorted_list.each { |movie| movies_list << {id: movie.id, title: movie.title, sort_name: movie.sort_name, search_name: movie.search_name, poster: movie.poster, year: movie.year, isnew: movie.isnew} }
     movies_list
   end
 
@@ -102,7 +102,7 @@ class Movie < ActiveRecord::Base
   private
 
   def create_sort_name
-    self.sort_name = self.title.gsub(/^(The\b*\W|A\b*\W|An\b*\W)/, '').downcase
+    self.sort_name = self.title.gsub(/^(The\b*\W|A\b*\W|An\b*\W)/, '')
   end
 
   def create_search_name
