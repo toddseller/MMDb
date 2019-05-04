@@ -36,7 +36,7 @@ class Movie < ActiveRecord::Base
           actors = parsed_doc.xpath('//*[dt[contains(.,"Cast")]]/dd') ? itunes_info(parsed_doc.xpath('//*[dt[contains(.,"Cast")]]/dd')) : ''
           producer = parsed_doc.xpath('//*[dt[contains(.,"Producers")]]/dd') ? itunes_info(parsed_doc.xpath('//*[dt[contains(.,"Producers")]]/dd')) : ''
           writer = parsed_doc.xpath('//*[dt[contains(.,"Screenwriter")]]/dd') ? itunes_info(parsed_doc.xpath('//*[dt[contains(.,"Screenwriter")]]/dd')) : ''
-          studio = parsed_doc.xpath('//*[dt[contains(.,"Studio")]]/dd') ? itunes_studio(parsed_doc.xpath('//*[dt[contains(.,"Studio")]]/dd')) : ''
+          studio = JSON.parse(parsed_doc.xpath('//script[@id="shoebox-ember-data-store"]').children[0].text())['data']['attributes']['studio'] ? itunes_studio(JSON.parse(parsed_doc.xpath('//script[@id="shoebox-ember-data-store"]').children[0].text())['data']['attributes']['studio']) : ''
           runtime = movie['trackTimeMillis'] != nil ? (movie['trackTimeMillis'] / (1000 * 60)).to_s : '0'
           director_check = director != '' ? director.split(' ').slice(-1, 1).join() : ''
           test_movie = {title: title, plot: plot, poster: poster, year: year, actors: actors, director: director, genre: genre, producer: producer, rating: rating, runtime: runtime, studio: studio, writer: writer, director_check: director_check}
@@ -212,10 +212,7 @@ class Movie < ActiveRecord::Base
   end
 
   def self.itunes_studio(r)
-    studio = []
-    new_studio = r.text.gsub(/\n\s*/, '')
-    studio = new_studio.include?(';') ? new_studio.split(';') : new_studio.split(',')
-    studio.length != 0 ? studio.first(1).join() : ''
+    r.include?(';') ? r.split(';').first(1).join() : r.include?(',') ? r.split(',').first(1).join() : r.include?(':') ? r.split(':').first(1).join() : r
   end
 
   def self.get_studio(r)

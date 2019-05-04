@@ -26,7 +26,7 @@ gem 'rack-cors', '~> 1.0', '>= 1.0.2'
 gem 'nokogiri'
 gem 'rack', '>= 2.0.6'
 gem 'rack-contrib'
-gem 'will_paginate', '~> 3.1', '>= 3.1.6'
+gem 'humanize'
 
 group :test do
   gem 'faker'
