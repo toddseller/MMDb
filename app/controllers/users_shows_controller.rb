@@ -22,7 +22,7 @@ end
 
 post '/users/:user_id/shows' do
   @user = current_user
-  p @show = Show.find_by("title = ?", params[:show]['title']) || Show.new(title: params[:show]['title'], year: params[:show]['year'], rating: params[:show]['rating'], genre: params[:show]['genre'], poster: params[:season]['poster'])
+  @show = Show.find_by("title = ?", params[:show]['title']) || Show.new(title: params[:show]['title'], year: params[:show]['year'], rating: params[:show]['rating'], genre: params[:show]['genre'], poster: params[:season]['poster'])
   @season = Season.find_by(collectionId: params[:season]['collectionId']) || @show.seasons.new(params[:season])
   if @show.save
     @show.users << @user if !@show.users.include?(@user)
@@ -31,7 +31,7 @@ post '/users/:user_id/shows' do
         @season.update(is_active: true)
         @season
       end
-      @episodes_previews = Show.get_episodes(@season.collectionId, @season.season)
+      @episodes_previews = Show.get_episodes(@season.appleTvId, @season.season, @season.skip, @season.count)
       count = @episodes_previews.length
     end
 

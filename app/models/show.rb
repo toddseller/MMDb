@@ -26,14 +26,13 @@ class Show < ActiveRecord::Base
       end
     end
 
-    series_response = JSON.parse(HTTParty.get('https://itunes.apple.com/search?term=' + t + '&media=tvShow&entity=tvSeason'))
+    series_response = appletv_call(t)
 
-      series_response['results'].each do |s|
-        year = s['releaseDate'] != nil ? s['releaseDate'].split('-').slice(0,1).join() : ''
-        rating = s['contentAdvisoryRating'] ? s['contentAdvisoryRating'].upcase : ''
-        details = {title: s['artistName'], collectionName: get_collection_name(s['artistName'], get_season(s['collectionName'])), collectionId: s['collectionId'], season: get_season(s['collectionName']), poster: set_image(s['artworkUrl100']), rating: rating, year: year, plot: get_plot(s['longDescription']), genre: s['primaryGenreName']}
-        series << details if series.all? {|el| el[:collectionName] != get_collection_name(s['artistName'], get_season(s['collectionName'])) && is_number?(get_season(s['collectionName']))}
+    if series_response.length > 0
+      series_response.each do |s|
+        series << s if series.all? {|el| el[:collectionName] != s[:collectionName] && is_number?(s[:season])}
       end
+    end
 
       if JwtAuth.has_expired?(ENV['TVDB_TOKEN'])
         token_response = tvdb_auth()
@@ -45,32 +44,34 @@ class Show < ActiveRecord::Base
 
       first_response = tvdb_call("https://api.thetvdb.com/search/series?name=" + URI.encode(t))
 
-      first_response[:body]['data'].each do |s|
-        squared = true
-        second_response = tvdb_call("https://api.thetvdb.com/series/" + s['id'].to_s + "/episodes/summary") if s['seriesName'] != nil && s['seriesName'].downcase == t.downcase
-        second_response[:body]['data']['airedSeasons'].delete('0') if second_response && second_response[:body]['data']['airedSeasons'].include?('0')
+      if first_response && first_response[:code] == '200'
+        first_response[:body]['data'].each do |s|
+          squared = true
+          second_response = tvdb_call("https://api.thetvdb.com/series/" + s['id'].to_s + "/episodes/summary") if s['seriesName'] != nil && s['seriesName'].downcase == t.downcase
+          second_response[:body]['data']['airedSeasons'].delete('0') if second_response && second_response[:body]['data']['airedSeasons'].include?('0')
 
-        if second_response && second_response[:code] == '200'
-          second_response[:body]['data']['airedSeasons'].each do |a|
-            season_number = second_response[:body]['data']['airedSeasons'].index(a) + 1
-            collection_name = get_collection_name(s['seriesName'], season_number.to_s)
-            if series.all? {|el| el[:collectionName] != collection_name}
-              if squared
-                new_t = URI.encode(t + ' season ' + season_number.to_s)
-                doc = HTTParty.get('http://squaredtvart.tumblr.com/search/' + new_t)
-                parsed_doc ||= Nokogiri::HTML(doc)
-                if !parsed_doc.css('p')[1].text.include?('No results')
-                  poster = parsed_doc.css('a > img')[0]['src'].gsub(/_250.jpg/,'_1280.jpg')
+          if second_response && second_response[:code] == '200'
+            second_response[:body]['data']['airedSeasons'].each do |a|
+              season_number = second_response[:body]['data']['airedSeasons'].index(a) + 1
+              collection_name = get_collection_name(s['seriesName'], season_number.to_s)
+              if series.all? {|el| el[:collectionName] != collection_name}
+                if squared
+                  new_t = URI.encode(t + ' season ' + season_number.to_s)
+                  doc = HTTParty.get('http://squaredtvart.tumblr.com/search/' + new_t)
+                  parsed_doc ||= Nokogiri::HTML(doc)
+                  if !parsed_doc.css('p')[1].text.include?('No results')
+                    poster = parsed_doc.css('a > img')[0]['src'].gsub(/_250.jpg/,'_1280.jpg')
+                  else
+                    poster = 'https://s3-us-west-2.amazonaws.com/toddseller/tedflix/imgs/Artboard+1-196x196.jpg'
+                    squared = false
+                  end
                 else
                   poster = 'https://s3-us-west-2.amazonaws.com/toddseller/tedflix/imgs/Artboard+1-196x196.jpg'
-                  squared = false
                 end
-              else
-                poster = 'https://s3-us-west-2.amazonaws.com/toddseller/tedflix/imgs/Artboard+1-196x196.jpg'
+                year = s['firstAired'] != nil ? s['firstAired'].split('-').slice(0,1).join() : ''
+                details = {title: s['seriesName'], collectionName: collection_name, collectionId: get_collection_id(s['id'], season_number.to_s), season: season_number.to_s, poster: poster, rating: '', year: year, plot: s['overview'], genre: ''}
+                series << details if series.all? {|el| el[:collectionName] != collection_name}
               end
-              year = s['firstAired'] != nil ? s['firstAired'].split('-').slice(0,1).join() : ''
-              details = {title: s['seriesName'], collectionName: collection_name, collectionId: get_collection_id(s['id'], season_number.to_s), season: season_number.to_s, poster: poster, rating: '', year: year, plot: s['overview'], genre: ''}
-              series << details if series.all? {|el| el[:collectionName] != collection_name}
             end
           end
         end
@@ -78,7 +79,7 @@ class Show < ActiveRecord::Base
     series.sort {|a, b| [a[:title], a[:season].to_i] <=> [b[:title], b[:season].to_i]}
   end
 
-  def self.get_episodes(id, season)
+  def self.get_episodes(id, season, skip, count)
     episodes = []
     if id.include? 'tvdb'
       id = id.gsub(/tvdb/,'')
@@ -98,13 +99,13 @@ class Show < ActiveRecord::Base
         end
       end
     else
-      episodes_response = JSON.parse(HTTParty.get('https://itunes.apple.com/lookup?id=' + id + '&country=us&entity=tvEpisode'))
+      episodes_response = HTTParty.get('https://tv.apple.com/api/uts/v2/view/show/' + id + '/episodes?skip=' + skip + '&count=' + count + '&sf=143441&locale=EN&utsk=0&caller=wta&v=36&pfm=web')
       return nil if episodes_response.length == 0
 
-      episodes_response['results'].each do |e|
-        e['longDescription']
-        episode = {title: e['trackName'], date: convert_date(e['releaseDate']), plot: get_plot(e['longDescription']), runtime: e['trackTimeMillis'], tv_episode: e['trackNumber'], preview: e['previewUrl']}
-        episodes << episode if e['trackId'] && e['trackNumber'].to_i < 100 && !Date.parse(e['releaseDate']).future?
+      episodes_response['data']['episodes'].each do |e|
+        poster = e['images']['previewFrame']['url'].gsub(/({w}x{h}.{f})/, '300x169.jpg')
+        episode = {title: e['title'], date: Time.at(e['releaseDate'] / 1000).to_datetime.strftime("%b %-d, %Y"), plot: e['description'], runtime: e['duration'] * 1000, tv_episode: e['episodeNumber'], preview: poster}
+        episodes << episode
       end
     end
     episodes.sort_by {|k| k[:tv_episode]}
@@ -220,6 +221,48 @@ class Show < ActiveRecord::Base
       http.request(request)
     end
     response.code
+  end
+
+  def self.appletv_call(s_term)
+    details = []
+    response = HTTParty.get('https://tv.apple.com/api/uts/v2/uts/v2/search/incremental?sf=143441&locale=EN&utsk=0&caller=wta&v=36&pfm=web&q=' + s_term)
+
+    response['data']['canvas']['shelves'].each do |show|
+      show['items'].each do |s|
+        i = 0
+        startCount = 0
+        if s['type'] == 'Show'
+          request1 = HTTParty.get('https://tv.apple.com/api/uts/v2/view/show/' + s['id'] + '?sf=143441&locale=EN&utsk=0&caller=wta&v=36&pfm=web')
+          title =  request1['data']['content']['title']
+          description = request1['data']['content']['description']
+          genre = request1['data']['content']['genres'] ? request1['data']['content']['genres'][0]['name'] : ''
+          rating = request1['data']['content']['rating'] ? request1['data']['content']['rating']['displayName'] : ''
+          date = request1['data']['content']['releaseDate'] ? Time.at(request1['data']['content']['releaseDate'] / 1000).to_datetime.year.to_s : ''
+
+          request2 = HTTParty.get('https://tv.apple.com/api/uts/v2/view/show/' + s['id'] + '/episodes?sf=143441&locale=EN&utsk=0&caller=wta&v=36&pfm=web')
+
+          if request2['data']['seasonSummaries']
+            request2['data']['seasonSummaries'].each do |season|
+              collectionName = title + ', ' + season['label']
+              collectionId = request2['data']['seasons'][i]['id']
+              poster = request2['data']['seasons'][i]['images'] && request2['data']['seasons'][i]['images']['coverArt'] ? request2['data']['seasons'][i]['images']['coverArt']['url'].gsub(/({w}x{h}.{f})/, '600x600.jpg') : request2['data']['seasons'][i]['showImages']['coverArt']['url'].gsub(/({w}x{h}.{f})/, '600x600.jpg')
+              seasonNumber = request2['data']['seasons'][i]['seasonNumber'].to_s
+              skip = seasonNumber == '1' ? 0 : startCount
+              details << {appleTvId: s['id'], title: title, collectionName: collectionName, collectionId: collectionId, season: seasonNumber, rating: rating, genre: genre, plot: get_plot(description), year: date, poster: poster, skip: skip, count: season['episodeCount']}
+              i += 1
+              startCount += season['episodeCount']
+            end
+          else
+            collectionName = request2['data']['episodes'][0]['title'] + ', Season 1'
+            collectionId = request2['data']['episodes'][0]['id']
+            poster = request2['data']['episodes'][0]['images'] && request2['data']['episodes'][0]['images']['coverArt'] ? request2['data']['episodes'][0]['images']['coverArt']['url'].gsub(/({w}x{h}.{f})/, '600x600.jpg') : request2['data']['episodes'][0]['showImages']['coverArt']['url'].gsub(/({w}x{h}.{f})/, '600x600.jpg')
+            seasonNumber = '1'
+            details << {appleTvId: s['id'], title: title, collectionName: collectionName, collectionId: collectionId, season: seasonNumber, rating: rating, genre: genre, plot: get_plot(description), year: date, poster: poster, skip: 0, count: 1}
+          end
+        end
+      end
+    end
+    return details
   end
 
   def self.is_number?(string)

@@ -22,8 +22,8 @@ gem 'bcrypt'
 gem 'json'
 gem 'httparty'
 gem 'jwt'
-gem 'rack-cors', '~> 1.0', '>= 1.0.2'
-gem 'nokogiri'
+gem "rack-cors", ">= 1.0.4"
+gem "nokogiri", ">= 1.10.4"
 gem 'rack', '>= 2.0.6'
 gem 'rack-contrib'
 gem 'humanize'
