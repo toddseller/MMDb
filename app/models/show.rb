@@ -30,7 +30,7 @@ class Show < ActiveRecord::Base
 
     if series_response.length > 0
       series_response.each do |s|
-        series << s if series.all? {|el| el[:collectionName] != s[:collectionName] && is_number?(s[:season])}
+        series << s if series.all? {|el| el[:collectionName].downcase != s[:collectionName].downcase && is_number?(s[:season])}
       end
     end
 
@@ -70,7 +70,7 @@ class Show < ActiveRecord::Base
                 end
                 year = s['firstAired'] != nil ? s['firstAired'].split('-').slice(0,1).join() : ''
                 details = {title: s['seriesName'], collectionName: collection_name, collectionId: get_collection_id(s['id'], season_number.to_s), season: season_number.to_s, poster: poster, rating: '', year: year, plot: s['overview'], genre: ''}
-                series << details if series.all? {|el| el[:collectionName] != collection_name}
+                series << details if series.all? {|el| el[:collectionName].downcase != collection_name.downcase}
               end
             end
           end
