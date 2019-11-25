@@ -105,7 +105,7 @@ class Show < ActiveRecord::Base
       episodes_response['data']['episodes'].each do |e|
         poster = e['images']['previewFrame']['url'].gsub(/({w}x{h}.{f})/, '300x169.jpg')
         episode = {title: clean_up_title(e['title']), date: Time.at(e['releaseDate'] / 1000).to_datetime.strftime("%b %-d, %Y"), plot: e['description'], runtime: e['duration'] * 1000, tv_episode: e['episodeNumber'], preview: poster}
-        episodes << episode
+        episodes << episode if e['episodeNumber'] != nil
       end
     end
     episodes.sort_by {|k| k[:tv_episode]}
