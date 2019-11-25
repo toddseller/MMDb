@@ -138,6 +138,7 @@ class Show < ActiveRecord::Base
   end
 
   def self.get_plot(p)
+    return if p == nil
     new_p = p.gsub(/\<[i|b]\>|\<\/[i|b]\>/, '')
     new_p = new_p.gsub(/\'/, '&#39;')
     new_p = new_p.gsub(/\"/, '&#34;')
