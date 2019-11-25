@@ -79,7 +79,7 @@ class Show < ActiveRecord::Base
     series.sort {|a, b| [a[:title], a[:season].to_i] <=> [b[:title], b[:season].to_i]}
   end
 
-  def self.get_episodes(id, season, skip, count)
+  def self.get_episodes(id, season, skip=0, count=0)
     episodes = []
     if id.include? 'tvdb'
       id = id.gsub(/tvdb/,'')
