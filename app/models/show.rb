@@ -36,7 +36,7 @@ class Show < ActiveRecord::Base
 
     if series_response.length > 0
       series_response.each do |s|
-        series << s if series.all? {|el| el[:collectionName].downcase != s[:collectionName].downcase && el[:appleTvId] != s[:appleTvId] && is_number?(s[:season])}
+        series << s if series.all? {|el| el[:collectionName].downcase != s[:collectionName].downcase && is_number?(s[:season])}
       end
     end
 
