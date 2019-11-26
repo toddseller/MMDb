@@ -247,7 +247,8 @@ class Show < ActiveRecord::Base
           i = 0
           startCount = 0
           if s['type'] == 'Show'
-            request1 = HTTParty.get('https://tv.apple.com/api/uts/v2/view/show/' + s['id'] + '?sf=' + store + '&locale=EN&utsk=0&caller=wta&v=36&pfm=web')
+            # request1 = HTTParty.get('https://tv.apple.com/api/uts/v2/view/show/' + s['id'] + '?sf=' + store + '&locale=EN&utsk=0&caller=wta&v=36&pfm=web')
+            request1 = HTTParty.get('https://tv.apple.com/api/uts/v2/view/show/' + s['id'] + '?sf=143441&locale=EN&utsk=0&caller=wta&v=36&pfm=web')
             title =  request1['data']['content']['title']
             description = request1['data']['content']['description']
             genre = request1['data']['content']['genres'] ? request1['data']['content']['genres'][0]['name'] : ''
