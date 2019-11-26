@@ -27,9 +27,9 @@ post '/users/:user_id/shows' do
   if @show.save
     @show.users << @user if !@show.users.include?(@user)
     if @season.save
+      @season.update(count: params[:season]['count'])
       if @show.seasons.length == 1
         @season.update(is_active: true)
-        @season
       end
       @episodes_previews = @season.skip ? Show.get_episodes(@season.appleTvId, @season.season, @season.skip, @season.count) : Show.get_episodes(@season.collectionId, @season.season)
       count = @episodes_previews.length

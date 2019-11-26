@@ -21,7 +21,7 @@ class Show < ActiveRecord::Base
         show.seasons.each do |season|
           db_season = season.attributes.symbolize_keys
           db_season.store(:title, show.title)
-          series << db_season
+          series << db_season if db_season[:collectionId].include? 'tvdb'
         end
       end
     end
@@ -34,13 +34,13 @@ class Show < ActiveRecord::Base
       end
     end
 
-      # if JwtAuth.has_expired?(ENV['TVDB_TOKEN'])
-      #   token_response = tvdb_auth()
-      #   heroku_call(token_response[:body]['token'])
-      # elsif JwtAuth.renew_token?(ENV['TVDB_TOKEN'])
-      #   token_response = tvdb_call("https://api.thetvdb.com/refresh_token")
-      #   heroku_call(token_response[:body]['token'])
-      # end
+      if JwtAuth.has_expired?(ENV['TVDB_TOKEN'])
+        token_response = tvdb_auth()
+        heroku_call(token_response[:body]['token'])
+      elsif JwtAuth.renew_token?(ENV['TVDB_TOKEN'])
+        token_response = tvdb_call("https://api.thetvdb.com/refresh_token")
+        heroku_call(token_response[:body]['token'])
+      end
 
       first_response = tvdb_call("https://api.thetvdb.com/search/series?name=" + URI.encode(t))
 
