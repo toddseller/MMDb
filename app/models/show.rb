@@ -40,48 +40,48 @@ class Show < ActiveRecord::Base
       end
     end
 
-      if JwtAuth.has_expired?(ENV['TVDB_TOKEN'])
-        token_response = tvdb_auth()
-        heroku_call(token_response[:body]['token'])
-      elsif JwtAuth.renew_token?(ENV['TVDB_TOKEN'])
-        token_response = tvdb_call("https://api.thetvdb.com/refresh_token")
-        heroku_call(token_response[:body]['token'])
-      end
-
-      first_response = tvdb_call("https://api.thetvdb.com/search/series?name=" + URI.encode(t))
-
-      if first_response && first_response[:code] == '200'
-        first_response[:body]['data'].each do |s|
-          squared = true
-          second_response = tvdb_call("https://api.thetvdb.com/series/" + s['id'].to_s + "/episodes/summary") if s['seriesName'] != nil && s['seriesName'].downcase == t.downcase
-          second_response[:body]['data']['airedSeasons'].delete('0') if second_response && second_response[:body]['data']['airedSeasons'].include?('0')
-
-          if second_response && second_response[:code] == '200'
-            second_response[:body]['data']['airedSeasons'].each do |a|
-              season_number = second_response[:body]['data']['airedSeasons'].index(a) + 1
-              collection_name = get_collection_name(s['seriesName'], season_number.to_s)
-              if series.all? {|el| el[:collectionName] != collection_name}
-                if squared
-                  new_t = URI.encode(t + ' season ' + season_number.to_s)
-                  doc = HTTParty.get('http://squaredtvart.tumblr.com/search/' + new_t)
-                  parsed_doc ||= Nokogiri::HTML(doc)
-                  if !parsed_doc.css('p')[1].text.include?('No results')
-                    poster = parsed_doc.css('a > img')[0]['src'].gsub(/_250.jpg/,'_1280.jpg')
-                  else
-                    poster = 'https://s3-us-west-2.amazonaws.com/toddseller/tedflix/imgs/Artboard+1-196x196.jpg'
-                    squared = false
-                  end
-                else
-                  poster = 'https://s3-us-west-2.amazonaws.com/toddseller/tedflix/imgs/Artboard+1-196x196.jpg'
-                end
-                year = s['firstAired'] != nil ? s['firstAired'].split('-').slice(0,1).join() : ''
-                details = {title: s['seriesName'], collectionName: collection_name, collectionId: get_collection_id(s['id'], season_number.to_s), season: season_number.to_s, poster: poster, rating: '', year: year, plot: s['overview'], genre: ''}
-                series << details if series.all? {|el| el[:collectionName].downcase != collection_name.downcase}
-              end
-            end
-          end
-        end
-      end
+      # if JwtAuth.has_expired?(ENV['TVDB_TOKEN'])
+      #   token_response = tvdb_auth()
+      #   heroku_call(token_response[:body]['token'])
+      # elsif JwtAuth.renew_token?(ENV['TVDB_TOKEN'])
+      #   token_response = tvdb_call("https://api.thetvdb.com/refresh_token")
+      #   heroku_call(token_response[:body]['token'])
+      # end
+      #
+      # first_response = tvdb_call("https://api.thetvdb.com/search/series?name=" + URI.encode(t))
+      #
+      # if first_response && first_response[:code] == '200'
+      #   first_response[:body]['data'].each do |s|
+      #     squared = true
+      #     second_response = tvdb_call("https://api.thetvdb.com/series/" + s['id'].to_s + "/episodes/summary") if s['seriesName'] != nil && s['seriesName'].downcase == t.downcase
+      #     second_response[:body]['data']['airedSeasons'].delete('0') if second_response && second_response[:body]['data']['airedSeasons'].include?('0')
+      #
+      #     if second_response && second_response[:code] == '200'
+      #       second_response[:body]['data']['airedSeasons'].each do |a|
+      #         season_number = second_response[:body]['data']['airedSeasons'].index(a) + 1
+      #         collection_name = get_collection_name(s['seriesName'], season_number.to_s)
+      #         if series.all? {|el| el[:collectionName] != collection_name}
+      #           if squared
+      #             new_t = URI.encode(t + ' season ' + season_number.to_s)
+      #             doc = HTTParty.get('http://squaredtvart.tumblr.com/search/' + new_t)
+      #             parsed_doc ||= Nokogiri::HTML(doc)
+      #             if !parsed_doc.css('p')[1].text.include?('No results')
+      #               poster = parsed_doc.css('a > img')[0]['src'].gsub(/_250.jpg/,'_1280.jpg')
+      #             else
+      #               poster = 'https://s3-us-west-2.amazonaws.com/toddseller/tedflix/imgs/Artboard+1-196x196.jpg'
+      #               squared = false
+      #             end
+      #           else
+      #             poster = 'https://s3-us-west-2.amazonaws.com/toddseller/tedflix/imgs/Artboard+1-196x196.jpg'
+      #           end
+      #           year = s['firstAired'] != nil ? s['firstAired'].split('-').slice(0,1).join() : ''
+      #           details = {title: s['seriesName'], collectionName: collection_name, collectionId: get_collection_id(s['id'], season_number.to_s), season: season_number.to_s, poster: poster, rating: '', year: year, plot: s['overview'], genre: ''}
+      #           series << details if series.all? {|el| el[:collectionName].downcase != collection_name.downcase}
+      #         end
+      #       end
+      #     end
+      #   end
+      # end
     series.sort {|a, b| [a[:title], a[:season].to_i] <=> [b[:title], b[:season].to_i]}
   end
 
