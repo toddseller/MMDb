@@ -254,7 +254,8 @@ class Show < ActiveRecord::Base
             genre = request1['data']['content']['genres'] ? request1['data']['content']['genres'][0]['name'] : ''
             rating = request1['data']['content']['rating'] ? request1['data']['content']['rating']['displayName'] : ''
             date = request1['data']['content']['releaseDate'] ? Time.at(request1['data']['content']['releaseDate'] / 1000).to_datetime.year.to_s : ''
-            request2 = HTTParty.get('https://tv.apple.com/api/uts/v2/view/show/' + s['id'] + '/episodes?sf=' + store + '&locale=EN&utsk=0&caller=wta&v=36&pfm=web')
+            # request2 = HTTParty.get('https://tv.apple.com/api/uts/v2/view/show/' + s['id'] + '/episodes?sf=' + store + '&locale=EN&utsk=0&caller=wta&v=36&pfm=web')
+            request2 = HTTParty.get('https://tv.apple.com/api/uts/v2/view/show/' + s['id'] + '/episodes?sf=143441&locale=EN&utsk=0&caller=wta&v=36&pfm=web')
 
             if request2['data']['seasonSummaries']
               request2['data']['seasonSummaries'].each do |season|
