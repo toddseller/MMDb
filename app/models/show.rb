@@ -21,7 +21,11 @@ class Show < ActiveRecord::Base
         show.seasons.each do |season|
           db_season = season.attributes.symbolize_keys
           db_season.store(:title, show.title)
-          series << db_season if db_season[:collectionId].include? 'tvdb'
+          if season[:appleTvId]
+            request = HTTParty.get('https://tv.apple.com/api/uts/v2/view/show/' + season[:appleTvId] + '/episodes?sf=143441&locale=EN&utsk=0&caller=wta&v=36&pfm=web')
+            db_season[:count] = request['data']['seasonSummaries'][season[:season] - 1]['episodeCount'].to_s
+          end
+          series << db_season
         end
       end
     end
