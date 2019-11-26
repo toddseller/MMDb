@@ -239,9 +239,9 @@ class Show < ActiveRecord::Base
     details = []
     storeIds = ['143441', '143444']
 
-    storeIds.each do |store|
-      response = HTTParty.get('https://tv.apple.com/api/uts/v2/uts/v2/search/incremental?sf=' + store + '&locale=EN&utsk=0&caller=wta&v=36&pfm=web&q=' + s_term)
-
+    # storeIds.each do |store|
+      # response = HTTParty.get('https://tv.apple.com/api/uts/v2/uts/v2/search/incremental?sf=' + store + '&locale=EN&utsk=0&caller=wta&v=36&pfm=web&q=' + s_term)
+      response = HTTParty.get('https://tv.apple.com/api/uts/v2/uts/v2/search/incremental?sf=143441&locale=EN&utsk=0&caller=wta&v=36&pfm=web&q=' + s_term)
       response['data']['canvas']['shelves'].each do |show|
         show['items'].each do |s|
           i = 0
@@ -276,7 +276,7 @@ class Show < ActiveRecord::Base
           end
         end
       end
-    end
+    # end
     return details
   end
 
