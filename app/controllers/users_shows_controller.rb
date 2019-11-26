@@ -28,10 +28,11 @@ post '/users/:user_id/shows' do
     @show.users << @user if !@show.users.include?(@user)
     if @season.save
       @season.update(count: params[:season]['count'])
+      @season.update(storeId: params[:season]['storeId']) if @season[:storeId] == nil && params[:season]['storeId'] != nil
       if @show.seasons.length == 1
         @season.update(is_active: true)
       end
-      @episodes_previews = @season.skip ? Show.get_episodes(@season.appleTvId, @season.season, @season.skip, @season.count) : Show.get_episodes(@season.collectionId, @season.season)
+      @episodes_previews = @season.skip ? Show.get_episodes(@season.appleTvId, @season.season, @season.skip, @season.count, @season.storeId) : Show.get_episodes(@season.collectionId, @season.season)
       count = @episodes_previews.length
     end
 
