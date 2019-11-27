@@ -165,7 +165,7 @@ class Movie < ActiveRecord::Base
   def self.get_genres(r)
     genres = []
     r['genres'].each {|k| genres << k['name']} if r['genres']
-    genres.length != 0 ? genres.first(2).join(', ') : ''
+    genres.length != 0 ? genres[0] : ''
   end
 
   def self.get_plot(p)
