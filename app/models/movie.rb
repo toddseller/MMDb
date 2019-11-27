@@ -11,7 +11,7 @@ class Movie < ActiveRecord::Base
   before_save :create_search_name
   before_save :create_director_check
   before_save :update_user_count
-  before_update :sanitize_input
+  # before_update :sanitize_input
   before_update :adjust_url
 
   scope :sorted_list, -> {order(:sort_name, :year)}
@@ -256,7 +256,7 @@ class Movie < ActiveRecord::Base
                 rating = content['rating'] ? content['rating']['displayName'] : ''
                 runtime = content['duration'] ? (content['duration'] / 60).to_s : ''
                 studio = content['studio'] ? content['studio'] : ''
-                director_check = director.length > 0 ? director[0].split(' ').slice(-1, 1).join() : ''
+                p director_check = director.length > 0 ? director[0].split(' ').slice(-1, 1).join() : ''
 
                 movies << {title: title, plot: plot, poster: poster, year: year, actors: get_first_six(actors), director: get_first_six(director), genre: genre, producer: get_first_six(producer), rating: rating, runtime: runtime, studio: studio, writer: get_first_six(writer), director_check: director_check} if movies.all? {|el| el[:title] != title && el[:year] != year || el[:director_check] != director_check}
               end
