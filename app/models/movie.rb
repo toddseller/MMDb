@@ -20,30 +20,14 @@ class Movie < ActiveRecord::Base
 
   def self.get_titles(t)
     movie_array = Movie.where("search_name LIKE ?", "%#{t}%").sorted_list.first(10)
-    itunes_response = JSON.parse(HTTParty.get('https://itunes.apple.com/search?term=' + t + '&media=movie&entity=movie'))
-    if itunes_response['results'] != []
-      itunes_response['results'].each do |movie|
-        if !movie['collectionType']
-          title = movie['trackName'] != nil ? movie['trackName'].gsub(/\s\(\d*\)/, '') : ''
-          plot = movie['longDescription'] != nil ? get_plot(movie['longDescription']) : ''
-          poster = movie['artworkUrl100'] != nil ? movie['artworkUrl100'].gsub!(/100x100bb/, '1200x630bb') : ''
-          director = movie['artistName'] != nil ? movie['artistName'].split(' & ').join(', ') : ''
-          genre = movie['primaryGenreName'] != nil ? movie['primaryGenreName'] : ''
-          rating = movie['contentAdvisoryRating'] != nil ? movie['contentAdvisoryRating'].upcase : ''
-          year = movie['releaseDate'] != nil ? movie['releaseDate'].split('-').slice(0, 1).join() : ''
-          doc = HTTParty.get(movie['trackViewUrl'])
-          parsed_doc ||= Nokogiri::HTML(doc)
-          actors = parsed_doc.xpath('//*[dt[contains(.,"Cast")]]/dd') ? itunes_info(parsed_doc.xpath('//*[dt[contains(.,"Cast")]]/dd')) : ''
-          producer = parsed_doc.xpath('//*[dt[contains(.,"Producers")]]/dd') ? itunes_info(parsed_doc.xpath('//*[dt[contains(.,"Producers")]]/dd')) : ''
-          writer = parsed_doc.xpath('//*[dt[contains(.,"Screenwriter")]]/dd') ? itunes_info(parsed_doc.xpath('//*[dt[contains(.,"Screenwriter")]]/dd')) : ''
-          studio = JSON.parse(parsed_doc.xpath('//script[@id="shoebox-ember-data-store"]').children[0].text())['data']['attributes']['studio'] ? itunes_studio(JSON.parse(parsed_doc.xpath('//script[@id="shoebox-ember-data-store"]').children[0].text())['data']['attributes']['studio']) : ''
-          runtime = movie['trackTimeMillis'] != nil ? (movie['trackTimeMillis'] / (1000 * 60)).to_s : '0'
-          director_check = director != '' ? director.split(' ').slice(-1, 1).join() : ''
-          test_movie = {title: title, plot: plot, poster: poster, year: year, actors: actors, director: director, genre: genre, producer: producer, rating: rating, runtime: runtime, studio: studio, writer: writer, director_check: director_check}
-          movie_array << test_movie if movie_array.all? {|el| el[:title] != title && el[:year] != year || el[:director_check] != director_check}
-        end
+    movie_response = appletv_call(t)
+
+    if movie_response.length > 0
+      movie_response.each do |m|
+        movie_array << m if movie_array.all? {|el| el[:title] != m[:title] && el[:year] != m[:year] || el[:director_check] != m[:director_check]}
       end
     end
+
     title_response = HTTParty.get('https://api.themoviedb.org/3/search/movie?api_key=' + ENV['TMDB_KEY'] + '&query=' + t)
 
     return nil if title_response['results'] == []
@@ -225,5 +209,62 @@ class Movie < ActiveRecord::Base
     writers = []
     r['credits']['crew'].each {|k| writers << k['name'] if k['job'] == 'Screenplay' || k['job'] == 'Writer'}
     writers.length != 0 ? writers.first(6).join(', ') : ''
+  end
+
+  def self.get_first_six(a)
+    a.length != 0 ? a.first(6).join(', ') : ''
+  end
+
+  def self.appletv_call(s_term)
+    movies = []
+    storeIds = ['143441', '143444']
+
+    storeIds.each do |store|
+     response = HTTParty.get('https://tv.apple.com/api/uts/v2/uts/v2/search/incremental?sf=' + store + '&locale=EN&utsk=0&caller=wta&v=36&pfm=web&q=' + s_term)
+
+      if response['data']['canvas'] != nil
+        response['data']['canvas']['shelves'].each do |movie|
+          if movie['items'].length > 0
+            movie['items'].each do |m|
+              if m['type'] == 'Movie'
+                request = HTTParty.get('https://tv.apple.com/api/uts/v2/view/product/' + m['id'] + '?sf=' + store + '&locale=EN&utsk=0&caller=wta&v=36&pfm=web')
+                content = request['data']['content']
+                credits = request['data']['roles'] ? request['data']['roles'] : []
+                actors = []
+                director = []
+                producer = []
+                writer = []
+                credits.each do |credit|
+                  case credit['type']
+                  when 'Actor'
+                    actors << credit['personName']
+                  when 'Director'
+                    director << credit['personName']
+                  when 'Producer'
+                    producer << credit['personName']
+                  when 'Writer'
+                    writer << credit['personName']
+                  else
+                    puts "not matching"
+                  end
+                end
+                title = content['title']
+                plot = content['description'] ? get_plot(content['description']) : ''
+                year = content['releaseDate'] ? Time.at(content['releaseDate'] / 1000).to_datetime.year.to_s : ''
+                poster = content['images']['coverArt'] ? content['images']['coverArt']['url'].gsub(/({w}x{h}.{f})/, content['images']['coverArt']['width'].to_s + 'x' + content['images']['coverArt']['height'].to_s + '.jpg') : ''
+                genre = content['genres'] ? content['genres'][0]['name'] : ''
+                rating = content['rating'] ? content['rating']['displayName'] : ''
+                runtime = content['duration'] ? (content['duration'] / 60).to_s : ''
+                studio = content['studio'] ? content['studio'] : ''
+                director_check = director.length > 0 ? director[0].split(' ').slice(-1, 1).join() : ''
+
+                movies << {title: title, plot: plot, poster: poster, year: year, actors: get_first_six(actors), director: get_first_six(director), genre: genre, producer: get_first_six(producer), rating: rating, runtime: runtime, studio: studio, writer: get_first_six(writer), director_check: director_check} if movies.all? {|el| el[:title] != title && el[:year] != year || el[:director_check] != director_check}
+              end
+            end
+          end
+        end
+      end
+    end
+    return movies
   end
 end
