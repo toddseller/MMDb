@@ -5,6 +5,8 @@ class Episode < ActiveRecord::Base
   belongs_to :seasons, -> { order(:tv_episode) }
 
   before_create :create_duration
+  before_save :update_duration
+
 
   scope :sorted_list, -> { order(:tv_episode) }
 
@@ -23,12 +25,26 @@ class Episode < ActiveRecord::Base
     time = self.runtime.to_i
     hour = time.round / (1000 * 60 * 60)
     min = time / (1000 * 60) % 60
-    if hour == 1
-      self.runtime = hour.to_s + ' hour, ' + min.to_s + ' minutes'
-    elsif hour > 1
-      self.runtime = hour.to_s + ' hours, ' + min.to_s + ' minutes'
+    if hour != 0 && min > 0
+      self.runtime = hour.to_s + 'h ' + min.to_s + 'm'
+    elsif hour != 0 && min == 0
+      self.runtime = hour.to_s + ' hr'
     else
-      self.runtime = min.to_s + ' minutes'
+      self.runtime = min.to_s + ' min'
+    end
+  end
+
+  def update_duration
+    if self.runtime.include? 'hour'
+      if self.runtime.include? '0'
+        self.runtime = self.runtime.gsub(/hours?.*/, 'hr')
+      else
+        duration = self.runtime.gsub(/\shours?,/, 'h')
+        duration = duration.gsub(/\sminutes?/, 'm')
+        self.runtime = duration
+      end
+    elsif self.runtime.include? 'minute'
+      self.runtime = self.runtime.gsub(/minutes?/, 'min')
     end
   end
 end
