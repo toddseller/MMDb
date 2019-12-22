@@ -32,7 +32,7 @@ post '/users/:user_id/shows' do
       if @show.seasons.length == 1
         @season.update(is_active: true)
       end
-      @episodes_previews = @season.skip ? Show.get_episodes(@season.appleTvId, @season.season, @season.skip, @season.count, @season.storeId) : Show.get_episodes(@season.collectionId, @season.season)
+     @episodes_previews = @season.skip != '' ? Show.get_episodes(@season.appleTvId, @season.season, @season.skip, @season.count, @season.storeId) : Show.get_episodes(@season.collectionId, @season.season)
       count = @episodes_previews.length
     end
 
