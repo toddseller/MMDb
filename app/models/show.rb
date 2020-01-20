@@ -21,6 +21,9 @@ class Show < ActiveRecord::Base
         show.seasons.each do |season|
           db_season = season.attributes.symbolize_keys
           db_season.store(:title, show.title)
+          p season[:appleTvId]
+          p season[:appleTvId] == nil
+          p season[:appleTvId] == ''
           if season[:appleTvId] != nil || season[:appleTvId] != ''
             storeId = season[:storeId] ? season[:storeId] : '143441'
             request = HTTParty.get('https://tv.apple.com/api/uts/v2/view/show/' + season[:appleTvId] + '/episodes?sf=' + storeId +'&locale=EN&utsk=0&caller=wta&v=36&pfm=web')
