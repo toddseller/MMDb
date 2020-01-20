@@ -87,6 +87,7 @@ class Show < ActiveRecord::Base
 
   def self.get_episodes(id, season, skip=0, count=0, storeId='143441')
     episodes = []
+    p id
     if id.include? 'tvdb'
       id = id.gsub(/tvdb/,'')
       id = id[0...-season.to_s.length]
