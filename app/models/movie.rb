@@ -220,14 +220,14 @@ class Movie < ActiveRecord::Base
     storeIds = ['143441', '143444']
 
     storeIds.each do |store|
-     response = HTTParty.get('https://uts-api.itunes.apple.com/v2/uts/v2/search/incremental?sf=' + store + '&locale=EN&utsk=0&caller=wta&v=36&pfm=web&q=' + s_term)
+     response = HTTParty.get('https://uts-api.itunes.apple.com/uts/v2/search/incremental?sf=' + store + '&locale=EN&utsk=0&caller=wta&v=36&pfm=web&q=' + s_term)
 
       if response['data']['canvas'] != nil
         response['data']['canvas']['shelves'].each do |movie|
           if movie['items'].length > 0
             movie['items'].each do |m|
               if m['type'] == 'Movie'
-                request = HTTParty.get('https://uts-api.itunes.apple.com/v2/view/product/' + m['id'] + '?sf=' + store + '&locale=EN&utsk=0&caller=wta&v=36&pfm=web')
+                request = HTTParty.get('https://uts-api.itunes.apple.com/uts/v2/view/product/' + m['id'] + '?sf=' + store + '&locale=EN&utsk=0&caller=wta&v=36&pfm=web')
                 content = request['data']['content']
                 credits = request['data']['roles'] ? request['data']['roles'] : []
                 actors = []
