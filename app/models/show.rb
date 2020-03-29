@@ -241,7 +241,7 @@ class Show < ActiveRecord::Base
     storeIds = ['143441', '143444']
 
     storeIds.each do |store|
-      response = HTTParty.get('https://tv.apple.com/api/uts/v2/uts/v2/search/incremental?sf=' + store + '&locale=EN&utsk=0&caller=wta&v=36&pfm=web&q=' + s_term)
+      response = HTTParty.get('https://uts-api.itunes.apple.com/v2/uts/v2/search/incremental?sf=' + store + '&locale=EN&utsk=0&caller=wta&v=36&pfm=web&q=' + s_term)
 
       if response['data']['canvas'] != nil
         response['data']['canvas']['shelves'].each do |show|
@@ -250,13 +250,13 @@ class Show < ActiveRecord::Base
             startCount = 0
 
             if s['type'] == 'Show'
-              request1 = HTTParty.get('https://tv.apple.com/api/uts/v2/view/show/' + s['id'] + '?sf=' + store + '&locale=EN&utsk=0&caller=wta&v=36&pfm=web')
+              request1 = HTTParty.get('https://uts-api.itunes.apple.com/v2/view/show/' + s['id'] + '?sf=' + store + '&locale=EN&utsk=0&caller=wta&v=36&pfm=web')
               title =  request1['data']['content']['title']
               description = request1['data']['content']['description']
               genre = request1['data']['content']['genres'] ? request1['data']['content']['genres'][0]['name'] : ''
               rating = request1['data']['content']['rating'] ? request1['data']['content']['rating']['displayName'] : ''
               date = request1['data']['content']['releaseDate'] ? Time.at(request1['data']['content']['releaseDate'] / 1000).to_datetime.year.to_s : ''
-              request2 = HTTParty.get('https://tv.apple.com/api/uts/v2/view/show/' + s['id'] + '/episodes?sf=' + store + '&locale=EN&utsk=0&caller=wta&v=36&pfm=web')
+              request2 = HTTParty.get('https://uts-api.itunes.apple.com/v2/view/show/' + s['id'] + '/episodes?sf=' + store + '&locale=EN&utsk=0&caller=wta&v=36&pfm=web')
 
               if request2['data']['seasonSummaries']
                 request2['data']['seasonSummaries'].each do |season|
