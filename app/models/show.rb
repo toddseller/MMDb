@@ -108,8 +108,10 @@ class Show < ActiveRecord::Base
       episodes_response = HTTParty.get('https://tv.apple.com/api/uts/v2/view/show/' + id + '/episodes?skip=' + skip + '&count=' + count + '&sf=' + storeId + '&locale=EN&utsk=0&caller=wta&v=36&pfm=web')
       return nil if episodes_response.length == 0
 
+      p episodes_response['data']['episodes']
+
       episodes_response['data']['episodes'].each do |e|
-        poster = e['images']['previewFrame']['url'].gsub(/({w}x{h}.{f})/, '300x169.jpg')
+        poster = e['images']['previewFrame'] ? e['images']['previewFrame']['url'].gsub(/({w}x{h}.{f})/, '300x169.jpg') : e['showImages']['keyframe']['url'].gsub(/({w}x{h}.{f})/, '300x169.jpg')
         date = e['releaseDate'] ? Time.at(e['releaseDate'] / 1000).to_datetime.strftime("%b %-d, %Y") : ''
         runtime = e['duration'] ? e['duration'] * 1000 : ''
         episode = {title: clean_up_title(e['title']), date: date, plot: e['description'], runtime: runtime, tv_episode: e['episodeNumber'], preview: poster}
