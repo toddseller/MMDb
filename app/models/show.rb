@@ -21,7 +21,7 @@ class Show < ActiveRecord::Base
         show.seasons.each do |season|
           db_season = season.attributes.symbolize_keys
           db_season.store(:title, show.title)
-          if season[:appleTvId] != nil
+          if season[:appleTvId] != nil && season[:appleTvId] != ""
             storeId = season[:storeId] ? season[:storeId] : '143441'
             request = HTTParty.get('https://tv.apple.com/api/uts/v2/view/show/' + season[:appleTvId] + '/episodes?sf=' + storeId +'&locale=EN&utsk=0&caller=wta&v=36&pfm=web')
             db_season[:storeId] = storeId if db_season[:storeId] == nil
@@ -40,13 +40,13 @@ class Show < ActiveRecord::Base
       end
     end
 
-    if JwtAuth.has_expired?(ENV['TVDB_TOKEN'])
-      token_response = tvdb_auth()
-      heroku_call(token_response[:body]['token'])
-    elsif JwtAuth.renew_token?(ENV['TVDB_TOKEN'])
-      token_response = tvdb_call("https://api.thetvdb.com/refresh_token")
-      heroku_call(token_response[:body]['token'])
-    end
+    # if JwtAuth.has_expired?(ENV['TVDB_TOKEN'])
+    #   token_response = tvdb_auth()
+    #   heroku_call(token_response[:body]['token'])
+    # elsif JwtAuth.renew_token?(ENV['TVDB_TOKEN'])
+    #   token_response = tvdb_call("https://api.thetvdb.com/refresh_token")
+    #   heroku_call(token_response[:body]['token'])
+    # end
 
     first_response = tvdb_call("https://api.thetvdb.com/search/series?name=" + URI.encode(t))
 
@@ -89,7 +89,7 @@ class Show < ActiveRecord::Base
     episodes = []
     if id.include? 'tvdb'
       id = id.gsub(/tvdb/,'')
-      id = id[0...-season.to_s.length]
+      p id = id[0...-season.to_s.length]
 
       get_runtime = tvdb_call("https://api.thetvdb.com/series/" + id.to_s)
       runtime = get_runtime[:body]['data']['runtime'].to_i * 1000 * 60
