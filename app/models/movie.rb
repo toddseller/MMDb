@@ -34,7 +34,7 @@ class Movie < ActiveRecord::Base
     title_response['results'].each do |movie|
       movie_response = HTTParty.get('https://api.themoviedb.org/3/movie/' + movie['id'].to_s + '?api_key=' + ENV['TMDB_KEY'] + '&append_to_response=credits,releases')
       if movie_response.code == 200 && movie['poster_path'] != nil
-        year = movie_response['release_date'] != nil ? movie['release_date'].split('-').slice(0, 1).join() : ''
+        year = movie_response['release_date'] != nil && movie_response['release_date'] != '' ? movie['release_date'].split('-').slice(0, 1).join() : ''
         runtime = movie_response['runtime'] != nil ? movie_response['runtime'].to_s : '0'
         title = movie['title']
         plot = get_plot(movie['overview'])
