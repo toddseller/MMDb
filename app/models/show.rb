@@ -251,7 +251,7 @@ class Show < ActiveRecord::Base
             i = 0
             startCount = 0
 
-            if s['type'] == 'Show'
+            if s['type'] == 'Show' && s['title'] && s['title'].downcase().include?(s_term.downcase())
               request1 = HTTParty.get('https://uts-api.itunes.apple.com/uts/v2/view/show/' + s['id'] + '?sf=' + store + '&locale=EN&utsk=0&caller=wta&v=36&pfm=web')
               title =  request1['data']['content']['title']
               description = request1['data']['content']['description']
