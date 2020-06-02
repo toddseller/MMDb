@@ -89,7 +89,7 @@ class Show < ActiveRecord::Base
     episodes = []
     if id.include? 'tvdb'
       id = id.gsub(/tvdb/,'')
-      p id = id[0...-season.to_s.length]
+      id = id[0...-season.to_s.length]
 
       get_runtime = tvdb_call("https://api.thetvdb.com/series/" + id.to_s)
       runtime = get_runtime[:body]['data']['runtime'].to_i * 1000 * 60
@@ -107,7 +107,6 @@ class Show < ActiveRecord::Base
     else
       episodes_response = HTTParty.get('https://tv.apple.com/api/uts/v2/view/show/' + id + '/episodes?skip=' + skip + '&count=' + count + '&sf=' + storeId + '&locale=EN&utsk=0&caller=wta&v=36&pfm=web')
       return nil if episodes_response.length == 0
-
       episodes_response['data']['episodes']
 
       episodes_response['data']['episodes'].each do |e|
