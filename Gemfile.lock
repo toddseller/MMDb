@@ -43,7 +43,7 @@ GEM
     pg (1.2.2)
     puma (4.3.3)
       nio4r (~> 2.0)
-    rack (2.2.2)
+    rack (2.2.3)
     rack-contrib (2.1.0)
       rack (~> 2.0)
     rack-cors (1.1.1)
