@@ -258,11 +258,15 @@ class Show < ActiveRecord::Base
               rating = request1['data']['content']['rating'] ? request1['data']['content']['rating']['displayName'] : ''
               date = request1['data']['content']['releaseDate'] ? Time.at(request1['data']['content']['releaseDate'] / 1000).to_datetime.year.to_s : ''
               request2 = HTTParty.get('https://uts-api.itunes.apple.com/uts/v2/view/show/' + s['id'] + '/episodes?sf=' + store + '&locale=EN&utsk=0&caller=wta&v=36&pfm=web')
+              p s['id']
+              p title
 
               if request2['data']['seasonSummaries']
                 request2['data']['seasonSummaries'].each do |season|
+                  p season
                   collectionName = title + ', ' + season['label']
-                  collectionId = request2['data']['seasons'][i]['id']
+                  p collectionId = request2['data']['seasons'][i]['id']
+                  p get_plot(description)
                   poster = request2['data']['seasons'][i]['images'] && request2['data']['seasons'][i]['images']['coverArt'] ? request2['data']['seasons'][i]['images']['coverArt']['url'].gsub(/({w}x{h}.{f})/, '600x600.jpg') : request2['data']['seasons'][i]['showImages'] && request2['data']['seasons'][i]['showImages']['coverArt'] ? request2['data']['seasons'][i]['showImages']['coverArt']['url'].gsub(/({w}x{h}.{f})/, '600x600.jpg') : 'https://s3-us-west-2.amazonaws.com/toddseller/tedflix/imgs/Artboard+1-196x196.jpg'
                   seasonNumber = request2['data']['seasons'][i]['seasonNumber'].to_s
                   skip = seasonNumber == '1' ? 0 : startCount

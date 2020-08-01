@@ -50,3 +50,13 @@ get '/movies/4k/:id' do
     erb :"/partials/_filtered_list", layout: false, locals: {user: user}
   end
 end
+
+get '/movies/update' do
+  title = params[:title].downcase
+  @route = params[:route]
+  @movie_previews = Movie.update_title_search(title)
+  page = erb :"/partials/_update_preview", layout: false
+  if request.xhr?
+    json query: @movie_previews, page: page
+  end
+end

@@ -47,6 +47,8 @@ var dynamicListener = function () {
   $('#user-page').on('click', '.show-edit', editShow)
   $('#user-page').on('click', '#edit-button', submitUpdate)
   $('#user-page').on('click', '#delete-button', deleteMovie)
+  $('#user-page').on('click', '#update-search', updateDatabase)
+  $('#user-page').on('click', '#update-movie', submitPreviewUpdate)
   $('#user-page').on('click', '.rating-input', ratingSubmit)
   $('#user-page').on('click', '.description-details a', searchByName)
   $('#user-page').on('click', '.studio a', searchByName)
@@ -388,6 +390,29 @@ var checkDatabase2 = function (event) {
   $('#scroll-left').hide()
 }
 
+var updateDatabase = function (event) {
+  event.preventDefault()
+  var parentForm = $('.edit-form').attr('action')
+  var title = $('#movie_title').text()
+  var data = {title: title, route: parentForm}
+  var route = '/movies/update'
+  $.ajax({
+    url: route,
+    data: data,
+    success: previewMovie,
+    error: (function(jqXHR, textStatus, errorThrown) {
+      if (jqXHR.status == 500) {
+        $('#preview').empty().slideDown(300, 'linear').append('<div style="width: 174px; height: auto;"><img src="/imgs/loading_image.svg" width: 174 height: auto></div>').css({'display':'flex','justify-content':'center'})
+      }
+    })
+  })
+  $(this).trigger('reset')
+  $('#preview').empty().slideDown(300, 'linear').append('<div id="loading"><h3>Searching Our Database...</h3><div class="loader"></div></div>').css({'display':'flex','justify-content':'center'})
+  $('#dismiss').attr('style','top: 0;').show()
+  $('#scroll-right').hide()
+  $('#scroll-left').hide()
+}
+
 var createShow = function (event) {
   event.preventDefault()
   var id = $('.index-preview') > 0 ? $('.index-preview').attr('id') : window.sessionStorage.id
@@ -625,6 +650,25 @@ var listShow = function (response) {
 
 var closePreview = function (event) {
   event.preventDefault()
+  $('#preview').slideUp(300, 'linear')
+  $('#dismiss').hide()
+  $('#scroll-right').hide()
+  $('#scroll-left').hide()
+  if ($('#movie-list').length == 1) {
+    $('#add').show()
+    $('#movie-list').css('top', '0')
+  } else {
+    $('#add-show').show()
+    $('#show-list').css('top', '0')
+  }
+  $('#search').hide()
+  $('#search-year').hide()
+  $('#search-title').css('right', '0')
+  $('.input-group-btn').css('top', '0')
+  $('#more').show()
+}
+
+var closeUpdatePreview = function () {
   $('#preview').slideUp(300, 'linear')
   $('#dismiss').hide()
   $('#scroll-right').hide()
@@ -915,7 +959,20 @@ var submitUpdate = function (event) {
   })
 }
 
+var submitPreviewUpdate = function(event) {
+  event.preventDefault()
+  var formRoute = $(this).attr('action')
+  var formData = $('#search-movie-title').val().length > 0 ? $(this).serialize() + '&filter=' + filterValue : $(this).serialize() + '&name=' + filterValue
+  var response = $.ajax({
+    url: formRoute,
+    type: 'PUT',
+    data: formData,
+    success: displayUpdatedMovie
+  })
+}
+
 var displayUpdatedMovie = function (response) {
+  closeUpdatePreview()
   $('#movie-list').empty().append(response.query)
   var that = $('#' + response.id).parent('div')
   var posterArt = $('#' + response.id).children('img')

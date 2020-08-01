@@ -51,6 +51,39 @@ class Movie < ActiveRecord::Base
     movie_array.sort_by {|k| k[:year]}
   end
 
+  def self.update_title_search(t)
+    movie_array = []
+    movie_response = appletv_call(t)
+
+    if movie_response.length > 0
+      movie_response.each do |m|
+        movie_array << m
+      end
+    end
+
+    title_response = HTTParty.get('https://api.themoviedb.org/3/search/movie?api_key=' + ENV['TMDB_KEY'] + '&query=' + t)
+
+    return nil if title_response['results'] == []
+    title_response['results'].each do |movie|
+      movie_response = HTTParty.get('https://api.themoviedb.org/3/movie/' + movie['id'].to_s + '?api_key=' + ENV['TMDB_KEY'] + '&append_to_response=credits,releases')
+      if movie_response.code == 200 && movie['poster_path'] != nil
+        year = movie_response['release_date'] != nil && movie_response['release_date'] != '' ? movie['release_date'].split('-').slice(0, 1).join() : ''
+        runtime = movie_response['runtime'] != nil ? movie_response['runtime'].to_s : '0'
+        title = movie['title']
+        plot = get_plot(movie['overview'])
+        poster = 'https://image.tmdb.org/t/p/w342' + movie['poster_path']
+        director = get_director(movie_response)
+        genre = get_genres(movie_response)
+        rating = get_rating(movie_response)
+        studio = get_studio(movie_response)
+        director_check = director != '' ? director.split(' ').slice(-1, 1).join() : ''
+        test_movie = {title: title, plot: plot, poster: poster, year: year, actors: get_actors(movie_response), director: director, genre: genre, producer: get_producers(movie_response), rating: rating, runtime: runtime, studio: studio, writer: get_writers(movie_response), director_check: director_check}
+        movie_array << test_movie if movie_array.all? {|el| el[:title] != test_movie[:title] && el[:year] != year || el[:director_check] != test_movie[:director_check]}
+      end
+    end
+    movie_array.sort_by {|k| k[:year]}
+  end
+
   def self.search_person(n)
     person_response = HTTParty.get('https://api.themoviedb.org/3/search/person?api_key=' + ENV['TMDB_KEY'] + '&query=' + n)
     person_response['results'].length
@@ -237,13 +270,13 @@ class Movie < ActiveRecord::Base
                 credits.each do |credit|
                   case credit['type']
                   when 'Actor'
-                    actors << credit['personName']
+                    actors << credit['personName'].gsub(/^[[:space:]]/, '').gsub(/[[:space:]]$/, '')
                   when 'Director'
-                    director << credit['personName']
+                    director << credit['personName'].gsub(/^[[:space:]]/, '').gsub(/[[:space:]]$/, '')
                   when 'Producer'
-                    producer << credit['personName']
+                    producer << credit['personName'].gsub(/^[[:space:]]/, '').gsub(/[[:space:]]$/, '')
                   when 'Writer'
-                    writer << credit['personName']
+                    writer << credit['personName'].gsub(/^[[:space:]]/, '').gsub(/[[:space:]]$/, '')
                   else
                     puts "not matching"
                   end

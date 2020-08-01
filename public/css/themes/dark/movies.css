@@ -1119,3 +1119,7 @@ a.index-user:hover,
     border-radius: 4px;
     background-color: #d9534f;
 }
+
+#update-search {
+    margin-right: 15px;
+}
