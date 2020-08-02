@@ -30,7 +30,7 @@ class Movie < ActiveRecord::Base
 
     title_response = HTTParty.get('https://api.themoviedb.org/3/search/movie?api_key=' + ENV['TMDB_KEY'] + '&query=' + t)
 
-    return nil if title_response['results'] == []
+    return movie_array.sort_by {|k| k[:year]} if title_response['results'] == []
     title_response['results'].each do |movie|
       movie_response = HTTParty.get('https://api.themoviedb.org/3/movie/' + movie['id'].to_s + '?api_key=' + ENV['TMDB_KEY'] + '&append_to_response=credits,releases')
       if movie_response.code == 200 && movie['poster_path'] != nil
@@ -270,6 +270,8 @@ class Movie < ActiveRecord::Base
                 credits.each do |credit|
                   case credit['type']
                   when 'Actor'
+                    actors << credit['personName'].gsub(/^[[:space:]]/, '').gsub(/[[:space:]]$/, '')
+                  when 'Voice'
                     actors << credit['personName'].gsub(/^[[:space:]]/, '').gsub(/[[:space:]]$/, '')
                   when 'Director'
                     director << credit['personName'].gsub(/^[[:space:]]/, '').gsub(/[[:space:]]$/, '')
