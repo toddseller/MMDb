@@ -938,6 +938,7 @@ var editShow = function (event) {
 }
 
 var displayEditForm = function (response) {
+  closeUpdatePreview()
   $('.modal-body').replaceWith(response)
   $('.modal-footer').hide()
 }
@@ -967,12 +968,11 @@ var submitPreviewUpdate = function(event) {
     url: formRoute,
     type: 'PUT',
     data: formData,
-    success: displayUpdatedMovie
+    success: displayEditForm
   })
 }
 
 var displayUpdatedMovie = function (response) {
-  closeUpdatePreview()
   $('#movie-list').empty().append(response.query)
   var that = $('#' + response.id).parent('div')
   var posterArt = $('#' + response.id).children('img')

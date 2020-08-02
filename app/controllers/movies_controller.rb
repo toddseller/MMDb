@@ -53,10 +53,23 @@ end
 
 get '/movies/update' do
   title = params[:title].downcase
-  @route = params[:route]
+  @id = params[:route].split('/').last
   @movie_previews = Movie.update_title_search(title)
   page = erb :"/partials/_update_preview", layout: false
   if request.xhr?
     json query: @movie_previews, page: page
+  end
+end
+
+put '/movies/update/:id' do
+  @movie = Movie.find(params[:id])
+  params[:movie][:rating] = params[:movie][:rating].upcase
+  @movie.update(params[:movie])
+  @user = current_user
+  if request.xhr?
+    page = erb :'/partials/_edit_movie', locals: {movie: @movie, user: @user}, layout: false
+    json page
+  else
+    erb :'/users/show'
   end
 end
