@@ -53,6 +53,7 @@ end
 
 put '/users/:user_id/movies/:id' do
   @movie = Movie.find(params[:id])
+  params[:movie][:rating] = params[:movie][:rating].upcase
   @movie.update(params[:movie])
   @user = current_user
   link = URI::encode(@movie.title.gsub(/[*:;\/]/,'_'))
