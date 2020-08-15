@@ -250,7 +250,7 @@ class Movie < ActiveRecord::Base
 
   def self.appletv_call(s_term)
     movies = []
-    storeIds = ['143441', '143444']
+    storeIds = ['143441', '143444', '143455', '143460']
 
     storeIds.each do |store|
      response = HTTParty.get('https://uts-api.itunes.apple.com/uts/v2/search/incremental?sf=' + store + '&locale=EN&utsk=0&caller=wta&v=36&pfm=web&q=' + s_term)
