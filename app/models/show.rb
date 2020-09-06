@@ -32,7 +32,7 @@ class Show < ActiveRecord::Base
       end
     end
 
-    series_response = appletv_call(t)
+    p series_response = appletv_call(t)
 
     if series_response.length > 0
       series_response.each do |s|
@@ -130,6 +130,12 @@ class Show < ActiveRecord::Base
     episode_counts = []
     self.seasons.each {|s| episode_counts << s.episodes.count}
     episode_counts.inject(0, :+)
+  end
+
+  def basic_info(u)
+    shows_list = []
+    u.shows.sorted_list.each{ |show| shows_list << {id: show.id, title: show.title, seasonNumbers: show.season_numbers, seasonCount: show.seasons.count}}
+    shows_list
   end
 
   private

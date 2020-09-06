@@ -98,8 +98,16 @@ namespace '/api/v2' do
     authenticate!
 
     user = User.find(@auth_payload['sub'])
-    user.shows.sorted_list.to_json( { include: [ seasons: { include: :episodes } ] } )
+    Show.basic_info(user).to_json
   end
+
+  get '/shows/:id' do
+    authenticate!
+
+    show = Show.find(params[:id])
+    show.to_json({ include: [ seasons: { include: :episodes } ] })
+  end
+
 
   def authenticate!
     supplied_token = String(request.env['HTTP_AUTHORIZATION']).slice(7..-1)
