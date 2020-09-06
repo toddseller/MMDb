@@ -132,7 +132,7 @@ class Show < ActiveRecord::Base
     episode_counts.inject(0, :+)
   end
 
-  def basic_info(u)
+  def self.basic_info(u)
     shows_list = []
     u.shows.sorted_list.each{ |show| shows_list << {id: show.id, title: show.title, seasonNumbers: show.season_numbers, seasonCount: show.seasons.count}}
     shows_list
