@@ -114,7 +114,7 @@ namespace '/api/v2' do
     user = User.find(@auth_payload['sub'])
     movies_count = user.movies.count
     shows_count = user.shows.count
-    episodes_count = user.shows.seasons.episodes.count
+    episodes_count = Episode.episode_count(user)
     {moviesCount: movies_count, showsCount: shows_count, episodesCount: episodes_count}.to_json
   end
 
