@@ -108,6 +108,15 @@ namespace '/api/v2' do
     show.to_json({include: [seasons: {include: :episodes}]})
   end
 
+  get '/add_show' do
+    authenticate!
+
+    title = params[:query].downcase
+    show_previews = Show.get_series(title)
+
+    show_previews.to_json
+  end
+
   get '/counts' do
     authenticate!
 
