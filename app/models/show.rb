@@ -134,7 +134,7 @@ class Show < ActiveRecord::Base
 
   def self.basic_info(u)
     shows_list = []
-    u.shows.sorted_list.each{ |show| shows_list << {id: show.id, title: show.title, sort_name: show.sort_name, search_name: show.search_name, seasonNumbers: show.season_numbers, seasonCount: show.seasons.count}}
+    u.shows.sorted_list.each{ |show| shows_list << {id: show.id, title: show.title, sort_name: show.sort_name, search_name: show.search_name, poster: show.poster, seasonNumbers: show.season_numbers, seasonCount: show.seasons.count}}
     shows_list
   end
 
