@@ -8,9 +8,9 @@ namespace '/api/v2' do
     topMovies = []
     recentMovies = []
     recentShows = []
-    Movie.top_movies.first(10).each {|m| topMovies << {id: m.id, poster: m.poster}}
-    Movie.recently_added.first(10).each {|m| recentMovies << {id: m.id, poster: m.poster}}
-    Show.recently_added.first(10).each {|s| recentShows << {id: s.id, poster: s.poster}}
+    Movie.top_movies.first(10).each { |m| topMovies << {id: m.id, poster: m.poster} }
+    Movie.recently_added.first(10).each { |m| recentMovies << {id: m.id, poster: m.poster} }
+    Show.recently_added.first(10).each { |s| recentShows << {id: s.id, poster: s.poster} }
     year = Time.now.year
     {topMovies: topMovies, recentMovies: recentMovies, recentShows: recentShows, year: year, topUsers: User.top_users}.to_json
   end
@@ -55,14 +55,14 @@ namespace '/api/v2' do
     authenticate!
 
     user = User.find(@auth_payload['sub'])
-    user.movies.sorted_list.to_json( { include: :ratings } )
+    user.movies.sorted_list.to_json({include: :ratings})
   end
 
   get '/movies/:id' do
     authenticate!
 
     movie = Movie.find(params[:id])
-    movie.to_json( { include: :ratings } )
+    movie.to_json({include: :ratings})
   end
 
   put '/movies/:id' do
@@ -91,7 +91,7 @@ namespace '/api/v2' do
       movie.users << user if !movie.users.include?(user)
       movie.save
     end
-    movie.to_json( { include: :ratings } )
+    movie.to_json({include: :ratings})
   end
 
   get '/shows' do
@@ -105,7 +105,17 @@ namespace '/api/v2' do
     authenticate!
 
     show = Show.find(params[:id])
-    show.to_json({ include: [ seasons: { include: :episodes } ] })
+    show.to_json({include: [seasons: {include: :episodes}]})
+  end
+
+  get '/counts' do
+    authenticate!
+
+    user = User.find(@auth_payload['sub'])
+    movies_count = user.movies.count
+    shows_count = user.shows.count
+    episodes_count = user.shows.seasons.episodes.count
+    {moviesCount: movies_count, showsCount: shows_count, episodesCount: episodes_count}.to_json
   end
 
 
