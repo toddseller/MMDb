@@ -140,7 +140,7 @@ namespace '/api/v2' do
   get '/add_episodes' do
     authenticate!
     p '*' * 50
-    p params[:show]
+    p params['id']
     p params[:show]['id']
     season = Season.find_by(collectionId: params[:show]['collectionId'])
 
