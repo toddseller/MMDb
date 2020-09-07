@@ -121,7 +121,7 @@ namespace '/api/v2' do
     authenticate!
 
     user = User.find(@auth_payload['sub'])
-    p params
+
     show = Show.find_by("title = ?", params[:show]['title']) || Show.new(title: params[:show]['title'], year: params[:show]['year'], rating: params[:show]['rating'], genre: params[:show]['genre'], poster: params[:season]['poster'])
     season = Season.find_by(collectionId: params[:show]['collectionId']) || show.seasons.new(params[:show])
 
@@ -139,8 +139,7 @@ namespace '/api/v2' do
 
   get '/add_episodes' do
     authenticate!
-    p '*' * 100
-    p params[:show]
+
     season = Season.find(params[:show])
 
     episodes_previews = !season.skip.to_s.strip.empty? ? Show.get_episodes(season.appleTvId, season.season, season.skip, season.count, season.storeId) : Show.get_episodes(season.collectionId, season.season)
@@ -149,7 +148,8 @@ namespace '/api/v2' do
 
   post '/add_episodes' do
     authenticate!
-
+    p '*' * 100
+    p params
     show = Show.find(params[:show_id])
     season = show.seasons.find(params[:season_id])
 
@@ -167,6 +167,8 @@ namespace '/api/v2' do
     #     end
     #   end
     end
+
+    show.to_json({include: [seasons: {include: :episodes}]})
   end
 
   get '/counts' do
