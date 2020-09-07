@@ -147,15 +147,14 @@ namespace '/api/v2' do
 
     episodes_previews = !season.skip.to_s.strip.empty? ? Show.get_episodes(season.appleTvId, season.season, season.skip, season.count, season.storeId) : Show.get_episodes(season.collectionId, season.season)
     episodes_previews.each { |episode| episode.merge!({:show_id => season.show_id, :season_id => season.id}) }
-    p episodes_previews.to_json
+    episodes_previews.to_json
   end
 
   post '/add_episodes' do
     authenticate!
-    p '*' * 100
-    p params
+
     show = Show.find(params[:episode]['show_id'])
-    season = show.seasons.find(params[:season_id])
+    season = show.seasons.find(params[:episode]['season_id'])
 
     if params.has_key?('episode')
       p params
