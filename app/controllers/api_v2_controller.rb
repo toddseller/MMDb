@@ -170,10 +170,8 @@ namespace '/api/v2' do
     #   end
     end
 
-    # show.merge!({:seasonNumbers => show.season_numbers, :seasonCount => show.seasons.count})
-    # test = show.as_json
-    test = show.as_json({include: [seasons: {include: :episodes}]})
-    p test.merge!({'seasonNumbers' => show.season_numbers, 'seasonCount' => show.seasons.count})
+    updated_show = show.as_json({include: [seasons: {include: :episodes}]})
+    updated_show.merge!({'seasonNumbers' => show.season_numbers, 'seasonCount' => show.seasons.count})
   end
 
   get '/counts' do
