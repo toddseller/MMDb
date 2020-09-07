@@ -135,7 +135,7 @@ namespace '/api/v2' do
         end
       end
     end
-    show_info = {id: show.id, title: show.title, sort_name: show.sort_name, search_name: show.search_name, poster: show.poster, seasonNumbers: show.season_numbers, seasonCount: show.seasons.count}
+    p show_info = {id: show.id, title: show.title, sort_name: show.sort_name, search_name: show.search_name, poster: show.poster, seasonNumbers: show.season_numbers, seasonCount: show.seasons.count}
 
     show_info.to_json
   end
@@ -146,7 +146,8 @@ namespace '/api/v2' do
     season = Season.find(params[:show])
 
     episodes_previews = !season.skip.to_s.strip.empty? ? Show.get_episodes(season.appleTvId, season.season, season.skip, season.count, season.storeId) : Show.get_episodes(season.collectionId, season.season)
-    episodes_previews.to_json
+    episodes_previews[:show_id] = season.show_id
+    p episodes_previews.to_json
   end
 
   post '/add_episodes' do
