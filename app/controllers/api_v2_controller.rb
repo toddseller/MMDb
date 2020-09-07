@@ -123,13 +123,13 @@ namespace '/api/v2' do
     user = User.find(@auth_payload['sub'])
     p params
     show = Show.find_by("title = ?", params[:show]['title']) || Show.new(title: params[:show]['title'], year: params[:show]['year'], rating: params[:show]['rating'], genre: params[:show]['genre'], poster: params[:season]['poster'])
-    season = Season.find_by(collectionId: params[:season]['collectionId']) || show.seasons.new(params[:season])
+    season = Season.find_by(collectionId: params[:show]['collectionId']) || show.seasons.new(params[:show])
 
     if show.save
       show.users << user if !show.users.include?(user)
       if season.save
-        season.update(count: params[:season]['count'])
-        season.update(storeId: params[:season]['storeId']) if season[:storeId] == nil && params[:season]['storeId'] != nil
+        season.update(count: params[:show]['count'])
+        season.update(storeId: params[:show]['storeId']) if season[:storeId] == nil && params[:show]['storeId'] != nil
         if show.seasons.length == 1
           season.update(is_active: true)
         end
