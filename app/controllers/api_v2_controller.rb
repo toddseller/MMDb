@@ -135,7 +135,7 @@ namespace '/api/v2' do
         end
       end
     end
-    p show_info = {id: show.id, title: show.title, sort_name: show.sort_name, search_name: show.search_name, poster: show.poster, seasonNumbers: show.season_numbers, seasonCount: show.seasons.count}
+    show_info = {id: show.id, title: show.title, sort_name: show.sort_name, search_name: show.search_name, poster: show.poster, seasonNumbers: show.season_numbers, seasonCount: show.seasons.count}
 
     show_info.to_json
   end
@@ -170,6 +170,7 @@ namespace '/api/v2' do
     #   end
     end
 
+    show.merge!({:seasonNumbers => show.season_numbers, :seasonCount => show.seasons.count})
     show.to_json({include: [seasons: {include: :episodes}]})
   end
 
