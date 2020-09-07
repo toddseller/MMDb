@@ -139,6 +139,28 @@ namespace '/api/v2' do
     episodes_previews.to_json
   end
 
+  post '/add_episodes' do
+    authenticate!
+
+    show = Show.find(params[:show_id])
+    season = show.seasons.find(params[:season_id])
+
+    if params.has_key?('episode')
+      p params
+      episode = season.episodes.find_by(tv_episode: params[:episode]['tv_episode']) || season.episodes.new(params[:episode])
+      if episode.save
+        season.episodes << episode if !season.episodes.include?(episode)
+      end
+    # else
+    #   params['episodes'].each do |e|
+    #     @episode = @season.episodes.find_by(tv_episode: e[:tv_episode]) || @season.episodes.new(e)
+    #     if @episode.save
+    #       @season.episodes << @episode if !@season.episodes.include?(@episode)
+    #     end
+    #   end
+    end
+  end
+
   get '/counts' do
     authenticate!
 
