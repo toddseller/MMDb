@@ -117,6 +117,27 @@ namespace '/api/v2' do
     show_previews.to_json
   end
 
+  post '/add_show' do
+    authenticate!
+
+    user = User.find(@auth_payload['sub'])
+    show = Show.find_by("title = ?", params[:show]['title']) || Show.new(title: params[:show]['title'], year: params[:show]['year'], rating: params[:show]['rating'], genre: params[:show]['genre'], poster: params[:season]['poster'])
+    season = Season.find_by(collectionId: params[:season]['collectionId']) || show.seasons.new(params[:season])
+
+    if show.save
+      show.users << user if !show.users.include?(user)
+      if season.save
+        season.update(count: params[:season]['count'])
+        season.update(storeId: params[:season]['storeId']) if season[:storeId] == nil && params[:season]['storeId'] != nil
+        if show.seasons.length == 1
+          season.update(is_active: true)
+        end
+        episodes_previews = !season.skip.to_s.strip.empty? ? Show.get_episodes(season.appleTvId, season.season, season.skip, season.count, season.storeId) : Show.get_episodes(season.collectionId, season.season)
+      end
+    end
+    episodes_previews.to_json
+  end
+
   get '/counts' do
     authenticate!
 
