@@ -146,7 +146,7 @@ namespace '/api/v2' do
     season = Season.find(params[:show])
 
     episodes_previews = !season.skip.to_s.strip.empty? ? Show.get_episodes(season.appleTvId, season.season, season.skip, season.count, season.storeId) : Show.get_episodes(season.collectionId, season.season)
-    episodes_previews[:show_id] = season.show_id
+    episodes_previews.merge({show_id: season.show_id})
     p episodes_previews.to_json
   end
 
