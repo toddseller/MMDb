@@ -157,8 +157,7 @@ namespace '/api/v2' do
     season = show.seasons.find(params[:episode]['season_id'])
 
     if params.has_key?('episode')
-      p params
-      episode = season.episodes.find_by(tv_episode: params[:episode]['tv_episode']) || season.episodes.new(params[:episode])
+      episode = season.episodes.find_by(tv_episode: params[:episode]['tv_episode']) || season.episodes.new(params[:episode].except(:show_id, :season_id))
       if episode.save
         season.episodes << episode if !season.episodes.include?(episode)
       end
