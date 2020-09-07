@@ -133,9 +133,16 @@ namespace '/api/v2' do
         if show.seasons.length == 1
           season.update(is_active: true)
         end
-        episodes_previews = !season.skip.to_s.strip.empty? ? Show.get_episodes(season.appleTvId, season.season, season.skip, season.count, season.storeId) : Show.get_episodes(season.collectionId, season.season)
       end
     end
+  end
+
+  get '/add_episodes' do
+    authenticate!
+    p params
+    season = Season.find_by(collectionId: params[:show]['collectionId'])
+
+    episodes_previews = !season.skip.to_s.strip.empty? ? Show.get_episodes(season.appleTvId, season.season, season.skip, season.count, season.storeId) : Show.get_episodes(season.collectionId, season.season)
     episodes_previews.to_json
   end
 
