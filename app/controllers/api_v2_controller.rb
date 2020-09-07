@@ -121,6 +121,7 @@ namespace '/api/v2' do
     authenticate!
 
     user = User.find(@auth_payload['sub'])
+    p params
     show = Show.find_by("title = ?", params[:show]['title']) || Show.new(title: params[:show]['title'], year: params[:show]['year'], rating: params[:show]['rating'], genre: params[:show]['genre'], poster: params[:season]['poster'])
     season = Season.find_by(collectionId: params[:season]['collectionId']) || show.seasons.new(params[:season])
 
