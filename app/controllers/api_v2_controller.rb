@@ -172,6 +172,8 @@ namespace '/api/v2' do
 
     updated_show = show.as_json({include: [seasons: {include: :episodes}]})
     updated_show.merge!({'seasonNumbers' => show.season_numbers, 'seasonCount' => show.seasons.count})
+
+    updated_show
   end
 
   get '/counts' do
