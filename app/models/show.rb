@@ -9,6 +9,7 @@ class Show < ActiveRecord::Base
 
   before_create :create_sort_name
   before_save :create_search_name
+  before_save :add_season_count
 
   scope :sorted_list, -> { order(:sort_name, :year) }
   scope :recently_added, -> {order(created_at: :desc)}
@@ -146,6 +147,11 @@ class Show < ActiveRecord::Base
 
   def create_search_name
     self.search_name = self.title.downcase if self.title != 'M*A*S*H'
+  end
+
+  def add_season_count
+    self.seasonNumbers = self.season_numbers.to_s
+    self.seasonCount = self.seasons.count.to_s
   end
 
   def self.set_image(p)
