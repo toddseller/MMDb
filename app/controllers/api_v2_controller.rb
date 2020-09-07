@@ -139,7 +139,9 @@ namespace '/api/v2' do
 
   get '/add_episodes' do
     authenticate!
-
+    p '*' * 100
+    p params
+    p params[:show]['id']
     season = Season.find(params[:show]['id'])
 
     episodes_previews = !season.skip.to_s.strip.empty? ? Show.get_episodes(season.appleTvId, season.season, season.skip, season.count, season.storeId) : Show.get_episodes(season.collectionId, season.season)
