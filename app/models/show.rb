@@ -32,7 +32,7 @@ class Show < ActiveRecord::Base
       end
     end
 
-    p series_response = appletv_call(t)
+    series_response = appletv_call(t)
 
     if series_response.length > 0
       series_response.each do |s|

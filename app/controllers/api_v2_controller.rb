@@ -135,6 +135,9 @@ namespace '/api/v2' do
         end
       end
     end
+    show_info = {id: show.id, title: show.title, sort_name: show.sort_name, search_name: show.search_name, poster: show.poster, seasonNumbers: show.season_numbers, seasonCount: show.seasons.count}}
+
+    show_info.to_json
   end
 
   get '/add_episodes' do
