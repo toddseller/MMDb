@@ -153,6 +153,8 @@ namespace '/api/v2' do
   post '/add_episodes' do
     authenticate!
 
+    p params[:episode].count
+
     show = Show.find(params[:episode]['show_id'])
     season = show.seasons.find(params[:episode]['season_id'])
 
