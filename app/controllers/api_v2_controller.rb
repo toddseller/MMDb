@@ -153,23 +153,21 @@ namespace '/api/v2' do
   post '/add_episodes' do
     authenticate!
 
-    p params[:episode].instance_of? Array
-
     show = Show.find(params[:episode]['show_id'])
     season = show.seasons.find(params[:episode]['season_id'])
 
-    if params.has_key?('episode')
+    if params[:episode].instance_of? Array
+      params['episode'].each do |e|
+        episode = season.episodes.find_by(tv_episode: e[:tv_episode]) || season.episodes.new(e.except(:show_id, :season_id))
+        if episode.save
+          season.episodes << episode if !season.episodes.include?(episode)
+        end
+      end
+    else
       episode = season.episodes.find_by(tv_episode: params[:episode]['tv_episode']) || season.episodes.new(params[:episode].except(:show_id, :season_id))
       if episode.save
         season.episodes << episode if !season.episodes.include?(episode)
       end
-    # else
-    #   params['episodes'].each do |e|
-    #     @episode = @season.episodes.find_by(tv_episode: e[:tv_episode]) || @season.episodes.new(e)
-    #     if @episode.save
-    #       @season.episodes << @episode if !@season.episodes.include?(@episode)
-    #     end
-    #   end
     end
 
     show.to_json({include: [seasons: {include: :episodes}]})
