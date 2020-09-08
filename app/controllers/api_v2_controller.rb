@@ -123,7 +123,7 @@ namespace '/api/v2' do
     user = User.find(@auth_payload['sub'])
 
     show = Show.find_by("title = ?", params[:show]['title']) || Show.new(title: params[:show]['title'], year: params[:show]['year'], rating: params[:show]['rating'], genre: params[:show]['genre'], poster: params[:season]['poster'])
-    season = Season.find_by(collectionId: params[:show]['collectionId']) || show.seasons.new(params[:show])
+    season = Season.find_by(collectionId: params[:show]['collectionId']) || show.seasons.new(params[:show].except(:genre, :rating, :title, :year))
 
     if show.save
       show.users << user if !show.users.include?(user)
