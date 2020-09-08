@@ -143,7 +143,7 @@ namespace '/api/v2' do
   get '/add_episodes' do
     authenticate!
 
-    season = Season.find(params[:show])
+    season = Season.find_by("title = ?", params[:show])
 
     episodes_previews = !season.skip.to_s.strip.empty? ? Show.get_episodes(season.appleTvId, season.season, season.skip, season.count, season.storeId) : Show.get_episodes(season.collectionId, season.season)
     episodes_previews.each { |episode| episode.merge!({:show_id => season.show_id, :season_id => season.id}) }
