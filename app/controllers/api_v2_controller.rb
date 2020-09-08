@@ -153,10 +153,10 @@ namespace '/api/v2' do
   post '/add_episodes' do
     authenticate!
 
-    show = Show.find(params[:episode]['show_id'])
-    season = show.seasons.find(params[:episode]['season_id'])
-
     if params[:episode].instance_of? Array
+      show = Show.find(params[:episode][0]['show_id'])
+      season = show.seasons.find(params[:episode][0]['season_id'])
+
       params['episode'].each do |e|
         episode = season.episodes.find_by(tv_episode: e[:tv_episode]) || season.episodes.new(e.except(:show_id, :season_id))
         if episode.save
@@ -164,6 +164,9 @@ namespace '/api/v2' do
         end
       end
     else
+      show = Show.find(params[:episode]['show_id'])
+      season = show.seasons.find(params[:episode]['season_id'])
+
       episode = season.episodes.find_by(tv_episode: params[:episode]['tv_episode']) || season.episodes.new(params[:episode].except(:show_id, :season_id))
       if episode.save
         season.episodes << episode if !season.episodes.include?(episode)
