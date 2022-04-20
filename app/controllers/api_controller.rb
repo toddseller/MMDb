@@ -33,10 +33,10 @@ get '/api/movies/count' do
   # user = User.find(params[:user_key])
   # count = user.movies.count
 
-  plex = HTTParty.get('http://onyxwear.duckdns.org:8181/api/v2?apikey=' + ENV['TAUTULLI_KEY'] + '&cmd=get_library&section_id=1')
-  
+  plex_response = HTTParty.get('http://onyxwear.duckdns.org:8181/api/v2?apikey=' + ENV['TAUTULLI_KEY'] + '&cmd=get_library&section_id=1')
+  count = plex_response['data']['count']
 
-  json plex['data']['count']
+  json count
 end
 
 get '/api/year' do
