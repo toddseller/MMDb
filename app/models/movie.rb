@@ -53,7 +53,7 @@ class Movie < ActiveRecord::Base
 
   def self.plex_count()
     plex_response = HTTParty.get('http://onyxwear.duckdns.org:8181/api/v2?apikey=' + ENV['TAUTULLI_KEY'] + '&cmd=get_library&section_id=1')
-    plex_response['data']['count']
+    p plex_response
   end
 
   def self.update_title_search(t)
