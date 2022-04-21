@@ -32,9 +32,9 @@ end
 get '/api/movies/count' do
   # user = User.find(params[:user_key])
   # count = user.movies.count
-  count = Movie.plex_count
+  counts = Movie.plex_count
 
-  json count
+  counts.to_json
 end
 
 get '/api/year' do
