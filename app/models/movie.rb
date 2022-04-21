@@ -57,7 +57,7 @@ class Movie < ActiveRecord::Base
     shows = plex_response['response']['data'][1]['count']
     episodes = plex_response['response']['data'][1]['child_count']
 
-    {movies: movies, shows: shows, episodes: episodes}
+    [{movies: movies, shows: shows, episodes: episodes}]
   end
 
   def self.update_title_search(t)
