@@ -1,4 +1,8 @@
 use Rack::Cors do |config|
+  before do
+    content_type 'application/json'
+  end
+  
   config.allow do |allow|
 
     allow.origins 'http://toddseller.com', 'http://www.toddseller.com', 'http://test.toddseller.com', 'https://www.test.toddseller.com', 'https://toddseller.com', 'https://www.toddseller.com', 'https://test.toddseller.com', 'https://www.test.toddseller.com'
