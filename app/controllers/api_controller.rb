@@ -14,7 +14,7 @@ use Rack::Cors do |config|
   end
 end
 
-before '/api' do
+before '/api/*' do
   content_type 'application/json'
 end
 
