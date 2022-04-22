@@ -1,7 +1,4 @@
 use Rack::Cors do |config|
-  # before do
-  #   content_type 'application/json'
-  # end
   
   config.allow do |allow|
 
@@ -24,6 +21,10 @@ use Rack::Cors do |config|
       :headers => :any,
       :max_age => 0
   end
+end
+
+before do
+  content_type 'application/json'
 end
 
 get '/api/movies' do
