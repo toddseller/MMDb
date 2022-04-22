@@ -1,4 +1,8 @@
 use Rack::Cors do |config|
+  before do
+    content_type 'application/json'
+  end
+  
   config.allow do |allow|
 
     allow.origins 'http://toddseller.com', 'http://www.toddseller.com', 'http://test.toddseller.com', 'https://www.test.toddseller.com', 'https://toddseller.com', 'https://www.toddseller.com', 'https://test.toddseller.com', 'https://www.test.toddseller.com'
@@ -30,10 +34,11 @@ get '/api/movies' do
 end
 
 get '/api/movies/count' do
-  user = User.find(params[:user_key])
-  count = user.movies.count
+  # user = User.find(params[:user_key])
+  # count = user.movies.count
+  counts = Movie.plex_count
 
-  json count
+  counts.to_json
 end
 
 get '/api/year' do

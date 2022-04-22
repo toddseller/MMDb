@@ -51,6 +51,15 @@ class Movie < ActiveRecord::Base
     movie_array.sort_by {|k| k[:year]}
   end
 
+  def self.plex_count()
+    plex_response = HTTParty.get('http://onyxwear.duckdns.org:8181/api/v2?apikey=' + ENV['TAUTULLI_KEY'] + '&cmd=get_libraries')
+    movies = plex_response['response']['data'][0]['count']
+    shows = plex_response['response']['data'][1]['count']
+    episodes = plex_response['response']['data'][1]['child_count']
+
+    {movies: movies, shows: shows, episodes: episodes}
+  end
+
   def self.update_title_search(t)
     movie_array = []
     movie_response = appletv_call(t)
