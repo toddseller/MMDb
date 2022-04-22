@@ -12,18 +12,9 @@ use Rack::Cors do |config|
       :headers => :any,
       :max_age => 0
   end
-
-  config.allow do |allow|
-
-    allow.origins 'http://youmightnotneedindustryjargon.com', 'http://www.youmightnotneedindustryjargon.com'
-    allow.resource '/api/year',
-      :methods => [:get],
-      :headers => :any,
-      :max_age => 0
-  end
 end
 
-before do
+before '/api' do
   content_type 'application/json'
 end
 
