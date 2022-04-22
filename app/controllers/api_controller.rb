@@ -1,7 +1,7 @@
 use Rack::Cors do |config|
-  before do
-    content_type 'application/json'
-  end
+  # before do
+  #   content_type 'application/json'
+  # end
   
   config.allow do |allow|
 
