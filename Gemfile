@@ -13,7 +13,7 @@ gem 'dotenv'
 gem 'puma'
 
 gem 'activesupport', '~> 6.1.3'
-gem 'activerecord', '~> 6.1.3'
+gem 'activerecord', '~> 6.1.7'
 
 gem 'rake'
 
