@@ -12,7 +12,7 @@ gem 'dotenv'
 # Use Puma for our web server
 gem 'puma'
 
-gem 'activesupport', '~> 6.1.3'
+gem 'activesupport', '~> 6.1.7'
 gem 'activerecord', '~> 6.1.3'
 
 gem 'rake'
