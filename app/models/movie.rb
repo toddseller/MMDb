@@ -52,7 +52,7 @@ class Movie < ActiveRecord::Base
   end
 
   def self.plex_count()
-    plex_response = HTTParty.get('http://onyxwear.duckdns.org:8181/api/v2?apikey=' + ENV['TAUTULLI_KEY'] + '&cmd=get_libraries')
+    p plex_response = HTTParty.get('https://plex.toddseller.tech/api/v2?apikey=' + ENV['TAUTULLI_KEY'] + '&cmd=get_libraries')
     movies = plex_response['response']['data'][0]['count']
     shows = plex_response['response']['data'][1]['count']
     episodes = plex_response['response']['data'][1]['child_count']
@@ -262,13 +262,13 @@ class Movie < ActiveRecord::Base
     storeIds = ['143441', '143444', '143455', '143460']
 
     storeIds.each do |store|
-     response = HTTParty.get('https://uts-api.itunes.apple.com/uts/v2/search/incremental?sf=' + store + '&locale=EN&utsk=0&caller=wta&v=36&pfm=web&q=' + s_term)
+     response = HTTParty.get('https://uts-api.itunes.apple.com/uts/v2/search/incremental?sf=' + store + '&locale=en-US&utsk=0&caller=wta&v=36&pfm=desktop&q=' + URI.encode(s_term))
 
       if response['data']['canvas'] != nil
         response['data']['canvas']['shelves'].each do |movie|
           if movie['items'].length > 0
             movie['items'].each do |m|
-              if m['type'] == 'Movie'
+              if m['type'] == 'Movie' && m['title'].downcase() == s_term.downcase()
                 request = HTTParty.get('https://uts-api.itunes.apple.com/uts/v2/view/product/' + m['id'] + '?sf=' + store + '&locale=EN&utsk=0&caller=wta&v=36&pfm=web')
                 content = request['data']['content']
                 credits = request['data']['roles'] ? request['data']['roles'] : []
@@ -292,9 +292,9 @@ class Movie < ActiveRecord::Base
                     puts "not matching"
                   end
                 end
-                title = content['title']
+                p title = content['title']
                 plot = content['description'] ? get_plot(content['description']) : ''
-                year = content['releaseDate'] ? Time.at(content['releaseDate'] / 1000).to_datetime.year.to_s : ''
+                p year = content['releaseDate'] ? Time.at(content['releaseDate'] / 1000).to_datetime.year.to_s : ''
                 poster = content['images']['coverArt'] ? content['images']['coverArt']['url'].gsub(/({w}x{h}.{f})/, content['images']['coverArt']['width'].to_s + 'x' + content['images']['coverArt']['height'].to_s + '.jpg') : ''
                 genre = content['genres'] ? content['genres'][0]['name'] : ''
                 rating = content['rating'] ? content['rating']['displayName'] : ''

@@ -19,15 +19,18 @@ class Show < ActiveRecord::Base
     show_array =  Show.where("search_name LIKE ?", "%#{t}%").sorted_list
     if show_array.length > 0
       show_array.each do |show|
+        show.seasons
         show.seasons.each do |season|
           db_season = season.attributes.symbolize_keys
           db_season.store(:title, show.title)
           if season[:appleTvId] != nil && season[:appleTvId] != ""
             storeId = season[:storeId] ? season[:storeId] : '143441'
-            request = HTTParty.get('https://tv.apple.com/api/uts/v2/view/show/' + season[:appleTvId] + '/episodes?sf=' + storeId +'&locale=EN&utsk=0&caller=wta&v=36&pfm=web')
+            request = HTTParty.get('https://tv.apple.com/api/uts/v2/view/show/' + season[:appleTvId] + '/episodes?sf=' + storeId +'&locale=en-US&utsk=0&caller=wta&v=36&pfm=desktop')
             db_season[:storeId] = storeId if db_season[:storeId] == nil
             db_season[:count] = request['data']['seasonSummaries'][season[:season] - 1]['episodeCount'].to_s
           end
+          db_season[:show_collection_id] = show[:show_collection_id]
+          db_season[:year] = show[:year]
           series << db_season
         end
       end
@@ -37,30 +40,29 @@ class Show < ActiveRecord::Base
 
     if series_response.length > 0
       series_response.each do |s|
-        series << s if series.all? {|el| el[:collectionName].downcase != s[:collectionName].downcase && is_number?(s[:season])}
+        series << s if series.all? {|el| el[:collectionName].downcase != s[:collectionName].downcase || el[:show_collection_id] != s[:show_collection_id] && is_number?(s[:season])}
       end
     end
 
     if JwtAuth.has_expired?(ENV['TVDB_TOKEN'])
       token_response = tvdb_auth()
-      heroku_call(token_response[:body]['token'])
-    elsif JwtAuth.renew_token?(ENV['TVDB_TOKEN'])
-      token_response = tvdb_call("https://api.thetvdb.com/refresh_token")
-      heroku_call(token_response[:body]['token'])
+      ENV['TVDB_TOKEN'] = token_response[:body]['data']['token']
     end
 
-    first_response = tvdb_call("https://api.thetvdb.com/search/series?name=" + URI.encode(t))
-
+    
+    first_response = tvdb_call("https://api4.thetvdb.com/v4/search?query=" + URI.encode(t) + "&type=series&limit=1")
     if first_response && first_response[:code] == '200'
       first_response[:body]['data'].each do |s|
         squared = true
-        second_response = tvdb_call("https://api.thetvdb.com/series/" + s['id'].to_s + "/episodes/summary") if s['seriesName'] != nil && s['seriesName'].downcase == t.downcase
-        second_response[:body]['data']['airedSeasons'].delete('0') if second_response && second_response[:body]['data']['airedSeasons'].include?('0')
-
-        if second_response && second_response[:code] == '200'
-          second_response[:body]['data']['airedSeasons'].each do |a|
-            season_number = second_response[:body]['data']['airedSeasons'].index(a) + 1
-            collection_name = get_collection_name(s['seriesName'], season_number.to_s)
+        second_response = tvdb_call("https://api4.thetvdb.com/v4/series/" + s['tvdb_id'].to_s + "/extended?meta=translations&short=true")
+        aired_seasons = []
+        if !second_response[:body].nil? || !second_response[:body].empty? && second_response[:code] == '200'
+          second_response[:body]['data']['seasons'].each do |sea|
+            aired_seasons << sea['number'] if sea['number'] != 0 && sea['type']['type'] == 'official'
+          end
+          aired_seasons.each do |a|
+            season_number = a
+            collection_name = get_collection_name(s['name'], season_number.to_s)
             if series.all? {|el| el[:collectionName] != collection_name}
               if squared
                 new_t = URI.encode(t + ' season ' + season_number.to_s)
@@ -69,21 +71,25 @@ class Show < ActiveRecord::Base
                 if !parsed_doc.css('p')[1].text.include?('No results')
                   poster = parsed_doc.css('a > img')[0]['src'].gsub(/_250.jpg/,'_1280.jpg')
                 else
-                  poster = 'https://s3-us-west-2.amazonaws.com/toddseller/tedflix/imgs/Artboard+1-196x196.jpg'
+                  poster = s['image_url']
                   squared = false
                 end
               else
                 poster = 'https://s3-us-west-2.amazonaws.com/toddseller/tedflix/imgs/Artboard+1-196x196.jpg'
               end
-              year = s['firstAired'] != nil ? s['firstAired'].split('-').slice(0,1).join() : ''
-              details = {title: s['seriesName'], collectionName: collection_name, collectionId: get_collection_id(s['id'], season_number.to_s), season: season_number.to_s, poster: poster, rating: '', year: year, plot: s['overview'], genre: ''}
+              overview = second_response[:body]['data'].has_key?('overviewTranslations') || second_response[:body]['data'].has_key?(:overviewTranslations) ? get_overview(second_response[:body]['data']['translations']['overviewTranslations']) : ''
+              year = s.has_key?('year') && s['year'] != nil ? s['year'] : ''
+              genre = second_response[:body]['data'].has_key?('genres') && second_response[:body]['data']['genres'].length != 0 ? second_response[:body]['data']['genres'][0]['name'] : ''
+              rating = second_response[:body]['data'].has_key?('contentRatings') || second_response[:body]['data'].has_key?(:contentRatings) ? get_ratings(second_response[:body]['data']['contentRatings']) : ''
+              details = {title: s['name'], collectionName: collection_name, collectionId: get_collection_id(s['tvdb_id'], season_number.to_s), season: season_number.to_s, poster: poster, rating: rating, year: year, plot: overview, genre: genre, show_collection_id: s['tvdb_id']}
               series << details if series.all? {|el| el[:collectionName].downcase != collection_name.downcase}
             end
           end
         end
       end
     end
-    series.sort {|a, b| [a[:title], a[:season].to_i] <=> [b[:title], b[:season].to_i]}
+    
+    series.sort {|a, b| [a[:year], a[:title], a[:season].to_i] <=> [b[:year], b[:title], b[:season].to_i]}
   end
 
   def self.get_episodes(id, season, skip=0, count=0, storeId='143441')
@@ -91,29 +97,24 @@ class Show < ActiveRecord::Base
     if id.include? 'tvdb'
       id = id.gsub(/tvdb/,'')
       id = id[0...-season.to_s.length]
-
-      get_runtime = tvdb_call("https://api.thetvdb.com/series/" + id.to_s)
-      runtime = get_runtime[:body]['data']['runtime'].to_i * 1000 * 60
-
-      first_response = tvdb_call("https://api.thetvdb.com/series/" + id.to_s + "/episodes/query?airedSeason=" + season.to_s)
-
-      first_response[:body]['data'].each do |e|
-        if e['firstAired'] != ''
-          preview = "https://www.thetvdb.com/banners/episodes/" + id.to_s + "/" + e['id'].to_s + ".jpg"
-          plot = e['overview'] ? get_plot(e['overview']) : ''
-          episode = {title: e['episodeName'], date: convert_date(e['firstAired']), plot: plot, runtime: runtime, tv_episode: e['airedEpisodeNumber'], preview: preview}
-          episodes << episode if !Date.parse(e['firstAired']).future?
+      p first_response = tvdb_call("https://api4.thetvdb.com/v4/series/" + id.to_s + "/episodes/official?page=0&season=" + season.to_s)
+      first_response[:body]['data']['episodes'].each do |e|
+        if e['aired'] != ''
+          preview = e['image'] ? e['image'] : ''
+          plot = e.has_key?('overview') || e.has_key?(:overview) ? get_plot(e['overview']) : ''
+          runtime = e['runtime'] ? e['runtime'].to_s : ''
+          episode = {title: e['name'], date: convert_date(e['aired']), plot: plot, runtime: runtime, tv_episode: e['number'], preview: preview}
+          episodes << episode if e['aired'] != nil && !Date.parse(e['aired']).future?
         end
       end
     else
-      episodes_response = HTTParty.get('https://tv.apple.com/api/uts/v2/view/show/' + id + '/episodes?skip=' + skip + '&count=' + count + '&sf=' + storeId + '&locale=EN&utsk=0&caller=wta&v=36&pfm=web')
+      episodes_response = HTTParty.get('https://tv.apple.com/api/uts/v2/view/show/' + id + '/episodes?skip=' + skip + '&count=' + count + '&sf=' + storeId + '&locale=en-US&utsk=0&caller=wta&v=36&pfm=desktop')
       return nil if episodes_response.length == 0
-      episodes_response['data']['episodes']
 
       episodes_response['data']['episodes'].each do |e|
         poster = e['images']['previewFrame'] ? e['images']['previewFrame']['url'].gsub(/({w}x{h}.{f})/, '300x169.jpg') : e['showImages']['keyframe']['url'].gsub(/({w}x{h}.{f})/, '300x169.jpg')
         date = e['releaseDate'] ? Time.at(e['releaseDate'] / 1000).to_datetime.strftime("%b %-d, %Y") : ''
-        runtime = e['duration'] ? e['duration'] * 1000 : ''
+        runtime = e['duration'] ? e['duration'] / 60 : ''
         episode = {title: clean_up_title(e['title']), date: date, plot: e['description'], runtime: runtime, tv_episode: e['episodeNumber'], preview: poster}
         episodes << episode if e['episodeNumber'] != nil
       end
@@ -169,8 +170,12 @@ class Show < ActiveRecord::Base
   end
 
   def self.convert_date(d)
-    date = DateTime.parse(d)
-    new_date = date.strftime("%b %-d, %Y")
+    if d != nil
+      date = DateTime.parse(d)
+      new_date = date.strftime("%b %-d, %Y")
+    else
+      ''
+    end
   end
 
   def self.get_season(s)
@@ -191,15 +196,37 @@ class Show < ActiveRecord::Base
     new_t = t.gsub(/\"/, '')
   end
 
+  def self.get_ratings(s)
+    if !s.empty?
+      rating = s.select { |rating| rating['country'] == 'usa' }
+      if !rating.empty?
+        rating[0]['name']
+      else
+        ''
+      end
+    else
+      ''
+    end
+  end
+
+  def self.get_overview(s)
+    if s != nil
+      overview = s.select { |overview| overview['language'] == 'eng' }
+      # overview[0]['language'] == 'eng' ? overview[0]['overview'] : ''
+      overview.length != 0 ? overview[0]['overview'] : ''
+    else
+      ''
+    end
+  end
+
   def self.tvdb_auth
-    uri = URI.parse("https://api.thetvdb.com/login")
+    uri = URI.parse("https://api4.thetvdb.com/v4/login")
     request = Net::HTTP::Post.new(uri)
     request.content_type = "application/json"
     request["Accept"] = "application/json"
     request.body = JSON.dump({
       "apikey" => ENV['TVDB_APIKEY'],
-      "userkey" => ENV['TVDB_USERKEY'],
-      "username" => ENV['TVDB_USERNAME']
+      "pin" => ENV['TVDB_PIN']
     })
 
     req_options = {
@@ -226,7 +253,9 @@ class Show < ActiveRecord::Base
     response = Net::HTTP.start(uri.hostname, uri.port, req_options) do |http|
       http.request(request)
     end
-    response = {code: response.code, body: JSON.parse(response.body)}
+    if !response.body.nil? || !response.body.empty?
+      response = {code: response.code, body: JSON.parse(response.body)}
+    end
   end
 
   def self.heroku_call(token)
@@ -251,10 +280,9 @@ class Show < ActiveRecord::Base
 
   def self.appletv_call(s_term)
     details = []
-    storeIds = ['143441', '143444', '143455', '143460']
-
+    storeIds = ['143444', '143455', '143460']
     storeIds.each do |store|
-      response = HTTParty.get('https://uts-api.itunes.apple.com/uts/v2/search/incremental?sf=' + store + '&locale=EN&utsk=0&caller=wta&v=36&pfm=web&q=' + s_term)
+      response = HTTParty.get('https://uts-api.itunes.apple.com/uts/v2/search/incremental?sf=' + store + '&locale=en-US&utsk=0&caller=wta&v=36&pfm=desktop&q=' + URI.encode(s_term))
 
       if response['data']['canvas'] != nil
         response['data']['canvas']['shelves'].each do |show|
@@ -263,27 +291,25 @@ class Show < ActiveRecord::Base
             startCount = 0
 
             if s['type'] == 'Show' && s['title'] && s['title'].downcase() == s_term.downcase()
-              request1 = HTTParty.get('https://uts-api.itunes.apple.com/uts/v2/view/show/' + s['id'] + '?sf=' + store + '&locale=EN&utsk=0&caller=wta&v=36&pfm=web')
-              title =  request1['data']['content']['title']
+              request1 = HTTParty.get('https://uts-api.itunes.apple.com/uts/v2/view/show/' + s['id'] + '?sf=' + store + '&locale=en-US&utsk=0&caller=wta&v=36&pfm=desktop')
+              p title =  request1['data']['content']['title']
               description = request1['data']['content']['description']
               genre = request1['data']['content']['genres'] ? request1['data']['content']['genres'][0]['name'] : ''
               rating = request1['data']['content']['rating'] ? request1['data']['content']['rating']['displayName'] : ''
               date = request1['data']['content']['releaseDate'] ? Time.at(request1['data']['content']['releaseDate'] / 1000).to_datetime.year.to_s : ''
-              request2 = HTTParty.get('https://uts-api.itunes.apple.com/uts/v2/view/show/' + s['id'] + '/episodes?sf=' + store + '&locale=EN&utsk=0&caller=wta&v=36&pfm=web')
-              p s['id']
-              p title
+              show_collection_id = s['id']
+              p request2 = HTTParty.get('https://uts-api.itunes.apple.com/uts/v2/view/show/' + s['id'] + '/episodes?sf=' + store + '&locale=en-US&utsk=0&caller=wta&v=36&pfm=desktop')
 
               if request2['data']['seasonSummaries']
                 request2['data']['seasonSummaries'].each do |season|
-                  p season
                   collectionName = title + ', ' + season['label']
-                  p collectionId = request2['data']['seasons'][i]['id']
-                  p get_plot(description)
+                  collectionId = request2['data']['seasons'][i]['id']
+                  get_plot(description)
                   poster = request2['data']['seasons'][i]['images'] && request2['data']['seasons'][i]['images']['coverArt'] ? request2['data']['seasons'][i]['images']['coverArt']['url'].gsub(/({w}x{h}.{f})/, '600x600.jpg') : request2['data']['seasons'][i]['showImages'] && request2['data']['seasons'][i]['showImages']['coverArt'] ? request2['data']['seasons'][i]['showImages']['coverArt']['url'].gsub(/({w}x{h}.{f})/, '600x600.jpg') : 'https://s3-us-west-2.amazonaws.com/toddseller/tedflix/imgs/Artboard+1-196x196.jpg'
                   seasonNumber = request2['data']['seasons'][i]['seasonNumber'].to_s
                   skip = seasonNumber == '1' ? 0 : startCount
                   # details << {appleTvId: s['id'], title: title, collectionName: collectionName, collectionId: collectionId, season: seasonNumber, rating: rating, genre: genre, plot: get_plot(description), year: date, poster: poster, skip: skip, count: season['episodeCount'], storeId: store}
-                  details << {appleTvId: s['id'], title: title, collectionName: collectionName, collectionId: collectionId, season: seasonNumber, rating: rating, genre: genre, plot: get_plot(description), year: date, poster: poster, skip: skip, count: season['episodeCount'], storeId: '143441'}
+                  details << {appleTvId: s['id'], title: title, collectionName: collectionName, collectionId: collectionId, season: seasonNumber, rating: rating, genre: genre, plot: get_plot(description), year: date, poster: poster, skip: skip, count: season['episodeCount'], storeId: store, show_collection_id: s['id']}
                   i += 1
                   startCount += season['episodeCount']
                 end
@@ -292,7 +318,7 @@ class Show < ActiveRecord::Base
                 collectionId = request2['data']['episodes'][0]['id']
                 poster = request2['data']['episodes'][0]['images'] && request2['data']['episodes'][0]['images']['coverArt'] ? request2['data']['episodes'][0]['images']['coverArt']['url'].gsub(/({w}x{h}.{f})/, '600x600.jpg') : request2['data']['episodes'][0]['showImages'] && request2['data']['episodes'][0]['showImages']['coverArt'] ? request2['data']['episodes'][0]['showImages']['coverArt']['url'].gsub(/({w}x{h}.{f})/, '600x600.jpg') : 'https://s3-us-west-2.amazonaws.com/toddseller/tedflix/imgs/Artboard+1-196x196.jpg'
                 seasonNumber = '1'
-                details << {appleTvId: s['id'], title: title, collectionName: collectionName, collectionId: collectionId, season: seasonNumber, rating: rating, genre: genre, plot: get_plot(description), year: date, poster: poster, skip: 0, count: 1, storeId: store}
+                details << {appleTvId: s['id'], title: title, collectionName: collectionName, collectionId: collectionId, season: seasonNumber, rating: rating, genre: genre, plot: get_plot(description), year: date, poster: poster, skip: 0, count: 1, storeId: store, show_collection_id: s['id']}
               end
             end
           end

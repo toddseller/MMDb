@@ -6,10 +6,12 @@ use Rack::Cors do |config|
     allow.resource '/api/movies/count',
       :methods => [:get],
       :headers => :any,
+      :credentials => true,
       :max_age => 0
     allow.resource '/api/year',
       :methods => [:get],
       :headers => :any,
+      :credentials => true,
       :max_age => 0
   end
 end

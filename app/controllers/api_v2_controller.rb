@@ -121,9 +121,9 @@ namespace '/api/v2' do
     authenticate!
 
     user = User.find(@auth_payload['sub'])
-
-    show = Show.find_by("title = ?", params[:show]['title']) || Show.new(title: params[:show]['title'], year: params[:show]['year'], rating: params[:show]['rating'], genre: params[:show]['genre'], poster: params[:show]['poster'])
-    season = Season.find_by(collectionId: params[:show]['collectionId']) || show.seasons.new(params[:show].except(:genre, :rating, :title, :year))
+    show = Show.find_by("show_collection_id = ?", params[:show]['show_collection_id']) || Show.new(title: params[:show]['title'], year: params[:show]['year'], rating: params[:show]['rating'], genre: params[:show]['genre'], poster: params[:show]['poster'], show_collection_id: params[:show]['show_collection_id'])
+    params[:show].except!(:genre, :rating, :title, :year, :show_collection_id)
+    season = Season.find_by(collectionId: params[:show]['collectionId']) || show.seasons.new(params[:show])
 
     if show.save
       show.users << user if !show.users.include?(user)
@@ -158,7 +158,8 @@ namespace '/api/v2' do
       season = show.seasons.find(params[:episode][0]['season_id'])
 
       params['episode'].each do |e|
-        episode = season.episodes.find_by(tv_episode: e[:tv_episode]) || season.episodes.new(e.except(:show_id, :season_id))
+        e.except!(:show_id, :season_id)
+        episode = season.episodes.find_by(tv_episode: e[:tv_episode]) || season.episodes.new(e)
         if episode.save
           season.episodes << episode if !season.episodes.include?(episode)
         end
@@ -167,7 +168,9 @@ namespace '/api/v2' do
       show = Show.find(params[:episode]['show_id'])
       season = show.seasons.find(params[:episode]['season_id'])
 
-      episode = season.episodes.find_by(tv_episode: params[:episode]['tv_episode']) || season.episodes.new(params[:episode].except(:show_id, :season_id))
+      params[:episode].except!(:show_id, :season_id)
+
+      episode = season.episodes.find_by(tv_episode: params[:episode]['tv_episode']) || season.episodes.new(params[:episode])
       if episode.save
         season.episodes << episode if !season.episodes.include?(episode)
       end

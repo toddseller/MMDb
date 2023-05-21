@@ -1,0 +1,10 @@
+version: '3.8'
+services:
+  web:
+    build: .
+    command: bash -c "rm -f tmp/pids/server.pid && bundle exec puma -t 5:5 -p 4666"
+    volumes:
+      - .:/Sinatra-Docker
+    restart: unless-stopped
+    ports:
+      - "4666:4666"

@@ -22,7 +22,7 @@ end
 
 post '/users/:user_id/shows' do
   @user = current_user
-  @show = Show.find_by("title = ?", params[:show]['title']) || Show.new(title: params[:show]['title'], year: params[:show]['year'], rating: params[:show]['rating'], genre: params[:show]['genre'], poster: params[:season]['poster'])
+  @show = Show.find_by("show_collection_id = ?", params[:show]['show_collection_id']) || Show.new(title: params[:show]['title'], year: params[:show]['year'], rating: params[:show]['rating'], genre: params[:show]['genre'], poster: params[:season]['poster'], show_collection_id: params[:show]['show_collection_id'])
   @season = Season.find_by(collectionId: params[:season]['collectionId']) || @show.seasons.new(params[:season])
   if @show.save
     @show.users << @user if !@show.users.include?(@user)

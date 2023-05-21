@@ -1,4 +1,4 @@
-d<%@movie_previews.each do |movie| %>
+<%@movie_previews.each do |movie| %>
   <% if movie[:poster] != 'NA' %>
     <div class="movie-preview">
       <form id="create-movie" action=<%="/users/#{@user.id}/movies"%> method="POST">
