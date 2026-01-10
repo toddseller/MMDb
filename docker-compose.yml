@@ -1,0 +1,30 @@
+services:
+  web:
+    build: .
+    command: bash -c "rm -f tmp/pids/server.pid && bundle exec rackup config.ru -o 0.0.0.0 -p 4666"
+    volumes:
+      - .:/app
+    restart: unless-stopped
+    ports:
+      - "4666:4666"
+    env_file:
+      - .env
+    environment:
+      - RACK_ENV=development
+      - DATABASE_URL=${DATABASE_URL}
+      - SESSION_SECRET=${SESSION_SECRET}
+      - JWT_SECRET=${JWT_SECRET}
+      - JWT_ISSUER=${JWT_ISSUER:-mmdb.online}
+      - TMDB_KEY=${TMDB_KEY}
+      - TMDB_TOKEN=${TMDB_TOKEN}
+      - TVDB_APIKEY=${TVDB_APIKEY}
+      - TVDB_PIN=${TVDB_PIN}
+      - TVDB_USERNAME=${TVDB_USERNAME}
+      - TVDB_USERKEY=${TVDB_USERKEY}
+      - TVDB_TOKEN=${TVDB_TOKEN}
+      - TAUTULLI_KEY=${TAUTULLI_KEY}
+      - PLEX_USER=${PLEX_USER}
+      - PLEX_USER_ID=${PLEX_USER_ID}
+      - LIBRARY_KEY=${LIBRARY_KEY:-1}
+      - REDISTOGO_URL=${REDISTOGO_URL:-redis://localhost:6379/}
+      - HEROKU_KEY=${HEROKU_KEY}

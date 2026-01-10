@@ -9,13 +9,14 @@
         <input type="hidden" name="season[season]" value="<%="#{show[:season]}"%>">
         <input type="hidden" name="season[plot]" value="<%="#{show[:plot]}"%>">
         <input type="hidden" name="season[poster]" value="<%="#{show[:poster]}"%>">
+        <input type="hidden" name="show[show_collection_id]" value="<%="#{show[:show_collection_id]}"%>">
         <input type="hidden" name="season[collectionId]" value="<%="#{show[:collectionId]}"%>">
         <input type="hidden" name="season[collectionName]" value="<%="#{show[:collectionName]}"%>">
         <input type="hidden" name="season[skip]" value="<%="#{show[:skip]}"%>">
         <input type="hidden" name="season[count]" value="<%="#{show[:count]}"%>">
         <input type="hidden" name="season[appleTvId]" value="<%="#{show[:appleTvId]}"%>">
         <input type="hidden" name="season[storeId]" value="<%="#{show[:storeId]}"%>">
-        <input type="image" id="show-poster" name="submit" src="<%="#{show[:poster]}"%>" width="300" height="auto" border="0" alt="<%="#{show[:title]} Poster"%>">
+        <input type="image" id="show-poster" name="submit" src="<%="#{show[:poster]}"%>" width="300" height="300" border="0" alt="<%="#{show[:title]} Poster"%>">
         <p class="preview-truncate"><%="#{show[:title]}"%></p>
         <p id="year"><%="Season #{show[:season]}"%></p>
       </form>

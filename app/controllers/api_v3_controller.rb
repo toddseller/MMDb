@@ -1,4 +1,4 @@
-namespace '/api/v2' do
+namespace '/api/v3' do
 
   before do
     content_type 'application/json'
@@ -30,13 +30,22 @@ namespace '/api/v2' do
   post '/authenticate' do
     user = User.find_by(email: params[:username_email]) || User.find_by(user_name: params[:username_email])
     if user && user.authenticate(params[:password])
-      currentUser = {id: user.id, firstName: user.first_name, userName: user.user_name, avatar: user.avatar}
+      currentUser = {id: user.id, firstName: user.first_name, lastName: user.last_name, userName: user.user_name, email: user.email, avatar: user.avatar}
       session[:user_id] = user.id
       {token: JwtAuth.token(user), user: currentUser}.to_json
     else
       session[:user_id] = nil
       halt 401, json(errorMessage: "Invalid login. Please check your credentials and try again.")
     end
+  end
+
+  get '/user' do
+    authenticate!
+
+    user = User.find(@auth_payload['sub'])
+    currentUser = {id: user.id, firstName: user.first_name, lastName: user.last_name, userName: user.user_name, email: user.email, avatar: user.avatar}
+
+    currentUser.to_json
   end
 
   post '/deauthenticate' do
@@ -47,22 +56,21 @@ namespace '/api/v2' do
     authenticate!
 
     user = User.find(@auth_payload['sub'])
-    # user.movies.sorted_list.to_json( { include: :ratings } )
-    Movie.basic_info(user).to_json
+    {request: Movie.ios_movies(user, params[:page])}.to_json
   end
 
   get '/movies_details' do
     authenticate!
 
     user = User.find(@auth_payload['sub'])
-    user.movies.sorted_list.to_json({include: :ratings})
+    {request: user.movies.sorted_list}.to_json
   end
 
   get '/movies/:id' do
     authenticate!
 
     movie = Movie.find(params[:id])
-    movie.to_json({include: :ratings})
+    {request: movie}.to_json
   end
 
   put '/movies/:id' do
@@ -71,6 +79,28 @@ namespace '/api/v2' do
     movie = Movie.find(params[:id])
     movie.update(params[:movie])
     movie.to_json
+  end
+
+  patch '/movies/:id' do
+    authenticate!
+
+    movie = Movie.find(params[:id])
+    movie.title = params[:title]
+    movie.sort_name = params[:sortName].downcase
+    movie.plot = params[:plot]
+    movie.poster = params[:poster]
+    movie.year = params[:year]
+    movie.actors = params[:actors]
+    movie.director = params[:director]
+    movie.genre = params[:genre]
+    movie.producer = params[:producer]
+    movie.rating = params[:rating]
+    movie.studio = params[:studio]
+    movie.writer = params[:writer]
+    movie.isnew = params[:isNew]
+    movie.hd = params[:hd]
+    
+    {request: movie}.to_json
   end
 
   get '/add_movie' do
@@ -98,7 +128,7 @@ namespace '/api/v2' do
     authenticate!
 
     user = User.find(@auth_payload['sub'])
-    Show.basic_info(user).to_json
+    {request: Show.ios_shows(user, params[:page])}.to_json({include: [seasons: {include: :episodes}]})
   end
 
   get '/shows/:id' do
@@ -176,7 +206,7 @@ namespace '/api/v2' do
       end
     end
 
-    show.to_json({include: [seasons: {include: :episodes}]})
+    show.to_json({include: [seasons: {include: :episodes.order(tv_episode)}]})
   end
 
   get '/counts' do

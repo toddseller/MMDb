@@ -4,10 +4,10 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
   <link rel="prefetch" href="/imgs/animated.svg">
-  <% if session[:theme] == 'dark' %>
-    <link rel='stylesheet' href='/css/dark.css' type='text/css'>
-  <% else %>
+  <% if session[:theme] == 'default' %>
     <link rel='stylesheet' href='/css/default.css' type='text/css'>
+  <% else %>
+    <link rel='stylesheet' href='/css/dark.css' type='text/css'>
   <% end %>
 
   <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>

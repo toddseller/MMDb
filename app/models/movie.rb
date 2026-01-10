@@ -1,6 +1,8 @@
 class Movie < ActiveRecord::Base
 
 
+  self.per_page = 100
+
   validates :title, presence: true
 
   has_and_belongs_to_many :users
@@ -51,8 +53,25 @@ class Movie < ActiveRecord::Base
     movie_array.sort_by {|k| k[:year]}
   end
 
+  def self.plex_add(data, user)
+    user = User.find(user.to_i)
+    movie = Movie.where('title = ? AND year = ?', data['title'], data['year'].to_s)
+    if movie.empty?
+      movies = get_titles(data['title'].downcase)
+      movies.each do |movie|
+        if movie[:title].downcase() == data['title'].downcase() && movie[:year] == data['year'].to_s
+          movie = Movie.new(movie)
+          if movie.save
+            movie.users << user if !movie.users.include?(user)
+            movie.save
+          end
+        end 
+      end
+    end
+  end
+
   def self.plex_count()
-    plex_response = HTTParty.get('http://onyxwear.duckdns.org:8181/api/v2?apikey=' + ENV['TAUTULLI_KEY'] + '&cmd=get_libraries')
+    plex_response = HTTParty.get('https://plex.toddseller.dev/api/v2?apikey=' + ENV['TAUTULLI_KEY'] + '&cmd=get_libraries')
     movies = plex_response['response']['data'][0]['count']
     shows = plex_response['response']['data'][1]['count']
     episodes = plex_response['response']['data'][1]['child_count']
@@ -105,6 +124,12 @@ class Movie < ActiveRecord::Base
   def self.basic_info(u)
     movies_list = []
     u.movies.sorted_list.each { |movie| movies_list << {id: movie.id, title: movie.title, sort_name: movie.sort_name, search_name: movie.search_name, poster: movie.poster, year: movie.year, isnew: movie.isnew} }
+    movies_list.sort_by {|k| k[:sort_name]}
+  end
+
+  def self.ios_movies(user, page)
+    movies_list = []
+    user.movies.sorted_list.paginate(page: page).each { |movie| movies_list << {id: movie.id, title: movie.title, plot: movie.plot, poster: movie.poster, year: movie.year, actors: movie.actors, director: movie.director, genre: movie.genre, producer: movie.producer, rating: movie.rating, runtime: movie.runtime, studio: movie.studio, writer: movie.writer, isNew: movie.isnew, hd: movie.hd, sortName: movie.sort_name}}
     movies_list
   end
 
@@ -128,7 +153,7 @@ class Movie < ActiveRecord::Base
   private
 
   def create_sort_name
-    self.sort_name = self.title.gsub(/^(The\b*\W|A\b*\W|An\b*\W)/, '')
+    self.sort_name = self.title.gsub(/^(The\b*\W|A\b*\W|An\b*\W)/, '').downcase
   end
 
   def create_search_name
@@ -262,13 +287,13 @@ class Movie < ActiveRecord::Base
     storeIds = ['143441', '143444', '143455', '143460']
 
     storeIds.each do |store|
-     response = HTTParty.get('https://uts-api.itunes.apple.com/uts/v2/search/incremental?sf=' + store + '&locale=EN&utsk=0&caller=wta&v=36&pfm=web&q=' + s_term)
+     response = HTTParty.get('https://uts-api.itunes.apple.com/uts/v2/search/incremental?sf=' + store + '&locale=en-US&utsk=0&caller=wta&v=36&pfm=desktop&q=' + CGI.escape(s_term))
 
       if response['data']['canvas'] != nil
         response['data']['canvas']['shelves'].each do |movie|
           if movie['items'].length > 0
             movie['items'].each do |m|
-              if m['type'] == 'Movie'
+              if m['type'] == 'Movie' && m['title'].downcase() == s_term.downcase()
                 request = HTTParty.get('https://uts-api.itunes.apple.com/uts/v2/view/product/' + m['id'] + '?sf=' + store + '&locale=EN&utsk=0&caller=wta&v=36&pfm=web')
                 content = request['data']['content']
                 credits = request['data']['roles'] ? request['data']['roles'] : []
@@ -292,9 +317,9 @@ class Movie < ActiveRecord::Base
                     puts "not matching"
                   end
                 end
-                title = content['title']
+                p title = content['title']
                 plot = content['description'] ? get_plot(content['description']) : ''
-                year = content['releaseDate'] ? Time.at(content['releaseDate'] / 1000).to_datetime.year.to_s : ''
+                p year = content['releaseDate'] ? Time.at(content['releaseDate'] / 1000).to_datetime.year.to_s : ''
                 poster = content['images']['coverArt'] ? content['images']['coverArt']['url'].gsub(/({w}x{h}.{f})/, content['images']['coverArt']['width'].to_s + 'x' + content['images']['coverArt']['height'].to_s + '.jpg') : ''
                 genre = content['genres'] ? content['genres'][0]['name'] : ''
                 rating = content['rating'] ? content['rating']['displayName'] : ''

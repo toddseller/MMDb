@@ -18,8 +18,8 @@ end
 post '/shows' do
   @user = current_user
   @my_shows = @user.shows.sorted_list
-  @show = Show.find_by("title = ?", params[:show]['title']) || Show.new(title: params[:show]['title'], year: params[:show]['year'], rating: params[:show]['rating'], genre: params[:show]['genre'], poster: params[:season]['poster'])
-  @season = Season.find_by(collectionName: params[:season]['collectionName']) || @show.seasons.new(params[:season])
+  @show = Show.find_by(show_collection_id = ?", params[:show]['show_collection_id']) || Show.new(title: params[:show]['title'], year: params[:show]['year'], rating: params[:show]['rating'], genre: params[:show]['genre'], poster: params[:season]['poster'], show_collection_id: params[:show]['show_collection_id'])
+  @season = Season.find_by(collectionId: params[:season]['collectionId']) || @show.seasons.new(params[:season])
   if @show.save
     @show.users << @user if !@show.users.include?(@user)
   end

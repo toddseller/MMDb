@@ -23,10 +23,10 @@ class Episode < ActiveRecord::Base
 
   def create_duration
     time = self.runtime.to_i
-    hour = time.round / (1000 * 60 * 60)
-    min = time / (1000 * 60) % 60
+    hour = time.round / 60
+    min = time % 60
     if hour != 0 && min > 0
-      self.runtime = hour.to_s + 'h ' + min.to_s + 'm'
+      p self.runtime = hour.to_s + 'h ' + min.to_s + 'm'
     elsif hour != 0 && min == 0
       self.runtime = hour.to_s + ' hr'
     else

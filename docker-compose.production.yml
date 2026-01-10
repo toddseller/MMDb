@@ -1,0 +1,68 @@
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile.production
+    image: mmdb-web:latest
+    restart: always
+    ports:
+      - "${PORT:-4666}:${PORT:-4666}"
+    env_file:
+      - .env
+    environment:
+      - RACK_ENV=production
+      - DATABASE_URL=${DATABASE_URL}
+      - SESSION_SECRET=${SESSION_SECRET}
+      - JWT_SECRET=${JWT_SECRET}
+      - JWT_ISSUER=${JWT_ISSUER:-mmdb.online}
+      - TMDB_KEY=${TMDB_KEY}
+      - TMDB_TOKEN=${TMDB_TOKEN}
+      - TVDB_APIKEY=${TVDB_APIKEY}
+      - TVDB_PIN=${TVDB_PIN}
+      - TVDB_USERNAME=${TVDB_USERNAME}
+      - TVDB_USERKEY=${TVDB_USERKEY}
+      - TVDB_TOKEN=${TVDB_TOKEN}
+      - TAUTULLI_KEY=${TAUTULLI_KEY}
+      - PLEX_USER=${PLEX_USER}
+      - PLEX_USER_ID=${PLEX_USER_ID}
+      - LIBRARY_KEY=${LIBRARY_KEY:-1}
+      - REDISTOGO_URL=${REDISTOGO_URL:-redis://localhost:6379/}
+      - HEROKU_KEY=${HEROKU_KEY}
+      - WEB_CONCURRENCY=${WEB_CONCURRENCY:-2}
+      - PUMA_THREADS=${PUMA_THREADS:-5}
+      - PORT=${PORT:-4666}
+    depends_on:
+      - db
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:${PORT:-4666}/"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 40s
+
+  db:
+    image: postgres:15-alpine
+    restart: always
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB:-mmdb_production}
+      - POSTGRES_USER=${POSTGRES_USER:-postgres}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  postgres-data:
+    driver: local

@@ -9,7 +9,7 @@
         <input type="hidden" name="episode[runtime]" value="<%="#{episode[:runtime]}"%>">
         <input type="hidden" name="episode[tv_episode]" value="<%="#{episode[:tv_episode]}"%>">
         <button type="submit" id="episode-video" border="0">
-          <% if episode[:preview].include?('video') %>
+          <% if episode[:preview] != nil && episode[:preview].include?('video') %>
             <video src="<%="#{episode[:preview]}"%>" width='300'></video>
           <% else %>
             <img src="<%="#{episode[:preview]}"%>" onError="this.onerror=null;this.src='https://s3-us-west-2.amazonaws.com/toddseller/tedflix/imgs/Artboard+1-196x196.jpg';" width='300'>

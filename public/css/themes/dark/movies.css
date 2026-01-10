@@ -60,7 +60,7 @@ img
 #info-header > .description-poster img
 {
     width: 447px;
-
+    height: 447px;
     border: rgba(243,243,243,.1) 1px solid;
     background: none;
 }
@@ -795,7 +795,7 @@ a.movie-edit:hover
 .index-preview-show img
 {
     width: 213px;
-    height: auto;
+    height: 213px;
     margin-top: 20px;
 
     transition: all .3s ease-in-out;

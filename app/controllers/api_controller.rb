@@ -2,14 +2,16 @@ use Rack::Cors do |config|
   
   config.allow do |allow|
 
-    allow.origins 'http://toddseller.com', 'http://www.toddseller.com', 'http://test.toddseller.com', 'https://www.test.toddseller.com', 'https://toddseller.com', 'https://www.toddseller.com', 'https://test.toddseller.com', 'https://www.test.toddseller.com'
+    allow.origins 'toddseller.com', 'www.toddseller.com', 'test.toddseller.com', 'www.test.toddseller.com'
     allow.resource '/api/movies/count',
       :methods => [:get],
       :headers => :any,
+      :credentials => true,
       :max_age => 0
     allow.resource '/api/year',
       :methods => [:get],
       :headers => :any,
+      :credentials => true,
       :max_age => 0
   end
 end
