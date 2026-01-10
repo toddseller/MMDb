@@ -1,0 +1,537 @@
+{
+    "event": "library.new",
+    "user": true,
+    "owner": true,
+    "Account": {
+        "id": 9025447,
+        "thumb": "https://plex.tv/users/2614f96d2f90b918/avatar?c=1728737232",
+        "title": "toddseller"
+    },
+    "Server": {
+        "title": "MYFLIX",
+        "uuid": "e61d32650eadd83975d19f787ae50fa423b72090"
+    },
+    "Metadata": {
+        "librarySectionType": "show",
+        "ratingKey": "106956",
+        "key": "/library/metadata/106956",
+        "parentRatingKey": "106953",
+        "grandparentRatingKey": "106850",
+        "guid": "plex://episode/5d9c0e43ffd9ef001e9cd08d",
+        "parentGuid": "plex://season/602e5ee091bd55002cf763d0",
+        "grandparentGuid": "plex://show/5d9c081a3c3f87001f3477a9",
+        "grandparentSlug": "midsomer-murders",
+        "type": "episode",
+        "title": "Ring Out Your Dead",
+        "grandparentKey": "/library/metadata/106850",
+        "parentKey": "/library/metadata/106953",
+        "librarySectionTitle": "TV Shows",
+        "librarySectionID": 2,
+        "librarySectionKey": "/library/sections/2",
+        "grandparentTitle": "Dark Winds",
+        "parentTitle": "Season 3",
+        "contentRating": "TV-14",
+        "summary": "In the village of Midsomer Wellow, someone is killing off the bellringers of the parish church, in the week before a big bell-ringing competition. One young woman on the team is even shot dead in the churchyard on her wedding day. Before he can crack the case, Barnaby has to understand the significance of an old killing in the same village in the year 1860, when the Midsomer Wellow Vicar of the day, the Reverend Jonathan Ebbrell, was murdered and thrown down a well by the bellringers of his church. So where are the Ebbrells now?",
+        "index": 2,
+        "parentIndex": 3,
+        "audienceRating": 6.4,
+        "year": 2022,
+        "thumb": "/library/metadata/106956/thumb/1728764269",
+        "art": "/library/metadata/106850/art/1728671915",
+        "parentThumb": "/library/metadata/106953/thumb/1728760512",
+        "grandparentThumb": "/library/metadata/106850/thumb/1728671915",
+        "grandparentArt": "/library/metadata/106850/art/1728671915",
+        "grandparentTheme": "/library/metadata/106850/theme/1728671915",
+        "duration": 5400000,
+        "originallyAvailableAt": "2002-09-15",
+        "addedAt": 1728764268,
+        "updatedAt": 1728764269,
+        "audienceRatingImage": "themoviedb://image.rating",
+        "Image": [
+            {
+                "alt": "Ring Out Your Dead",
+                "type": "coverPoster",
+                "url": "/library/metadata/106953/thumb/1728760512"
+            },
+            {
+                "alt": "Ring Out Your Dead",
+                "type": "snapshot",
+                "url": "/library/metadata/106956/thumb/1728764269"
+            },
+            {
+                "alt": "Ring Out Your Dead",
+                "type": "background",
+                "url": "/library/metadata/106850/art/1728671915"
+            },
+            {
+                "alt": "Ring Out Your Dead",
+                "type": "clearLogo",
+                "url": "/library/metadata/106850/clearLogo/1728671915"
+            }
+        ],
+        "UltraBlurColors": {
+            "topLeft": "243313",
+            "topRight": "9a392f",
+            "bottomRight": "4f4443",
+            "bottomLeft": "223114"
+        },
+        "Guid": [
+            {
+                "id": "imdb://tt0647499"
+            },
+            {
+                "id": "tmdb://41078"
+            },
+            {
+                "id": "tvdb://217309"
+            }
+        ],
+        "Rating": [
+            {
+                "image": "themoviedb://image.rating",
+                "value": 6.4,
+                "type": "audience"
+            }
+        ],
+        "Director": [
+            {
+                "id": 462466,
+                "filter": "director=462466",
+                "tag": "Sarah Hellings",
+                "tagKey": "5d776999ad5437001f76195f",
+                "thumb": "https://metadata-static.plex.tv/d/people/d816336b8331a318300874f14e7a9594.jpg"
+            }
+        ],
+        "Writer": [
+            {
+                "id": 462487,
+                "filter": "writer=462487",
+                "tag": "Christopher Russell",
+                "tagKey": "62962de826feeabf6b09f74d"
+            }
+        ],
+        "Role": [
+            {
+                "id": 462225,
+                "filter": "actor=462225",
+                "tag": "John Nettles",
+                "tagKey": "5d776857f59e58002189c0bc",
+                "role": "DCI Tom Barnaby",
+                "thumb": "https://metadata-static.plex.tv/people/5d776857f59e58002189c0bc.jpg"
+            },
+            {
+                "id": 462226,
+                "filter": "actor=462226",
+                "tag": "Jane Wymark",
+                "tagKey": "5d77699efb0d55001f52afce",
+                "role": "Joyce Barnaby",
+                "thumb": "https://metadata-static.plex.tv/f/people/f480afb7a2a59773d04492ebbc8a9ddb.jpg"
+            },
+            {
+                "id": 462230,
+                "filter": "actor=462230",
+                "tag": "Daniel Casey",
+                "tagKey": "5d7768f7f617c9002015b142",
+                "role": "Sgt Gavin Troy",
+                "thumb": "https://metadata-static.plex.tv/people/5d7768f7f617c9002015b142.jpg"
+            },
+            {
+                "id": 462227,
+                "filter": "actor=462227",
+                "tag": "Laura Howard",
+                "tagKey": "5d7768fb96b655001fdc705a",
+                "role": "Cully Barnaby",
+                "thumb": "https://metadata-static.plex.tv/9/people/92aa0f72aab11c3833ca73213b871384.jpg"
+            },
+            {
+                "id": 236623,
+                "filter": "actor=236623",
+                "tag": "Barry Jackson",
+                "tagKey": "5d77682c103a2d001f565a4d",
+                "role": "Doctor George Bullard",
+                "thumb": "https://metadata-static.plex.tv/people/5d77682c103a2d001f565a4d.jpg"
+            },
+            {
+                "id": 320767,
+                "filter": "actor=320767",
+                "tag": "Carmen du Sautoy",
+                "tagKey": "5d776827103a2d001f5645f0",
+                "role": "Rosalind Parr",
+                "thumb": "https://image.tmdb.org/t/p/original/kw8Pri4y7Wf3XMtFV3HjP8Gq5rT.jpg"
+            },
+            {
+                "id": 225035,
+                "filter": "actor=225035",
+                "tag": "Adrian Scarborough",
+                "tagKey": "5d776829151a60001f24b134",
+                "role": "Peter Fogden",
+                "thumb": "https://metadata-static.plex.tv/2/people/24ed4c03a57cb8453d3452324832471c.jpg"
+            },
+            {
+                "id": 243247,
+                "filter": "actor=243247",
+                "tag": "Graham Crowden",
+                "tagKey": "5d776827880197001ec90a5d",
+                "role": "Reggie Barton",
+                "thumb": "https://metadata-static.plex.tv/8/people/8a85a8c46bc9edcc8614e04cfe4d0b64.jpg"
+            },
+            {
+                "id": 211192,
+                "filter": "actor=211192",
+                "tag": "Lyndsey Marshal",
+                "tagKey": "5d776828a091de001f2e63c8",
+                "role": "Emma Tysoe",
+                "thumb": "https://metadata-static.plex.tv/people/5d776828a091de001f2e63c8.jpg"
+            },
+            {
+                "id": 241741,
+                "filter": "actor=241741",
+                "tag": "Hugh Bonneville",
+                "tagKey": "5d7768263c3c2a001fbcaff7",
+                "role": "Hugh Barton",
+                "thumb": "https://metadata-static.plex.tv/c/people/c56800ffa95b93593e588ad60a976943.jpg"
+            },
+            {
+                "id": 271266,
+                "filter": "actor=271266",
+                "tag": "Gwen Taylor",
+                "tagKey": "5d776827880197001ec90a4d",
+                "role": "Frances Le Bon",
+                "thumb": "https://metadata-static.plex.tv/c/people/c9d4babdb8ff17dcac9466626229cf0c.jpg"
+            },
+            {
+                "id": 232610,
+                "filter": "actor=232610",
+                "tag": "Gemma Jones",
+                "tagKey": "5d7768278718ba001e311e57",
+                "role": "Maisie Gooch",
+                "thumb": "https://metadata-static.plex.tv/d/people/d9c4a790f47854d1bee4c89587d0667e.jpg"
+            },
+            {
+                "id": 368587,
+                "filter": "actor=368587",
+                "tag": "Clare Holman",
+                "tagKey": "5d77683feb5d26001f1e3122",
+                "role": "Sue Tutt",
+                "thumb": "https://metadata-static.plex.tv/9/people/9e8ec4a913400d864b927daac2a12857.jpg"
+            },
+            {
+                "id": 340395,
+                "filter": "actor=340395",
+                "tag": "Dugald Bruce Lockhart",
+                "tagKey": "5d776889308bca002032c909",
+                "role": "Greg Tutt",
+                "thumb": "https://metadata-static.plex.tv/c/people/c9237f0e3a252b024c0e3b4dd2e9d23a.jpg"
+            },
+            {
+                "id": 287273,
+                "filter": "actor=287273",
+                "tag": "Jamie de Courcey",
+                "tagKey": "5d7768fd7a53e9001e6de7b9",
+                "role": "Marcus Steadman"
+            },
+            {
+                "id": 462488,
+                "filter": "actor=462488",
+                "tag": "Seamus Whitty",
+                "tagKey": "62962de83c71169f69f6fe03",
+                "role": "Liam Brooker"
+            },
+            {
+                "id": 336763,
+                "filter": "actor=336763",
+                "tag": "Harry Burton",
+                "tagKey": "5d7768402ec6b5001f6bddf4",
+                "role": "Dennis Ebbrell",
+                "thumb": "https://metadata-static.plex.tv/people/5d7768402ec6b5001f6bddf4.jpg"
+            },
+            {
+                "id": 462238,
+                "filter": "actor=462238",
+                "tag": "Caroline Lintott",
+                "tagKey": "5d77706a96b655001fe958e2",
+                "role": "Jen"
+            },
+            {
+                "id": 462489,
+                "filter": "actor=462489",
+                "tag": "Steven Pimlott",
+                "tagKey": "63f755a6b5dbef526f4d05e1",
+                "role": "Judge"
+            },
+            {
+                "id": 462490,
+                "filter": "actor=462490",
+                "tag": "Julia Swift",
+                "tagKey": "5d77689ead5437001f74b11d",
+                "role": "Angie Blunstone",
+                "thumb": "https://metadata-static.plex.tv/4/people/4c0ee4cd50231f8f118daa9c7375ed94.jpg"
+            }
+        ]
+    }
+}
+
+{:appleTvId=>"umc.cmc.1ou7df0dhe06jbyt31d84ved", :title=>"Midsomer Murders", :collectionName=>"Midsomer Murders, Season 8", :collectionId=>"umc.cmc.3cecqz11cbnoam0in63vl30b9", :season=>"8", :rating=>"TV-14", :genre=>"Crime", :plot=>"A veteran DC Inspector (John Nettles, &#34;Bergerac&#34;) and his fellow detectives investigate murders around the regional community of Midsomer County in this classic UK mystery series.", :year=>"1997", :poster=>"https://is1-ssl.mzstatic.com/image/thumb/Video/86/3d/a8/mzl.tziwwcvy.jpg/600x600.jpg", :skip=>35, :count=>8, :storeId=>"143441", :show_collection_id=>"umc.cmc.1ou7df0dhe06jbyt31d84ved"}
+
+{:id=>3263, :season=>4, :plot=>"Samantha, a cheerful freelance journalist, and Jay, an up&#8211;and&#8211;coming chef from the city, throw both caution and money to the wind when they decide to convert a huge run&#8211;down country estate they inherited into a bed and breakfast &#8211;&#8211; only to find it&#39;s inhabited by the many spirits of deceased residents. The departed souls are a close&#8211;knit, eclectic group that includes a saucy Prohibition&#8211;era lounge singer, a pompous 1700&#39;s Militiaman, a &#39;60s hippie fond of hallucinogens and an overly upbeat &#39;80s scout troop leader. If the spirits were anxious about the commotion a renovation and B&B will create in their home, it&#39;s nothing compared to when they realize Samantha is the first live person who can see and hear them.", :poster=>"https://is1-ssl.mzstatic.com/image/thumb/Video221/v4/5e/d9/ec/5ed9ec3f-7337-6074-805f-ac38e5d14c8e/a8f91dfd-c1dc-45fa-bb83-c92166ec7bad_GhostsS4_iTunesStore-TV-Cover.jpg/600x600.jpg", :collectionId=>"umc.cmc.3wtp6tq7m7glx4ucb3fbhc15x", :collectionName=>"Ghosts, Season 4", :is_active=>true, :show_id=>902, :created_at=>2024-10-18 20:10:19 UTC, :updated_at=>2024-11-01 14:06:58 UTC, :appleTvId=>"umc.cmc.5im3fjdrpuofiw5highf2zk82", :skip=>"50", :count=>"3", :storeId=>"143441", :title=>"Ghosts", :show_collection_id=>"umc.cmc.5im3fjdrpuofiw5highf2zk82", :year=>"2021"}
+
+{
+    "event": "library.new",
+    "user": true,
+    "owner": true,
+    "Account": {
+        "id": 9025447,
+        "thumb": "https://plex.tv/users/2614f96d2f90b918/avatar?c=1730512478",
+        "title": "toddseller"
+    },
+    "Server": {
+        "title": "MYFLIX",
+        "uuid": "e61d32650eadd83975d19f787ae50fa423b72090"
+    },
+    "Metadata": {
+        "librarySectionType": "show",
+        "ratingKey": "107341",
+        "key": "/library/metadata/107341",
+        "parentRatingKey": "107338",
+        "grandparentRatingKey": "107337",
+        "guid": "plex://episode/630a127385083526cd9fbeec",
+        "parentGuid": "plex://season/630a127285083526cd9fbed4",
+        "grandparentGuid": "plex://show/630a127285083526cd9fbecb",
+        "grandparentSlug": "rivals-2",
+        "type": "episode",
+        "title": "Episode 2",
+        "grandparentKey": "/library/metadata/107337",
+        "parentKey": "/library/metadata/107338",
+        "librarySectionTitle": "TV Shows",
+        "librarySectionID": 2,
+        "librarySectionKey": "/library/sections/2",
+        "grandparentTitle": "Rivals",
+        "parentTitle": "Season 1",
+        "contentRating": "TV-MA",
+        "summary": "Declan feels the pressure to deliver a new hit show for Tony and his company, Corinium, with producer Cameron on hand to help despite their fractious relationship. Keen to recruit businessman Freddie Jones, Tony agrees to attend a dinner party, but the guest list holds nasty surprises. Taggie gets her first catering job, but the evening is fraught with incidents. When the dinner party descends into chaos, can Tony salvage the situation and kill two birds with one stone?",
+        "index": 2,
+        "parentIndex": 1,
+        "audienceRating": 5.5,
+        "year": 2024,
+        "thumb": "/library/metadata/107341/thumb/1730569650",
+        "art": "/library/metadata/107337/art/1730569229",
+        "parentThumb": "/library/metadata/107338/thumb/1730569230",
+        "grandparentThumb": "/library/metadata/107337/thumb/1730569229",
+        "grandparentArt": "/library/metadata/107337/art/1730569229",
+        "duration": 2880000,
+        "originallyAvailableAt": "2024-10-18",
+        "addedAt": 1730569647,
+        "updatedAt": 1730569650,
+        "audienceRatingImage": "themoviedb://image.rating",
+        "chapterSource": "media",
+        "Image": [
+            {
+                "alt": "Episode 2",
+                "type": "coverPoster",
+                "url": "/library/metadata/107338/thumb/1730569230"
+            },
+            {
+                "alt": "Episode 2",
+                "type": "snapshot",
+                "url": "/library/metadata/107341/thumb/1730569650"
+            },
+            {
+                "alt": "Episode 2",
+                "type": "background",
+                "url": "/library/metadata/107337/art/1730569229"
+            }
+        ],
+        "UltraBlurColors": {
+            "topLeft": "2e0f0b",
+            "topRight": "36110d",
+            "bottomRight": "82510d",
+            "bottomLeft": "63371e"
+        },
+        "Guid": [
+            {
+                "id": "imdb://tt22052954"
+            },
+            {
+                "id": "tmdb://3912587"
+            }
+        ],
+        "Rating": [
+            {
+                "image": "themoviedb://image.rating",
+                "value": 5.5,
+                "type": "audience"
+            }
+        ],
+        "Role": [
+            {
+                "id": 223620,
+                "filter": "actor=223620",
+                "tag": "David Tennant",
+                "tagKey": "5d77682785719b001f3a0f74",
+                "role": "Tony Baddingham",
+                "thumb": "https://metadata-static.plex.tv/1/people/18d822ed5f68236fcaf9d91ca0318dee.jpg"
+            },
+            {
+                "id": 300535,
+                "filter": "actor=300535",
+                "tag": "Aidan Turner",
+                "tagKey": "5d7768881999bc0020dc8418",
+                "role": "Declan O'Hara",
+                "thumb": "https://metadata-static.plex.tv/b/people/bcfd6760f95658c47d514f3f0a2efa92.jpg"
+            },
+            {
+                "id": 294966,
+                "filter": "actor=294966",
+                "tag": "Danny Dyer",
+                "tagKey": "5d77682f7228e5001f1ddd13",
+                "role": "Freddie Jones",
+                "thumb": "https://metadata-static.plex.tv/0/people/063e965aed8e7d144d1e42c47ae6fcf5.jpg"
+            },
+            {
+                "id": 221576,
+                "filter": "actor=221576",
+                "tag": "Alex Hassell",
+                "tagKey": "5d77683ce6d55c002040e6d5",
+                "role": "Rupert Campbell-Black",
+                "thumb": "https://metadata-static.plex.tv/people/5d77683ce6d55c002040e6d5.jpg"
+            },
+            {
+                "id": 465015,
+                "filter": "actor=465015",
+                "tag": "Nafessa Williams",
+                "tagKey": "5d776afefb0d55001f558214",
+                "role": "Cameron Cook",
+                "thumb": "https://metadata-static.plex.tv/5/people/592cf634608eb6cbb18762b345636ea0.jpg"
+            },
+            {
+                "id": 448442,
+                "filter": "actor=448442",
+                "tag": "Bella Maclean",
+                "tagKey": "5f4066635a76a80042ddd53f",
+                "role": "Taggie O'Hara",
+                "thumb": "https://metadata-static.plex.tv/1/people/1793a960bed6899dfe7e6abfc1e2d96a.jpg"
+            },
+            {
+                "id": 283306,
+                "filter": "actor=283306",
+                "tag": "Katherine Parkinson",
+                "tagKey": "5d77683a7e9a3c0020c6dcb0",
+                "role": "Lizzie Vereker",
+                "thumb": "https://metadata-static.plex.tv/1/people/19400cfd33539bd0c98831caebd37e11.jpg"
+            },
+            {
+                "id": 223699,
+                "filter": "actor=223699",
+                "tag": "Victoria Smurfit",
+                "tagKey": "5d7768262ec6b5001f6ba259",
+                "role": "Maud O'Hara",
+                "thumb": "https://metadata-static.plex.tv/5/cc68393fae/people/5b0f4c69c20cbb2701bd0cb548479843.jpg"
+            },
+            {
+                "id": 232616,
+                "filter": "actor=232616",
+                "tag": "Claire Rushbrook",
+                "tagKey": "5d776830961905001eb92fb1",
+                "role": "Lady Monica Baddingham",
+                "thumb": "https://metadata-static.plex.tv/1/people/1d500bb7e11c8d499ee50f3e9570b30f.jpg"
+            },
+            {
+                "id": 241990,
+                "filter": "actor=241990",
+                "tag": "Oliver Chris",
+                "tagKey": "5d77682ce6d55c002040b915",
+                "role": "James Vereker",
+                "thumb": "https://metadata-static.plex.tv/people/5d77682ce6d55c002040b915.jpg"
+            },
+            {
+                "id": 316667,
+                "filter": "actor=316667",
+                "tag": "Lisa McGrillis",
+                "tagKey": "5d776a3f9ab54400214fcb5b",
+                "role": "Valerie Jones",
+                "thumb": "https://metadata-static.plex.tv/a/people/a6c98a32d8f77860cf59e391e8faaa5e.jpg"
+            },
+            {
+                "id": 366555,
+                "filter": "actor=366555",
+                "tag": "Emily Atack",
+                "tagKey": "5d7768a0d11dd30020228c21",
+                "role": "Sarah Stratton",
+                "thumb": "https://metadata-static.plex.tv/2/people/2efef645f234339a45d5243e784f0da3.jpg"
+            },
+            {
+                "id": 281783,
+                "filter": "actor=281783",
+                "tag": "Rufus Jones",
+                "tagKey": "5d776853f59e58002189bc62",
+                "role": "Paul Stratton",
+                "thumb": "https://metadata-static.plex.tv/6/people/69f52722d8b615943531f5cee5ee069a.jpg"
+            },
+            {
+                "id": 290497,
+                "filter": "actor=290497",
+                "tag": "Luke Pasqualino",
+                "tagKey": "5d77692ffb0d55001f523237",
+                "role": "Basil 'Bas' Baddingham",
+                "thumb": "https://metadata-static.plex.tv/6/people/6a2028e7574db332bb045e38f63a3a8c.jpg"
+            },
+            {
+                "id": 328771,
+                "filter": "actor=328771",
+                "tag": "Catriona Chandler",
+                "tagKey": "62977679b76c9938a2d2801f",
+                "role": "Caitlin O'Hara",
+                "thumb": "https://metadata-static.plex.tv/d/people/d50bec8839386e98f82349a6ce04b885.jpg"
+            },
+            {
+                "id": 465016,
+                "filter": "actor=465016",
+                "tag": "Denis Curej",
+                "tagKey": "65ec19b016c5a3571aae925c",
+                "role": "BMX Teen",
+                "thumb": "https://metadata-static.plex.tv/2/people/2707d166fa846b86e7426ca87bcd86ce.jpg"
+            },
+            {
+                "id": 316631,
+                "filter": "actor=316631",
+                "tag": "Bryony Hannah",
+                "tagKey": "5d7768693ab0e7001f500910",
+                "role": "Deirdre Kilpatrick",
+                "thumb": "https://metadata-static.plex.tv/1/cc68393fae/people/1ab94a370013d5574e989cb9caa8b391.jpg"
+            },
+            {
+                "id": 454996,
+                "filter": "actor=454996",
+                "tag": "Milo Callaghan",
+                "tagKey": "5f3fd5b3427eeb0041e55a51",
+                "role": "Seb Burrows",
+                "thumb": "https://metadata-static.plex.tv/7/people/7b98110a9ca362da745fdc4208470250.jpg"
+            },
+            {
+                "id": 363495,
+                "filter": "actor=363495",
+                "tag": "Lara Peake",
+                "tagKey": "5d776a6ff617c9002016d1b4",
+                "role": "Daysee Butler",
+                "thumb": "https://metadata-static.plex.tv/a/people/ae5ffe354f614776f8712a45112ea272.jpg"
+            },
+            {
+                "id": 308590,
+                "filter": "actor=308590",
+                "tag": "Wendy Albiston",
+                "tagKey": "5d77688796b655001fdbacd0",
+                "role": "Mrs. Makepiece",
+                "thumb": "https://metadata-static.plex.tv/b/people/b2c249a67375e93b2deffc2d226be661.jpg"
+            }
+        ],
+        "Producer": [
+            {
+                "id": 465024,
+                "filter": "producer=465024",
+                "tag": "Elliot Hegarty",
+                "tagKey": "5d776ba6594b2b001e6e0064",
+                "thumb": "https://metadata-static.plex.tv/4/people/4d49a4ac00e6b840f2620523fae8643b.jpg"
+            }
+        ]
+    }
+}

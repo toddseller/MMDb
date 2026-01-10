@@ -1,14 +1,11 @@
-FROM ruby:2.6.7
+FROM ruby:3.4.8
 
-RUN apt-get update -qq && apt-get install -y build-essential
-ENV TAUTULLI_KEY 5466f53fef0c47a2bad02cede4f40cbb
+RUN apt-get update -qq && apt-get install -y build-essential libpq-dev
 
 RUN mkdir -p /app
 WORKDIR /app
 
-ADD . /Sinatra-Docker
-COPY Gemfile* /app
-RUN gem install bundler:2.2.19
+COPY Gemfile* /app/
 RUN bundle install
 
 COPY . /app

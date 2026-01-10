@@ -1,0 +1,283 @@
+{
+    "event": "library.new",
+    "user": true,
+    "owner": true,
+    "Account": {
+        "id": 9025447,
+        "thumb": "https://plex.tv/users/2614f96d2f90b918/avatar?c=1730512478",
+        "title": "toddseller"
+    },
+    "Server": {
+        "title": "MYFLIX",
+        "uuid": "e61d32650eadd83975d19f787ae50fa423b72090"
+    },
+    "Metadata": {
+        "librarySectionType": "show",
+        "ratingKey": "107337",
+        "key": "/library/metadata/107337/children",
+        "guid": "plex://show/630a127285083526cd9fbecb",
+        "slug": "rivals-2",
+        "studio": "Happy Prince",
+        "type": "show",
+        "title": "Rivals",
+        "librarySectionTitle": "TV Shows",
+        "librarySectionID": 2,
+        "librarySectionKey": "/library/sections/2",
+        "contentRating": "TV-MA",
+        "summary": "It is 1986 and Britain is booming. \"Rivals\" dives headfirst into the cutthroat world of TV where hair-dos are big and ambitions are even bigger. Deals are brokered in boardrooms, as well as bedrooms. Nobody can be sure who will come out on top. With every man and woman out only for themselves, can true love really blossom?",
+        "index": 1,
+        "audienceRating": 6.8,
+        "year": 2024,
+        "thumb": "/library/metadata/107337/thumb/1730569229",
+        "art": "/library/metadata/107337/art/1730569229",
+        "duration": 3300000,
+        "originallyAvailableAt": "2024-10-18",
+        "leafCount": 4,
+        "viewedLeafCount": 0,
+        "childCount": 1,
+        "addedAt": 1730569226,
+        "updatedAt": 1730569229,
+        "audienceRatingImage": "themoviedb://image.rating",
+        "primaryExtraKey": "/library/metadata/107340",
+        "Image": [
+            {
+                "alt": "Rivals",
+                "type": "coverPoster",
+                "url": "/library/metadata/107337/thumb/1730569229"
+            },
+            {
+                "alt": "Rivals",
+                "type": "background",
+                "url": "/library/metadata/107337/art/1730569229"
+            }
+        ],
+        "UltraBlurColors": {
+            "topLeft": "58081d",
+            "topRight": "2a0c04",
+            "bottomRight": "5d622a",
+            "bottomLeft": "983a36"
+        },
+        "Genre": [
+            {
+                "id": 8,
+                "filter": "genre=8",
+                "tag": "Drama"
+            },
+            {
+                "id": 2156,
+                "filter": "genre=2156",
+                "tag": "Documentary"
+            }
+        ],
+        "Country": [
+            {
+                "id": 226,
+                "filter": "country=226",
+                "tag": "United Kingdom"
+            }
+        ],
+        "Guid": [
+            {
+                "id": "imdb://tt21906238"
+            },
+            {
+                "id": "tmdb://208921"
+            },
+            {
+                "id": "tvdb://231731"
+            },
+            {
+                "id": "tvdb://429920"
+            }
+        ],
+        "Rating": [
+            {
+                "image": "imdb://image.rating",
+                "value": 8,
+                "type": "audience"
+            },
+            {
+                "image": "rottentomatoes://image.rating.ripe",
+                "value": 9.4,
+                "type": "critic"
+            },
+            {
+                "image": "rottentomatoes://image.rating.upright",
+                "value": 9,
+                "type": "audience"
+            },
+            {
+                "image": "themoviedb://image.rating",
+                "value": 6.8,
+                "type": "audience"
+            }
+        ],
+        "Role": [
+            {
+                "id": 223620,
+                "filter": "actor=223620",
+                "tag": "David Tennant",
+                "tagKey": "5d77682785719b001f3a0f74",
+                "role": "Tony Baddingham",
+                "thumb": "https://metadata-static.plex.tv/1/people/18d822ed5f68236fcaf9d91ca0318dee.jpg"
+            },
+            {
+                "id": 300535,
+                "filter": "actor=300535",
+                "tag": "Aidan Turner",
+                "tagKey": "5d7768881999bc0020dc8418",
+                "role": "Declan O'Hara",
+                "thumb": "https://metadata-static.plex.tv/b/people/bcfd6760f95658c47d514f3f0a2efa92.jpg"
+            },
+            {
+                "id": 294966,
+                "filter": "actor=294966",
+                "tag": "Danny Dyer",
+                "tagKey": "5d77682f7228e5001f1ddd13",
+                "role": "Freddie Jones",
+                "thumb": "https://metadata-static.plex.tv/0/people/063e965aed8e7d144d1e42c47ae6fcf5.jpg"
+            },
+            {
+                "id": 221576,
+                "filter": "actor=221576",
+                "tag": "Alex Hassell",
+                "tagKey": "5d77683ce6d55c002040e6d5",
+                "role": "Rupert Campbell-Black",
+                "thumb": "https://metadata-static.plex.tv/people/5d77683ce6d55c002040e6d5.jpg"
+            },
+            {
+                "id": 465015,
+                "filter": "actor=465015",
+                "tag": "Nafessa Williams",
+                "tagKey": "5d776afefb0d55001f558214",
+                "role": "Cameron Cook",
+                "thumb": "https://metadata-static.plex.tv/5/people/592cf634608eb6cbb18762b345636ea0.jpg"
+            },
+            {
+                "id": 448442,
+                "filter": "actor=448442",
+                "tag": "Bella Maclean",
+                "tagKey": "5f4066635a76a80042ddd53f",
+                "role": "Taggie O'Hara",
+                "thumb": "https://metadata-static.plex.tv/1/people/1793a960bed6899dfe7e6abfc1e2d96a.jpg"
+            },
+            {
+                "id": 283306,
+                "filter": "actor=283306",
+                "tag": "Katherine Parkinson",
+                "tagKey": "5d77683a7e9a3c0020c6dcb0",
+                "role": "Lizzie Vereker",
+                "thumb": "https://metadata-static.plex.tv/1/people/19400cfd33539bd0c98831caebd37e11.jpg"
+            },
+            {
+                "id": 223699,
+                "filter": "actor=223699",
+                "tag": "Victoria Smurfit",
+                "tagKey": "5d7768262ec6b5001f6ba259",
+                "role": "Maud O'Hara",
+                "thumb": "https://metadata-static.plex.tv/5/cc68393fae/people/5b0f4c69c20cbb2701bd0cb548479843.jpg"
+            },
+            {
+                "id": 232616,
+                "filter": "actor=232616",
+                "tag": "Claire Rushbrook",
+                "tagKey": "5d776830961905001eb92fb1",
+                "role": "Lady Monica Baddingham",
+                "thumb": "https://metadata-static.plex.tv/1/people/1d500bb7e11c8d499ee50f3e9570b30f.jpg"
+            },
+            {
+                "id": 241990,
+                "filter": "actor=241990",
+                "tag": "Oliver Chris",
+                "tagKey": "5d77682ce6d55c002040b915",
+                "role": "James Vereker",
+                "thumb": "https://metadata-static.plex.tv/people/5d77682ce6d55c002040b915.jpg"
+            },
+            {
+                "id": 316667,
+                "filter": "actor=316667",
+                "tag": "Lisa McGrillis",
+                "tagKey": "5d776a3f9ab54400214fcb5b",
+                "role": "Valerie Jones",
+                "thumb": "https://metadata-static.plex.tv/a/people/a6c98a32d8f77860cf59e391e8faaa5e.jpg"
+            },
+            {
+                "id": 366555,
+                "filter": "actor=366555",
+                "tag": "Emily Atack",
+                "tagKey": "5d7768a0d11dd30020228c21",
+                "role": "Sarah Stratton",
+                "thumb": "https://metadata-static.plex.tv/2/people/2efef645f234339a45d5243e784f0da3.jpg"
+            },
+            {
+                "id": 281783,
+                "filter": "actor=281783",
+                "tag": "Rufus Jones",
+                "tagKey": "5d776853f59e58002189bc62",
+                "role": "Paul Stratton",
+                "thumb": "https://metadata-static.plex.tv/6/people/69f52722d8b615943531f5cee5ee069a.jpg"
+            },
+            {
+                "id": 290497,
+                "filter": "actor=290497",
+                "tag": "Luke Pasqualino",
+                "tagKey": "5d77692ffb0d55001f523237",
+                "role": "Basil 'Bas' Baddingham",
+                "thumb": "https://metadata-static.plex.tv/6/people/6a2028e7574db332bb045e38f63a3a8c.jpg"
+            },
+            {
+                "id": 328771,
+                "filter": "actor=328771",
+                "tag": "Catriona Chandler",
+                "tagKey": "62977679b76c9938a2d2801f",
+                "role": "Caitlin O'Hara",
+                "thumb": "https://metadata-static.plex.tv/d/people/d50bec8839386e98f82349a6ce04b885.jpg"
+            },
+            {
+                "id": 465016,
+                "filter": "actor=465016",
+                "tag": "Denis Curej",
+                "tagKey": "65ec19b016c5a3571aae925c",
+                "role": "BMX Teen",
+                "thumb": "https://metadata-static.plex.tv/2/people/2707d166fa846b86e7426ca87bcd86ce.jpg"
+            },
+            {
+                "id": 316631,
+                "filter": "actor=316631",
+                "tag": "Bryony Hannah",
+                "tagKey": "5d7768693ab0e7001f500910",
+                "role": "Deirdre Kilpatrick",
+                "thumb": "https://metadata-static.plex.tv/1/cc68393fae/people/1ab94a370013d5574e989cb9caa8b391.jpg"
+            },
+            {
+                "id": 454996,
+                "filter": "actor=454996",
+                "tag": "Milo Callaghan",
+                "tagKey": "5f3fd5b3427eeb0041e55a51",
+                "role": "Seb Burrows",
+                "thumb": "https://metadata-static.plex.tv/7/people/7b98110a9ca362da745fdc4208470250.jpg"
+            },
+            {
+                "id": 363495,
+                "filter": "actor=363495",
+                "tag": "Lara Peake",
+                "tagKey": "5d776a6ff617c9002016d1b4",
+                "role": "Daysee Butler",
+                "thumb": "https://metadata-static.plex.tv/a/people/ae5ffe354f614776f8712a45112ea272.jpg"
+            },
+            {
+                "id": 308590,
+                "filter": "actor=308590",
+                "tag": "Wendy Albiston",
+                "tagKey": "5d77688796b655001fdbacd0",
+                "role": "Mrs. Makepiece",
+                "thumb": "https://metadata-static.plex.tv/b/people/b2c249a67375e93b2deffc2d226be661.jpg"
+            }
+        ],
+        "Location": [
+            {
+                "path": "Z:\\TV Shows\\Rivals"
+            }
+        ]
+    }
+}

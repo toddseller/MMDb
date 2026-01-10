@@ -1,0 +1,56 @@
+# Git
+.git
+.gitignore
+
+# Docker
+Dockerfile*
+docker-compose*
+.dockerignore
+
+# Documentation
+README.md
+*.md
+
+# Logs
+log/*
+*.log
+
+# Temporary files
+tmp/*
+*.swp
+*.swo
+*~
+
+# Environment files (use docker secrets instead)
+.env
+.env.*
+
+# Development/Test files
+spec/
+test/
+.rspec
+
+# Editor files
+.vscode/
+.idea/
+*.sublime-*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Ruby/Bundle
+.bundle/
+vendor/bundle/
+
+# Database
+*.sqlite3
+*.db
+
+# Compiled files
+*.o
+*.so
+*.gem
+
+# Coverage
+coverage/

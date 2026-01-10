@@ -1,5 +1,5 @@
 source 'https://rubygems.org'
-ruby '2.6.7'
+ruby '3.4.8'
 
 # PostgreSQL driver
 gem 'pg'
@@ -12,12 +12,10 @@ gem 'dotenv'
 # Use Puma for our web server
 gem 'puma'
 
-gem 'activesupport', '~> 6.1.3'
-gem 'activerecord', '~> 6.1.3'
+gem 'activesupport', '~> 7.2.0'
+gem 'activerecord', '~> 7.2.0'
 
 gem 'rake'
-
-gem 'shotgun'
 gem 'bcrypt'
 gem 'json'
 gem 'httparty'
@@ -25,8 +23,11 @@ gem 'jwt'
 gem "rack-cors", ">= 1.0.4"
 gem "nokogiri", ">= 1.10.4"
 gem 'rack', '>= 2.0.6'
+gem 'rackup'
 gem 'rack-contrib'
 gem 'humanize'
+gem 'will_paginate', '~> 3.3.0'
+gem 'htmlentities', '~> 4.3', '>= 4.3.4'
 
 group :test do
   gem 'faker'
