@@ -2,7 +2,7 @@ class Episode < ActiveRecord::Base
 
   validates :title, presence: true
 
-  belongs_to :seasons, -> { order(:tv_episode) }
+  belongs_to :season, -> { order(:tv_episode) }
 
   before_create :create_duration
   # before_save :update_duration
@@ -11,12 +11,10 @@ class Episode < ActiveRecord::Base
   scope :sorted_list, -> { order(:tv_episode) }
 
   def self.episode_count(u)
-    user = User.find(u)
-    episodes = []
-    user.shows.each do |show|
-      show.seasons.each {|season| episodes << season.episodes.count}
-    end
-    (episodes.reduce(:+) || 0).to_s.reverse.gsub(/(\d{3})(?=\d)/, '\1,').reverse
+    count = Episode.joins(season: { show: :users })
+                   .where(users: { id: u })
+                   .count
+    count.to_s.reverse.gsub(/(\d{3})(?=\d)/, '\1,').reverse
   end
 
   private

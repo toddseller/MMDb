@@ -1,5 +1,5 @@
 get '/users/:user_id/shows' do
-  @user = User.find(params[:user_id])
+  @user = User.includes(shows: { seasons: :episodes }, movies: []).find(params[:user_id])
   @my_shows = @user.shows.sorted_list
   @movies = @user.movies
   @show_count = @user.shows.count.to_s.reverse.gsub(/(\d{3})(?=\d)/, '\1,').reverse

@@ -44,5 +44,8 @@ end
 
 # Renamed from on_worker_fork
 after_worker_boot do
-  ActiveRecord::Base.establish_connection if defined?(ActiveRecord)
+  if defined?(ActiveRecord)
+    ActiveRecord::Base.establish_connection
+    ActiveRecord::Base.connection.verify!
+  end
 end
