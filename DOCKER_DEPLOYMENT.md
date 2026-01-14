@@ -20,16 +20,16 @@ This project includes both development and production Docker configurations for 
 
 ```bash
 # Start development environment
-docker-compose up
+docker compose up
 
 # Or run in detached mode
-docker-compose up -d
+docker compose up -d
 
 # View logs
-docker-compose logs -f
+docker compose logs -f
 
 # Stop containers
-docker-compose down
+docker compose down
 ```
 
 The application will be available at `http://localhost:4666`
@@ -58,23 +58,23 @@ cp .env.example .env
 
 ```bash
 # Build production image
-docker-compose -f docker-compose.production.yml build
+docker compose -f docker-compose.production.yml build
 
 # Start production environment
-docker-compose -f docker-compose.production.yml up -d
+docker compose -f docker-compose.production.yml up -d
 
 # View logs
-docker-compose -f docker-compose.production.yml logs -f web
+docker compose -f docker-compose.production.yml logs -f web
 
 # Stop containers
-docker-compose -f docker-compose.production.yml down
+docker compose -f docker-compose.production.yml down
 ```
 
 ### Run Database Migrations
 
 ```bash
 # Execute migrations in the web container
-docker-compose -f docker-compose.production.yml exec web bundle exec rake db:migrate
+docker compose -f docker-compose.production.yml exec web bundle exec rake db:migrate
 ```
 
 ### Production Features
@@ -127,29 +127,29 @@ ruby -e "require 'securerandom'; puts SecureRandom.hex(64)"
 
 ### View Container Status
 ```bash
-docker-compose -f docker-compose.production.yml ps
+docker compose -f docker-compose.production.yml ps
 ```
 
 ### Access Container Shell
 ```bash
-docker-compose -f docker-compose.production.yml exec web bash
+docker compose -f docker-compose.production.yml exec web bash
 ```
 
 ### View Database Logs
 ```bash
-docker-compose -f docker-compose.production.yml logs -f db
+docker compose -f docker-compose.production.yml logs -f db
 ```
 
 ### Restart Services
 ```bash
-docker-compose -f docker-compose.production.yml restart web
+docker compose -f docker-compose.production.yml restart web
 ```
 
 ## Scaling
 
 Scale web workers horizontally:
 ```bash
-docker-compose -f docker-compose.production.yml up -d --scale web=3
+docker compose -f docker-compose.production.yml up -d --scale web=3
 ```
 
 Note: You'll need a load balancer (nginx/traefik) in front for this.
@@ -159,7 +159,7 @@ Note: You'll need a load balancer (nginx/traefik) in front for this.
 ### Container won't start
 ```bash
 # Check logs
-docker-compose -f docker-compose.production.yml logs web
+docker compose -f docker-compose.production.yml logs web
 
 # Check health status
 docker inspect mmdb_web --format='{{.State.Health.Status}}'
@@ -168,20 +168,20 @@ docker inspect mmdb_web --format='{{.State.Health.Status}}'
 ### Database connection issues
 ```bash
 # Verify database is running
-docker-compose -f docker-compose.production.yml exec db pg_isready
+docker compose -f docker-compose.production.yml exec db pg_isready
 
 # Check database logs
-docker-compose -f docker-compose.production.yml logs db
+docker compose -f docker-compose.production.yml logs db
 ```
 
 ### Reset everything
 ```bash
 # Stop and remove all containers, networks, and volumes
-docker-compose -f docker-compose.production.yml down -v
+docker compose -f docker-compose.production.yml down -v
 
 # Rebuild from scratch
-docker-compose -f docker-compose.production.yml build --no-cache
-docker-compose -f docker-compose.production.yml up -d
+docker compose -f docker-compose.production.yml build --no-cache
+docker compose -f docker-compose.production.yml up -d
 ```
 
 ## Security Best Practices
@@ -217,20 +217,20 @@ curl http://localhost:4666/
 
 Container health status:
 ```bash
-docker-compose -f docker-compose.production.yml ps
+docker compose -f docker-compose.production.yml ps
 ```
 
 ## Backup and Restore
 
 ### Backup Database
 ```bash
-docker-compose -f docker-compose.production.yml exec db \
+docker compose -f docker-compose.production.yml exec db \
   pg_dump -U postgres mmdb_production > backup.sql
 ```
 
 ### Restore Database
 ```bash
-cat backup.sql | docker-compose -f docker-compose.production.yml exec -T db \
+cat backup.sql | docker compose -f docker-compose.production.yml exec -T db \
   psql -U postgres mmdb_production
 ```
 
@@ -241,11 +241,11 @@ cat backup.sql | docker-compose -f docker-compose.production.yml exec -T db \
 git pull
 
 # Rebuild image
-docker-compose -f docker-compose.production.yml build
+docker compose -f docker-compose.production.yml build
 
 # Restart with new image
-docker-compose -f docker-compose.production.yml up -d
+docker compose -f docker-compose.production.yml up -d
 
 # Run any new migrations
-docker-compose -f docker-compose.production.yml exec web bundle exec rake db:migrate
+docker compose -f docker-compose.production.yml exec web bundle exec rake db:migrate
 ```

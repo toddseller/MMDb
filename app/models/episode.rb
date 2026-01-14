@@ -16,7 +16,7 @@ class Episode < ActiveRecord::Base
     user.shows.each do |show|
       show.seasons.each {|season| episodes << season.episodes.count}
     end
-    episodes.reduce(:+).to_s.reverse.gsub(/(\d{3})(?=\d)/, '\1,').reverse
+    (episodes.reduce(:+) || 0).to_s.reverse.gsub(/(\d{3})(?=\d)/, '\1,').reverse
   end
 
   private

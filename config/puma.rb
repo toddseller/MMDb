@@ -1,7 +1,8 @@
 # Puma configuration file for production
 
 # Set the environment
-environment ENV.fetch('RACK_ENV', 'production')
+rack_env = ENV.fetch('RACK_ENV', 'production')
+environment rack_env
 
 # Number of threads per worker
 threads_count = ENV.fetch('PUMA_THREADS', 5).to_i
@@ -11,10 +12,17 @@ threads threads_count, threads_count
 bind "tcp://0.0.0.0:#{ENV.fetch('PORT', 4666)}"
 
 # Workers (processes)
-workers ENV.fetch('WEB_CONCURRENCY', 2).to_i
+# Default to 0 (single mode) for development on macOS to avoid fork() crashes
+# Set to 2+ for production
+if ENV['WEB_CONCURRENCY']
+  worker_count = ENV['WEB_CONCURRENCY'].to_i
+else
+  worker_count = (rack_env == 'production') ? 2 : 0
+end
+workers worker_count
 
-# Preload application for better performance
-preload_app!
+# Preload application for better performance (only in production with workers)
+preload_app! if worker_count > 0
 
 # Logging
 stdout_redirect(

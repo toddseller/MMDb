@@ -1,29 +1,81 @@
+# Bundler
 .bundle
-.DS_Store
+vendor/bundle
+
+# Environment files (NEVER commit these!)
+.env
+.env.local
+.env.*.local
+.env.production
+.env.development
+.env.test
+
+# Database
 config/database.yml
 db/*.sqlite3
 db/*.sqlite
 db/*.sqlite3-journal
+
+# Logs
 log/*.log
+*.log
+
+# Temporary files
 tmp/
-.sass-cache/
+*.swp
+*.swo
+*~
+\#*#
+
+# OS files
+.DS_Store
 .DS_store
-coverage
+Thumbs.db
+
+# IDE files
+.idea/
+.vscode/
+*.tmproj
+.project
+.classpath
+.settings/
+
+# Coverage reports
+coverage/
+.coverage
+
+# Documentation
 doc/api
 doc/app
+
+# Build artifacts
 curriculum/.pygments-cache
 curriculum/public/*
 public/assets
-*.tmproj
-*~
-\#*#
-.idea/
+
+# Other
 ignored/
 .irb-save-history
 chromedriver.log
 .tddium*
 bin/
-.env
-*.swp
-.ruby-version
 .rdb
+
+# Puma
+tmp/pids/
+tmp/cache/
+log/puma_stdout.log
+log/puma_stderr.log
+
+# Ruby version managers
+.ruby-version
+.ruby-gemset
+.rvmrc
+
+# Secrets and keys (double protection)
+*.pem
+*.key
+*.p12
+secrets.yml
+master.key
+credentials.yml.enc
