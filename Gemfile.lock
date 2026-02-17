@@ -56,14 +56,17 @@ GEM
       racc (~> 1.4)
     nokogiri (1.19.0-arm64-darwin)
       racc (~> 1.4)
+    nokogiri (1.19.0-x86_64-linux-gnu)
+      racc (~> 1.4)
     pg (1.6.3)
     pg (1.6.3-aarch64-linux)
     pg (1.6.3-arm64-darwin)
+    pg (1.6.3-x86_64-linux)
     prism (1.7.0)
     puma (7.1.0)
       nio4r (~> 2.0)
     racc (1.8.1)
-    rack (3.2.4)
+    rack (3.2.5)
     rack-contrib (2.5.0)
       rack (< 4)
     rack-cors (3.0.0)
@@ -116,6 +119,7 @@ GEM
 PLATFORMS
   aarch64-linux
   arm64-darwin-25
+  x86_64-linux
 
 DEPENDENCIES
   activerecord (~> 7.2.0)
