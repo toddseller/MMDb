@@ -52,13 +52,16 @@ GEM
     mustermann (3.0.4)
       ruby2_keywords (~> 0.0.1)
     nio4r (2.7.5)
-    nokogiri (1.19.0-aarch64-linux-gnu)
+    nokogiri (1.19.1-aarch64-linux-gnu)
       racc (~> 1.4)
-    nokogiri (1.19.0-arm64-darwin)
+    nokogiri (1.19.1-arm64-darwin)
+      racc (~> 1.4)
+    nokogiri (1.19.1-x86_64-linux-gnu)
       racc (~> 1.4)
     pg (1.6.3)
     pg (1.6.3-aarch64-linux)
     pg (1.6.3-arm64-darwin)
+    pg (1.6.3-x86_64-linux)
     prism (1.7.0)
     puma (7.1.0)
       nio4r (~> 2.0)
@@ -116,6 +119,7 @@ GEM
 PLATFORMS
   aarch64-linux
   arm64-darwin-25
+  x86_64-linux
 
 DEPENDENCIES
   activerecord (~> 7.2.0)
