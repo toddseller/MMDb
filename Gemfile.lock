@@ -39,7 +39,7 @@ GEM
     humanize (3.1.0)
     i18n (1.14.8)
       concurrent-ruby (~> 1.0)
-    json (2.18.0)
+    json (2.19.2)
     jwt (3.1.2)
       base64
     logger (1.7.0)
@@ -56,9 +56,12 @@ GEM
       racc (~> 1.4)
     nokogiri (1.19.0-arm64-darwin)
       racc (~> 1.4)
+    nokogiri (1.19.0-x86_64-linux-gnu)
+      racc (~> 1.4)
     pg (1.6.3)
     pg (1.6.3-aarch64-linux)
     pg (1.6.3-arm64-darwin)
+    pg (1.6.3-x86_64-linux)
     prism (1.7.0)
     puma (7.1.0)
       nio4r (~> 2.0)
@@ -116,6 +119,7 @@ GEM
 PLATFORMS
   aarch64-linux
   arm64-darwin-25
+  x86_64-linux
 
 DEPENDENCIES
   activerecord (~> 7.2.0)
