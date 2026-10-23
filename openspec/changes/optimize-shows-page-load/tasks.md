@@ -34,8 +34,8 @@ Test-first throughout: write the test, run it and see it fail for the right reas
 ## 6. Integration check
 
 - [x] 6.1 Run the whole suite (`bundle exec rspec`) and verify it is green
-- [ ] 6.2 After deploying, time `https://mmdb.online/users/1/shows` (full and XHR, 3 runs each, `curl -w "%{time_starttransfer}"`) and record the result next to the baseline below; verify the wait for the first byte is close to the empty-collection figure rather than about 4.6 s
-- [ ] 6.3 Check in a browser that the grid looks the same, posters load as you scroll, and the network panel shows 400x400 Apple images; record the image bytes of the first screen
+- [x] 6.2 After deploying, time `https://mmdb.online/users/1/shows` (full and XHR, 3 runs each, `curl -w "%{time_starttransfer}"`) and record the result next to the baseline below; verify the wait for the first byte is close to the empty-collection figure rather than about 4.6 s
+- [x] 6.3 Check in a browser that the grid looks the same, posters load as you scroll, and the network panel shows 400x400 Apple images; record the image bytes of the first screen
 
 Baseline, production, 2026-10-23, user 1 (859 shows, 29,727 episodes):
 - Wait for first byte: 4.45 to 4.78 s (XHR and full page alike); empty collection 0.11 to 0.18 s; homepage 0.49 s
@@ -43,6 +43,12 @@ Baseline, production, 2026-10-23, user 1 (859 shows, 29,727 episodes):
 - Posters requested at once: 859, about 157 MB (541 Apple at about 103 KB, 264 `cdn.myflix.stream` at about 289 KB, 18 TheTVDB at about 1.4 MB, 36 other)
 - Scripts (gzipped): Optimizely 122 KB, jQuery 33 KB, bootstrap 10 KB, mmdb.js 6 KB, jquery-lazyload 2 KB
 - Browser (Brave, logged in, 2026-10-23): wait for first byte 4,461 ms; 862 `img` elements, 0 with `loading="lazy"`; 551 Apple posters at 600x600, 0 at 400x400; all 862 loaded with no scrolling, against about 45 visible on the first screen; posters display at 213 px from 600 px files; at least 19.4 MB decoded (the Resource Timing buffer kept only 234 of the image entries, so the real total is higher). Poster hosts send no `Timing-Allow-Origin`, so transfer bytes read 0 from script; take the 6.3 byte figures from the DevTools network panel in a fresh tab with the cache disabled
+
+After, production, 2026-10-23, `cf58b24` deployed (`git merge --ff-only` on the server, then `docker compose restart web`):
+- Wait for first byte (curl, logged out): full page 0.66 s (first, cold), 0.27 s, 0.29 s; XHR 0.34 s, 0.31 s, 0.29 s; homepage 0.58 s. About 15 times faster than the 4.6 s baseline; still about twice the empty-collection figure, which is the remaining per-show rendering and the one batched seasons query
+- Response: 389 KB of HTML (full page), 404 KB (XHR JSON); slightly larger than before because of the added `loading` attribute
+- Browser (Brave, logged in, fresh tab): wait for first byte 247 ms; 859 grid images, all with `loading="lazy"`; 541 Apple posters at 400x400, 0 at 600x600 (400 px files displayed at 213 px); 65 posters loaded before scrolling (42 fully visible), 165 after scrolling half-way; first screen 72 image requests, 1.93 MB decoded, against all 862 and at least 19.4 MB before. Transfer bytes still unreadable from script (no `Timing-Allow-Origin`)
+- Grid looks the same as before; season labels unchanged; no broken images
 
 ## Workflow follow-up
 
