@@ -29,8 +29,8 @@ Test-first throughout: write the test, run it and see it fail for the right reas
 
 ## 6. Pull request with its archive
 
-- [ ] 6.1 Commit, push the branch, and have the owner open the pull request; verify the `test` check passes
-- [ ] 6.2 Archive the change on the branch as its last commit (sync `web-page-escaping` into a new main spec, move the change to `openspec/changes/archive/`), push, and verify the `test` check passes on that commit
+- [x] 6.1 Commit, push the branch, and have the owner open the pull request; verify the `test` check passes
+- [x] 6.2 Archive the change on the branch as its last commit (sync `web-page-escaping` into a new main spec, move the change to `openspec/changes/archive/`), push, and verify the `test` check passes on that commit
 
 ## Workflow follow-up
 
