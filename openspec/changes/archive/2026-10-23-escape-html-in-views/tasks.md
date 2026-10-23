@@ -17,7 +17,7 @@ Test-first throughout: write the test, run it and see it fail for the right reas
 
 ## 4. Escaping by default (design decisions 1 to 3)
 
-- [ ] 4.1 Write `spec/view_text_spec.rb` for `ViewText.escape`: stored `Tom &amp; Jerry` comes out as `Tom &amp; Jerry`, not double-escaped as `Tom &amp;amp; Jerry`, so it displays `&`; `<b>` becomes `&lt;b&gt;`, `"` becomes `&quot;`, numbers and `nil` become strings; run it and see it fail with `NameError`
+- [x] 4.1 Write `spec/view_text_spec.rb` for `ViewText.escape`: stored `Tom &amp; Jerry` comes out as `Tom &amp; Jerry`, not double-escaped as `Tom &amp;amp; Jerry`, so it displays `&`; `<b>` becomes `&lt;b&gt;`, `"` becomes `&quot;`, numbers and `nil` become strings; run it and see it fail with `NameError`
 - [x] 4.2 Add `app/helpers/view_text.rb`, add `erubi` to the Gemfile, set `:erb` to `escape: true, escapefunc: '::ViewText.escape'` in `config.ru`, and confirm `Tilt[:erb]` is `Tilt::ErubiTemplate` (replace `require 'tilt/erb'` with `require 'tilt/erubi'` if it isn't); verify 4.1 passes and `Gemfile.lock` still lists `x86_64-linux`
 - [x] 4.3 Change the layout's `yield` and the 16 partial calls to `<%== %>`; verify 2.1 passes unchanged, the script and plot examples of 3.1 pass, and the whole suite passes except the attribute examples
 
