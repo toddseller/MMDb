@@ -19,7 +19,7 @@ module Artwork
     key = "images/#{SecureRandom.alphanumeric(27)}.#{extension}"
     Aws::S3::Client.new.put_object(bucket: ENV['ARTWORK_BUCKET'], key: key, body: file, content_type: content_type)
     CDN + key
-  rescue Aws::Errors::ServiceError, Seahorse::Client::NetworkingError => e
+  rescue Aws::Errors::ServiceError, Aws::Errors::MissingCredentialsError, Seahorse::Client::NetworkingError => e
     # The SDK's message can echo request details, so only the class reaches the log.
     warn "artwork upload failed: #{e.class}"
     raise StoreFailed

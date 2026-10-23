@@ -55,6 +55,10 @@ When the file cannot be stored, the upload SHALL answer 502 with a readable mess
 - **WHEN** storage answers an upload with an error
 - **THEN** the response is 502 with a message that the artwork couldn't be stored, and no stored poster changes
 
+#### Scenario: Storage credentials are missing
+- **WHEN** the server has no storage credentials configured and the owner uploads a valid JPEG
+- **THEN** the response is 502 with the same message, nothing is sent to storage, and no stored poster changes
+
 ### Requirement: Artwork tab offers a file upload
 The show edit modal's artwork tab SHALL offer a file picker limited to JPEG and PNG next to the existing poster URL field. A successful upload SHALL put the returned URL in that field and refresh the artwork previews, so the existing Save stores it as the season and show poster. A failed upload SHALL show its message in the tab and leave the field unchanged. Pasting a URL SHALL keep working.
 

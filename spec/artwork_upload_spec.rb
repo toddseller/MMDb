@@ -88,6 +88,30 @@ describe 'POST /users/:user_id/shows/:id/artwork' do
     end
   end
 
+  context 'when the server has no storage credentials' do
+    # Without these the SDK would fall back to ~/.aws on the developer's machine or the EC2 metadata endpoint.
+    AWS_LOOKUPS = { 'AWS_ACCESS_KEY_ID' => nil, 'AWS_SECRET_ACCESS_KEY' => nil, 'AWS_SHARED_CREDENTIALS_FILE' => '/nonexistent',
+                    'AWS_CONFIG_FILE' => '/nonexistent', 'AWS_EC2_METADATA_DISABLED' => 'true' }
+
+    around do |example|
+      saved = AWS_LOOKUPS.keys.to_h { |name| [name, ENV[name]] }
+      AWS_LOOKUPS.each { |name, value| ENV[name] = value }
+      example.run
+    ensure
+      saved.each { |name, value| ENV[name] = value }
+    end
+
+    it 'answers with the storage failure message' do
+      log_in(user, 'secret')
+      response = nil
+      expect { response = upload(JPEG) }.to output(/artwork upload failed: Aws::Errors::MissingCredentialsError/).to_stderr
+
+      expect([response.status, JSON.parse(response.body)['error']]).to eq [502, "The artwork couldn't be stored. Try again."]
+      expect(a_request(:put, S3_OBJECT)).not_to have_been_made
+      expect(show.reload.poster).not_to start_with(Artwork::CDN)
+    end
+  end
+
   context 'for anyone else' do
     let(:other) { create_user }
 
