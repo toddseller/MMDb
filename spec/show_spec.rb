@@ -1,5 +1,3 @@
-require_relative 'spec_helper'
-
 describe Show, '#thumbnail' do
   def thumbnail_for(poster)
     Show.new(title: 'Test', poster: poster).thumbnail

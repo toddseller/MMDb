@@ -32,4 +32,6 @@ gem 'htmlentities', '~> 4.3', '>= 4.3.4'
 group :test do
   gem 'faker'
   gem 'rspec'
+  gem 'simplecov', require: false
+  gem 'webmock'
 end
