@@ -44,7 +44,7 @@ Test-first throughout: write the test, run it and see it fail for the right reas
 
 - [x] 9.1 Owner creates the ruleset on GitHub (design decision 8): Settings, Rules, Rulesets, New branch ruleset; name `master requires tests`; enforcement Active; target the default branch; enable "Require a pull request before merging" and "Require status checks to pass" with the `test` check; bypass list: Repository admin. Verify `GET /repos/toddseller/MMDb/rules/branches/master` lists both rules
 - [x] 9.2 Open a throwaway pull request whose only commit makes one example fail; verify the `test` check fails and GitHub blocks the merge, then close the pull request and delete its branch
-- [ ] 9.3 Merge the `add-ci-test-gate` pull request with its passing check; verify the `test` run for the merge commit on `master` passes
+- [x] 9.3 Merge the `add-ci-test-gate` pull request with its passing check; verify the `test` run for the merge commit on `master` passes
 
 ## Workflow follow-up
 
