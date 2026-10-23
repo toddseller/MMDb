@@ -1,0 +1,58 @@
+name: Tests
+
+on:
+  pull_request:
+    branches: [master]
+  push:
+    branches: [master]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: tests-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # The master ruleset requires a check named "test"; renaming this job silently drops the requirement.
+  test:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        # Matches production, so db/structure.sql loads exactly as it does there.
+        image: postgres:11
+        env:
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    # spec_helper forces a URL without credentials, so pg and psql take them from these.
+    env:
+      PGHOST: localhost
+      PGUSER: postgres
+      PGPASSWORD: postgres
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # .ruby-version is gitignored, so the version is stated here.
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.4.8'
+          bundler-cache: true
+
+      - run: createdb MMDb_test
+
+      - run: bundle exec rspec
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage
+          path: coverage/

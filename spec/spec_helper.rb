@@ -1,6 +1,11 @@
-require 'rubygems'
+# Started before anything else, because SimpleCov only sees files loaded after it.
+require 'simplecov'
+SimpleCov.start do
+  add_filter '/spec/'
+  track_files '{app,config}/**/*.rb'
+end
 
-# All our specs should require 'spec_helper' (this file)
+require 'rubygems'
 
 # If RACK_ENV isn't set, set it to 'test'.  Sinatra defaults to development,
 # so we have to override that unless we want to set RACK_ENV=test from the
@@ -11,6 +16,15 @@ ENV['RACK_ENV'] ||= 'test'
 # and Dotenv.load never overrides a variable that is already set.
 ENV['DATABASE_URL'] = 'postgres://localhost/MMDb_test'
 
+# Fixed values so local runs match CI, which has no .env, and real keys never reach a test.
+{
+  'JWT_SECRET' => 'test-jwt-secret', 'JWT_ISSUER' => 'test-issuer',
+  'PLEX_USER' => 'test-plex-user', 'PLEX_USER_ID' => '1',
+  'TMDB_KEY' => 'test-tmdb-key', 'TMDB_TOKEN' => 'test-tmdb-token',
+  'TVDB_APIKEY' => 'test-tvdb-apikey', 'TVDB_PIN' => 'test-tvdb-pin', 'TVDB_TOKEN' => 'test-tvdb-token',
+  'TAUTULLI_KEY' => 'test-tautulli-key', 'LIBRARY_KEY' => 'test-library-key', 'HEROKU_KEY' => 'test-heroku-key'
+}.each { |name, value| ENV[name] = value }
+
 require File.expand_path("../../config/environment", __FILE__)
 
 # The migrations don't build the production schema (shows."episodeCount" was added by hand),
@@ -19,7 +33,7 @@ unless ActiveRecord::Base.connection.table_exists?(:shows)
   system('psql', '-q', '-o', File::NULL, '-v', 'ON_ERROR_STOP=1', '-d', DB_NAME, '-f', APP_ROOT.join('db', 'structure.sql').to_s, exception: true)
 end
 
-# Collects the SQL each block runs, skipping schema lookups and transaction statements.
+# ActiveRecord sends SCHEMA and TRANSACTION statements on its own, so counting them would make query counts noisy.
 module QueryCounter
   def queries
     sqls = []
@@ -41,3 +55,5 @@ RSpec.configure do |config|
     end
   end
 end
+
+Dir[APP_ROOT.join('spec', 'support', '*.rb')].sort.each { |file| require file }

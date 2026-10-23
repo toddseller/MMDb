@@ -286,7 +286,7 @@ bundle exec rake generate:model NAME=ModelName
 # Open console with app loaded
 bundle exec rake console
 
-# Run tests (if configured)
+# Run tests (see Development > Testing)
 bundle exec rake spec
 ```
 
@@ -625,8 +625,29 @@ sudo systemctl status mmdb
 2. Update model in `app/models/`
 3. Add routes in appropriate controller
 4. Add views in `app/views/` (if web interface)
-5. Test manually or add specs
+5. Add specs (see Testing below)
 6. Update API documentation above
+
+### Testing
+
+The suite runs against a local Postgres database built from `db/structure.sql`, a schema-only dump of production; the migrations alone miss `shows."episodeCount"`, which was added by hand. Every pull request to `master` must pass the suite before it can merge.
+
+```bash
+brew services run postgresql@14   # or start Postgres however you normally do
+createdb MMDb_test                # once; the first run loads db/structure.sql into it
+bundle exec rspec
+```
+
+- Tests always use `MMDb_test` and fixed test settings, even when `.env` points at production or holds real keys.
+- Tests can't reach the network: an unstubbed HTTP request fails the test and names the URL. Stub external APIs with `stub_request` and JSON fixtures in `spec/fixtures/`.
+- Every run prints line coverage and writes the full report to `coverage/index.html`. Coverage is reported, not enforced.
+- A test that exposes a bug states the correct behavior inside `pending "<reason>"`. It reports as pending while the bug exists and fails once the bug is fixed, as a reminder to remove the marker. Security and data-loss bugs get their own fix instead.
+- If production's schema changes outside the migrations, refresh the dump (dropping the `\restrict` lines newer `pg_dump` versions add), then drop and recreate `MMDb_test`:
+
+```bash
+pg_dump --schema-only --no-owner --no-privileges "$DATABASE_URL" | grep -Ev '^\\(un)?restrict ' > db/structure.sql
+dropdb MMDb_test && createdb MMDb_test
+```
 
 ### Code Style
 

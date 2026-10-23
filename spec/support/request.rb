@@ -1,5 +1,3 @@
-require_relative 'spec_helper'
-
 # Drives the real Rack app from config.ru, so session and view settings match production.
 module RequestHelper
   APP = Rack::Builder.parse_file(APP_ROOT.join('config.ru').to_s)
