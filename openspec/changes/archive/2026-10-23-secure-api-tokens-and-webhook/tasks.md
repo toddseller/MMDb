@@ -44,13 +44,13 @@ Test-first throughout: write the test, run it and see it fail for the right reas
 - [x] 8.1 Run `docker compose build` in the myflix repo, then serve the image locally on port 7667 and verify the home page answers 200 and its JavaScript bundle references `https://mmdb.online/api/v2`. If the build fails on the Dependabot pins, apply the fallback in design decision 7, record it here, and build again
   - Note: the Dependabot pins build fine. A native build on the Mac fails because `node-sass` 4.14 has no arm64 binary and `node:14-buster-slim` cannot compile it; building as `linux/amd64` (the server is x86_64) downloads the prebuilt binary and succeeds, so rehearse with `DOCKER_DEFAULT_PLATFORM=linux/amd64 docker compose build`.
 - [x] 8.2 Commit the myflix changes, push the branch, and have the owner open and merge the pull request on GitHub; verify through the GitHub API that it merged
-- [ ] 8.3 On the server, back up `~/myflix` (`tar czf ~/myflix-backup-2026-10-23.tgz -C ~ myflix`), copy the merged `frontend/` and `docker-compose.yml`, and run `docker compose up -d --build`; verify in Brave that myflix.stream loads, a login works and the grid shows titles as text
+- [x] 8.3 On the server, back up `~/myflix` (`tar czf ~/myflix-backup-2026-10-23.tgz -C ~ myflix`), copy the merged `frontend/` and `docker-compose.yml`, and run `docker compose up -d --build`; verify in Brave that myflix.stream loads, a login works and the grid shows titles as text
 
 ## 9. MMDb pull request with its archive
 
 - [x] 9.1 Run the whole MMDb suite; verify it passes and coverage is reported
-- [ ] 9.2 Commit the MMDb changes, push the branch, and have the owner open the pull request; verify the `test` check passes
-- [ ] 9.3 Archive the change on the branch as its last commit (sync `api-auth`, `plex-webhook` and `myflix-client-security` into main specs, move the change to `openspec/changes/archive/`), push, and verify the `test` check passes on that commit
+- [x] 9.2 Commit the MMDb changes, push the branch, and have the owner open the pull request; verify the `test` check passes
+- [x] 9.3 Archive the change on the branch as its last commit (sync `api-auth`, `plex-webhook` and `myflix-client-security` into main specs, move the change to `openspec/changes/archive/`), push, and verify the `test` check passes on that commit
 
 ## Workflow follow-up
 
