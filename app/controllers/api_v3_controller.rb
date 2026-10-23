@@ -20,7 +20,7 @@ namespace '/api/v3' do
     if user.valid?
       session[:user_id] = user.id
       status 201
-      {token: JwtAuth.token(user)}.to_json
+      {token: JwtAuth.token(user, lifetime: JwtAuth::SESSION_LIFETIME)}.to_json
     else
       session[:user_id] = nil
       halt 422, json(errorMessage: user.errors.full_messages)
@@ -32,7 +32,8 @@ namespace '/api/v3' do
     if user && user.authenticate(params[:password])
       currentUser = {id: user.id, firstName: user.first_name, lastName: user.last_name, userName: user.user_name, email: user.email, avatar: user.avatar}
       session[:user_id] = user.id
-      {token: JwtAuth.token(user), user: currentUser}.to_json
+      lifetime = [true, "true"].include?(params[:remember]) ? JwtAuth::REMEMBERED_LIFETIME : JwtAuth::SESSION_LIFETIME
+      {token: JwtAuth.token(user, lifetime: lifetime), user: currentUser}.to_json
     else
       session[:user_id] = nil
       halt 401, json(errorMessage: "Invalid login. Please check your credentials and try again.")

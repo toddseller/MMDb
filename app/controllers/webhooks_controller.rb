@@ -1,7 +1,10 @@
 namespace '/v1/webhooks' do
 
+  # Plex can't sign webhooks or add headers, so the secret travels in the URL as ?token=.
   before do
     content_type 'application/json'
+    secret = ENV['PLEX_WEBHOOK_SECRET'].to_s
+    halt 401 if secret.empty? || !Rack::Utils.secure_compare(secret, params[:token].to_s)
   end
 
   post '/new' do

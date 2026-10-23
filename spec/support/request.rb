@@ -10,8 +10,10 @@ module RequestHelper
     request('POST', path, **opts)
   end
 
-  def request(method, path, params: {}, xhr: true)
-    env = { method: method, params: params }
+  # env takes Rack keys, such as 'HTTP_AUTHORIZATION'.
+  def request(method, path, params: {}, json: nil, env: {}, xhr: true)
+    env = env.merge(method: method, params: params)
+    env.merge!(input: json.to_json, 'CONTENT_TYPE' => 'application/json') if json
     env['HTTP_X_REQUESTED_WITH'] = 'XMLHttpRequest' if xhr
     env['HTTP_COOKIE'] = @cookie if @cookie
     response = Rack::MockRequest.new(APP).request(method, path, env)
