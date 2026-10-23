@@ -168,6 +168,19 @@
   cursor: default;
 }
 
+/* The dialog shrinks its buttons; the Upload button sits against a full-height field, so it keeps Bootstrap's height. */
+#edit-show .input-group-btn .btn
+{
+  padding: 6px 12px;
+}
+
+/* The file input is hidden, so its focus is shown on the label that stands in for it. */
+#edit-show #artwork-file:focus + label
+{
+  outline: 2px solid #757575;
+  outline-offset: 2px;
+}
+
 #edit-show .edit-container
 {
   margin-top: 20px;
@@ -190,7 +203,7 @@
   margin-left: -15px;
 }
 
-#artwork .form-control
+#artwork .input-group
 {
   margin-top: 15px;
 }
