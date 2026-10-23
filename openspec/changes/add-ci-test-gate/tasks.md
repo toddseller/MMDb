@@ -38,11 +38,11 @@ Test-first throughout: write the test, run it and see it fail for the right reas
 ## 8. CI workflow (spec: The suite runs on every pull request and push to master; Tests run against the production schema)
 
 - [x] 8.1 Add `.github/workflows/test.yml` per design decisions 1 and 2: a job named `test` (with a comment saying the required check matches that name), `postgres:11` service with a health check, `ruby-version: 3.4.8`, `bundler-cache: true`, `PGHOST`/`PGUSER`/`PGPASSWORD`, `createdb MMDb_test`, `bundle exec rspec`, and an upload of `coverage/` with `if: always()`; verify the file parses with `ruby -ryaml -e 'YAML.load_file(".github/workflows/test.yml")'`
-- [ ] 8.2 Commit the change, push the branch, and have the owner open a pull request to `master`; verify through the GitHub API (`/repos/toddseller/MMDb/commits/<sha>/check-runs`) that the `test` check ran on the latest commit and passed, that its log shows the line-coverage total, and that the run offers the coverage artifact
+- [x] 8.2 Commit the change, push the branch, and have the owner open a pull request to `master`; verify through the GitHub API (`/repos/toddseller/MMDb/commits/<sha>/check-runs`) that the `test` check ran on the latest commit and passed, that its log shows the line-coverage total, and that the run offers the coverage artifact
 
 ## 9. Merge gate (spec: A failing suite blocks the merge)
 
-- [ ] 9.1 Owner creates the ruleset on GitHub (design decision 8): Settings, Rules, Rulesets, New branch ruleset; name `master requires tests`; enforcement Active; target the default branch; enable "Require a pull request before merging" and "Require status checks to pass" with the `test` check; bypass list: Repository admin. Verify `GET /repos/toddseller/MMDb/rules/branches/master` lists both rules
+- [x] 9.1 Owner creates the ruleset on GitHub (design decision 8): Settings, Rules, Rulesets, New branch ruleset; name `master requires tests`; enforcement Active; target the default branch; enable "Require a pull request before merging" and "Require status checks to pass" with the `test` check; bypass list: Repository admin. Verify `GET /repos/toddseller/MMDb/rules/branches/master` lists both rules
 - [ ] 9.2 Open a throwaway pull request whose only commit makes one example fail; verify the `test` check fails and GitHub blocks the merge, then close the pull request and delete its branch
 - [ ] 9.3 Merge the `add-ci-test-gate` pull request with its passing check; verify the `test` run for the merge commit on `master` passes
 
