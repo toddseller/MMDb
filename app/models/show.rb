@@ -16,6 +16,11 @@ class Show < ActiveRecord::Base
   scope :sorted_list, -> { order(:sort_name, :year) }
   scope :recently_added, -> {order(created_at: :desc)}
 
+  # Grid-sized poster: Apple artwork is sized in the URL; other hosts stay full size.
+  def thumbnail
+    poster.to_s.sub(/600x600\.jpg\z/, '400x400.jpg')
+  end
+
   def self.get_series(t)
     series = []
     show_array =  Show.where("search_name LIKE ?", "%#{t}%").sorted_list

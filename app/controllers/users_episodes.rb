@@ -1,6 +1,6 @@
 post '/users/:user_id/shows/:show_id/seasons/:season_id/episodes' do
   @user = current_user
-  @my_shows = @user.shows.sorted_list
+  @my_shows = @user.shows.sorted_list.includes(:seasons)
   @show = Show.find(params[:show_id])
   @season = @show.seasons.find(params[:season_id])
   if params.has_key?('episode')
