@@ -1,7 +1,7 @@
 <%@movie_previews.each do |movie| %>
   <% if movie[:poster] != 'NA' %>
     <div class="movie-preview">
-      <form id="create-movie" action=<%="/users/#{@user.id}/movies"%> method="POST">
+      <form id="create-movie" action="<%="/users/#{@user.id}/movies"%>" method="POST">
         <input type="hidden" name="movie[title]" value="<%="#{movie[:title]}"%>">
         <input type="hidden" name="movie[year]" value="<%="#{movie[:year]}"%>">
         <input type="hidden" name="movie[rating]" value="<%="#{movie[:rating]}"%>">

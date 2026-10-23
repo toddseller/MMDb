@@ -34,6 +34,7 @@ GEM
     diff-lcs (1.6.2)
     dotenv (3.2.0)
     drb (2.2.3)
+    erubi (1.13.1)
     faker (3.5.3)
       i18n (>= 1.8.11, < 2)
     hashdiff (1.2.1)
@@ -139,6 +140,7 @@ DEPENDENCIES
   activesupport (~> 7.2.0)
   bcrypt
   dotenv
+  erubi
   faker
   htmlentities (~> 4.3, >= 4.3.4)
   httparty

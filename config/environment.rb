@@ -30,7 +30,7 @@ require 'sinatra/namespace'
 self.instance_eval do
   alias :namespace :namespace_pre_sinatra if self.respond_to?(:namespace_pre_sinatra, true)
 end
-require 'tilt/erb'
+require 'tilt/erubi'
 require 'rack'
 require 'rack/cors'
 require 'rack/contrib'

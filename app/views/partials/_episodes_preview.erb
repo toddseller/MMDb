@@ -1,7 +1,7 @@
 <%@episodes_previews.each do |episode| %>
   <% if episode[:preview] != 'NA' %>
     <div class="episode-preview">
-      <form id="create-episode" action=<%="/users/#{@user.id}/shows/#{@show.id}/seasons/#{@season.id}/episodes"%> method="POST">
+      <form id="create-episode" action="<%="/users/#{@user.id}/shows/#{@show.id}/seasons/#{@season.id}/episodes"%>" method="POST">
         <input type="hidden" name="episode[title]" value="<%="#{episode[:title]}"%>">
         <input type="hidden" name="episode[date]" value="<%="#{episode[:date]}"%>">
         <input type="hidden" name="episode[plot]" value="<%="#{episode[:plot]}"%>">
@@ -22,7 +22,7 @@
   <% end %>
 <% end %>
 <div class="episode-preview">
-  <form id="create-episode" action=<%="/users/#{@user.id}/shows/#{@show.id}/seasons/#{@season.id}/episodes"%> method="POST">
+  <form id="create-episode" action="<%="/users/#{@user.id}/shows/#{@show.id}/seasons/#{@season.id}/episodes"%>" method="POST">
     <%@episodes_previews.each do |episode| %>
       <% if episode[:preview] != 'NA' %>
         <input type="hidden" name="episodes[][title]" value="<%="#{episode[:title]}"%>">

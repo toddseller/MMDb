@@ -88,12 +88,12 @@
       <% end %>
     </div>
     <div class="col-lg-4 description-poster">
-      <img src=<%= "#{movie.poster}" %> alt=<%= "#{movie.title} Poster" %>>
+      <img src="<%= "#{movie.poster}" %>" alt="<%= "#{movie.title} Poster" %>">
     </div>
   </div>
 </div>
 <% if session[:user_id] == user.id %>
   <div class="modal-footer">
-      <a class="btn btn-danger movie-edit" href=<%= "/users/#{user.id}/movies/#{movie.id}/edit" %>>Edit</a>
+      <a class="btn btn-danger movie-edit" href="<%= "/users/#{user.id}/movies/#{movie.id}/edit" %>">Edit</a>
   </div>
 <% end %>

@@ -1,0 +1,7 @@
+Movies Law & Order Season 1
+input[value]=Clear
+input[value]=
+input[value]=Search
+img[src]=
+img[alt]=Law & Order Poster
+img[src]=https://is1-ssl.mzstatic.com/image/thumb/law-order/400x400.jpg
