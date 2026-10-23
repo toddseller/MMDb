@@ -65,13 +65,6 @@ An authenticated request whose event is missing or is not valid JSON SHALL be an
 - **WHEN** an authenticated request has neither a `payload` field nor a JSON body
 - **THEN** the response is a 400 and nothing is added
 
-### Requirement: Each webhook request's shape is logged without values
-Each authenticated webhook request SHALL write one log line naming the request content type, its parameter names and, for `payload`, whether it was text or a file and the file's content type. The line SHALL NOT contain parameter values, event contents or the webhook secret.
-
-#### Scenario: Plex event logged
-- **WHEN** an authenticated webhook request is handled
-- **THEN** the log contains one line with its content type, parameter names and payload kind, and no part of the event JSON
-
 ### Requirement: The webhook secret never appears in logs
 The webhook secret SHALL NOT be written to any log, including the access log line for the request.
 
