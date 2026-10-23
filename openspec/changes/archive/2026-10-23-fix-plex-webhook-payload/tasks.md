@@ -24,8 +24,8 @@ Test-first throughout: write the test, run it and see it fail for the right reas
 
 ## 5. Pull request with its archive
 
-- [ ] 5.1 Commit, push the branch, and have the owner open the pull request; verify the `test` check passes
-- [ ] 5.2 Archive the change on the branch as its last commit (merge the four ADDED requirements into `openspec/specs/plex-webhook/spec.md`, keeping its existing requirements and Purpose untouched, then move the change to `openspec/changes/archive/`), push, and verify the `test` check passes on that commit
+- [x] 5.1 Commit, push the branch, and have the owner open the pull request; verify the `test` check passes
+- [x] 5.2 Archive the change on the branch as its last commit (merge the four ADDED requirements into `openspec/specs/plex-webhook/spec.md`, keeping its existing requirements and Purpose untouched, then move the change to `openspec/changes/archive/`), push, and verify the `test` check passes on that commit
 
 ## Workflow follow-up
 
