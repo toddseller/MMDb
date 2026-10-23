@@ -37,4 +37,22 @@ end
 
 use Rack::JSONBodyParser
 
+# The access logger writes the query string after the app runs, so moving the Plex webhook
+# secret out of it here keeps the secret out of every log line.
+class WebhookToken
+  def initialize(app)
+    @app = app
+  end
+
+  def call(env)
+    if env['PATH_INFO'].start_with?('/v1/webhooks')
+      query = Rack::Utils.parse_query(env['QUERY_STRING'])
+      env['mmdb.webhook_token'] = query.delete('token')
+      env['QUERY_STRING'] = Rack::Utils.build_query(query)
+    end
+    @app.call(env)
+  end
+end
+use WebhookToken
+
 run Sinatra::Application
