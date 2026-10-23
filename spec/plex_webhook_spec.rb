@@ -72,31 +72,12 @@ describe 'POST /v1/webhooks/new' do
     expect(Show).not_to have_received(:plex_add)
   end
 
-  describe 'shape log' do
-    def stdout_of
-      original, $stdout = $stdout, StringIO.new
-      yield
-      $stdout.string
-    ensure
-      $stdout = original
-    end
-
-    def shape_lines(output) = output.lines.grep(/plex webhook:/)
-
-    it 'names the content type, parameters and a file payload without values' do
-      lines = shape_lines(stdout_of { deliver(event, token: secret, as: :file) })
-      expect(lines.size).to eq 1
-      expect(lines.first).to include('content_type=multipart/form-data', 'payload=file(application/json)').and match(/params=\[[^\]]*"payload"/)
-      expect(lines.first).not_to include('Dark', 'library.new', secret)
-    end
-
-    it 'marks a text payload' do
-      expect(shape_lines(stdout_of { deliver(event, token: secret, as: :text) }).first).to include('payload=text')
-    end
-
-    it 'marks a JSON body as having no payload field' do
-      expect(shape_lines(stdout_of { deliver(event, token: secret, as: :json) }).first).to include('content_type=application/json', 'payload=none')
-    end
+  it 'writes no shape line for any payload form' do
+    original, $stdout = $stdout, StringIO.new
+    [:text, :file, :json].each { |format| deliver(event, token: secret, as: format) }
+    expect($stdout.string).not_to include('plex webhook:')
+  ensure
+    $stdout = original
   end
 
   it 'keeps the token out of the access log, correct or not' do

@@ -9,13 +9,6 @@ namespace '/v1/webhooks' do
   end
 
   helpers do
-    # Names and kinds only, never values: records which form Plex sends without logging its data.
-    def log_plex_shape
-      payload = request.params['payload']
-      kind = payload.is_a?(Hash) ? "file(#{payload[:type]})" : payload ? 'text' : 'none'
-      puts "plex webhook: content_type=#{request.media_type} params=#{request.params.keys.sort} payload=#{kind}"
-    end
-
     # Rack turns a payload part with a filename into an uploaded-file Hash, and JSONBodyParser has
     # already consumed a JSON body (production's input can't rewind), so read whichever form arrived.
     def plex_event
@@ -31,7 +24,6 @@ namespace '/v1/webhooks' do
 
   post '/new' do
     status 204
-    log_plex_shape
     payload = plex_event
 
     if payload['Account']['title'] == ENV['PLEX_USER']
