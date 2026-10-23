@@ -10,6 +10,11 @@ configure do
 
   # Set the views to
   set :views, File.join(Sinatra::Application.root, "app", "views")
+
+  # Disable HostAuthorization as it blocks requests in production environments 
+  # where the Host header might not match expectations (e.g., behind proxies)
+  set :protection, :except => [:host_authorization, :remote_token]
+  set :host_authorization, { allowed_hosts: [nil] }
 end
 
 configure :development do

@@ -38,7 +38,8 @@ require 'jwt'
 require 'humanize'
 
 require 'dotenv'
-Dotenv.load
+# Load .env file if it exists, but don't override existing environment variables
+Dotenv.load if defined?(Dotenv)
 
 require 'erb'
 require 'bcrypt'
@@ -54,6 +55,11 @@ APP_ROOT = Pathname.new(File.expand_path('../../', __FILE__))
 APP_NAME = APP_ROOT.basename.to_s
 
 # Set up the controllers and helpers
+# We disable host_authorization specifically here as well to ensure it's picked up by namespaces
+require 'rack/protection'
+Sinatra::Application.set :protection, :except => [:host_authorization, :remote_token]
+Sinatra::Application.set :host_authorization, { allowed_hosts: [nil] }
+
 Dir[APP_ROOT.join('app', 'controllers', '*.rb')].each { |file| require file }
 Dir[APP_ROOT.join('app', 'helpers', '*.rb')].each { |file| require file }
 

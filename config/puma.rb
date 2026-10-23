@@ -1,7 +1,8 @@
 # Puma configuration file for production
 
 # Set the environment
-rack_env = ENV.fetch('RACK_ENV', 'production')
+# Use RACK_ENV from environment, or default to production if not set
+rack_env = ENV['RACK_ENV'] || 'production'
 environment rack_env
 
 # Number of threads per worker
@@ -17,6 +18,8 @@ bind "tcp://0.0.0.0:#{ENV.fetch('PORT', 4666)}"
 if ENV['WEB_CONCURRENCY']
   worker_count = ENV['WEB_CONCURRENCY'].to_i
 else
+  # Use RACK_ENV to determine worker count if WEB_CONCURRENCY is not set
+  # Ensure it defaults to at least 2 in production to enable cluster mode
   worker_count = (rack_env == 'production') ? 2 : 0
 end
 workers worker_count
@@ -25,27 +28,28 @@ workers worker_count
 preload_app! if worker_count > 0
 
 # Logging
-stdout_redirect(
-  ENV.fetch('PUMA_STDOUT_LOG', 'log/puma_stdout.log'),
-  ENV.fetch('PUMA_STDERR_LOG', 'log/puma_stderr.log'),
-  true
-) if ENV['RACK_ENV'] == 'production'
-
-# Daemonize
-# pidfile ENV.fetch('PIDFILE', 'tmp/pids/puma.pid')
+if rack_env == 'production'
+  stdout_redirect(
+    ENV.fetch('PUMA_STDOUT_LOG', 'log/puma_stdout.log'),
+    ENV.fetch('PUMA_STDERR_LOG', 'log/puma_stderr.log'),
+    true
+  )
+end
 
 # Allow puma to be restarted by `rails restart` command
 plugin :tmp_restart
 
-# Renamed from on_worker_boot (deprecated in Puma 7)
-before_worker_boot do
-  ActiveRecord::Base.connection_pool.disconnect! if defined?(ActiveRecord)
-end
+# before_worker_boot is used for actions before the workers are forked
+# Only executes in cluster mode
+if worker_count > 0
+  before_worker_boot do
+    ActiveRecord::Base.connection_pool.disconnect! if defined?(ActiveRecord)
+  end
 
-# Renamed from on_worker_fork
-after_worker_boot do
-  if defined?(ActiveRecord)
-    ActiveRecord::Base.establish_connection
-    ActiveRecord::Base.connection.verify!
+  # after_worker_fork executes in the worker process after it has been forked
+  after_worker_fork do
+    if defined?(ActiveRecord)
+      ActiveRecord::Base.establish_connection
+    end
   end
 end

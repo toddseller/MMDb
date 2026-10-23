@@ -287,51 +287,55 @@ class Movie < ActiveRecord::Base
     storeIds = ['143441', '143444', '143455', '143460']
 
     storeIds.each do |store|
-     response = HTTParty.get('https://uts-api.itunes.apple.com/uts/v2/search/incremental?sf=' + store + '&locale=en-US&utsk=0&caller=wta&v=36&pfm=desktop&q=' + CGI.escape(s_term))
+      begin
+        response = HTTParty.get('https://uts-api.itunes.apple.com/uts/v2/search/incremental?sf=' + store + '&locale=en-US&utsk=0&caller=wta&v=58&pfm=appletv&q=' + CGI.escape(s_term))
 
-      if response['data']['canvas'] != nil
-        response['data']['canvas']['shelves'].each do |movie|
-          if movie['items'].length > 0
-            movie['items'].each do |m|
-              if m['type'] == 'Movie' && m['title'].downcase() == s_term.downcase()
-                request = HTTParty.get('https://uts-api.itunes.apple.com/uts/v2/view/product/' + m['id'] + '?sf=' + store + '&locale=EN&utsk=0&caller=wta&v=36&pfm=web')
-                content = request['data']['content']
-                credits = request['data']['roles'] ? request['data']['roles'] : []
-                actors = []
-                director = []
-                producer = []
-                writer = []
-                credits.each do |credit|
-                  case credit['type']
-                  when 'Actor'
-                    actors << credit['personName'].gsub(/^[[:space:]]/, '').gsub(/[[:space:]]$/, '')
-                  when 'Voice'
-                    actors << credit['personName'].gsub(/^[[:space:]]/, '').gsub(/[[:space:]]$/, '')
-                  when 'Director'
-                    director << credit['personName'].gsub(/^[[:space:]]/, '').gsub(/[[:space:]]$/, '')
-                  when 'Producer'
-                    producer << credit['personName'].gsub(/^[[:space:]]/, '').gsub(/[[:space:]]$/, '')
-                  when 'Writer'
-                    writer << credit['personName'].gsub(/^[[:space:]]/, '').gsub(/[[:space:]]$/, '')
-                  else
-                    puts "not matching"
+        if response.code == 200 && response['data'] && response['data']['canvas']
+          response['data']['canvas']['shelves'].each do |movie|
+            if movie['items'] && movie['items'].length > 0
+              movie['items'].each do |m|
+                if m['type'] == 'Movie' && m['title'] && m['title'].downcase == s_term.downcase
+                  request = HTTParty.get('https://uts-api.itunes.apple.com/uts/v2/view/product/' + m['id'] + '?sf=' + store + '&locale=en-US&utsk=0&caller=wta&v=58&pfm=appletv')
+                  if request.code == 200 && request['data'] && request['data']['content']
+                    content = request['data']['content']
+                    credits = request['data']['roles'] ? request['data']['roles'] : []
+                    actors = []
+                    director = []
+                    producer = []
+                    writer = []
+                    credits.each do |credit|
+                      case credit['type']
+                      when 'Actor', 'Voice'
+                        actors << credit['personName'].strip if credit['personName']
+                      when 'Director'
+                        director << credit['personName'].strip if credit['personName']
+                      when 'Producer'
+                        producer << credit['personName'].strip if credit['personName']
+                      when 'Writer'
+                        writer << credit['personName'].strip if credit['personName']
+                      end
+                    end
+                    title = content['title']
+                    plot = content['description'] ? get_plot(content['description']) : ''
+                    year = content['releaseDate'] ? Time.at(content['releaseDate'] / 1000).to_datetime.year.to_s : ''
+                    poster = content['images'] && content['images']['coverArt'] ? content['images']['coverArt']['url'].gsub(/({w}x{h}.{f})/, content['images']['coverArt']['width'].to_s + 'x' + content['images']['coverArt']['height'].to_s + '.jpg') : ''
+                    genre = content['genres'] ? content['genres'][0]['name'] : ''
+                    rating = content['rating'] ? content['rating']['displayName'] : ''
+                    runtime = content['duration'] ? (content['duration'] / 60).to_s : ''
+                    studio = content['studio'] ? content['studio'] : ''
+                    director_check = director.length > 0 ? director[0].split(' ').last : ''
+
+                    movies << {title: title, plot: plot, poster: poster, year: year, actors: get_first_six(actors), director: get_first_six(director), genre: genre, producer: get_first_six(producer), rating: rating, runtime: runtime, studio: studio, writer: get_first_six(writer), director_check: director_check} if movies.all? {|el| el[:title] != title && el[:year] != year || el[:director_check] != director_check}
                   end
                 end
-                p title = content['title']
-                plot = content['description'] ? get_plot(content['description']) : ''
-                p year = content['releaseDate'] ? Time.at(content['releaseDate'] / 1000).to_datetime.year.to_s : ''
-                poster = content['images']['coverArt'] ? content['images']['coverArt']['url'].gsub(/({w}x{h}.{f})/, content['images']['coverArt']['width'].to_s + 'x' + content['images']['coverArt']['height'].to_s + '.jpg') : ''
-                genre = content['genres'] ? content['genres'][0]['name'] : ''
-                rating = content['rating'] ? content['rating']['displayName'] : ''
-                runtime = content['duration'] ? (content['duration'] / 60).to_s : ''
-                studio = content['studio'] ? content['studio'] : ''
-                director_check = director.length > 0 ? director[0].split(' ').slice(-1, 1).join() : ''
-
-                movies << {title: title, plot: plot, poster: poster, year: year, actors: get_first_six(actors), director: get_first_six(director), genre: genre, producer: get_first_six(producer), rating: rating, runtime: runtime, studio: studio, writer: get_first_six(writer), director_check: director_check} if movies.all? {|el| el[:title] != title && el[:year] != year || el[:director_check] != director_check}
               end
             end
           end
         end
+      rescue JSON::ParserError
+        puts "Error parsing JSON in Movie.appletv_call for store: #{store}"
+      rescue => e
+        puts "Error in Movie.appletv_call: #{e.message}"
       end
     end
     return movies
