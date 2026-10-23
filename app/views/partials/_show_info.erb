@@ -4,10 +4,10 @@
   <div class="modal-body">
     <div id="info-header" class="row">
       <% if user.is_a?(User) && user == current_user %>
-        <a class="show-edit" href=<%= "/users/#{user.id}/shows/#{show.id}/edit" %>><span class="glyphicon glyphicon-option-horizontal"></span></a>
+        <a class="show-edit" href="<%= "/users/#{user.id}/shows/#{show.id}/edit" %>"><span class="glyphicon glyphicon-option-horizontal"></span></a>
       <% end %>
       <div class="col-lg-4 description-poster">
-        <img src=<%= "#{season.poster}" %> alt=<%= "#{show.title} Poster" %>>
+        <img src="<%= "#{season.poster}" %>" alt="<%= "#{show.title} Poster" %>">
         <% if show.seasons.count == 1 && show.episode_count == 1 %>
           <p id="counts">1 season, 1 episode</p>
         <% elsif show.seasons.count == 1 && show.episode_count > 1 %>
@@ -49,7 +49,7 @@
         <div id="season-selector">
           <hr/>
           SEASON:
-          <form id="season-default" action=<%="/users/#{user.id}/shows/#{show.id}/seasons/"%> method="POST">
+          <form id="season-default" action="<%="/users/#{user.id}/shows/#{show.id}/seasons/"%>" method="POST">
             <% show.seasons.sorted_seasons.each do |s| %>
               <% if s.is_active %>
                 <input class="season-submit" id="active-season" type="submit" name="season[:id]" value="<%="#{s.season}"%>">

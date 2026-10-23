@@ -11,6 +11,9 @@ configure do
   # Set the views to
   set :views, File.join(Sinatra::Application.root, "app", "views")
 
+  # Every <%= %> is escaped; <%== %> is reserved for the layout's yield and embedded partials.
+  set :erb, escape: true, escapefunc: '::ViewText.escape'
+
   # Disable HostAuthorization as it blocks requests in production environments 
   # where the Host header might not match expectations (e.g., behind proxies)
   set :protection, :except => [:host_authorization, :remote_token]

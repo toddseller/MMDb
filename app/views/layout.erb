@@ -61,21 +61,21 @@
         </a>
         <div id="drop-down-submenu">
           <ul>
-            <a id="user-movies" href=<%="/users/#{session[:user_id]}"%>>
+            <a id="user-movies" href="<%="/users/#{session[:user_id]}"%>">
               <li><span class="glyphicon glyphicon-film"></span>Movies</li>
             </a>
-            <a id="user-shows" href=<%="/users/#{session[:user_id]}/shows"%>>
+            <a id="user-shows" href="<%="/users/#{session[:user_id]}/shows"%>">
               <li><span class="glyphicon glyphicon-blackboard"></span>TV Shows</li>
             </a>
           </ul>
         </div>
-        <a id="update" href=<%="/users/#{session[:user_id]}/edit"%>><li><span class="glyphicon glyphicon-cog"></span>Account Settings</li></a>
-        <a id="logout" href=<%="#{session[:user_id]}"%>><li><span class="glyphicon glyphicon-log-out"></span>Sign Out</li></a>
+        <a id="update" href="<%="/users/#{session[:user_id]}/edit"%>"><li><span class="glyphicon glyphicon-cog"></span>Account Settings</li></a>
+        <a id="logout" href="<%="#{session[:user_id]}"%>"><li><span class="glyphicon glyphicon-log-out"></span>Sign Out</li></a>
       </ul>
     </div>
   <% end %>
   <div id="user-page">
-    <%= yield %>
+    <%== yield %>
   </div>
   <div class="modal fade" id="logIn" tabindex="-1" role="dialog">
     <div class="modal-dialog">

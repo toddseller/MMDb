@@ -22,7 +22,7 @@
     </div>
     <div class="col-sm-12 edit-container tab-content">
       <div id="show" class="tab-pane in active">
-        <form class="form-horizontal show-data new-show" action=<%= "/shows" %> method="POST">
+        <form class="form-horizontal show-data new-show" action="<%= "/shows" %>" method="POST">
           <div class="form-group row">
             <label class="col-sm-2 control-label text-right" for="show_title">title</label>
             <div class="col-sm-10">
@@ -62,7 +62,7 @@
         </form>
       </div>
       <div id="season" class="tab-pane">
-        <form class="form-horizontal show-data new-show" action=<%= "/shows" %> method="POST">
+        <form class="form-horizontal show-data new-show" action="<%= "/shows" %>" method="POST">
           <div class="form-group row">
             <label class="col-sm-2 control-label text-right" for="show_collectionName">collection</label>
             <div class="col-sm-10">
@@ -90,7 +90,7 @@
         </form>
       </div>
       <div id="episode" class="tab-pane">
-        <%= erb :'/partials/_new_episode', layout: false %>
+        <%== erb :'/partials/_new_episode', layout: false %>
       </div>
     </div>
   </div>

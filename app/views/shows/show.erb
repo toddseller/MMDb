@@ -11,7 +11,7 @@
     <% if session[:user_id] == @user.id %>
       <button id="add-show" class="btn btn-danger pull-right">Add TV Show</button>
     <% elsif @movies.exists? %>
-      <a id="user-movies" href=<%="/users/#{@user.id}"%>>
+      <a id="user-movies" href="<%="/users/#{@user.id}"%>">
         <button id="switch" class="btn btn-danger pull-right">
           <span class="glyphicon glyphicon-film"></span>
           Movies
@@ -19,7 +19,7 @@
       </a>
     <% end %>
     <div id="search" class="pull-right">
-      <%= erb :'/partials/_add_show', layout: false %>
+      <%== erb :'/partials/_add_show', layout: false %>
     </div>
     <div class="preview-wrapper">
       <div class="col-lg-12" id="preview"></div>
@@ -38,7 +38,7 @@
   </div>
   <div id="show-list" class="col-xs-12">
     <% @my_shows.each do |show| %>
-      <%= erb :'/partials/_my_shows', locals: {show: show, user: @user}, layout: false %>
+      <%== erb :'/partials/_my_shows', locals: {show: show, user: @user}, layout: false %>
     <% end %>
   </div>
 </div>

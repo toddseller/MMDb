@@ -1,7 +1,7 @@
 <%@show_previews.each do |show| %>
   <% if show[:poster] != 'NA' %>
     <div class="show-preview">
-      <form id="create-show" action=<%="/users/#{@user.id}/shows"%> method="POST">
+      <form id="create-show" action="<%="/users/#{@user.id}/shows"%>" method="POST">
         <input type="hidden" name="show[title]" value="<%="#{show[:title]}"%>">
         <input type="hidden" name="show[year]" value="<%="#{show[:year]}"%>">
         <input type="hidden" name="show[rating]" value="<%="#{show[:rating]}"%>">

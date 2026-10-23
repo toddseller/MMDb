@@ -2,7 +2,7 @@
   <div class="row">
     <div class="col-sm-12 edit-show">
       <div class="col-sm-3 edit-poster">
-        <img class="text-right" src=<%= "#{@show.poster}" %> alt="">
+        <img class="text-right" src="<%= "#{@show.poster}" %>" alt="">
       </div>
       <div class="col-sm-9 show-title">
         <h4><%= @show.title %></h4>
@@ -27,7 +27,7 @@
     </div>
     <div class="col-sm-12 edit-container tab-content">
       <div id="detail" class="tab-pane in active">
-        <form class="form-horizontal show-data" id=<%="#{@episode.id}"%> action=<%= "/users/#{@user.id}/shows/#{@show.id}" %> method="POST">
+        <form class="form-horizontal show-data" id="<%="#{@episode.id}"%>" action="<%= "/users/#{@user.id}/shows/#{@show.id}" %>" method="POST">
           <div class="form-group row">
             <label class="col-sm-2 control-label text-right" for="episode_title">title</label>
             <div class="col-sm-10">
@@ -37,7 +37,7 @@
           <div class="form-group row">
             <label class="col-sm-2 control-label text-right" for="tv_episode">episode</label>
             <div class="col-sm-3">
-              <input id="tv_episode" type="text" class="form-control" name="episode[tv_episode]" value=<%= "#{@episode.tv_episode}" %>>
+              <input id="tv_episode" type="text" class="form-control" name="episode[tv_episode]" value="<%= "#{@episode.tv_episode}" %>">
             </div>
           </div>
           <div class="form-group row">
@@ -59,29 +59,29 @@
             </div>
           </div>
         </form>
-        <button id="episode-delete" class="btn btn-danger" href=<%="/users/#{@user.id}/shows/#{@show.id}/seasons/#{@season.id}/episodes/#{@episode.id}"%>>Delete Episode</button>
+        <button id="episode-delete" class="btn btn-danger" href="<%="/users/#{@user.id}/shows/#{@show.id}/seasons/#{@season.id}/episodes/#{@episode.id}"%>">Delete Episode</button>
       </div>
       <div id="artwork" class="tab-pane">
-        <form class="form-horizontal show-data" action=<%= "/users/#{@user.id}/shows/#{@show.id}" %> method="POST">
-          <img src=<%="#{@season.poster}"%>>
+        <form class="form-horizontal show-data" action="<%= "/users/#{@user.id}/shows/#{@show.id}" %>" method="POST">
+          <img src="<%="#{@season.poster}"%>">
           <div class="form-group row">
             <div class="col-sm-12">
-              <input type="text" class="form-control" name="season[poster]" value=<%= "#{@season.poster}" %>>
+              <input type="text" class="form-control" name="season[poster]" value="<%= "#{@season.poster}" %>">
             </div>
           </div>
         </form>
       </div>
       <div id="season" class="tab-pane">
-        <form class="form-horizontal show-data" action=<%= "/users/#{@user.id}/shows/#{@show.id}" %> method="POST">
+        <form class="form-horizontal show-data" action="<%= "/users/#{@user.id}/shows/#{@show.id}" %>" method="POST">
           <div class="form-group row">
             <label class="col-sm-2 control-label text-right" for="season">season</label>
             <div class="col-sm-3">
-              <input id="season" type="text" class="form-control" name="season[season]" value=<%= "#{@season.season}" %>>
+              <input id="season" type="text" class="form-control" name="season[season]" value="<%= "#{@season.season}" %>">
             </div>
           </div><div class="form-group row">
             <label class="col-sm-2 control-label text-right" for="rating">rating</label>
             <div class="col-sm-3">
-              <input id="rating" type="text" class="form-control" name="show[rating]" value=<%= "#{@show.rating}" %>>
+              <input id="rating" type="text" class="form-control" name="show[rating]" value="<%= "#{@show.rating}" %>">
             </div>
           </div><div class="form-group row">
             <label class="col-sm-2 control-label text-right" for="genre">genre</label>
@@ -92,7 +92,7 @@
           <div class="form-group row">
             <label class="col-sm-2 control-label text-right" for="show_year">year</label>
             <div class="col-sm-4">
-              <input id="show_year" type="text" class="form-control" name="show[year]" value=<%= "#{@show.year}" %>>
+              <input id="show_year" type="text" class="form-control" name="show[year]" value="<%= "#{@show.year}" %>">
             </div>
           </div>
           <div class="form-group row">
@@ -104,7 +104,7 @@
           <div class="form-group row">
             <label class="col-sm-2 control-label text-right" for="collectionId">id</label>
             <div class="col-sm-10">
-              <input id="collectionId" type="text" class="form-control" name="season[collectionId]" value=<%= "#{@season.collectionId}" %>>
+              <input id="collectionId" type="text" class="form-control" name="season[collectionId]" value="<%= "#{@season.collectionId}" %>">
             </div>
           </div>
           <div class="form-group row">
@@ -126,7 +126,7 @@
         </form>
       </div>
       <div id="sorting" class="tab-pane">
-        <form class="form-horizontal show-data" action=<%= "/users/#{@user.id}/shows/#{@show.id}" %> method="POST">
+        <form class="form-horizontal show-data" action="<%= "/users/#{@user.id}/shows/#{@show.id}" %>" method="POST">
           <div class="form-group row">
             <label class="col-sm-2 control-label text-right" for="show_title">title</label>
             <div class="col-sm-10">
@@ -147,14 +147,14 @@
 <div class="modal-footer">
   <div class="btn-group" role="group">
     <% if @previous_episode %>
-      <button type="button" class="btn btn-default edit-next" href=<%="/users/#{@user.id}/shows/#{@show.id}/seasons/#{@season.id}/episodes/#{@previous_episode.id}/edit"%>>
+      <button type="button" class="btn btn-default edit-next" href="<%="/users/#{@user.id}/shows/#{@show.id}/seasons/#{@season.id}/episodes/#{@previous_episode.id}/edit"%>">
         <span class="glyphicon glyphicon-menu-left"></span>
       </button>
     <% else %>
       <button type="button" class="btn btn-default disabled edit-next" disabled="disabled"><span class="glyphicon glyphicon-menu-left"></span></button>
     <% end %>
     <% if @next_episode %>
-      <button type="button" class="btn btn-default edit-next" href=<%="/users/#{@user.id}/shows/#{@show.id}/seasons/#{@season.id}/episodes/#{@next_episode.id}/edit"%>>
+      <button type="button" class="btn btn-default edit-next" href="<%="/users/#{@user.id}/shows/#{@show.id}/seasons/#{@season.id}/episodes/#{@next_episode.id}/edit"%>">
         <span class="glyphicon glyphicon-menu-right"></span>
       </button>
     <% else %>
