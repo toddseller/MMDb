@@ -2,7 +2,7 @@
 
 ## Why
 
-Searching in Add TV Show takes 10 to 25 seconds: `lupin` 10.4s (78 outside requests), `the office` 25.2s (140), `office` 16.8s (131), measured on 2026-10-23. `Show.get_series` makes every request one after another: an Apple episode-count check per matching database season, 4 Apple storefront searches with details fetched again in each, then TMDB details for every search result, one request per season. Partial titles also never return Apple results, because Apple matches are kept only when the title equals the search term, so the list falls back to TMDB even when Apple has the show.
+Searching in Add TV Show takes 10 to 25 seconds: `lupin` 10.4s (65 outside requests), `the office` 25.2s (101), `office` 16.8s (114), measured on 2026-10-23. `Show.get_series` makes every request one after another: an Apple episode-count check per matching database season, 4 Apple storefront searches with details fetched again in each, then TMDB details for every search result, one request per season. Partial titles also never return Apple results, because Apple matches are kept only when the title equals the search term, so the list falls back to TMDB even when Apple has the show.
 
 ## What Changes
 
