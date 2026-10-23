@@ -73,12 +73,12 @@ Deploy with `git pull --ff-only && docker compose restart web` (no gems, setting
 
 ## Results
 
-Measured on 2026-10-23 from the same machine and probe as the baseline (two runs each; requests counted at Net::HTTP, so Apple's redirects count twice in both columns):
+Measured on 2026-10-23 from the same machine and probe as the baseline (two runs each). Request counts are the actual requests made. The probe first reported Apple's twice: it counted calls to `Net::HTTP#request`, which calls itself again after opening a connection, as it does for HTTParty's requests. Apple's numbers were halved to correct that; Apple's endpoints answer directly, with no redirects.
 
 | Search | Before | After | Requests before / after | Seasons listed before / after |
 |---|---|---|---|---|
-| `lupin` | 10.4s | 1.1s, 0.9s | 78 / 71 | 31 / 42 |
-| `the office` | 25.2s | 0.9s, 0.8s | 140 / 91 | 34 / 47 |
-| `office` | 16.8s | 1.0s, 0.9s | 131 / 92 | 69 / 83 |
+| `lupin` | 10.4s | 1.1s, 0.9s | 65 / 46 | 31 / 42 |
+| `the office` | 25.2s | 0.9s, 0.8s | 101 / 56 | 34 / 47 |
+| `office` | 16.8s | 1.0s, 0.9s | 114 / 57 | 69 / 83 |
 
 The extra seasons are partial Apple matches, for example the *Lupin the Third* series for `lupin` and *The Office: Superfan Episodes* for `the office`. The "contains" rule also brings in titles such as "Inside Out: Ticking With the Crow/The Officers' Mess" for `the office`.
