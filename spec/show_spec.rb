@@ -18,6 +18,6 @@ describe Show, '#thumbnail' do
   end
 
   it 'returns an empty string without a poster' do
-    expect(thumbnail_for(nil)).to eq ''
+    expect(thumbnail_for(nil)).to eq 'deliberately wrong'
   end
 end
