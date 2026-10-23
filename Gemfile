@@ -29,6 +29,7 @@ gem 'humanize'
 gem 'will_paginate', '~> 3.3.0'
 gem 'htmlentities', '~> 4.3', '>= 4.3.4'
 gem 'erubi'
+gem 'aws-sdk-s3'
 
 group :test do
   gem 'faker'

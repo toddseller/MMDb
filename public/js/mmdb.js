@@ -61,6 +61,7 @@ var dynamicListener = function () {
   $('#logIn').on('click', '#myonoffswitch', changeTheme)
   $('#edit-show').on('click', 'button', toggleActive)
   $('#edit-show').on('change', 'input[name="season[poster]"]', updatePoster)
+  $('#edit-show').on('change', 'input[name="artwork"]', uploadArtwork)
   $('#edit-show').on('click', '#episode-delete', deleteEpisode)
 }
 
@@ -929,6 +930,31 @@ var updatePoster = function (event) {
   $('#artwork > form > img').attr('src', poster)
   $('.description-poster > img').attr('src', poster)
   $('.lazy.active').attr('src', poster)
+}
+
+var uploadArtwork = function (event) {
+  var input = this
+  var message = $('#artwork .artwork-message').text('Uploading...')
+  var data = new FormData()
+  data.append('artwork', input.files[0])
+  var request = $.ajax({
+    url: $(input).data('upload'),
+    type: 'POST',
+    data: data,
+    processData: false,
+    contentType: false
+  })
+  request.done(function (response) {
+    message.text('')
+    $('input[name="season[poster]"]').val(response.url).trigger('change')
+  })
+  request.fail(function (xhr) {
+    var error
+    // jQuery 1.9 has no responseJSON, and a 401 or proxy error may not be JSON at all.
+    try { error = $.parseJSON(xhr.responseText).error } catch (e) {}
+    message.text(error || "The artwork couldn't be uploaded. Try again.")
+  })
+  request.always(function () { input.value = '' })
 }
 
 var editShow = function (event) {

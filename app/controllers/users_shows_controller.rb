@@ -96,6 +96,16 @@ put '/users/:user_id/shows/:id' do
   end
 end
 
+post '/users/:user_id/shows/:id/artwork' do
+  halt 401 unless current_user && current_user.id == params[:user_id].to_i && current_user.shows.exists?(params[:id])
+  upload = params[:artwork]
+  json url: Artwork.store(upload.is_a?(Hash) ? upload[:tempfile] : nil)
+rescue Artwork::Invalid => e
+  halt 422, json(error: e.message)
+rescue Artwork::StoreFailed
+  halt 502, json(error: "The artwork couldn't be stored. Try again.")
+end
+
 delete '/users/:user_id/shows/:id' do
   @movie = Movie.find(params[:id])
   @user = current_user
