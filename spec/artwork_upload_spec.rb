@@ -158,4 +158,18 @@ describe 'the show edit modal' do
     expect(tab.at_css('.artwork-message')).not_to be_nil
     expect(tab.at_css('input[name="season[poster]"]')).not_to be_nil
   end
+
+  it 'shows the picker as an Upload button attached to the URL field' do
+    user = create_user
+    show = create_show(user)
+    show.seasons.last.update!(is_active: true)
+    log_in(user, 'secret')
+    group = Nokogiri::HTML(JSON.parse(get("/users/#{user.id}/shows/#{show.id}/edit").body)).at_css('#artwork .input-group')
+
+    expect(group.at_css('input[name="season[poster]"]')).not_to be_nil
+    file = group.at_css('.input-group-btn input[type="file"]#artwork-file.sr-only')
+    expect(file).not_to be_nil
+    button = file.next_element
+    expect([button.name, button['for'], button['class'], button.text]).to eq ['label', 'artwork-file', 'btn btn-default', 'Upload']
+  end
 end

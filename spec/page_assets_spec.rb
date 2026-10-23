@@ -27,4 +27,18 @@ describe 'page assets' do
   ensure
     File.utime(original, original, path)
   end
+
+  %w[dark default].each do |theme|
+    it "imports the #{theme} theme's modals.css with a version" do
+      expect(File.read(APP_ROOT.join('public', 'css', "#{theme}.css"))).to match(%r{@import url\('themes/#{theme}/modals\.css\?v=\d+'\);})
+    end
+  end
+
+  it 'serves a versioned import as the same file' do
+    plain = get('/css/themes/dark/modals.css', xhr: false)
+    versioned = get('/css/themes/dark/modals.css?v=2', xhr: false)
+
+    expect(versioned.status).to eq 200
+    expect(versioned.body).to eq plain.body
+  end
 end
