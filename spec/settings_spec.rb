@@ -11,7 +11,7 @@ describe 'test settings' do
 
   it 'signs and verifies API tokens with the test secret' do
     user = create_user
-    payload, = JwtAuth.decode(JwtAuth.token(user))
+    payload, = JwtAuth.decode(JwtAuth.token(user, lifetime: JwtAuth::SESSION_LIFETIME))
     expect(payload['sub']).to eq user.id
   end
 end

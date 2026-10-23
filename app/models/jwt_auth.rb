@@ -1,23 +1,18 @@
 class JwtAuth
 
-  def self.token(u)
-    JWT.encode self.payload(u), ENV['JWT_SECRET'], 'HS256'
+  REMEMBERED_LIFETIME = 30 * 86_400
+  SESSION_LIFETIME = 86_400
+
+  def self.token(u, lifetime:)
+    JWT.encode self.payload(u, lifetime), ENV['JWT_SECRET'], 'HS256'
   end
 
-  def self.payload(u)
-     # {
-     #    sub: u.id,
-     #    exp: Time.now.to_i + 60 * 1440,
-     #    iat: Time.now.to_i,
-     #    iss: ENV['JWT_ISSUER'],
-     #    user: {
-     #      username: u.user_name,
-     #      fullname: u.full_name
-     #    }
-     # }
+  def self.payload(u, lifetime)
+     now = Time.now.to_i
      {
         sub: u.id,
-        iat: Time.now.to_i,
+        iat: now,
+        exp: now + lifetime,
         iss: ENV['JWT_ISSUER'],
         user: {
           username: u.user_name,
@@ -27,7 +22,8 @@ class JwtAuth
   end
 
   def self.decode(token)
-    options = { algorithm: 'HS256', iss: ENV['JWT_ISSUER'] }
+    # Requiring exp rejects every token issued before expiry existed, whatever secret signed it.
+    options = { algorithm: 'HS256', iss: ENV['JWT_ISSUER'], verify_iss: true, required_claims: ['exp'] }
     JWT.decode token, ENV['JWT_SECRET'], true, options
   end
 
