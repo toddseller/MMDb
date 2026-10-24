@@ -58,7 +58,9 @@ ignored/
 .irb-save-history
 chromedriver.log
 .tddium*
-bin/
+# bin/ holds Bundler binstubs, except the deploy script that production runs.
+bin/*
+!bin/deploy
 .rdb
 
 # Puma
