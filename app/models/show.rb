@@ -40,6 +40,7 @@ class Show < ActiveRecord::Base
     # Merge only once every source has answered, so the database, then Apple, then TMDB order holds.
     # Same-named shows years apart (the UK and US Office) are different shows, so both are kept.
     series = db_rows || []
+    series_response, tmdb_response = [series_response, tmdb_response].map { |rows| (rows || []).select { |s| from_stored_source?(series, s) } }
     (series_response || []).each do |s|
       series << s if series.all? {|el| el[:collectionName].downcase != s[:collectionName].downcase || !same_year?(el[:year], s[:year]) || el[:show_collection_id] != s[:show_collection_id] && is_number?(s[:season])}
     end
@@ -52,6 +53,12 @@ class Show < ActiveRecord::Base
   # Apple and TMDB often date the same show a year apart (the UK Office: 2001 on TMDB, 2002 on Apple).
   def self.same_year?(a, b)
     (a.to_i - b.to_i).abs <= 1
+  end
+
+  # Adding a season finds its show by show_collection_id, so a season of a stored show under another id would create a second copy of the show.
+  def self.from_stored_source?(db_rows, s)
+    stored = db_rows.select { |el| el[:title].downcase == s[:title].downcase && same_year?(el[:year], s[:year]) }
+    stored.empty? || stored.any? { |el| el[:show_collection_id] == s[:show_collection_id] } && stored.none? { |el| el[:season].to_i == s[:season].to_i }
   end
 
   def self.refresh_apple_count(db_season)
