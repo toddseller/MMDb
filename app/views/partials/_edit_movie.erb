@@ -43,7 +43,7 @@
                     <label class="edit-isnew">
                       <input id="movie-isnew" type="hidden" name="movie[isnew]" value="false">
                       <% if @movie.isnew %>
-                        <input id="movie-isnew" type="checkbox" name="movie[isnew" value="true" checked="checked"> New
+                        <input id="movie-isnew" type="checkbox" name="movie[isnew]" value="true" checked="checked"> New
                       <% else %>
                         <input id="movie-isnew" type="checkbox" name="movie[isnew]" value="true"> New
                       <% end %>
@@ -176,11 +176,12 @@
             </div>
             <button id="edit-button" type="submit" class="btn btn-default pull-right">Update</button>
           </form>
-          <form id="delete-form" action="test" method="POST">
+          <form id="delete-form" action="<%= "/users/#{@user.id}/movies/#{@movie.id}" %>" method="POST">
             <input type="hidden" name="_method" value="DELETE">
             <button id="delete-button" type="submit" class="btn btn-danger pull-right">Delete</button>
           </form>
           <button id="update-search" class="btn btn-default pull-right">Search</button>
+          <p class="edit-error text-danger text-right clearfix" role="alert" hidden></p>
         </div>
       </div>
     </div>

@@ -16,8 +16,7 @@ test('editing a movie from its details saves the change', async ({ page }) => {
 
   // The edit link is an icon with no text; its URL is what the server serves the form at.
   await page.locator('a[href*="/movies/"][href$="/edit"]').click()
-  // Today's code also copies the form into the hidden sign-in modal; a user can only fill the visible one.
-  await page.locator('textarea[name="movie[plot]"]:visible').fill('Edit Target now has a new plot.')
+  await page.locator('textarea[name="movie[plot]"]').fill('Edit Target now has a new plot.')
   await page.getByRole('button', { name: 'Update' }).click()
 
   await expect(page.getByText('Edit Target now has a new plot.')).toBeVisible()

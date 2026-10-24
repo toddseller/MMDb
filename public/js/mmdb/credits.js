@@ -1,13 +1,14 @@
 // @ts-check
 import { on } from '#mmdb/events.js'
 import { request } from '#mmdb/request.js'
+import { rememberQuery } from '#mmdb/filters.js'
 
 /** @param {Document} document @param {string} name */
 const searchByName = async (document, name) => {
   const window = /** @type {Window} */ (document.defaultView)
   const form = /** @type {HTMLFormElement | null} */ (document.getElementById('filter-input'))
   form?.reset()
-  window.filterValue = name
+  rememberQuery(name)
   const id = document.querySelector('.index-preview')?.id || window.sessionStorage.getItem('id') || ''
   const { page, url } = await request(`/movies/search?${new URLSearchParams({ filter: name, id })}`)
   const image = /** @type {HTMLImageElement | null} */ (document.getElementById('profile-image'))

@@ -16,3 +16,10 @@ export const request = async (url, { method = 'GET', body } = {}) => {
   if (!response.ok) throw new Error(`${method} ${url} failed: ${response.status}`)
   return response.headers.get('Content-Type')?.includes('application/json') ? response.json() : response.text()
 }
+
+// The form's own window's FormData, since the constructor rejects forms from another window (as in the tests).
+/** @param {HTMLFormElement} form */
+export const fields = (form) => {
+  const { FormData } = /** @type {Window & typeof globalThis} */ (form.ownerDocument.defaultView)
+  return new URLSearchParams(/** @type {any} */ (new FormData(form)))
+}

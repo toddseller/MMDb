@@ -142,7 +142,7 @@ const togglePoster = async (document, poster) => {
 }
 
 /**
- * Binds the poster clicks, and lends the drawer to the jQuery code that still opens and closes it.
+ * Binds the poster clicks, and lends the open tile to the jQuery season default until it moves.
  * @param {Document} document
  */
 export const init = (document) => {
@@ -152,5 +152,5 @@ export const init = (document) => {
       togglePoster(document, link)
     })
   }
-  /** @type {Window} */ (document.defaultView).drawer = { open, close, get tile() { return current } }
+  /** @type {Window} */ (document.defaultView).drawer = { get tile() { return current } }
 }

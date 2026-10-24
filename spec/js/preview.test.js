@@ -2,7 +2,7 @@
 import { test, beforeEach, afterEach } from 'node:test'
 import assert from 'node:assert/strict'
 import { makePage, stubFetch, json, stubAnimate } from './dom.js'
-import { init } from '#mmdb/preview.js'
+import { init, search, close } from '#mmdb/preview.js'
 
 // The add controls and panel as users/show.erb and shows/show.erb render them for the collection's owner.
 /** @param {'movies' | 'shows'} kind */
@@ -239,16 +239,20 @@ test('dismiss closes the panel and its controls and restores the add button', as
   assert.ok(shown('#add'))
 })
 
-test('window.preview runs a search into the panel and closes it, for the edit form', async () => {
-  page.window.preview.search('/movies/update?title=amber')
+test('search and close run the edit form’s search in the panel and close it', async () => {
+  search(page.document, '/movies/update?title=amber', 'movies')
   assert.equal(fetched.calls[0].url, '/movies/update?title=amber')
   assert.equal(loadingText(), 'Searching Our Database...')
   await answerNext(json({ query: [{}], page: '<form id="update-movie"></form>' }))
   assert.ok(el('#preview #update-movie'))
 
-  page.window.preview.close()
+  close(page.document)
   assert.ok(!shown('#preview'))
   assert.ok(shown('#add'))
+})
+
+test('window.preview lends only close, for Create New Show', () => {
+  assert.deepEqual(Object.keys(page.window.preview), ['close'])
 })
 
 test('an arrow that starts fading out comes back if the panel scrolls back before the fade ends', async () => {

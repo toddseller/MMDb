@@ -1,6 +1,3 @@
-// Also written by public/js/mmdb/filters.js and credits.js; stays until the jQuery code that reads it moves to modules.
-var filterValue = ''
-
 var bindListeners = function () {
   $('#sign-in-form').on('submit', validate)
   $('.close').on('click', clearForm)
@@ -19,14 +16,7 @@ var dynamicListener = function () {
   $(document).on('click', '#user-shows', getUser)
   $('#user-page').on('click', '.top-preview', activateModal)
   $('#user-page').on('click', '#create-new', createShow)
-  $('#user-page').on('click', '.movie-edit', editMovie)
   $('#user-page').on('click', '.show-edit', editShow)
-  $('#user-page').on('click', '#edit-button', submitUpdate)
-  $('#user-page').on('click', '#delete-button', deleteMovie)
-  $('#user-page').on('click', '#update-search', updateDatabase)
-  $('#user-page').on('click', '#update-movie', submitPreviewUpdate)
-  $('#user-page').on('click', '.rating-input', ratingSubmit)
-  $('#user-page').on('change', '.hd input:checkbox', toggleHD)
   $('#user-page').on('click', '.season-submit', seasonDefault)
   $('#logIn').on('click', '#update-submit', userUpdateSubmit)
   $('#logIn').on('keyup', '#confirm', testPassword)
@@ -62,13 +52,6 @@ var goToProfile = function (event) {
       $('#show-list').empty().append(response)
     }
   })
-}
-
-var toggleHD = function () {
-  if (this.checked) {
-    var checkname = $(this).attr("name");
-    $("input:checkbox[name='" + checkname + "']").not(this).removeAttr("checked");
-  }
 }
 
 var animateMenu = function (event) {
@@ -211,12 +194,6 @@ var autoFocus = function () {
   $(this).find('[autofocus]').focus()
 }
 
-var updateDatabase = function (event) {
-  event.preventDefault()
-  var data = {title: $('#movie_title').text(), route: $('.edit-form').attr('action')}
-  window.preview.search('/movies/update?' + $.param(data))
-}
-
 var createShow = function (event) {
   event.preventDefault()
   var id = $('.index-preview') > 0 ? $('.index-preview').attr('id') : window.sessionStorage.id
@@ -244,28 +221,6 @@ var seasonDefault = function (event) {
   })
 }
 
-var ratingSubmit = function (event) {
-  event.preventDefault()
-
-  var rating = $(this).serialize()
-  var route = $(this).parents('form').attr('action')
-  var label = $('label[for="' + $(this).attr('id') + '"]')
-
-  label.nextAll('label').andSelf().css('color', '#ff0000').css('font-size', '19px')
-  label.prevAll('label').css('color', '#e4e4e4').css('font-size', '19px')
-  $('.rating>p').css('bottom', '13px')
-
-  var request = $.ajax({
-    url: route,
-    type: 'POST',
-    data: rating
-  })
-
-  request.done(function (response) {
-    $('#ratings-container').html(response)
-  })
-}
-
 var activateModal = function (event) {
   event.preventDefault()
   var route = $(this).children('a').attr('href')
@@ -275,12 +230,6 @@ var activateModal = function (event) {
 var displayMovieModal = function (response) {
   $('#movie .modal-content').empty().append(response)
   $('#movie').modal('show')
-}
-
-var editMovie = function (event) {
-  event.preventDefault()
-  var route = $(this).attr('href')
-  $.get(route, displayEditForm)
 }
 
 var toggleActive = function (event) {
@@ -407,65 +356,9 @@ var editShow = function (event) {
   $.get(route, displayShowEditForm)
 }
 
-var displayEditForm = function (response) {
-  window.preview.close()
-  $('.modal-body').replaceWith(response)
-  $('.modal-footer').hide()
-}
-
 var displayShowEditForm = function (response) {
   $('#edit-show').empty().append(response)
   $('#edit-show').modal('show')
-}
-
-var submitUpdate = function (event) {
-  event.preventDefault()
-  var formRoute = $(this).parent().attr('action')
-  var formData = $('#search-movie-title').val().length > 0 ? $(this).parent().serialize() + '&filter=' + filterValue : $(this).parent().serialize() + '&name=' + filterValue
-  var response = $.ajax({
-    url: formRoute,
-    type: 'PUT',
-    data: formData,
-    success: displayUpdatedMovie
-  })
-}
-
-var submitPreviewUpdate = function(event) {
-  event.preventDefault()
-  var formRoute = $(this).attr('action')
-  var formData = $('#search-movie-title').val().length > 0 ? $(this).serialize() + '&filter=' + filterValue : $(this).serialize() + '&name=' + filterValue
-  var response = $.ajax({
-    url: formRoute,
-    type: 'PUT',
-    data: formData,
-    success: displayEditForm
-  })
-}
-
-var displayUpdatedMovie = function (response) {
-  window.drawer.close(true)
-  $('#movie-list').empty().append(response.query)
-  window.drawer.open($('#' + response.id).parent('div')[0], response.page, true)
-}
-
-var deleteMovie = function (event) {
-  event.preventDefault()
-  var parentForm = $(this).parent().parent().children('form')
-  var route = $(parentForm[0]).attr('action')
-  var newRoute = $(this).attr('action', route)
-  var formRoute = $(newRoute).attr('action')
-  var data = $('#search-movie-title').val().length > 0 ? $.param({filter:filterValue}) : $.param({name:filterValue})
-  $.ajax({
-    url: formRoute,
-    type: 'DELETE',
-    data: data,
-    success: function (response) {
-      if (response.status !== 'true') return
-      $('#movie-list').empty().append(response.page)
-      $('.footer').empty().append(response.movie_count + ' Movies').fadeIn()
-    }
-  })
-  window.drawer.close()
 }
 
 var getUser = function (event) {
