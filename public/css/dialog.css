@@ -1,0 +1,79 @@
+/* What the three <dialog class="modal"> need beyond the themes' .modal rules, which predate <dialog>.
+   Position, size and colours live in themes/<theme>/modals.css. */
+
+/* The browser gives dialogs a box of their own; the themes style .modal-content as the box instead. */
+dialog.modal {
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+}
+
+/* The themes hide .modal, as Bootstrap showed it by script. */
+dialog.modal[open] {
+  display: block;
+}
+
+dialog.modal::backdrop {
+  background: rgb(0 0 0 / 50%);
+}
+
+/* The page stays put behind a dialog. Its scrollbar's space is kept on every page, so where a scrollbar takes up
+   space, hiding it doesn't shift the page, and a page too short to scroll doesn't shift when a gutter appears. */
+html {
+  scrollbar-gutter: stable;
+}
+
+html:has(dialog.modal[open]) {
+  overflow: hidden;
+}
+
+/* Bootstrap's fade and slide. Opening starts from @starting-style; closing runs when dialog.js adds .closing, and it
+   holds the dialog open until these transitions end. */
+@media (prefers-reduced-motion: no-preference) {
+  /* Opening, the backdrop comes first and the box after it; closing, the other way round. A transition takes its
+     delay from the state being entered. */
+  dialog.modal {
+    transition: opacity .15s linear .15s;
+  }
+
+  dialog.modal::backdrop {
+    transition: opacity .15s linear;
+  }
+
+  dialog.modal .modal-dialog {
+    transition: transform .3s ease-out .15s;
+  }
+
+  dialog.modal.closing,
+  dialog.modal.closing .modal-dialog {
+    transition-delay: 0s;
+  }
+
+  dialog.modal.closing::backdrop {
+    transition-delay: .15s;
+  }
+
+  @starting-style {
+    dialog.modal[open],
+    dialog.modal[open]::backdrop {
+      opacity: 0;
+    }
+
+    dialog.modal[open] .modal-dialog {
+      transform: translate(0, -25%);
+    }
+  }
+
+  dialog.modal.closing,
+  dialog.modal.closing::backdrop {
+    opacity: 0;
+  }
+
+  dialog.modal.closing .modal-dialog {
+    transform: translate(0, -25%);
+  }
+}

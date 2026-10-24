@@ -3,12 +3,9 @@ import { on } from '#mmdb/events.js'
 import { request, fields } from '#mmdb/request.js'
 import { openTile } from '#mmdb/drawer.js'
 import { close as closePanel } from '#mmdb/preview.js'
-import { modal as bootstrapModal } from '#mmdb/bootstrap.js'
+import { open, close } from '#mmdb/dialog.js'
 
 const FALLBACK_UPLOAD_ERROR = "The artwork couldn't be uploaded. Try again."
-
-/** @param {Document} document @param {'show' | 'hide'} action */
-const modal = (document, action) => bootstrapModal(document, '#edit-show', action)
 
 /** @param {Document} document */
 const dialog = (document) => /** @type {HTMLElement} */ (document.getElementById('edit-show'))
@@ -85,17 +82,23 @@ const addEpisode = async (document) => {
   if (header) header.textContent = `Season ${season}, ${count} ${count > 1 ? 'episodes' : 'episode'} added`
 }
 
+/** @param {Element | null} chosen the tab or pane to show, among its siblings */
+const activate = (chosen) => {
+  chosen?.parentElement?.querySelectorAll(':scope > .active').forEach((other) => other.classList.remove('active'))
+  chosen?.classList.add('active')
+}
+
 /** @param {Document} document */
 const ok = (document) => {
   if (!isCreate(document)) return tryTo(document, 'save', titleOf(document, 'show[title]'), async () => {
     await save(document)
-    modal(document, 'hide')
+    close(document, 'edit-show')
   })
   // An untitled episode is refused by the server, and "+" has already added the ones before it.
-  if (!titleOf(document, 'episode[title]').trim()) return modal(document, 'hide')
+  if (!titleOf(document, 'episode[title]').trim()) return close(document, 'edit-show')
   return tryTo(document, 'save', titleOf(document, 'show[title]'), async () => {
     await addEpisode(document)
-    modal(document, 'hide')
+    close(document, 'edit-show')
   })
 }
 
@@ -162,7 +165,7 @@ const setDefaultSeason = async (document, button) => {
 /** @param {Document} document @param {string} html */
 const openDialog = (document, html) => {
   dialog(document).innerHTML = html
-  modal(document, 'show')
+  open(document, 'edit-show')
 }
 
 /**
@@ -184,13 +187,20 @@ export const init = (document) => {
     closePanel(document)
     openDialog(document, page)
   })
-  // Bootstrap's tab plugin switches the panes but only highlights <li> tabs, and these are buttons.
-  on(document, 'click', '#edit-show [data-toggle="tab"]', (_event, tab) => {
-    tab.parentElement?.querySelectorAll('.active').forEach((other) => other.classList.remove('active'))
-    tab.classList.add('active')
+  on(document, 'click', '#edit-show [data-tab]', (_event, tab) => {
+    activate(tab)
+    activate(dialog(document).querySelector(/** @type {string} */ (tab.getAttribute('href'))))
+  })
+  // Not the forms' submit: a form only submits on Enter when it has a single text field, and then posts natively.
+  on(document, 'keydown', '#edit-show input[type="text"]', (event) => {
+    const key = /** @type {KeyboardEvent} */ (event)
+    // An input method's Enter picks the text being composed; a held key's repeats would save again before the first lands.
+    if (key.key !== 'Enter' || key.isComposing || key.repeat) return
+    event.preventDefault()
+    ok(document)
   })
   on(document, 'click', '#edit-show #ok', () => ok(document))
-  on(document, 'click', '#edit-show #cancel', () => modal(document, 'hide'))
+  on(document, 'click', '#edit-show #cancel', () => close(document, 'edit-show'))
   on(document, 'click', '#edit-show .edit-next', (_event, arrow) => move(document, arrow))
   on(document, 'click', '#edit-show #add-new-episode', () => tryTo(document, 'save', titleOf(document, 'show[title]'), () => addEpisode(document)))
   on(document, 'click', '#edit-show #episode-delete', (_event, button) => deleteEpisode(document, button))

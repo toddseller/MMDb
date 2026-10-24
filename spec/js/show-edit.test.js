@@ -1,7 +1,7 @@
 // @ts-check
 import { test, beforeEach, afterEach } from 'node:test'
 import assert from 'node:assert/strict'
-import { makePage, stubFetch, json } from './dom.js'
+import { makePage, stubFetch, stubDialogs, json } from './dom.js'
 import { init } from '#mmdb/show-edit.js'
 import { init as initPreview } from '#mmdb/preview.js'
 import { open } from '#mmdb/drawer.js'
@@ -22,7 +22,7 @@ const PAGE = `
     <div id="show-list"><div class="index-preview-show" id="7"><a class="show-modal" id="3"><img src="${OLD_THUMB}" alt="Tides Poster"></a><p>Tides</p></div></div>
     <footer><div class="footer"></div></footer>
   </div>
-  <div class="modal fade" id="edit-show"><div class="modal-dialog"><div class="modal-content"></div></div></div>`
+  <dialog class="modal" id="edit-show"><div class="modal-dialog"><div class="modal-content"></div></div></dialog>`
 
 // The drawer's details as _show_info.erb renders them.
 const DETAILS = `
@@ -41,8 +41,8 @@ const EDIT = ({ next = '/users/7/shows/3/seasons/5/episodes/12/edit', previous }
   <div class="modal-header"><div class="edit-poster"><img src="https://img.test/old/600x600.jpg"></div><h4>Tides &amp; Co</h4><p>Season 1, 3 episodes selected</p></div>
   <div class="modal-body">
     <div class="btn-group" role="group">
-      <button type="button" class="btn btn-default active" data-toggle="tab" href="#detail">Details</button>
-      <button type="button" class="btn btn-default" data-toggle="tab" href="#artwork">Artwork</button>
+      <button type="button" class="btn btn-default active" data-tab href="#detail">Details</button>
+      <button type="button" class="btn btn-default" data-tab href="#artwork">Artwork</button>
     </div>
     <div class="edit-container tab-content">
       <div id="detail" class="tab-pane in active">
@@ -92,14 +92,18 @@ let page
 let fetched
 /** @type {Array<{ resolve: (response: Response) => void }>} */
 let pending
-/** @type {string[]} */
-let modal
 
 /** @param {string} selector */
 const el = (selector) => /** @type {HTMLElement} */ (page.document.querySelector(selector))
 /** @param {string} selector */
 const click = (selector) => {
   const event = new page.window.MouseEvent('click', { bubbles: true, cancelable: true })
+  el(selector).dispatchEvent(event)
+  return event
+}
+/** @param {string} selector @param {KeyboardEventInit} [init] */
+const enter = (selector, init = {}) => {
+  const event = new page.window.KeyboardEvent('keydown', { key: 'Enter', bubbles: true, cancelable: true, ...init })
   el(selector).dispatchEvent(event)
   return event
 }
@@ -112,6 +116,7 @@ const answerNext = async (/** @type {Response} */ response) => { pending.shift()
 /** @param {number} n */
 const body = (n) => new URLSearchParams(String(fetched.calls[n].init.body))
 const error = () => el('#edit-show .edit-error')
+const isOpen = () => /** @type {HTMLDialogElement} */ (el('#edit-show')).open
 const tileImage = () => el('#show-list img')
 const failed = (status = 500, text = '') => new Response(text, { status })
 
@@ -122,10 +127,9 @@ const openDialog = async (html = EDIT()) => {
 
 beforeEach(() => {
   pending = []
-  modal = []
   fetched = stubFetch(() => new Promise((resolve) => pending.push({ resolve })))
   page = makePage(PAGE)
-  page.window.$ = /** @type {any} */ ((/** @type {string} */ selector) => ({ modal: (/** @type {string} */ action) => modal.push(`${selector} ${action}`) }))
+  stubDialogs(page.window)
   init(page.document)
   initPreview(page.document)
   open(/** @type {HTMLElement} */ (el('#show-list .index-preview-show')), DETAILS, true)
@@ -140,10 +144,10 @@ test('the edit link opens the dialog with the form the server renders', async ()
   assert.equal(fetched.calls[0].url, '/users/7/shows/3/edit')
   await answerNext(json(EDIT()))
   assert.equal(el('#edit-show textarea[name="episode[title]"]').textContent, 'Tides 1x1')
-  assert.deepEqual(modal, ['#edit-show show'])
+  assert.equal(isOpen(), true)
 })
 
-test('a tab click moves the highlight and sends nothing', async () => {
+test('a tab click shows its panel, moves the highlight and sends nothing', async () => {
   await openDialog()
 
   click('#edit-show [href="#artwork"]')
@@ -151,6 +155,41 @@ test('a tab click moves the highlight and sends nothing', async () => {
   assert.equal(fetched.calls.length, 1)
   assert.ok(el('#edit-show [href="#artwork"]').classList.contains('active'))
   assert.ok(!el('#edit-show [href="#detail"]').classList.contains('active'))
+  assert.ok(el('#edit-show #artwork').classList.contains('active'))
+  assert.ok(!el('#edit-show #detail').classList.contains('active'))
+})
+
+test('Enter in a field saves like OK instead of posting the form', async () => {
+  await openDialog()
+
+  const event = enter('#edit-show input[name="season[poster]"]')
+  assert.ok(event.defaultPrevented)
+  assert.equal(fetched.calls[1].init.method, 'PUT')
+  await answerNext(json({ page: '<p class="saved">Saved</p>', poster: 'https://img.test/old/400x400.jpg' }))
+
+  await settle()
+  assert.equal(isOpen(), false)
+})
+
+test('Enter in a multi-line field or while composing text is left alone', async () => {
+  await openDialog()
+
+  const newline = enter('#edit-show textarea[name="episode[title]"]')
+  const composing = enter('#edit-show input[name="season[poster]"]', { isComposing: true })
+
+  assert.ok(!newline.defaultPrevented)
+  assert.ok(!composing.defaultPrevented)
+  assert.equal(fetched.calls.length, 1)
+})
+
+test('a held Enter saves once', async () => {
+  await openDialog()
+
+  enter('#edit-show input[name="season[poster]"]')
+  enter('#edit-show input[name="season[poster]"]', { repeat: true })
+  enter('#edit-show input[name="season[poster]"]', { repeat: true })
+
+  assert.equal(fetched.calls.length, 2)
 })
 
 test('OK saves every tab, then shows the details and the tile thumbnail and closes', async () => {
@@ -165,12 +204,13 @@ test('OK saves every tab, then shows the details and the tile thumbnail and clos
     ['episode[title]', 'Renamed'], ['season[poster]', 'https://img.test/new/600x600.jpg'], ['show[title]', 'Tides & Co'],
     ['show[poster]', 'https://img.test/new/600x600.jpg'], ['form[id]', '11'],
   ])
-  assert.deepEqual(modal, ['#edit-show show'])
+  assert.equal(isOpen(), true)
   await answerNext(json({ page: '<p class="saved">Saved</p>', poster: 'https://img.test/new/400x400.jpg' }))
 
   assert.equal(el('.info .info-wrapper').innerHTML, '<p class="saved">Saved</p>')
   assert.equal(tileImage().getAttribute('src'), 'https://img.test/new/400x400.jpg')
-  assert.deepEqual(modal, ['#edit-show show', '#edit-show hide'])
+  await settle()
+  assert.equal(isOpen(), false)
 })
 
 test('a failed save names the stored title as text, keeps the dialog and hides the line on the next try', async () => {
@@ -182,7 +222,7 @@ test('a failed save names the stored title as text, keeps the dialog and hides t
 
   assert.equal(error().hidden, false)
   assert.equal(error().textContent, "Couldn't save Tides & Co. Try again.")
-  assert.deepEqual(modal, ['#edit-show show'])
+  assert.equal(isOpen(), true)
   assert.equal(tileImage().getAttribute('src'), OLD_THUMB)
   click('#edit-show #ok')
   assert.equal(error().hidden, true)
@@ -194,7 +234,8 @@ test('Cancel closes without a request', async () => {
   click('#edit-show #cancel')
 
   assert.equal(fetched.calls.length, 1)
-  assert.deepEqual(modal, ['#edit-show show', '#edit-show hide'])
+  await settle()
+  assert.equal(isOpen(), false)
 })
 
 test('an arrow saves first, then shows the other episode in the open dialog', async () => {
@@ -209,7 +250,7 @@ test('an arrow saves first, then shows the other episode in the open dialog', as
   await answerNext(json(EDIT({ previous: '/users/7/shows/3/seasons/5/episodes/11/edit' }).replace('Tides 1x1', 'Tides 1x2')))
   assert.equal(el('#edit-show textarea[name="episode[title]"]').textContent, 'Tides 1x2')
   assert.equal(el('.info .info-wrapper').innerHTML, '<p>Saved</p>')
-  assert.deepEqual(modal, ['#edit-show show'])
+  assert.equal(isOpen(), true)
 })
 
 test('an arrow whose save fails stays on the episode and says so', async () => {
@@ -337,7 +378,7 @@ test('Create New Show closes the search panel and opens the form for the signed-
   assert.equal(fetched.calls[0].url, '/shows/new')
   assert.equal(el('#preview').style.display, 'none')
   assert.ok(el('#edit-show #add-new-episode'))
-  assert.deepEqual(modal, ['#edit-show show'])
+  assert.equal(isOpen(), true)
 })
 
 /** @param {string} count */
@@ -359,7 +400,7 @@ for (const [count, line] of /** @type {const} */ ([['1', 'Season 1, 1 episode ad
     assert.equal(/** @type {HTMLTextAreaElement} */ (el('#edit-show textarea[name="episode[title]"]')).value, '')
     assert.equal(el('#show-list').textContent, 'Handmade')
     assert.equal(el('#edit-show .modal-header p').textContent, line)
-    assert.deepEqual(modal, ['#edit-show show'])
+    assert.equal(isOpen(), true)
   })
 }
 
@@ -372,7 +413,21 @@ test('OK in Create New Show adds a titled episode, then closes', async () => {
   await answerNext(added('2'))
 
   assert.equal(el('#show-list').textContent, 'Handmade')
-  assert.deepEqual(modal, ['#edit-show show', '#edit-show hide'])
+  await settle()
+  assert.equal(isOpen(), false)
+})
+
+test('Enter in Create New Show adds a titled episode like OK', async () => {
+  await openCreate()
+  fill('#edit-show textarea[name="episode[title]"]', 'Handmade 1x2')
+
+  const event = enter('#edit-show input[name="season[season]"]')
+  assert.ok(event.defaultPrevented)
+  assert.equal(body(1).get('new'), 'true')
+  await answerNext(added('2'))
+
+  await settle()
+  assert.equal(isOpen(), false)
 })
 
 test('OK in Create New Show with no episode title just closes', async () => {
@@ -382,7 +437,8 @@ test('OK in Create New Show with no episode title just closes', async () => {
   click('#edit-show #ok')
 
   assert.equal(fetched.calls.length, 1)
-  assert.deepEqual(modal, ['#edit-show show', '#edit-show hide'])
+  await settle()
+  assert.equal(isOpen(), false)
 })
 
 test('a failed add in Create New Show names the typed show title', async () => {
@@ -394,5 +450,5 @@ test('a failed add in Create New Show names the typed show title', async () => {
   await answerNext(failed())
 
   assert.equal(error().textContent, "Couldn't save Handmade. Try again.")
-  assert.deepEqual(modal, ['#edit-show show'])
+  assert.equal(isOpen(), true)
 })

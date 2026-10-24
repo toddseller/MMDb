@@ -9,7 +9,7 @@ describe 'page assets' do
   it 'gives every script and the stylesheet a version' do
     urls = asset_urls
 
-    expect(urls.size).to eq 3
+    expect(urls.size).to eq 2
     expect(urls).to all(match(%r{\A/(js|css)/[\w.-]+\?v=\w+\z}))
   end
 

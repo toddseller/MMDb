@@ -1,22 +1,23 @@
 // @ts-check
 import { test, beforeEach, afterEach, mock } from 'node:test'
 import assert from 'node:assert/strict'
-import { makePage, stubFetch, json, html } from './dom.js'
+import { makePage, stubFetch, json, html, stubDialogs } from './dom.js'
 import { init } from '#mmdb/account.js'
 
 const LIGHT = '/css/default.css?v=1'
 const DARK = '/css/dark.css?v=1'
 
-// layout.erb's theme link, navbar, menu and sign-in modal.
+// layout.erb's theme link, navbar, Sign in button, menu and sign-in dialog.
 const PAGE = `
   <link id="theme" rel="stylesheet" href="${LIGHT}" data-default="${LIGHT}" data-dark="${DARK}">
   <p class="navbar-text">Signed in as Edie Tester</p>
+  <div id="sign-in"><button type="button" id="open-sign-in">Sign in</button></div>
   <div id="nav-toggle" class="active"></div>
   <div id="drop-down" class="active"><ul>
     <a id="update" href="/users/1/edit"><li>Account Settings</li></a>
     <a id="logout" href="1"><li>Sign Out</li></a>
   </ul></div>
-  <div class="modal" id="logIn"><div class="modal-dialog"><div class="modal-content">
+  <dialog class="modal" id="logIn"><div class="modal-dialog"><div class="modal-content">
     <div class="modal-body">
       <p class="login-errors">Invalid login.</p>
       <form id="sign-in-form" action="/sessions" method="POST">
@@ -25,7 +26,7 @@ const PAGE = `
         <button id="sign-in-submit" type="submit">Sign in</button>
       </form>
     </div>
-  </div></div></div>`
+  </div></div></dialog>`
 
 // _edit_user.erb, as Account Settings loads it into #logIn.
 const SETTINGS = `
@@ -56,10 +57,6 @@ let page
 /** @type {ReturnType<typeof stubFetch>} */
 let fetched
 /** @type {string[]} */
-let modals
-/** @type {Record<string, (event: { currentTarget: HTMLElement }) => void>} */
-let bootstrapEvents
-/** @type {string[]} */
 let replaced
 /** @type {(url: string, init: RequestInit) => Response} */
 let answer
@@ -89,8 +86,7 @@ const settle = async () => { for (let i = 0; i < 10; i++) await Promise.resolve(
 /** @param {number} n */
 const body = (n) => new URLSearchParams(String(fetched.calls[n].init.body))
 const shown = (/** @type {string} */ selector) => el(selector).style.display !== 'none' && el(selector).style.display !== ''
-/** @param {'shown.bs.modal' | 'hidden.bs.modal'} type @param {string} id */
-const fire = (type, id) => bootstrapEvents[`${type} ${id}`]({ currentTarget: /** @type {HTMLElement} */ (page.document.getElementById(id)) })
+const logIn = () => /** @type {HTMLDialogElement} */ (page.document.getElementById('logIn'))
 
 const openSettings = async () => {
   answer = () => html(SETTINGS)
@@ -101,16 +97,8 @@ const openSettings = async () => {
 /** @param {string} markup */
 const load = (markup) => {
   page = makePage(markup)
-  modals = []
-  bootstrapEvents = {}
   replaced = []
-  page.window.$ = /** @type {any} */ ((/** @type {string} */ selector) => ({
-    modal: (/** @type {string} */ action) => modals.push(`${selector} ${action}`),
-    // Bootstrap fires on each element the selector matched; the tests fire by id.
-    on: (/** @type {string} */ type, /** @type {any} */ handler) => {
-      for (const element of page.document.querySelectorAll(selector)) bootstrapEvents[`${type} ${element.id}`] = handler
-    },
-  }))
+  stubDialogs(page.window)
   init(page.document, (url) => replaced.push(url))
 }
 
@@ -163,19 +151,20 @@ test('a refused sign-in shows the error and empties the form', async () => {
 })
 
 test('closing the sign-in dialog empties it and hides the error', async () => {
+  logIn().showModal()
   submit('#sign-in-form')
   type('username_email', 'e2e')
 
-  fire('hidden.bs.modal', 'logIn')
+  logIn().close()
 
   assert.equal(field('username_email').value, '')
   assert.ok(!shown('.login-errors'))
 })
 
-test('a shown dialog focuses its autofocus field', () => {
-  fire('shown.bs.modal', 'logIn')
+test('the Sign in button opens the sign-in dialog', () => {
+  click('#open-sign-in')
 
-  assert.equal(page.document.activeElement, field('username_email'))
+  assert.equal(logIn().open, true)
 })
 
 test('Sign Out posts to the session and goes home', async () => {
@@ -195,7 +184,7 @@ test('Account Settings loads into the dialog, shows it and closes the menu', asy
 
   assert.equal(fetched.calls[0].url, '/users/1/edit')
   assert.ok(el('#logIn .login-form'))
-  assert.deepEqual(modals, ['#logIn show'])
+  assert.equal(logIn().open, true)
   assert.ok(!el('#drop-down').classList.contains('active'))
   assert.ok(!el('#nav-toggle').classList.contains('active'))
 })
@@ -247,7 +236,6 @@ test('saving puts the form, writes the new name as text and keeps the shown them
 
   const event = submit('#logIn .login-form')
   await settle()
-  fire('hidden.bs.modal', 'logIn')
 
   assert.ok(event.defaultPrevented)
   assert.equal(fetched.calls[1].url, '/users/1')
@@ -255,7 +243,7 @@ test('saving puts the form, writes the new name as text and keeps the shown them
   assert.equal(body(1).get('first_name'), 'Edie')
   assert.equal(body(1).get('theme'), 'dark')
   assert.ok(!body(1).has('password'), 'disabled fields stay out')
-  assert.deepEqual(modals, ['#logIn show', '#logIn hide'])
+  assert.equal(logIn().open, false)
   assert.equal(el('.navbar-text').textContent, 'Signed in as <b>Edith</b> Tester')
   assert.equal(el('#theme').getAttribute('href'), DARK)
 })
@@ -279,7 +267,7 @@ test('a refused password resets the password fields and enables Update', async (
   }
   assert.ok(!shown('#confirm > span'))
   assert.ok(!el('#update-submit').hasAttribute('disabled'))
-  assert.deepEqual(modals, ['#logIn show'])
+  assert.equal(logIn().open, true)
 })
 
 test('the theme switch swaps the one theme link between versioned URLs', async () => {
@@ -297,7 +285,7 @@ test('closing Account Settings without saving puts the saved theme back', async 
   await openSettings()
   el('#myonoffswitch').click()
 
-  fire('hidden.bs.modal', 'logIn')
+  logIn().close()
 
   assert.equal(el('#theme').getAttribute('href'), LIGHT)
 })

@@ -715,7 +715,7 @@ dropdb MMDb_test && createdb MMDb_test
 
 ### Browser tests
 
-Playwright drives a real Chromium through the major flows: the movie details drawer, searching by a credit or studio, the filters, adding a movie (the search panel, its arrows and dismiss, a failed search, a title with markup), editing and rating (the edit form's search and picking a result, the quality and New flags, a failed save or delete, saving and deleting while filtered), shows (adding an episode or a whole season, a failed search, the default season, expanding an episode plot), editing a show (saving and Cancel, the arrows, the poster, a failed save, Delete Episode, Create New Show), the account (sign-in, Sign Out, Account Settings with a wrong or right password, the theme switch and its saved theme, registration's password check), navigation (the menu, the Movies/TV Shows switch from the menu and from another user's page, the home page poster preview), the edit-show tabs, artwork upload, and deleting a movie. They check what a user sees, so they keep passing when the front-end JavaScript is rewritten. They run in CI after the RSpec suite, in the same required check.
+Playwright drives a real Chromium through the major flows: the movie details drawer, searching by a credit or studio, the filters, adding a movie (the search panel, its arrows and dismiss, a failed search, a title with markup), editing and rating (the edit form's search and picking a result, the quality and New flags, a failed save or delete, saving and deleting while filtered), shows (adding an episode or a whole season, a failed search, the default season, expanding an episode plot), editing a show (saving and Cancel, Enter as OK, the arrows, the poster, a failed save, Delete Episode, Create New Show), the account (sign-in, Sign Out, Account Settings with a wrong or right password, the theme switch and its saved theme, registration's password check), navigation (the menu, the Movies/TV Shows switch from the menu and from another user's page, the home page poster preview), the dialogs (Escape and the close button, the fade-out and reduced motion, focus kept inside and returned, the page behind not scrolling or closing them), the edit-show tabs, artwork upload, and deleting a movie. They check what a user sees, so they keep passing when the front-end JavaScript is rewritten. They run in CI after the RSpec suite, in the same required check.
 
 ```bash
 npm ci                              # once; installs Playwright
@@ -727,18 +727,19 @@ npx playwright show-report          # after a failure: steps, screenshots and tr
 ```
 
 - The app runs under `e2e/server.rb` on its own database, `MMDb_e2e`, with the RSpec suite's fixed test settings (`spec/support/test_env.rb`), so a local `.env` can't point it at production. An outbound request from the app fails and names the URL, as in RSpec.
-- The browser may only load from the app. jQuery is served from `e2e/vendor/`, and everything else from outside (posters, analytics) is blocked.
+- The browser may only load from the app; everything from outside (posters, analytics) is blocked.
 - `e2e/seed.rb` loads a known user with 30 movies and two shows, and a second user with a movie and a show of their own, before each run, and records the responses for flows that would reach Apple or TMDB (movie and show search, picking a season). It records them by calling the real routes with those services replaced, so the markup comes from the real partials. Tests answer those requests, and artwork uploads, in the browser.
 - Test files that change data reseed when they finish, so test order doesn't matter.
 
 ### Front-end modules and unit tests
 
-The front end is moving off jQuery one feature at a time. New code is plain JavaScript in ES modules, with no build step: browsers load the files exactly as written.
+The front end is plain JavaScript in ES modules, with no script library and no build step: browsers load the files exactly as written. `bootstrap.css` still styles the page, but none of Bootstrap's JavaScript is loaded.
 
 - **Where modules live:** `public/js/mmdb/<feature>.js`, started from `public/js/main.js`. Importing a module never touches the page; `main.js` calls each module's `init(document)`.
 - **How modules import each other:** as `#mmdb/<file>.js`. In the browser, the layout's import map (built by `AssetHelper#import_map` from the files in `public/js/mmdb/`) sends each name to its versioned URL, so a deploy never mixes new and cached modules. In Node, `package.json`'s `"imports"` resolves the same names to the source files.
-- **Types:** every module starts with `// @ts-check` and declares its types in JSDoc. `tsconfig.json` checks them with TypeScript, emitting nothing. The calls into Bootstrap's jQuery plugin all go through `public/js/mmdb/bootstrap.js`, typed in `public/js/mmdb/legacy.d.ts`.
-- **Unit tests:** in `spec/js/`, run by Node's test runner against jsdom pages, with `fetch` replaced by a recorder (`spec/js/dom.js`), so they never reach the network.
+- **Types:** every module starts with `// @ts-check` and declares its types in JSDoc. `tsconfig.json` checks them with TypeScript, emitting nothing.
+- **Dialogs:** sign-in and Account Settings, a movie's details and show edit are `<dialog class="modal">` elements in the layout. Open and close them only through `public/js/mmdb/dialog.js` (`open`, `close`, and `data-close` on a button), never with the browser's `showModal()` or `close()`: `public/css/dialog.css` fades them out, and `dialog.js` holds the dialog open until that fade has run, Escape included.
+- **Unit tests:** in `spec/js/`, run by Node's test runner against jsdom pages, with `fetch` replaced by a recorder (`spec/js/dom.js`), so they never reach the network. jsdom has no `showModal`, `close` or `getAnimations`; `stubDialogs` in `dom.js` supplies them.
 
 ```bash
 npm run typecheck   # TypeScript checks the modules and their tests

@@ -7,9 +7,6 @@
   <% themes = { 'default' => asset_path('/css/default.css'), 'dark' => asset_path('/css/dark.css') } %>
   <link id="theme" rel='stylesheet' href='<%= session[:theme] == 'default' ? themes['default'] : themes['dark'] %>' data-default='<%= themes['default'] %>' data-dark='<%= themes['dark'] %>' type='text/css'>
 
-  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-
-  <script src="<%= asset_path('/js/bootstrap.min.js') %>"></script>
   <script type="importmap"><%== import_map %></script>
   <script type="module" src="<%= asset_path('/js/main.js') %>"></script>
   <!-- Google Tag Manager -->
@@ -42,7 +39,7 @@
         </div>
       <% else %>
         <div id="sign-in" class="navbar-right">
-          <button type="button" class="btn btn-danger navbar-btn" data-toggle="modal" data-target="#logIn">Sign in</button>
+          <button type="button" id="open-sign-in" class="btn btn-danger navbar-btn">Sign in</button>
         </div>
       <% end %>
     </div>
@@ -73,11 +70,11 @@
   <div id="user-page">
     <%== yield %>
   </div>
-  <div class="modal fade" id="logIn" tabindex="-1" role="dialog">
+  <dialog class="modal" id="logIn">
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          <button type="button" class="close" data-close aria-label="Close"><span aria-hidden="true">&times;</span></button>
           <h4 class="modal-title">Sign in!</h4>
         </div>
         <div class="modal-body">
@@ -99,20 +96,20 @@
         </div>
       </div>
     </div>
-  </div>
-  <div class="modal fade" id="movie" tabindex="-1" role="dialog">
+  </dialog>
+  <dialog class="modal" id="movie">
     <div class="modal-dialog modal-lg">
       <div class="modal-content movie-content">
 
       </div>
     </div>
-  </div>
-  <div class="modal fade" id="edit-show" tabindex="-1" role="dialog">
+  </dialog>
+  <dialog class="modal" id="edit-show">
     <div class="modal-dialog">
       <div class="modal-content">
 
       </div>
     </div>
-  </div>
+  </dialog>
 </body>
 </html>

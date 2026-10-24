@@ -1,7 +1,7 @@
 // @ts-check
 import { test, beforeEach, afterEach } from 'node:test'
 import assert from 'node:assert/strict'
-import { makePage, stubFetch, json, html } from './dom.js'
+import { makePage, stubFetch, stubDialogs, json, html } from './dom.js'
 import { init, closeMenu } from '#mmdb/navigation.js'
 
 // The navbar and menu from layout.erb, around another user's movies page as users/show.erb renders it.
@@ -19,7 +19,7 @@ const PAGE = `
     <div id="movie-list"></div>
     <footer><div class="footer">1 Movies</div></footer>
   </div>
-  <div class="modal" id="movie"><div class="modal-dialog"><div class="modal-content movie-content"></div></div></div>`
+  <dialog class="modal" id="movie"><div class="modal-dialog"><div class="modal-content movie-content"></div></div></dialog>`
 
 // shows/show.erb as the TV Shows switch answers with it.
 const SHOWS = `<div id="search-boxes"><a id="user-movies" href="/users/9"><button id="switch">Movies</button></a></div>
@@ -29,8 +29,6 @@ const SHOWS = `<div id="search-boxes"><a id="user-movies" href="/users/9"><butto
 let page
 /** @type {ReturnType<typeof stubFetch>} */
 let fetched
-/** @type {string[]} */
-let modals
 /** @type {(url: string) => Response} */
 let answer
 
@@ -50,8 +48,7 @@ beforeEach(() => {
   answer = () => json({})
   fetched = stubFetch((url) => answer(url))
   page = makePage(PAGE)
-  modals = []
-  page.window.$ = /** @type {any} */ ((/** @type {string} */ selector) => ({ modal: (/** @type {string} */ action) => modals.push(`${selector} ${action}`) }))
+  stubDialogs(page.window)
   init(page.document)
 })
 
@@ -146,5 +143,5 @@ test('a home page poster opens the movie in the details dialog', async () => {
   assert.ok(event.defaultPrevented)
   assert.equal(fetched.calls[0].url, '/movies/4/show')
   assert.equal(el('#movie .modal-content').textContent, 'Amber')
-  assert.deepEqual(modals, ['#movie show'])
+  assert.equal(/** @type {HTMLDialogElement} */ (el('#movie')).open, true)
 })
