@@ -713,6 +713,24 @@ pg_dump --schema-only --no-owner --no-privileges "$DATABASE_URL" | grep -Ev '^\\
 dropdb MMDb_test && createdb MMDb_test
 ```
 
+### Browser tests
+
+Playwright drives a real Chromium through the major flows: the movie details drawer, the filters, adding a movie, editing and rating, shows (adding an episode, the default season), the modals, tabs and theme switch, artwork upload, and deleting a movie. They check what a user sees, so they keep passing when the front-end JavaScript is rewritten. They run in CI after the RSpec suite, in the same required check.
+
+```bash
+npm ci                              # once; installs Playwright
+npx playwright install chromium     # once per Playwright version
+createdb MMDb_e2e                   # once; the seed loads db/structure.sql into it
+npx playwright test                 # seeds MMDb_e2e, starts the app on port 4667, runs every flow
+npx playwright test e2e/drawer.spec.js   # one flow
+npx playwright show-report          # after a failure: steps, screenshots and traces
+```
+
+- The app runs under `e2e/server.rb` on its own database, `MMDb_e2e`, with the RSpec suite's fixed test settings (`spec/support/test_env.rb`), so a local `.env` can't point it at production. An outbound request from the app fails and names the URL, as in RSpec.
+- The browser may only load from the app. jQuery is served from `e2e/vendor/`, and everything else from outside (posters, analytics) is blocked.
+- `e2e/seed.rb` loads a known user, 30 movies and a show before each run, and records the responses for flows that would reach Apple or TMDB (movie and show search, picking a season). It records them by calling the real routes with those services replaced, so the markup comes from the real partials. Tests answer those requests, and artwork uploads, in the browser.
+- Test files that change data reseed when they finish, so test order doesn't matter.
+
 ### Code Style
 
 - Follow Ruby community style guide

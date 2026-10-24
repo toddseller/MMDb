@@ -1,0 +1,43 @@
+import { test, expect, USER } from './fixtures.js'
+
+// Titles as the grid names them, through each poster's alt text.
+const titles = (page) => page.locator('#movie-list img[alt$=" Poster"]').evaluateAll((imgs) => imgs.map((img) => img.alt.replace(/ Poster$/, '')))
+const grid = (page) => page.locator('#movie-list img[alt$=" Poster"]')
+
+test.describe('collection filters', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto(`/users/${USER.id}`)
+    await expect(grid(page)).toHaveCount(30)
+  })
+
+  test('a title search narrows the grid', async ({ page }) => {
+    await page.getByPlaceholder('Search Collection').pressSequentially('amb')
+
+    await expect(grid(page)).toHaveCount(1)
+    expect(await titles(page)).toEqual(['Amber'])
+  })
+
+  test('unwatched shows only new movies', async ({ page }) => {
+    await page.getByRole('link', { name: 'Unwatched' }).click()
+
+    await expect(grid(page)).toHaveCount(1)
+    expect(await titles(page)).toEqual(['Cedar'])
+  })
+
+  test('4K shows only 4K movies', async ({ page }) => {
+    await page.getByRole('link', { name: '4K' }).click()
+
+    await expect(grid(page)).toHaveCount(1)
+    expect(await titles(page)).toEqual(['Ultra Sharp'])
+  })
+
+  test('clear restores the full collection', async ({ page }) => {
+    await page.getByPlaceholder('Search Collection').pressSequentially('amb')
+    await expect(grid(page)).toHaveCount(1)
+
+    await page.getByRole('button', { name: 'Clear' }).click()
+
+    await expect(grid(page)).toHaveCount(30)
+    await expect(page.getByPlaceholder('Search Collection')).toHaveValue('')
+  })
+})

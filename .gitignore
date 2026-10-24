@@ -82,3 +82,9 @@ log/puma_stderr.log
 secrets.yml
 master.key
 credentials.yml.enc
+
+# Browser tests (Playwright)
+node_modules/
+test-results/
+playwright-report/
+e2e/.generated/

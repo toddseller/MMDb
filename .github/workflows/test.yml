@@ -60,3 +60,26 @@ jobs:
         with:
           name: coverage
           path: coverage/
+
+      # Browser tests: Playwright drives Chromium against the app, which runs on its own database (see e2e/).
+      # They stay in this job so the required "test" check covers them.
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '24'
+          cache: npm
+
+      - run: npm ci
+
+      - run: npx playwright install --with-deps chromium
+
+      - run: createdb MMDb_e2e
+
+      - run: npx playwright test
+
+      - uses: actions/upload-artifact@v7
+        if: failure()
+        with:
+          name: playwright-report
+          path: |
+            playwright-report/
+            test-results/
