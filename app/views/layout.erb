@@ -4,17 +4,12 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
   <link rel="prefetch" href="/imgs/animated.svg">
-  <% if session[:theme] == 'default' %>
-    <link rel='stylesheet' href='<%= asset_path('/css/default.css') %>' type='text/css'>
-  <% else %>
-    <link rel='stylesheet' href='<%= asset_path('/css/dark.css') %>' type='text/css'>
-  <% end %>
+  <% themes = { 'default' => asset_path('/css/default.css'), 'dark' => asset_path('/css/dark.css') } %>
+  <link id="theme" rel='stylesheet' href='<%= session[:theme] == 'default' ? themes['default'] : themes['dark'] %>' data-default='<%= themes['default'] %>' data-dark='<%= themes['dark'] %>' type='text/css'>
 
   <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 
   <script src="<%= asset_path('/js/bootstrap.min.js') %>"></script>
-  <script src="<%= asset_path('/js/mmdb.js') %>"></script>
-  <script src="<%= asset_path('/js/application.js') %>"></script>
   <script type="importmap"><%== import_map %></script>
   <script type="module" src="<%= asset_path('/js/main.js') %>"></script>
   <!-- Google Tag Manager -->

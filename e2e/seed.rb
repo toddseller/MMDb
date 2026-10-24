@@ -41,6 +41,16 @@ tides_season = tides.seasons.create!(season: 1, collectionName: 'Tide Tables, Se
 (1..3).each { |number| tides_season.episodes.create!(title: "Tide Tables 1x#{number}", tv_episode: number, plot: "Episode #{number}.") }
 user.shows << tides
 
+# The Movies and TV Shows buttons only show on another user's collection, so a second user owns one of each.
+other = User.create!(first_name: 'Olive', last_name: 'Other', user_name: 'other', email: 'other@example.test', password: 'other-password')
+other.movies << Movie.create!(title: 'Ferry Lights', year: '2001', director: 'Jane Doe', actors: 'Ann Lee', writer: 'Sam Ray', producer: 'Pat Kim',
+                              plot: 'Ferry Lights is a seeded movie.', genre: 'Drama', rating: 'PG', runtime: '90',
+                              poster: apple.call('ferry-lights'), isnew: false, hd: 1080)
+night = Show.create!(title: 'Night Ferry', year: '2022', show_collection_id: '997', poster: 'https://is1-ssl.mzstatic.com/image/thumb/night-ferry/600x600.jpg')
+night_season = night.seasons.create!(season: 1, collectionName: 'Night Ferry, Season 1', collectionId: 'tmdb9971', is_active: true)
+(1..2).each { |number| night_season.episodes.create!(title: "Night Ferry 1x#{number}", tv_episode: number, plot: "Episode #{number}.") }
+other.shows << night
+
 # The real search asks Apple and TMDB, which the tests can't reach. Record what the app renders for a canned
 # result instead, so the browser test answers the search with markup from the real _preview partial.
 def Movie.get_titles(_title)

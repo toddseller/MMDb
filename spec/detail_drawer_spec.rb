@@ -69,20 +69,4 @@ describe 'detail drawer' do
       end
     end
   end
-
-  context 'mmdb.js' do
-    let(:script) { File.read(APP_ROOT.join('public', 'js', 'mmdb.js')) }
-
-    it 'no longer rewrites tile margins or tracks the open tile by hand' do
-      expect(script).not_to match(/var (filtered|filteredWithInfo|switchInfoDiv) = function/)
-    end
-
-    it 'finds the row from the layout, not from a fixed count per row' do
-      expect(script).not_to match(/itemsPerRow|% ?7\b|\? 7 : 6/)
-    end
-
-    it 'removes the drawer when its transition ends, not on a timer' do
-      expect(script).not_to match(/setTimeout\(\w*[Rr]emove\w*/)
-    end
-  end
 end

@@ -3,12 +3,12 @@ import { on } from '#mmdb/events.js'
 import { request, fields } from '#mmdb/request.js'
 import { openTile } from '#mmdb/drawer.js'
 import { close as closePanel } from '#mmdb/preview.js'
+import { modal as bootstrapModal } from '#mmdb/bootstrap.js'
 
 const FALLBACK_UPLOAD_ERROR = "The artwork couldn't be uploaded. Try again."
 
-// Bootstrap's modal runs on jQuery until change 7 replaces the dialogs.
 /** @param {Document} document @param {'show' | 'hide'} action */
-const modal = (document, action) => /** @type {Window} */ (document.defaultView).$('#edit-show').modal(action)
+const modal = (document, action) => bootstrapModal(document, '#edit-show', action)
 
 /** @param {Document} document */
 const dialog = (document) => /** @type {HTMLElement} */ (document.getElementById('edit-show'))
