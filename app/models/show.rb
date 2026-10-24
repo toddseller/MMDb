@@ -576,6 +576,8 @@ class Show < ActiveRecord::Base
 
   def self.appletv_episodes(id, skip, count, storeId)
     episodes = []
+    # Seasons added in 2019, before the storefront was stored, have none; every lookup then used the US store.
+    storeId = storeId.presence || APPLE_STORES.first
     begin
       episodes_response = HTTParty.get('https://tv.apple.com/api/uts/v2/view/show/' + id + '/episodes?skip=' + skip + '&count=' + count + '&sf=' + storeId + '&locale=en-US&utsk=0&caller=wta&v=58&pfm=appletv')
       if episodes_response.code == 200 && episodes_response['data'] && episodes_response['data']['episodes']
