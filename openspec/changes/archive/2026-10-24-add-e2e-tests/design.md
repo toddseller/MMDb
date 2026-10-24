@@ -77,6 +77,8 @@ Differences from the plan above, found while implementing:
 
 **Seed data fixes.** The seed fills every credit field and marks one season active, as real data always has. Without them the details routes raise.
 
+**The server loads the schema too.** Playwright starts `webServer` before it runs `globalSetup`. So on a fresh `MMDb_e2e` (as in CI) the server's readiness check hit missing tables and timed out before the seed ever ran; locally the database was already seeded, which hid it. `e2e/database.rb` now holds the database setup the seed and server share, including loading the schema on first use.
+
 **`127.0.0.1`, not `localhost`.** Node can resolve `localhost` to `::1`, miss the server on `127.0.0.1`, and try to start a second one.
 
 **Break checks that needed stronger tests.**

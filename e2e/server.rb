@@ -1,9 +1,6 @@
 # Runs the app for the browser tests: its own database, the suite's fixed settings, and no outbound requests.
 # Usage: bundle exec ruby e2e/server.rb
-ENV['RACK_ENV'] ||= 'test'
-# Set before the app loads, so a local .env (which points at production) can't override it.
-ENV['DATABASE_URL'] = 'postgres://localhost/MMDb_e2e'
-require_relative '../spec/support/test_env'
+require_relative 'database'
 
 require 'webmock'
 WebMock.enable!

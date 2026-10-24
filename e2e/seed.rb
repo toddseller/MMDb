@@ -1,14 +1,6 @@
 # Loads known data into the browser tests' own database before each run.
 # Usage: bundle exec ruby e2e/seed.rb
-ENV['RACK_ENV'] ||= 'test'
-ENV['DATABASE_URL'] = 'postgres://localhost/MMDb_e2e'
-require_relative '../spec/support/test_env'
-require_relative '../config/environment'
-
-# Same schema source as the RSpec suite: the migrations don't build production's schema.
-unless ActiveRecord::Base.connection.table_exists?(:shows)
-  system('psql', '-q', '-o', File::NULL, '-v', 'ON_ERROR_STOP=1', '-d', DB_NAME, '-f', APP_ROOT.join('db', 'structure.sql').to_s, exception: true)
-end
+require_relative 'database'
 
 tables = ActiveRecord::Base.connection.tables - %w[schema_migrations ar_internal_metadata]
 ActiveRecord::Base.connection.execute("TRUNCATE #{tables.map { |t| %("#{t}") }.join(', ')} RESTART IDENTITY CASCADE")
