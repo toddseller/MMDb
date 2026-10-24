@@ -9,7 +9,7 @@ describe 'page assets' do
   it 'gives every script and the stylesheet a version' do
     urls = asset_urls
 
-    expect(urls.size).to eq 4
+    expect(urls.size).to eq 5
     expect(urls).to all(match(%r{\A/(js|css)/[\w.-]+\?v=\w+\z}))
   end
 
@@ -48,5 +48,43 @@ describe 'page assets' do
     %w[mmdb.js application.js].each do |script|
       expect(File.read(APP_ROOT.join('public', 'js', script))).not_to include('.lazyload(')
     end
+  end
+
+  def import_map(page = Nokogiri::HTML(get('/', xhr: false).body))
+    JSON.parse(page.at_css('script[type="importmap"]').text)['imports']
+  end
+
+  it 'maps every script module to its versioned URL' do
+    modules = Dir[APP_ROOT.join('public', 'js', 'mmdb', '*.js')].map { |path| File.basename(path) }.sort
+
+    expect(modules).not_to be_empty
+    expect(import_map.keys).to eq modules.map { |name| "#mmdb/#{name}" }
+    import_map.each do |specifier, url|
+      expect(url).to match(%r{\A/js/mmdb/#{Regexp.escape(specifier.delete_prefix('#mmdb/'))}\?v=\d+\z})
+    end
+  end
+
+  it 'changes only the changed module\'s version' do
+    path = APP_ROOT.join('public', 'js', 'mmdb', 'events.js')
+    original = File.mtime(path)
+    before = import_map
+    File.utime(original, original + 60, path)
+
+    after = import_map
+    expect(after['#mmdb/events.js']).not_to eq before['#mmdb/events.js']
+    expect(after.except('#mmdb/events.js')).to eq before.except('#mmdb/events.js')
+  ensure
+    File.utime(original, original, path)
+  end
+
+  it 'loads main.js as a versioned module after the import map' do
+    page = Nokogiri::HTML(get('/', xhr: false).body)
+    scripts = page.css('script')
+    map_index = scripts.index { |script| script['type'] == 'importmap' }
+    main_index = scripts.index { |script| script['type'] == 'module' && script['src'].to_s.start_with?('/js/main.js?v=') }
+
+    expect(map_index).not_to be_nil
+    expect(main_index).not_to be_nil
+    expect(main_index).to be > map_index
   end
 end

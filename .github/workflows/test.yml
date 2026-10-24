@@ -70,6 +70,11 @@ jobs:
 
       - run: npm ci
 
+      # Type checks and unit tests are quick, so they run before the Chromium download the browser tests need.
+      - run: npm run typecheck
+
+      - run: npm test
+
       - run: npx playwright install --with-deps chromium
 
       - run: createdb MMDb_e2e

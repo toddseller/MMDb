@@ -731,6 +731,22 @@ npx playwright show-report          # after a failure: steps, screenshots and tr
 - `e2e/seed.rb` loads a known user, 30 movies and a show before each run, and records the responses for flows that would reach Apple or TMDB (movie and show search, picking a season). It records them by calling the real routes with those services replaced, so the markup comes from the real partials. Tests answer those requests, and artwork uploads, in the browser.
 - Test files that change data reseed when they finish, so test order doesn't matter.
 
+### Front-end modules and unit tests
+
+The front end is moving off jQuery one feature at a time. New code is plain JavaScript in ES modules, with no build step: browsers load the files exactly as written.
+
+- **Where modules live:** `public/js/mmdb/<feature>.js`, started from `public/js/main.js`. Importing a module never touches the page; `main.js` calls each module's `init(document)`.
+- **How modules import each other:** as `#mmdb/<file>.js`. In the browser, the layout's import map (built by `AssetHelper#import_map` from the files in `public/js/mmdb/`) sends each name to its versioned URL, so a deploy never mixes new and cached modules. In Node, `package.json`'s `"imports"` resolves the same names to the source files.
+- **Types:** every module starts with `// @ts-check` and declares its types in JSDoc. `tsconfig.json` checks them with TypeScript, emitting nothing. Shared state that still lives in the jQuery code (`public/js/mmdb.js`) is typed in `public/js/mmdb/legacy.d.ts`.
+- **Unit tests:** in `spec/js/`, run by Node's test runner against jsdom pages, with `fetch` replaced by a recorder (`spec/js/dom.js`), so they never reach the network.
+
+```bash
+npm run typecheck   # TypeScript checks the modules and their tests
+npm test            # unit tests (seconds)
+```
+
+CI runs both after the RSpec suite and before the browser tests.
+
 ### Code Style
 
 - Follow Ruby community style guide

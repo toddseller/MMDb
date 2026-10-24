@@ -1,5 +1,5 @@
 var lastPos = 0
-var timeoutId = 0
+// Also written by public/js/mmdb/filters.js; stays until the jQuery code that reads it moves to modules.
 var filterValue = ''
 
 var bindListeners = function () {
@@ -10,9 +10,6 @@ var bindListeners = function () {
   $('#logout').on('click', logout)
   $('#update').on('click', updateUser)
   $('.registration #confirm').on('keyup', checkPassword)
-  $('#unwatched').on('click', unwatched)
-  $('#four-k').on('click', fourK)
-  $('#library').on('click', clearFilter)
   $('#user-profile').on('click', toggleProfile)
   $('#user-shows').on('click', getUser)
   $('#user-movies').on('click', getUser)
@@ -22,13 +19,8 @@ var dynamicListener = function () {
   $(document).on('click', '#user-movies', getUser)
   $(document).on('click', '#user-shows', getUser)
   $('#user-page').on('click', '#dismiss', closePreview)
-  $('#user-page').on('keyup', '#search-movie-title', function () {
-    clearTimeout(timeoutId)
-    timeoutId = setTimeout(filterMovies, 300)
-  })
   $('#user-page').on('click', '#scroll-right', scrollRight)
   $('#user-page').on('click', '#scroll-left', scrollLeft)
-  $('#user-page').on('click', '#clear-btn', clearFilter)
   $('#user-page').on('click', '.top-preview', activateModal)
   $('#user-page').on('click', '#add', showSearchBar)
   $('#user-page').on('click', '#add-show', showSearchBar2)
@@ -95,72 +87,6 @@ var toggleHD = function () {
     var checkname = $(this).attr("name");
     $("input:checkbox[name='" + checkname + "']").not(this).removeAttr("checked");
   }
-}
-
-var filterMovies = function (event) {
-
-  filterValue = $('#search-movie-title').val()
-  var routePath = $('#movie-list').length > 0 ? 'movies' : 'shows'
-  var id = $('.index-preview').attr('id') ? $('.index-preview').attr('id') : window.sessionStorage.id
-  if (window.sessionStorage.id != id || !window.sessionStorage.id) {
-    window.sessionStorage.setItem('id', id)
-  }
-  var data = $.param({filter:filterValue, id:id})
-  var route = '/' + routePath + '/filter'
-
-  var request = $.ajax({
-    url: route,
-    data: data
-  })
-  request.done(function (response) {
-    $('#movie-list').empty().append(response.page);
-    $('.footer').empty().append(response.count + ' Movies').fadeIn()
-  })
-}
-
-var unwatched = function (evenet) {
-  event.preventDefault()
-
-  $('#unwatched').addClass('active')
-  $('#four-k').removeClass('active')
-  var route = $(this).attr('href')
-  var request = $.ajax({
-    url: route
-  })
-  request.done(function (response) {
-    $('#movie-list').empty().append(response)
-  })
-}
-
-var fourK = function (evenet) {
-  event.preventDefault()
-
-  $('#four-k').addClass('active')
-  $('#unwatched').removeClass('active')
-  var route = $(this).attr('href')
-  var request = $.ajax({
-    url: route
-  })
-  request.done(function (response) {
-    $('#movie-list').empty().append(response)
-  })
-}
-
-var clearFilter = function () {
-  var id = window.sessionStorage.id
-  var route = '/users/' + id
-  $.get(route).done(function (response) {
-    $('#profile-wrapper').removeClass('active')
-    $('#user-page').empty().append(response.page)
-    $('.footer').empty().append(response.movie_count + ' Movies').fadeIn()
-    $('#profile-image').empty()
-    $('#profile-name').empty()
-  })
-  $('#filter-input').trigger('reset')
-  drawer.close(true)
-  $('#unwatched').removeClass('active')
-  $('#four-k').removeClass('active')
-  filterValue = ''
 }
 
 var animateMenu = function (event) {

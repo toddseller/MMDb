@@ -1,0 +1,17 @@
+{
+  // Type-checks the JavaScript modules from their JSDoc; nothing is compiled, browsers get the files as written.
+  "compilerOptions": {
+    "allowJs": true,
+    "checkJs": true,
+    "noEmit": true,
+    "strict": true,
+    "target": "ES2022",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    // Resolves #mmdb/* through package.json "imports", as Node does; the browser's import map maps the same names.
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
+    "types": ["node"]
+  },
+  // The legacy jQuery scripts stay out until each piece replaces them.
+  "include": ["public/js/main.js", "public/js/mmdb/**/*", "spec/js/**/*.js"]
+}
