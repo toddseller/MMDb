@@ -58,8 +58,10 @@ describe 'detail drawer' do
         expect(rule(path, 'img')).not_to match(/transform/)
       end
 
+      # Later edits to the theme raise its version again, so this checks a floor, not an exact number.
       it 'imports the versions that carry the rendering changes' do
-        expect(css("#{theme}.css")).to include("@import url('themes/#{theme}/movies.css?v=3');", "@import url('drawer.css?v=3');")
+        expect(css("#{theme}.css")[%r{themes/#{theme}/movies\.css\?v=(\d+)}, 1].to_i).to be >= 3
+        expect(css("#{theme}.css")).to include("@import url('drawer.css?v=3');")
       end
 
       it 'imports drawer.css and the changed movies.css with versions' do

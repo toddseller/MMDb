@@ -672,15 +672,6 @@ a.movie-edit:hover
     display: none;
 }
 
-#search-year
-{
-    top: -34px;
-    right: -180px;
-
-    display: none;
-
-    width: 81px;
-}
 
 .movie-modal
 {

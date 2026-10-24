@@ -49,6 +49,25 @@ generated = APP_ROOT.join('e2e', '.generated')
 FileUtils.mkdir_p(generated)
 File.write(generated.join('movie_search.json'), search.body)
 
+# More results than fit across the panel, a title with markup characters, and the edit form's search.
+canned = Movie.get_titles('nova').first
+recordings = {
+  'movie_search_many' => (1..12).map { |n| canned.merge(title: "Nova #{n}", poster: canned[:poster].sub('nova-drift', "nova-#{n}")) },
+  'movie_search_markup' => [canned.merge(title: 'Nova <i>Drift</i>')]
+}
+recordings.each do |file, results|
+  Movie.define_singleton_method(:get_titles) { |_title| results }
+  recorded = app.get('/movies?query=nova', 'HTTP_COOKIE' => cookie, 'HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest')
+  raise "recording #{file} failed: #{recorded.status}" unless recorded.ok?
+  File.write(generated.join("#{file}.json"), recorded.body)
+end
+Movie.define_singleton_method(:update_title_search) { |_title| [canned] }
+edit_target = Movie.find_by!(title: 'Edit Target')
+update_search = app.get('/movies/update', 'HTTP_COOKIE' => cookie, 'HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest',
+                        params: { title: edit_target.title, route: "/users/#{user.id}/movies/#{edit_target.id}" })
+raise "recording the edit search failed: #{update_search.status}" unless update_search.ok?
+File.write(generated.join('movie_update_search.json'), update_search.body)
+
 # Adding an episode starts with a show search (Apple and TMDB) and a season pick (TMDB episode lists).
 # Both are recorded the same way; the episode itself is then added by the real app.
 def Show.get_series(_title)

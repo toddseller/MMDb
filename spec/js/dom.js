@@ -34,3 +34,33 @@ export const json = (body, status = 200) => new Response(JSON.stringify(body), {
 
 /** @param {string} body @param {number} [status] */
 export const html = (body, status = 200) => new Response(body, { status, headers: { 'Content-Type': 'text/html' } })
+
+/** @typedef {{ keyframes: Keyframe[], duration: unknown, onfinish: (() => void) | null, finish: () => void, cancel: () => void }} AnimationStub */
+
+/**
+ * Gives an element a recording el.animate and el.getAnimations; jsdom has neither. As in browsers,
+ * a cancelled animation never runs its onfinish, and getAnimations lists only the running ones.
+ * @param {HTMLElement} el
+ * @returns {AnimationStub[]} every animation started on el, in order
+ */
+export const stubAnimate = (el) => {
+  /** @type {AnimationStub[]} */
+  const animations = []
+  /** @type {Set<AnimationStub>} */
+  const running = new Set()
+  el.animate = /** @type {any} */ ((/** @type {Keyframe[]} */ keyframes, /** @type {unknown} */ duration) => {
+    /** @type {AnimationStub} */
+    const animation = {
+      keyframes,
+      duration,
+      onfinish: null,
+      finish: () => { if (running.delete(animation)) animation.onfinish?.() },
+      cancel: () => { running.delete(animation) },
+    }
+    animations.push(animation)
+    running.add(animation)
+    return animation
+  })
+  el.getAnimations = /** @type {any} */ (() => [...running])
+  return animations
+}

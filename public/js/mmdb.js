@@ -1,4 +1,3 @@
-var lastPos = 0
 // Also written by public/js/mmdb/filters.js and credits.js; stays until the jQuery code that reads it moves to modules.
 var filterValue = ''
 
@@ -18,19 +17,8 @@ var bindListeners = function () {
 var dynamicListener = function () {
   $(document).on('click', '#user-movies', getUser)
   $(document).on('click', '#user-shows', getUser)
-  $('#user-page').on('click', '#dismiss', closePreview)
-  $('#user-page').on('click', '#scroll-right', scrollRight)
-  $('#user-page').on('click', '#scroll-left', scrollLeft)
   $('#user-page').on('click', '.top-preview', activateModal)
-  $('#user-page').on('click', '#add', showSearchBar)
-  $('#user-page').on('click', '#add-show', showSearchBar2)
-  $('#user-page').on('submit', '#movie-search', checkDatabase)
-  $('#user-page').on('submit', '#show-search', checkDatabase2)
   $('#user-page').on('click', '#create-new', createShow)
-  $('#user-page').on('submit', '#create-movie', movieToDB)
-  $('#user-page').on('submit', '#create-show', showToDB)
-  $('#user-page').on('submit', '#create-episode', episodeToDB)
-  $('#user-page').on('click', '#more', showYear)
   $('#user-page').on('click', '.movie-edit', editMovie)
   $('#user-page').on('click', '.show-edit', editShow)
   $('#user-page').on('click', '#edit-button', submitUpdate)
@@ -223,86 +211,10 @@ var autoFocus = function () {
   $(this).find('[autofocus]').focus()
 }
 
-var showSearchBar = function () {
-  $('#add').hide()
-  $('#search').show()
-}
-
-var showSearchBar2 = function () {
-  $('#add-show').hide()
-  $('#search').show()
-}
-
-var showYear = function () {
-  $('#search-year').show()
-  $('#search-title').css('right', '70px')
-  $('#search-btn').css('top', '-17px')
-  $('#more').hide()
-}
-
-var checkDatabase = function (event) {
-  event.preventDefault()
-  var data = $(this).serialize()
-  var route = '/movies'
-  $.ajax({
-    url: route,
-    data: data,
-    success: previewMovie,
-    error: (function(jqXHR, textStatus, errorThrown) {
-      if (jqXHR.status == 500) {
-        $('#preview').empty().slideDown(300, 'linear').append('<div style="width: 174px; height: auto;"><img src="/imgs/loading_image.svg" width: 174 height: auto></div>').css({'display':'flex','justify-content':'center'})
-      }
-    })
-  })
-  $(this).trigger('reset')
-  $('#preview').empty().slideDown(300, 'linear').append('<div id="loading"><h3>Searching Our Database...</h3><div class="loader"></div></div>').css({'display':'flex','justify-content':'center'})
-  $('#dismiss').attr('style','top: 0;').show()
-  $('#scroll-right').hide()
-  $('#scroll-left').hide()
-}
-
-var checkDatabase2 = function (event) {
-  event.preventDefault()
-  var data = $(this).serialize()
-  var route = '/shows'
-  $.ajax({
-    url: route,
-    data: data,
-    success: previewShow,
-    error: (function(jqXHR, textStatus, errorThrown) {
-      if (jqXHR.status == 500) {
-        $('#preview').empty().slideDown(300, 'linear').append('<button type="submit" id="create-new" class="add-all"><span class="glyphicon glyphicon-plus"></span><p>Create New Show</p></button>').css({'display':'flex','justify-content':'center','height':'300px'})
-      }
-    })
-  })
-  $(this).trigger('reset')
-  $('#preview').empty().slideDown(300, 'linear').append('<div id="loading"><h3>Searching Our Database...</h3><div class="loader"></div></div>').css({'display':'flex','justify-content':'center','height':'300px'})
-  $('#dismiss').show()
-  $('#scroll-right').hide()
-  $('#scroll-left').hide()
-}
-
 var updateDatabase = function (event) {
   event.preventDefault()
-  var parentForm = $('.edit-form').attr('action')
-  var title = $('#movie_title').text()
-  var data = {title: title, route: parentForm}
-  var route = '/movies/update'
-  $.ajax({
-    url: route,
-    data: data,
-    success: previewMovie,
-    error: (function(jqXHR, textStatus, errorThrown) {
-      if (jqXHR.status == 500) {
-        $('#preview').empty().slideDown(300, 'linear').append('<div style="width: 174px; height: auto;"><img src="/imgs/loading_image.svg" width: 174 height: auto></div>').css({'display':'flex','justify-content':'center'})
-      }
-    })
-  })
-  $(this).trigger('reset')
-  $('#preview').empty().slideDown(300, 'linear').append('<div id="loading"><h3>Searching Our Database...</h3><div class="loader"></div></div>').css({'display':'flex','justify-content':'center'})
-  $('#dismiss').attr('style','top: 0;').show()
-  $('#scroll-right').hide()
-  $('#scroll-left').hide()
+  var data = {title: $('#movie_title').text(), route: $('.edit-form').attr('action')}
+  window.preview.search('/movies/update?' + $.param(data))
 }
 
 var createShow = function (event) {
@@ -313,17 +225,7 @@ var createShow = function (event) {
 }
 
 var displayCreateShow = function (response) {
-  $('#preview').slideUp(500, 'linear')
-  $('#dismiss').hide()
-  $('#scroll-right').hide()
-  $('#scroll-left').hide()
-  $('#add-show').show()
-  $('#search').hide()
-  $('#search-year').hide()
-  $('#search-title').css('right', '0')
-  $('.input-group-btn').css('top', '0')
-  $('#show-list').css('top', '0')
-  $('#more').show()
+  window.preview.close()
   $('#edit-show').empty().append(response.page)
   $('#edit-show').modal('show')
 }
@@ -341,215 +243,6 @@ var seasonDefault = function (event) {
     if (window.drawer.tile) $(window.drawer.tile).find('img').attr('src', response.poster)
   })
 }
-
-var previewMovie = function (response) {
-  if (response.query.length <= 6) {
-    $('#preview').slideDown(300, 'linear')
-    $('#dismiss').attr('style','top: 0;').show()
-    $('#scroll-right').hide()
-    $('#preview').empty().append(response.page).attr('style', 'display: flex !important; justify-content: center;')
-  } else {
-    $('#preview').slideDown(300, 'linear')
-    $('#dismiss').attr('style','top: 0;').show()
-    $('#preview').scroll(addArrow)
-    $('#preview').empty().append(response.page).attr('style', 'display: flex !important; justify-content: space-between;')
-    $('#scroll-left').removeAttr('style')
-    $('#scroll-right').removeAttr('style')
-    $('.glyphicon-chevron-left').removeAttr('style')
-    $('.glyphicon-chevron-right').removeAttr('style')
-    if ($('#preview > div').size() <= 6) {
-      $('#scroll-right').hide()
-    } else {
-      $('#scroll-right').show()
-    }
-  }
-}
-
-var previewShow = function (response) {
-  if (response.query.length <= 6) {
-    $('#preview').slideDown(300, 'linear')
-    $('#dismiss').show()
-    $('#scroll-right').hide()
-    $('#preview').empty().append(response.page).attr('style', 'display: flex; justify-content: center; height: 300px;')
-  } else {
-    $('#preview').slideDown(300, 'linear')
-    $('#dismiss').show()
-    $('#preview').scroll(addArrow)
-    $('#preview').empty().append(response.page).attr('style', 'display: flex; justify-content: space-between; height: 300px;')
-    $('#scroll-left').attr('style', 'height: 200px; top: 87px;')
-    $('#scroll-right').attr('style', 'height: 200px; top: 87px;')
-    $('.glyphicon-chevron-left').attr('style', 'line-height: 4em;')
-    $('.glyphicon-chevron-right').attr('style', 'line-height: 4em;')
-    if ($('#preview > div').size() <= 6) {
-      $('#scroll-right').hide()
-    } else {
-      $('#scroll-right').show()
-    }
-  }
-}
-
-var addArrow = function () {
-  var currPos = $('#preview').scrollLeft()
-  var maxWidth = $('#preview').prop("scrollWidth") - $('#preview').width() - 30
-  var minWidth = 0
-
-  if (lastPos < currPos) {
-    $('#scroll-right').fadeIn()
-    $('#scroll-left').fadeIn()
-  }
-
-  if (lastPos > currPos) {
-    $('#scroll-left').fadeIn()
-    $('#scroll-right').fadeIn()
-  }
-
-  if (currPos == maxWidth) {
-    $('#scroll-right').fadeOut()
-  }
-
-  if (currPos == 0) {
-    $('#scroll-left').fadeOut()
-  }
-}
-
-var scrollRight = function () {
-  $('#preview').animate({
-    scrollLeft: '+=1386px'
-  }, 1000)
-}
-
-var scrollLeft = function () {
-  $('#preview').animate({
-    scrollLeft: '-=1386px'
-  }, 1000)
-}
-
-var movieToDB = function (event) {
-  event.preventDefault()
-  var title = $(this).find('input[name="movie[title]"]').val()
-  var movie = $(this).serialize() + '&filter=' + $('#search-movie-title').val()
-  $('#preview').empty().slideDown(300, 'linear').append('<div id="loading"><h3>Adding ' + title + ' to Your Collection...</h3><div class="loader"></div></div>').css('display','block')
-  var route = $(this).attr('action')
-  $.post(route, movie, listMovie)
-}
-
-var showToDB = function (event) {
-  event.preventDefault()
-  var title = $(this).find('input[name="show[title]"]').val()
-  var movie = $(this).serialize() + '&filter=' + $('#search-movie-title').val()
-  $('#preview').empty().slideDown(300, 'linear').append('<div id="loading"><h3>Adding ' + title + ' to Your Collection...</h3><div class="loader"></div></div>').css('display','block')
-  $('#scroll-right').hide()
-  var route = $(this).attr('action')
-  $.post(route, movie, listEpisode)
-}
-
-var episodeToDB = function (event) {
-  event.preventDefault()
-  var title = !$(this).find('button[type="submit"] > span').hasClass('glyphicon') ? $(this).find('input[name="episode[title]"]').val() : 'Season ' + $(this).find('button[type="submit"]').attr('id')
-  var movie = $(this).serialize() + '&filter=' + $('#search-movie-title').val()
-  $('#preview').empty().slideDown(300, 'linear').append('<div id="loading"><h3>Adding ' + title + ' to Your Collection...</h3><div class="loader"></div></div>').css('display','block')
-  $('#scroll-right').hide()
-  var route = $(this).attr('action')
-  $.post(route, movie, listShow)
-}
-
-var listMovie = function (response) {
-  if (response.status === 'true') {
-    $('#preview').slideUp(500, 'linear')
-    $('#dismiss').removeAttr('style').hide()
-    $('#scroll-right').hide()
-    $('#scroll-left').hide()
-    $('#add').show()
-    $('#search').hide()
-    $('#search-year').hide()
-    $('#search-title').css('right', '0')
-    $('.input-group-btn').css('top', '0')
-    $('#movie-list').css('top', '0')
-    $('#more').show()
-    $('#movie-list').empty().append(response.page)
-    $('.footer').empty().append(response.movie_count + ' Movies').fadeIn()
-  }
-}
-
-var listEpisode = function (response) {
-  if (response.status === 'true') {
-    $('#preview').slideDown(300, 'linear')
-    $('#dismiss').show()
-    $('#preview').scroll(addArrow)
-    if (response.count >= 5) {
-      $('#preview').empty().append(response.page).attr('style', 'display: flex; justify-content: space-between; height: 300px;')
-    } else {
-      $('#preview').empty().append(response.page).attr('style', 'display: flex; justify-content: center; height: 300px;')
-    }
-    if ($('#preview > div').size() <= 6) {
-      $('#scroll-right').hide()
-    } else {
-      $('#scroll-right').show().css({'height':'169px','top':'84px'})
-      $('#scroll-left').css({'height':'169px','top':'84px'})
-      $('#scroll-right .glyphicon').css({'line-height':'3.3em'})
-      $('#scroll-left .glyphicon').css({'line-height':'3.3em'})
-    }
-  }
-}
-
-var listShow = function (response) {
-  if (response.status === 'true') {
-    $('#preview').slideUp(500, 'linear')
-    $('#dismiss').hide()
-    $('#scroll-right').hide()
-    $('#scroll-left').hide()
-    $('#add-show').show()
-    $('#search').hide()
-    $('#search-year').hide()
-    $('#search-title').css('right', '0')
-    $('.input-group-btn').css('top', '0')
-    $('#show-list').css('top', '0')
-    $('#more').show()
-    $('#show-list').empty().append(response.page)
-    $('.footer').empty().append(response.show_count + ' TV Shows &#8212; ' + response.episode_count + ' Episodes')
-  }
-}
-
-var closePreview = function (event) {
-  event.preventDefault()
-  $('#preview').slideUp(300, 'linear')
-  $('#dismiss').hide()
-  $('#scroll-right').hide()
-  $('#scroll-left').hide()
-  if ($('#movie-list').length == 1) {
-    $('#add').show()
-    $('#movie-list').css('top', '0')
-  } else {
-    $('#add-show').show()
-    $('#show-list').css('top', '0')
-  }
-  $('#search').hide()
-  $('#search-year').hide()
-  $('#search-title').css('right', '0')
-  $('.input-group-btn').css('top', '0')
-  $('#more').show()
-}
-
-var closeUpdatePreview = function () {
-  $('#preview').slideUp(300, 'linear')
-  $('#dismiss').hide()
-  $('#scroll-right').hide()
-  $('#scroll-left').hide()
-  if ($('#movie-list').length == 1) {
-    $('#add').show()
-    $('#movie-list').css('top', '0')
-  } else {
-    $('#add-show').show()
-    $('#show-list').css('top', '0')
-  }
-  $('#search').hide()
-  $('#search-year').hide()
-  $('#search-title').css('right', '0')
-  $('.input-group-btn').css('top', '0')
-  $('#more').show()
-}
-
-var first = true
 
 var ratingSubmit = function (event) {
   event.preventDefault()
@@ -715,7 +408,7 @@ var editShow = function (event) {
 }
 
 var displayEditForm = function (response) {
-  closeUpdatePreview()
+  window.preview.close()
   $('.modal-body').replaceWith(response)
   $('.modal-footer').hide()
 }
@@ -766,7 +459,11 @@ var deleteMovie = function (event) {
     url: formRoute,
     type: 'DELETE',
     data: data,
-    success: listMovie
+    success: function (response) {
+      if (response.status !== 'true') return
+      $('#movie-list').empty().append(response.page)
+      $('.footer').empty().append(response.movie_count + ' Movies').fadeIn()
+    }
   })
   window.drawer.close()
 }
