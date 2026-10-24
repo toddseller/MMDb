@@ -34,6 +34,13 @@ show = Show.create!(title: 'Harbor Lights', year: '2019', show_collection_id: '9
 end
 user.shows << show
 
+# Show edit changes episodes, so it gets a show of its own with enough episodes to move between and delete.
+tides = Show.create!(title: 'Tide Tables', year: '2021', show_collection_id: '998', poster: 'https://is1-ssl.mzstatic.com/image/thumb/tide-tables/600x600.jpg')
+tides_season = tides.seasons.create!(season: 1, collectionName: 'Tide Tables, Season 1', collectionId: 'tmdb9981', is_active: true,
+                                     poster: 'https://is1-ssl.mzstatic.com/image/thumb/tide-tables/600x600.jpg')
+(1..3).each { |number| tides_season.episodes.create!(title: "Tide Tables 1x#{number}", tv_episode: number, plot: "Episode #{number}.") }
+user.shows << tides
+
 # The real search asks Apple and TMDB, which the tests can't reach. Record what the app renders for a canned
 # result instead, so the browser test answers the search with markup from the real _preview partial.
 def Movie.get_titles(_title)
@@ -87,6 +94,11 @@ form = Nokogiri::HTML(JSON.parse(show_search.body)['page']).at_css('form#create-
 season_pick = app.post(form['action'], xhr.merge(params: form.css('input[type=hidden]').to_h { |input| [input['name'], input['value']] }))
 raise "recording the season pick failed: #{season_pick.status}" unless season_pick.ok?
 File.write(generated.join('show_episodes.json'), season_pick.body)
+# A season the lookup finds no episodes for, which offers Create New Show instead.
+def Show.get_episodes(*) = []
+empty_pick = app.post(form['action'], xhr.merge(params: form.css('input[type=hidden]').to_h { |input| [input['name'], input['value']] }))
+raise "recording the empty season pick failed: #{empty_pick.status}" unless empty_pick.ok?
+File.write(generated.join('show_episodes_empty.json'), empty_pick.body)
 
 # A credit click searches the collection and asks TMDB for the person's picture; the picture lookup is canned.
 def Movie.search_person(name)
@@ -98,4 +110,4 @@ end
   File.write(generated.join("#{file}.json"), credit.body)
 end
 
-puts "seeded #{DB_NAME}: user #{user.email}, #{user.movies.count} movies, #{user.shows.count} show"
+puts "seeded #{DB_NAME}: user #{user.email}, #{user.movies.count} movies, #{user.shows.count} shows"

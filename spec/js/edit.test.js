@@ -4,7 +4,7 @@ import assert from 'node:assert/strict'
 import { makePage, stubFetch, json, html } from './dom.js'
 import { init } from '#mmdb/edit.js'
 import { init as initPreview } from '#mmdb/preview.js'
-import { init as initDrawer, open, close, isOpen } from '#mmdb/drawer.js'
+import { init as initDrawer, open, close, isOpen, openTile } from '#mmdb/drawer.js'
 import { rememberQuery } from '#mmdb/filters.js'
 
 // The tile id is the user's and the poster link's id is the movie's, as _filtered_list.erb renders them.
@@ -142,7 +142,7 @@ for (const [how, act] of /** @type {const} */ ([['Update', () => click('#edit-bu
     await answerNext(json({ page: '<p class="description-plot">A new plot.</p>', query: tiles([[12, 'Amber'], [7, 'Birch']]), id: 7 }))
 
     assert.ok(isOpen())
-    assert.equal(page.window.drawer.tile, tileOf('Birch'))
+    assert.equal(openTile(), tileOf('Birch'))
     assert.equal(el('.info .description-plot').textContent, 'A new plot.')
     assert.ok(el('.info').classList.contains('open'))
     assert.equal(page.document.querySelectorAll('.info').length, 1)

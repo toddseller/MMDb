@@ -51,6 +51,8 @@ const holdStill = (tile, top) => {
 // Filters and updates re-render the list wholesale, which takes an open drawer with it.
 export const isOpen = () => drawer !== null && drawer.isConnected
 
+export const openTile = () => current
+
 // Rows come from where tiles sit, so the drawer lands right at any width and with tiles hidden.
 /** @param {HTMLElement} tile */
 export const rowEnd = (tile) => {
@@ -145,7 +147,7 @@ const togglePoster = async (document, poster) => {
 }
 
 /**
- * Binds the poster clicks, and lends the open tile to the jQuery season default until it moves.
+ * Binds the poster clicks.
  * @param {Document} document
  */
 export const init = (document) => {
@@ -155,5 +157,4 @@ export const init = (document) => {
       togglePoster(document, link)
     })
   }
-  /** @type {Window} */ (document.defaultView).drawer = { get tile() { return current } }
 }

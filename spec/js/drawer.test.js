@@ -2,7 +2,7 @@
 import { test, beforeEach, afterEach, mock } from 'node:test'
 import assert from 'node:assert/strict'
 import { makePage, stubFetch, json } from './dom.js'
-import { init, rowEnd, show, close, isOpen } from '#mmdb/drawer.js'
+import { init, rowEnd, show, close, isOpen, openTile } from '#mmdb/drawer.js'
 
 // Two rows of three movie tiles, as _movie_list.erb renders them; layout is stubbed since jsdom has none.
 const ROWS = [['Amber', 'Birch', 'Cedar'], ['Delta', 'Ember', 'Fable']]
@@ -188,11 +188,11 @@ test('clicking the open tile’s poster closes the drawer without a request', ()
   assert.ok(!isOpen())
 })
 
-test('window.drawer lends only the open tile, for the season default', () => {
+test('tile() is the open tile, and null once closed', () => {
   show(tile('Birch'), 'Birch')
 
-  assert.deepEqual(Object.keys(page.window.drawer), ['tile'])
-  assert.equal(page.window.drawer.tile, tile('Birch'))
+  assert.equal(openTile(), tile('Birch'))
   close(true)
-  assert.equal(page.window.drawer.tile, null)
+  assert.equal(openTile(), null)
+  assert.equal('drawer' in page.window, false)
 })
