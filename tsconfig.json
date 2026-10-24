@@ -12,6 +12,5 @@
     "moduleResolution": "nodenext",
     "types": ["node"]
   },
-  // The legacy jQuery scripts stay out until each piece replaces them.
   "include": ["public/js/main.js", "public/js/mmdb/**/*", "spec/js/**/*.js"]
 }

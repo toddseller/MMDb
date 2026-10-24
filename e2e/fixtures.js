@@ -4,6 +4,7 @@ import { readFileSync } from 'node:fs'
 
 // The seed empties every table and restarts their ids, so its user is always 1.
 export const USER = { id: 1, email: 'e2e@example.test', password: 'e2e-password' }
+export const OTHER = { id: 2 }
 
 // Test files that change data call this when they finish, so counts and rows are the seeded ones for every file.
 export const reseed = () => execFileSync('bundle', ['exec', 'ruby', 'e2e/seed.rb'], { stdio: 'ignore' })

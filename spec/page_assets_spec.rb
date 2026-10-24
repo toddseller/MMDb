@@ -9,21 +9,21 @@ describe 'page assets' do
   it 'gives every script and the stylesheet a version' do
     urls = asset_urls
 
-    expect(urls.size).to eq 5
+    expect(urls.size).to eq 3
     expect(urls).to all(match(%r{\A/(js|css)/[\w.-]+\?v=\w+\z}))
   end
 
   it 'keeps the version while the file is unchanged' do
-    expect(version_of('/js/mmdb.js')).to eq version_of('/js/mmdb.js')
+    expect(version_of('/js/main.js')).to eq version_of('/js/main.js')
   end
 
   it 'changes the version when the file changes' do
-    path = APP_ROOT.join('public', 'js', 'mmdb.js')
+    path = APP_ROOT.join('public', 'js', 'main.js')
     original = File.mtime(path)
-    before = version_of('/js/mmdb.js')
+    before = version_of('/js/main.js')
     File.utime(original, original + 60, path)
 
-    expect(version_of('/js/mmdb.js')).not_to eq before
+    expect(version_of('/js/main.js')).not_to eq before
   ensure
     File.utime(original, original, path)
   end
@@ -45,9 +45,6 @@ describe 'page assets' do
   # Posters load natively now; the plugin's scroll handler also made content-visibility freeze long scrolls.
   it 'loads no script-based lazy loader' do
     expect(asset_urls.grep(/lazyload/)).to be_empty
-    %w[mmdb.js application.js].each do |script|
-      expect(File.read(APP_ROOT.join('public', 'js', script))).not_to include('.lazyload(')
-    end
   end
 
   def import_map(page = Nokogiri::HTML(get('/', xhr: false).body))
