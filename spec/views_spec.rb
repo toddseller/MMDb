@@ -12,7 +12,8 @@ describe 'views' do
     expect(offenders(/[\w-]+=<%/)).to eq []
   end
 
-  it 'output raw HTML only for the layout and partials' do
-    expect(offenders(%r{<%==(?!\s*(yield|erb :'/?partials/\w+'))})).to eq []
+  # The import map is JSON the server builds from module file names; escaping would break it, and it holds no user data.
+  it 'output raw HTML only for the layout, partials and the import map' do
+    expect(offenders(%r{<%==(?!\s*(yield|import_map\s*%>|erb :'/?partials/\w+'))})).to eq []
   end
 end

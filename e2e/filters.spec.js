@@ -40,4 +40,17 @@ test.describe('collection filters', () => {
     await expect(grid(page)).toHaveCount(30)
     await expect(page.getByPlaceholder('Search Collection')).toHaveValue('')
   })
+
+  test('4K still works after the collection is cleared', async ({ page }) => {
+    await page.getByPlaceholder('Search Collection').pressSequentially('amb')
+    await expect(grid(page)).toHaveCount(1)
+    await page.getByRole('button', { name: 'Clear' }).click()
+    await expect(grid(page)).toHaveCount(30)
+
+    await page.getByRole('link', { name: '4K' }).click()
+
+    await expect(grid(page)).toHaveCount(1)
+    expect(await titles(page)).toEqual(['Ultra Sharp'])
+    await expect(page).toHaveURL(new RegExp(`/users/${USER.id}$`))
+  })
 })
