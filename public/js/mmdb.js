@@ -15,17 +15,10 @@ var dynamicListener = function () {
   $(document).on('click', '#user-movies', getUser)
   $(document).on('click', '#user-shows', getUser)
   $('#user-page').on('click', '.top-preview', activateModal)
-  $('#user-page').on('click', '#create-new', createShow)
-  $('#user-page').on('click', '.show-edit', editShow)
-  $('#user-page').on('click', '.season-submit', seasonDefault)
   $('#logIn').on('click', '#update-submit', userUpdateSubmit)
   $('#logIn').on('keyup', '#confirm', testPassword)
   $('#logIn').on('change', '#current', deactivateSubmit)
   $('#logIn').on('click', '#myonoffswitch', changeTheme)
-  $('#edit-show').on('click', 'button', toggleActive)
-  $('#edit-show').on('change', 'input[name="season[poster]"]', updatePoster)
-  $('#edit-show').on('change', 'input[name="artwork"]', uploadArtwork)
-  $('#edit-show').on('click', '#episode-delete', deleteEpisode)
 }
 
 
@@ -194,33 +187,6 @@ var autoFocus = function () {
   $(this).find('[autofocus]').focus()
 }
 
-var createShow = function (event) {
-  event.preventDefault()
-  var id = $('.index-preview') > 0 ? $('.index-preview').attr('id') : window.sessionStorage.id
-  var route = '/users/' + id + '/shows/new'
-  $.get(route, displayCreateShow)
-}
-
-var displayCreateShow = function (response) {
-  window.preview.close()
-  $('#edit-show').empty().append(response.page)
-  $('#edit-show').modal('show')
-}
-
-var seasonDefault = function (event) {
-  event.preventDefault()
-  var id = $(this).val()
-  var route = $('#season-default').attr('action') + id
-  var request = $.ajax({
-    url: route,
-    method: 'POST'
-  })
-  request.done(function (response) {
-    $('.info-wrapper').empty().append(response.page)
-    if (window.drawer.tile) $(window.drawer.tile).find('img').attr('src', response.poster)
-  })
-}
-
 var activateModal = function (event) {
   event.preventDefault()
   var route = $(this).children('a').attr('href')
@@ -230,135 +196,6 @@ var activateModal = function (event) {
 var displayMovieModal = function (response) {
   $('#movie .modal-content').empty().append(response)
   $('#movie').modal('show')
-}
-
-var toggleActive = function (event) {
-  if ($(this).text() === 'Cancel') {
-    $('#edit-show').modal('toggle')
-  } else if ($(this).text() === 'OK') {
-    var route = $('.show-data').attr('action')
-    var type = $('.show-data').hasClass('new-show') ? $('.show-data').attr('method') : 'PUT'
-    var data = $('.show-data').serialize() + '&show%5Bposter%5D=' + encodeURIComponent($('input[name="season[poster]"]').val()) + '&form%5Bid%5D=' + $('.edit-container > div > form').attr('id')
-    var request = $.ajax({
-      url: route,
-      type: type,
-      data: data
-    })
-    request.done(function (response) {
-      $('.info-wrapper').empty().append(response)
-    })
-    $('#edit-show').modal('toggle')
-  } else if ($(this).attr('id') === 'add-new-episode') {
-    var route = $('.show-data').attr('action')
-    var type = $('.show-data').hasClass('new-show') ? $('.show-data').attr('method') : 'PUT'
-    var data = $('.show-data').serialize() + '&new=true'
-
-    var request = $.ajax({
-      url: route,
-      type: type,
-      data: data
-    })
-    request.done(function (response) {
-      $('#episode').empty().append(response.form)
-      if (response.count > 1) {
-        $('#edit-show .modal-header p').text('Season ' + response.season + ', ' + response.count + ' episodes added')
-      } else {
-        $('#edit-show .modal-header p').text('Season ' + response.season + ', ' + response.count + ' episode added')
-      }
-      $('#show-list').empty().append(response.page)
-    })
-  } else if ($(this).hasClass('edit-next')) {
-    var route = $(this).attr('href')
-    var type = $('.show-data').hasClass('new-show') ? $('.show-data').attr('method') : 'PUT'
-    var request1 = $.ajax({
-      url: route
-    })
-    var formRoute = $('.show-data').attr('action')
-    var data = $('.show-data').serialize() + '&show%5Bposter%5D=' + encodeURIComponent($('input[name="season[poster]"]').val()) + '&form%5Bid%5D=' + $('.edit-container > div > form').attr('id')
-    var request2 = $.ajax({
-      url: formRoute,
-      type: type,
-      data: data
-    })
-    $.when(request1, request2).done(function (r1, r2) {
-      $('#edit-show').empty().append(r1)
-      $('.info-wrapper').empty().append(r2)
-    })
-  } else {
-    $('button.btn.btn-default.active').toggleClass('active')
-    $(this).addClass('active')
-    var route = $('.show-data').attr('action')
-    var type = $('.show-data').hasClass('new-show') ? $('.show-data').attr('method') : 'PUT'
-    var data = $('.show-data').serialize() + '&show%5Bposter%5D=' + encodeURIComponent($('input[name="season[poster]"]').val()) + '&form%5Bid%5D=' + $('.edit-container > div > form').attr('id')
-    if (type == 'PUT') {
-      var request = $.ajax({
-        url: route,
-        type: type,
-        data: data
-      })
-      request.done(function (response) {
-        $('.info-wrapper').empty().append(response)
-      })
-    }
-  }
-}
-
-var deleteEpisode = function (event) {
-  var route = $(this).attr('href')
-  var request = $.ajax({
-    url: route,
-    type: 'DELETE'
-  })
-  request.done(function (response) {
-    $('#edit-show').empty().append(response.page)
-    $('.footer').empty().append(response.show_count + ' TV Shows &#8212; ' + response.episode_count + ' Episodes')
-  })
-}
-
-var updatePoster = function (event) {
-  var poster = $('input[name="season[poster]"]').val()
-  var title = $('textarea[name="show[title]"]').val()
-  $('.modal-header img').attr('src', poster)
-  $('#edit-show .modal-header h4').text(title)
-  $('#artwork > form > img').attr('src', poster)
-  $('.description-poster > img').attr('src', poster)
-  $('.lazy.active').attr('src', poster)
-}
-
-var uploadArtwork = function (event) {
-  var input = this
-  var message = $('#artwork .artwork-message').text('Uploading...')
-  var data = new FormData()
-  data.append('artwork', input.files[0])
-  var request = $.ajax({
-    url: $(input).data('upload'),
-    type: 'POST',
-    data: data,
-    processData: false,
-    contentType: false
-  })
-  request.done(function (response) {
-    message.text('')
-    $('input[name="season[poster]"]').val(response.url).trigger('change')
-  })
-  request.fail(function (xhr) {
-    var error
-    // jQuery 1.9 has no responseJSON, and a 401 or proxy error may not be JSON at all.
-    try { error = $.parseJSON(xhr.responseText).error } catch (e) {}
-    message.text(error || "The artwork couldn't be uploaded. Try again.")
-  })
-  request.always(function () { input.value = '' })
-}
-
-var editShow = function (event) {
-  event.preventDefault()
-  var route = $(this).attr('href')
-  $.get(route, displayShowEditForm)
-}
-
-var displayShowEditForm = function (response) {
-  $('#edit-show').empty().append(response)
-  $('#edit-show').modal('show')
 }
 
 var getUser = function (event) {

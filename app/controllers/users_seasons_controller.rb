@@ -8,7 +8,7 @@ post '/users/:user_id/shows/:show_id/seasons/:id' do
   end
   season = seasons.find_by(season: params[:id])
   show.update(poster: season.poster)
-  poster = show.poster
+  poster = show.thumbnail
   episodes = season.episodes.sorted_list
   if request.xhr?
     page = erb :'/partials/_show_info', locals: {show: show, user: user, season: season, episodes: episodes}, layout: false

@@ -217,7 +217,6 @@ const scroll = (document, direction) => {
 
 /**
  * Binds adding to the collection: the add buttons, both searches, the add forms and the panel's controls.
- * Lends close to the jQuery Create New Show until it moves.
  * @param {Document} document
  */
 export const init = (document) => {
@@ -237,6 +236,4 @@ export const init = (document) => {
   on(document, 'click', '#scroll-right', () => scroll(document, 1))
   // scroll doesn't bubble, so it's caught on the way down; the panel itself is replaced when Clear re-renders the page.
   document.addEventListener('scroll', (event) => { if (/** @type {Element} */ (event.target).id === 'preview') updateArrows(document) }, true)
-  const window = /** @type {Window} */ (document.defaultView)
-  window.preview = { close: () => close(document) }
 }

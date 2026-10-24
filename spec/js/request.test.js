@@ -1,8 +1,8 @@
 // @ts-check
 import { test, afterEach } from 'node:test'
 import assert from 'node:assert/strict'
-import { stubFetch, json, html } from './dom.js'
-import { request } from '#mmdb/request.js'
+import { makePage, stubFetch, json, html } from './dom.js'
+import { request, fields } from '#mmdb/request.js'
 
 /** @type {{ restore: () => void } | undefined} */
 let stub
@@ -45,4 +45,16 @@ test('throws, naming the status, when the response is not a success', async () =
   stub = stubFetch(() => html('Internal Server Error', 500))
 
   await assert.rejects(request('/movies/filter'), /500/)
+})
+
+test('a failed request carries the response text, for the server\'s own message', async () => {
+  stub = stubFetch(() => json({ error: 'Only JPEG and PNG.' }, 422))
+
+  await assert.rejects(request('/users/1/shows/2/artwork', { method: 'POST' }), { body: '{"error":"Only JPEG and PNG."}' })
+})
+
+test('fields() leaves out file inputs, as jQuery\'s serialize did', () => {
+  const { document } = makePage('<form><input name="season[poster]" value="a.jpg"><input type="file" name="artwork"></form>')
+
+  assert.deepEqual([...fields(/** @type {HTMLFormElement} */ (document.querySelector('form')))], [['season[poster]', 'a.jpg']])
 })

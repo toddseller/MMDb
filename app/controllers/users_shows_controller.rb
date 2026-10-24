@@ -90,7 +90,7 @@ put '/users/:user_id/shows/:id' do
   @user = current_user
   if request.xhr?
     page = erb :'/partials/_show_info', locals: {show: @show, user: @user, season: @season, episodes: @episodes}, layout: false
-    json page
+    json page: page, poster: @show.thumbnail
   else
     erb :'/users/show'
   end

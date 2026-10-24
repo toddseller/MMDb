@@ -1,7 +1,5 @@
-// State the modules share with code still in public/js/mmdb.js. Each piece that takes one over deletes its line.
+// What the modules still borrow from the jQuery page. Change 7 deletes it.
 interface Window {
-  // Lent by drawer.js to the jQuery season default until piece 5 imports it.
-  drawer: { readonly tile: HTMLElement | null }
-  // Lent by preview.js to the jQuery Create New Show until piece 5 imports it.
-  preview: { close: () => void }
+  // Bootstrap's modal, for the show edit dialog.
+  $: (selector: string) => { modal: (action: 'show' | 'hide') => void }
 }

@@ -13,13 +13,15 @@ export const request = async (url, { method = 'GET', body } = {}) => {
     credentials: 'same-origin',
     headers: { 'X-Requested-With': 'XMLHttpRequest' },
   })
-  if (!response.ok) throw new Error(`${method} ${url} failed: ${response.status}`)
+  // The body rides along because some routes explain a refusal in it, such as an artwork upload's { error }.
+  if (!response.ok) throw Object.assign(new Error(`${method} ${url} failed: ${response.status}`), { body: await response.text() })
   return response.headers.get('Content-Type')?.includes('application/json') ? response.json() : response.text()
 }
 
 // The form's own window's FormData, since the constructor rejects forms from another window (as in the tests).
+// Files are dropped, as jQuery's serialize dropped them: a form body can only carry their name as "[object File]".
 /** @param {HTMLFormElement} form */
 export const fields = (form) => {
   const { FormData } = /** @type {Window & typeof globalThis} */ (form.ownerDocument.defaultView)
-  return new URLSearchParams(/** @type {any} */ (new FormData(form)))
+  return new URLSearchParams(/** @type {Array<[string, string]>} */ ([...new FormData(form)].filter(([, value]) => typeof value === 'string')))
 }

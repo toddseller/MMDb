@@ -257,10 +257,6 @@ test('close works on a visitor’s page, which has no add button', () => {
   assert.ok(!shown('#preview'))
 })
 
-test('window.preview lends only close, for Create New Show', () => {
-  assert.deepEqual(Object.keys(page.window.preview), ['close'])
-})
-
 test('an arrow that starts fading out comes back if the panel scrolls back before the fade ends', async () => {
   page.window.matchMedia = /** @type {any} */ (() => ({ matches: false }))
   const fades = stubAnimate(el('#scroll-right'))
