@@ -235,6 +235,28 @@ describe 'Show.get_series' do
     end
   end
 
+  context 'names spelled with a curly apostrophe on Apple' do
+    before do
+      stub_apple_search('lupin', shows: [['umc.cmc.tales', 'Lupin’s Tales']])
+      stub_apple_show('umc.cmc.tales', title: 'Lupin’s Tales', seasons: [[1, 6], [2, 6]], year: 2020)
+    end
+
+    it 'treats them as the same name as TMDB’s straight apostrophe, Apple winning' do
+      stub_tmdb_search('lupin', [[129874, "Lupin's Tales"]])
+      stub_tmdb_show(129874, name: "Lupin's Tales", seasons: [1, 2])
+
+      expect(Show.get_series('lupin').map { |row| [row[:collectionName], row[:show_collection_id]] }).to eq [
+        ['Lupin’s Tales, Season 1', 'umc.cmc.tales'], ['Lupin’s Tales, Season 2', 'umc.cmc.tales']
+      ]
+    end
+
+    it 'matches them to a stored show spelled with a straight apostrophe' do
+      Show.create!(title: "Lupin's Tales", year: '2021', show_collection_id: '129874').seasons.create!(season: 1, collectionName: "Lupin's Tales, Season 1", collectionId: 'tmdb1298741')
+
+      expect(Show.get_series('lupin').map { |row| row[:collectionName] }).to eq ["Lupin's Tales, Season 1"]
+    end
+  end
+
   it 'sorts by year, then title, then season' do
     stub_tmdb_search('lupin', [[1, 'Lupin', 2021], [2, 'Lupin the Third', 1971]])
     stub_tmdb_show(1, name: 'Lupin', seasons: [2, 1])
