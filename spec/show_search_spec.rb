@@ -188,6 +188,53 @@ describe 'Show.get_series' do
     expect(rows.map { |row| [row[:collectionName], row[:year]] }).to eq [['The Office, Season 1', '2001'], ['The Office, Season 1', '2005']]
   end
 
+  context 'a show already in the database' do
+    def store_lupin(id, seasons)
+      show = Show.create!(title: 'Lupin', year: '2021', show_collection_id: id)
+      seasons.each { |number| show.seasons.create!(season: number, collectionName: "Lupin, Season #{number}", collectionId: "#{id}-s#{number}") }
+    end
+
+    def sources(rows) = rows.map { |row| [row[:collectionName], row[:id] ? 'db' : row[:show_collection_id]] }
+
+    before { stub_apple_search('lupin', shows: [['umc.cmc.lupin', 'Lupin']]) }
+
+    it 'takes its missing season from TMDB when stored with the TMDB id, and nothing from Apple' do
+      store_lupin('96677', [1, 2])
+      stub_apple_show('umc.cmc.lupin', title: 'Lupin', seasons: [[1, 5], [2, 5], [3, 7]])
+      stub_tmdb_search('lupin', [[96677, 'Lupin']])
+      stub_tmdb_show(96677, name: 'Lupin', seasons: [1, 2, 3])
+
+      expect(sources(Show.get_series('lupin'))).to eq [['Lupin, Season 1', 'db'], ['Lupin, Season 2', 'db'], ['Lupin, Season 3', '96677']]
+    end
+
+    it 'drops a season only the other source has' do
+      store_lupin('96677', [1, 2])
+      stub_apple_show('umc.cmc.lupin', title: 'Lupin', seasons: [[1, 5], [2, 5], [3, 7], [4, 6]])
+      stub_tmdb_search('lupin', [[96677, 'Lupin']])
+      stub_tmdb_show(96677, name: 'Lupin', seasons: [1, 2])
+
+      expect(sources(Show.get_series('lupin'))).to eq [['Lupin, Season 1', 'db'], ['Lupin, Season 2', 'db']]
+    end
+
+    it 'takes its missing season from Apple when stored with the Apple id, and nothing from TMDB' do
+      store_lupin('umc.cmc.lupin', [1])
+      stub_apple_show('umc.cmc.lupin', title: 'Lupin', seasons: [[1, 5], [2, 5]])
+      stub_tmdb_search('lupin', [[96677, 'Lupin']])
+      stub_tmdb_show(96677, name: 'Lupin', seasons: [1, 2, 3])
+
+      expect(sources(Show.get_series('lupin'))).to eq [['Lupin, Season 1', 'db'], ['Lupin, Season 2', 'umc.cmc.lupin']]
+    end
+
+    it 'offers only its own seasons when no source returns its id' do
+      store_lupin('tvdb-lupin', [1])
+      stub_apple_show('umc.cmc.lupin', title: 'Lupin', seasons: [[1, 5], [2, 5], [3, 7]])
+      stub_tmdb_search('lupin', [[96677, 'Lupin']])
+      stub_tmdb_show(96677, name: 'Lupin', seasons: [1, 2, 3])
+
+      expect(sources(Show.get_series('lupin'))).to eq [['Lupin, Season 1', 'db']]
+    end
+  end
+
   it 'sorts by year, then title, then season' do
     stub_tmdb_search('lupin', [[1, 'Lupin', 2021], [2, 'Lupin the Third', 1971]])
     stub_tmdb_show(1, name: 'Lupin', seasons: [2, 1])
@@ -233,7 +280,7 @@ describe 'Show.get_series' do
     end
 
     it 'keeps the database and TMDB entries when Apple fails' do
-      Show.create!(title: 'Lupin', year: '2021', show_collection_id: 'db-lupin').seasons.create!(season: 4, collectionName: 'Lupin, Season 4', collectionId: 'db-lupin-4')
+      Show.create!(title: 'Lupin', year: '2021', show_collection_id: '96677').seasons.create!(season: 4, collectionName: 'Lupin, Season 4', collectionId: 'tmdb966774')
       stub_request(:get, apple).to_return(status: 500, body: 'oops')
 
       rows = Show.get_series('lupin')
