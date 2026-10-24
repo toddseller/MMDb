@@ -2,6 +2,7 @@
 import { on } from '#mmdb/events.js'
 import { request } from '#mmdb/request.js'
 import { fadeIn, fadeOut } from '#mmdb/motion.js'
+import { close as closePanel } from '#mmdb/preview.js'
 
 // The longest drawer transition (.35s) plus slack, for when no transitionend arrives.
 const DRAWER_MS = 450
@@ -137,6 +138,8 @@ export const show = (tile, html) => {
 const togglePoster = async (document, poster) => {
   const tile = /** @type {HTMLElement} */ (poster.parentElement)
   if (isOpen() && current === tile) return close()
+  // An edit search's results update the movie they were searched for, so they can't stay up under another movie.
+  closePanel(document)
   const kind = document.getElementById('movie-list') ? 'movies' : 'shows'
   show(tile, await request(`/users/${tile.id}/${kind}/${poster.id}`))
 }

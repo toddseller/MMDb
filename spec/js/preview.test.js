@@ -251,6 +251,12 @@ test('search and close run the edit form’s search in the panel and close it', 
   assert.ok(shown('#add'))
 })
 
+test('close works on a visitor’s page, which has no add button', () => {
+  el('#add').remove()
+  assert.doesNotThrow(() => close(page.document))
+  assert.ok(!shown('#preview'))
+})
+
 test('window.preview lends only close, for Create New Show', () => {
   assert.deepEqual(Object.keys(page.window.preview), ['close'])
 })

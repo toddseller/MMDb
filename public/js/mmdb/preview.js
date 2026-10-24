@@ -147,7 +147,8 @@ export const close = (document, ms = OPEN_MS) => {
   if (isShown(panel)) slideUp(panel, ms)
   hideArrows(document)
   for (const el of [dismiss, search]) hide(el)
-  add.style.display = ''
+  // A visitor's page has no add button.
+  if (add) add.style.display = ''
 }
 
 /** @param {Document} document @param {HTMLFormElement} form */
