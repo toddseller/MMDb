@@ -81,7 +81,7 @@ test.describe('on the movies page', () => {
     await page.locator('#movie-list img[alt="Edit Target Poster"]').click()
     await page.locator('a[href*="/movies/"][href$="/edit"]').click()
 
-    await page.locator('#update-search:visible').click()
+    await page.locator('#update-search').click()
 
     await expect(panel(page).locator('#update-movie img, #update-movie input[type=image]').first()).toBeVisible()
   })

@@ -16,3 +16,13 @@ export const on = (root, type, selector, handler) => {
     if (target && root.contains(target)) handler(event, target)
   })
 }
+
+/**
+ * A handler for `on(document, 'submit', …)` that keeps the form from navigating and passes it to `handler`.
+ * @param {(document: Document, form: HTMLFormElement) => void} handler
+ * @param {Document} document
+ */
+export const onSubmit = (handler, document) => /** @param {Event} event @param {Element} form */ (event, form) => {
+  event.preventDefault()
+  handler(document, /** @type {HTMLFormElement} */ (form))
+}

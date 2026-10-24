@@ -3,6 +3,7 @@ import { test, beforeEach, afterEach } from 'node:test'
 import assert from 'node:assert/strict'
 import { makePage, stubFetch, json } from './dom.js'
 import { init } from '#mmdb/credits.js'
+import { listQuery, rememberQuery } from '#mmdb/filters.js'
 
 // The collection page with a movie's details open, as users/show.erb and _info.erb render them.
 const PAGE = `
@@ -39,7 +40,7 @@ const settle = async () => { for (let i = 0; i < 5; i++) await Promise.resolve()
 
 beforeEach(() => {
   page = makePage(PAGE)
-  page.window.filterValue = ''
+  rememberQuery('')
   fetched = stubFetch(() => json({ page: '<div class="index-preview" id="7"><p>Amber</p></div>', url: 'https://image.tmdb.org/t/p/w342/ann.jpg' }))
   init(page.document)
 })
@@ -54,7 +55,7 @@ test('clicking a credit searches the collection for it instead of following the 
 
   assert.ok(event.defaultPrevented)
   assert.equal(/** @type {HTMLInputElement} */ (byId('search-movie-title')).value, '')
-  assert.equal(page.window.filterValue, 'Ann Lee')
+  assert.deepEqual(listQuery(page.document), { name: 'Ann Lee' })
   assert.deepEqual(fetched.calls.map((call) => call.url), ['/movies/search?filter=Ann+Lee&id=7'])
 })
 

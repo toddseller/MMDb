@@ -1,6 +1,6 @@
 // @ts-check
-import { on } from '#mmdb/events.js'
-import { request } from '#mmdb/request.js'
+import { on, onSubmit } from '#mmdb/events.js'
+import { request, fields } from '#mmdb/request.js'
 import { fadeIn, fadeOut, slideDown, slideUp } from '#mmdb/motion.js'
 
 const OPEN_MS = 300
@@ -128,7 +128,7 @@ const showResults = (document, html, spread) => {
 let latestSearch = 0
 
 /** @param {Document} document @param {string} url @param {Layout} layout */
-const search = async (document, url, layout) => {
+export const search = async (document, url, layout) => {
   const mine = ++latestSearch
   applyLayout(document, layout)
   loading(document, 'Searching Our Database...', 'flex')
@@ -140,21 +140,14 @@ const search = async (document, url, layout) => {
   }
 }
 
-/** @param {Document} document @param {number} ms */
-const close = (document, ms) => {
+/** @param {Document} document @param {number} [ms] */
+export const close = (document, ms = OPEN_MS) => {
   latestSearch++
   const { panel, dismiss, search, add } = parts(document)
   if (isShown(panel)) slideUp(panel, ms)
   hideArrows(document)
   for (const el of [dismiss, search]) hide(el)
   add.style.display = ''
-}
-
-// The form's own window's FormData, since the constructor rejects forms from another window (as in the tests).
-/** @param {HTMLFormElement} form */
-const fields = (form) => {
-  const { FormData } = /** @type {Window & typeof globalThis} */ (form.ownerDocument.defaultView)
-  return new URLSearchParams(/** @type {any} */ (new FormData(form)))
 }
 
 /** @param {Document} document @param {HTMLFormElement} form */
@@ -207,12 +200,6 @@ const addEpisodes = async (document, form) => {
   showCollection(document, response.page, `${response.show_count} TV Shows \u2014 ${response.episode_count} Episodes`)
 }
 
-/** @param {(document: Document, form: HTMLFormElement) => void} handler @param {Document} document */
-const onSubmit = (handler, document) => /** @param {Event} event @param {Element} form */ (event, form) => {
-  event.preventDefault()
-  handler(document, /** @type {HTMLFormElement} */ (form))
-}
-
 /** @param {Document} document @param {HTMLFormElement} form */
 const searchFrom = (document, form) => {
   const url = `/${form.id === 'movie-search' ? 'movies' : 'shows'}?${fields(form)}`
@@ -229,7 +216,7 @@ const scroll = (document, direction) => {
 
 /**
  * Binds adding to the collection: the add buttons, both searches, the add forms and the panel's controls.
- * Lends the panel to the jQuery edit form's search and Create New Show until they move.
+ * Lends close to the jQuery Create New Show until it moves.
  * @param {Document} document
  */
 export const init = (document) => {
@@ -243,15 +230,12 @@ export const init = (document) => {
   on(document, 'submit', '#create-episode', onSubmit(addEpisodes, document))
   on(document, 'click', '#dismiss', (event) => {
     event.preventDefault()
-    close(document, OPEN_MS)
+    close(document)
   })
   on(document, 'click', '#scroll-left', () => scroll(document, -1))
   on(document, 'click', '#scroll-right', () => scroll(document, 1))
   // scroll doesn't bubble, so it's caught on the way down; the panel itself is replaced when Clear re-renders the page.
   document.addEventListener('scroll', (event) => { if (/** @type {Element} */ (event.target).id === 'preview') updateArrows(document) }, true)
   const window = /** @type {Window} */ (document.defaultView)
-  window.preview = {
-    search: (url) => search(document, url, 'movies'),
-    close: () => close(document, OPEN_MS),
-  }
+  window.preview = { close: () => close(document) }
 }

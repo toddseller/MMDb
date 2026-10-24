@@ -188,12 +188,11 @@ test('clicking the open tile’s poster closes the drawer without a request', ()
   assert.ok(!isOpen())
 })
 
-test('window.drawer lets the jQuery code open and close the drawer and read its tile', () => {
-  page.window.drawer.open(tile('Birch'), 'Birch', true)
+test('window.drawer lends only the open tile, for the season default', () => {
+  show(tile('Birch'), 'Birch')
 
+  assert.deepEqual(Object.keys(page.window.drawer), ['tile'])
   assert.equal(page.window.drawer.tile, tile('Birch'))
-  assert.ok(drawers()[0].classList.contains('open'))
-  page.window.drawer.close(true)
+  close(true)
   assert.equal(page.window.drawer.tile, null)
-  assert.equal(drawers().length, 0)
 })

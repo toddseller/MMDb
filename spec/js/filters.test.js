@@ -2,7 +2,7 @@
 import { test, beforeEach, afterEach, mock } from 'node:test'
 import assert from 'node:assert/strict'
 import { makePage, stubFetch, json, html } from './dom.js'
-import { init } from '#mmdb/filters.js'
+import { init, listQuery, rememberQuery } from '#mmdb/filters.js'
 import { open, isOpen } from '#mmdb/drawer.js'
 
 // The parts of the collection page the filters use, as users/show.erb renders them.
@@ -46,7 +46,7 @@ const titles = () => [...page.document.querySelectorAll('#movie-list p')].map((p
 beforeEach(() => {
   mock.timers.enable({ apis: ['setTimeout'] })
   page = makePage(collection())
-  page.window.filterValue = ''
+  rememberQuery('')
   init(page.document)
 })
 
@@ -69,7 +69,7 @@ test('a title search waits for a 300ms pause and makes one request for the full 
   const footer = /** @type {HTMLElement} */ (page.document.querySelector('.footer'))
   assert.equal(footer.textContent, '1 Movies')
   assert.equal(footer.style.display, '')
-  assert.equal(page.window.filterValue, 'amb')
+  assert.deepEqual(listQuery(page.document), { filter: 'amb' })
   assert.equal(page.window.sessionStorage.getItem('id'), '7')
 })
 
@@ -103,7 +103,7 @@ for (const control of ['#clear-btn input', '#library']) {
   test(`${control} resets the filters, closes the drawer and restores the collection`, async () => {
     answer(() => json({ page: collection(['Amber', 'Birch', 'Cedar']), movie_count: '3' }))
     page.window.sessionStorage.setItem('id', '7')
-    page.window.filterValue = 'amb'
+    rememberQuery('amb')
     page.document.getElementById('unwatched')?.classList.add('active')
     open(/** @type {HTMLElement} */ (page.document.querySelector('.index-preview')), 'Amber details', true)
 
@@ -112,7 +112,7 @@ for (const control of ['#clear-btn input', '#library']) {
 
     assert.equal(fetched.calls[0].url, '/users/7')
     assert.ok(!isOpen())
-    assert.equal(page.window.filterValue, '')
+    assert.deepEqual(listQuery(page.document), { name: '' })
     assert.deepEqual(titles(), ['Amber', 'Birch', 'Cedar'])
     assert.equal(page.document.querySelector('.footer')?.textContent, '3 Movies')
     assert.ok(!page.document.getElementById('unwatched')?.classList.contains('active'))

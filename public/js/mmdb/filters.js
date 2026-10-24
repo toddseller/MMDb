@@ -6,6 +6,20 @@ import { fadeIn } from '#mmdb/motion.js'
 
 const SEARCH_PAUSE_MS = 300
 
+// The text behind the list on screen, so a save or delete can ask the server to redraw that same list.
+let query = ''
+
+/** @param {string} value */
+export const rememberQuery = (value) => { query = value }
+
+/**
+ * What the server needs to redraw the list on screen: a title filter while the search box has text, otherwise a credits name.
+ * @param {Document} document
+ * @returns {{ filter: string } | { name: string }}
+ */
+export const listQuery = (document) =>
+  /** @type {HTMLInputElement | null} */ (document.getElementById('search-movie-title'))?.value ? { filter: query } : { name: query }
+
 /** @param {Document} document */
 const windowOf = (document) => /** @type {Window} */ (document.defaultView)
 
@@ -27,7 +41,7 @@ const showCount = (document, count) => {
 const search = async (document) => {
   const window = windowOf(document)
   const filter = /** @type {HTMLInputElement | null} */ (document.getElementById('search-movie-title'))?.value ?? ''
-  window.filterValue = filter
+  rememberQuery(filter)
   const kind = document.getElementById('movie-list') ? 'movies' : 'shows'
   const id = document.querySelector('.index-preview')?.id || window.sessionStorage.getItem('id') || ''
   if (window.sessionStorage.getItem('id') !== id) window.sessionStorage.setItem('id', id)
@@ -51,7 +65,7 @@ const clear = async (document) => {
   closeDrawer(true)
   document.getElementById('unwatched')?.classList.remove('active')
   document.getElementById('four-k')?.classList.remove('active')
-  window.filterValue = ''
+  rememberQuery('')
   const { page, movie_count: count } = await request(`/users/${window.sessionStorage.getItem('id')}`)
   replaceContents(document, '#user-page', page)
   showCount(document, count)
