@@ -1,7 +1,6 @@
 var lastPos = 0
 var timeoutId = 0
 var filterValue = ''
-var activeItem = $('body')
 
 var bindListeners = function () {
   $('#sign-in-form').on('submit', validate)
@@ -147,30 +146,6 @@ var fourK = function (evenet) {
   })
 }
 
-var filtered = function (array) {
-  return $.each(array, function (i) {
-    modulo = $('#movie-list').length > 0 ? 7 : 6
-    if ((i + 1) % modulo === 0) {
-      $(this).css('margin-right', '0')
-    } else {
-      $(this).css('margin-right', '2em')
-    }
-  })
-}
-
-var filteredWithInfo = function (array) {
-  return $.each(array, function (i) {
-    modulo = $('#movie-list').length > 0 ? 7 : 6
-    if ((i + 1) % modulo === 0) {
-      $(this).css('margin-right', '0')
-      $(this).after('<div class="info"></div>')
-     } else {
-      $(this).css('margin-right', '2em')
-     }
-    $('#movie-list > .index-preview:last').after('<div class="info"></div>')
-  })
- }
-
 var clearFilter = function () {
   var id = window.sessionStorage.id
   var route = '/users/' + id
@@ -183,10 +158,7 @@ var clearFilter = function () {
     $('#profile-name').empty()
   })
   $('#filter-input').trigger('reset')
-  $('.info').remove()
-  $('.pointer').removeClass('notransition').removeClass('active').removeAttr('style')
-  $('.truncate').fadeIn(400, 'linear')
-  $('.lazy').removeClass('notransition').removeClass('active')
+  drawer.close(true)
   $('#unwatched').removeClass('active')
   $('#four-k').removeClass('active')
   filterValue = ''
@@ -447,7 +419,7 @@ var seasonDefault = function (event) {
   })
   request.done(function (response) {
     $('.info-wrapper').empty().append(response.page)
-    $('img.active').attr('src', response.poster)
+    if (drawer.tile) drawer.tile.find('img').attr('src', response.poster)
   })
 }
 
@@ -690,77 +662,125 @@ var closeUpdatePreview = function () {
 
 var first = true
 
+// The longest drawer transition (.35s) plus slack, for when no transitionend arrives.
+var DRAWER_MS = 450
+
+// Runs done once, when el's transition on property ends or, if none runs (reduced motion, older browsers), after DRAWER_MS.
+var afterTransition = function (el, property, done) {
+  var finished = false
+  var onEnd = function (event) {
+    if (event.target === el[0] && event.originalEvent.propertyName === property) finish()
+  }
+  var finish = function () {
+    if (finished) return
+    finished = true
+    el.off('transitionend', onEnd)
+    done()
+  }
+  el.on('transitionend', onEnd)
+  setTimeout(finish, DRAWER_MS)
+}
+
+// A drawer closing above the clicked row pulls the row up as it shrinks; scrolling by the same amount each frame keeps the poster still.
+var holdStill = function (tile, top) {
+  var until = Date.now() + DRAWER_MS
+  var step = function () {
+    var moved = tile[0].getBoundingClientRect().top - top
+    if (moved) window.scrollBy(0, moved)
+    if (Date.now() < until) requestAnimationFrame(step)
+  }
+  requestAnimationFrame(step)
+}
+
+// The one details drawer, opened under the clicked poster's row.
+var drawer = {
+  tile: null,
+  el: null,
+
+  // Filters and updates re-render the list wholesale, which takes an open drawer with it.
+  isOpen: function () {
+    return this.el !== null && $.contains(document.documentElement, this.el[0])
+  },
+
+  // Rows come from where tiles sit, so the drawer lands right at any width and with tiles hidden.
+  rowEnd: function (tile) {
+    var top = tile[0].offsetTop
+    var end = tile
+    tile.nextAll('.index-preview, .index-preview-show').filter(':visible').each(function () {
+      if (this.offsetTop !== top) return false
+      end = $(this)
+    })
+    return end
+  },
+
+  mark: function (tile) {
+    if (this.tile) this.tile.removeClass('open')
+    this.tile = tile.addClass('open')
+  },
+
+  open: function (tile, html, instant) {
+    var el = $('<div class="info"><div class="info-wrapper"></div></div>')
+    el.children().html(html)
+    this.rowEnd(tile).after(el)
+    this.mark(tile)
+    this.el = el
+    $('.footer').fadeOut()
+    if (instant) return el.addClass('open')
+    // Reading the height commits the closed state, so adding .open animates instead of appearing at once.
+    el[0].offsetHeight
+    requestAnimationFrame(function () { el.addClass('open') })
+  },
+
+  close: function (instant) {
+    if (this.tile) this.tile.removeClass('open')
+    var el = this.el
+    this.tile = null
+    this.el = null
+    $('.footer').fadeIn()
+    if (!el) return
+    if (instant) return el.remove()
+    el.removeClass('open')
+    afterTransition(el, 'grid-template-rows', function () { el.remove() })
+  },
+
+  swap: function (tile, html) {
+    var wrapper = this.el.children('.info-wrapper')
+    var from = wrapper[0].offsetHeight
+    wrapper.css('height', from).html(html)
+    var to = wrapper[0].scrollHeight
+    this.mark(tile)
+    if (from === to) return wrapper.css('height', '')
+    wrapper[0].offsetHeight
+    wrapper.css('height', to)
+    afterTransition(wrapper, 'height', function () { wrapper.css('height', '') })
+  },
+
+  show: function (tile, html) {
+    if (!this.isOpen()) {
+      this.tile = null
+      this.el = null
+      return this.open(tile, html)
+    }
+    if (this.rowEnd(tile).is(this.rowEnd(this.tile))) return this.swap(tile, html)
+    var top = tile[0].getBoundingClientRect().top
+    this.close()
+    this.open(tile, html)
+    holdStill(tile, top)
+  }
+}
+
 var getMovieModal = function (event) {
   event.preventDefault()
 
-  var user = $(this).parent().attr('id')
-  var id = $(this).attr('id')
-  var indexPreview = $('#movie-list').length > 0 ? $('.index-preview') : $('.index-preview-show')
-  var route = $('#movie-list').length > 0 ? '/users/' + user + '/movies/' + id : '/users/' + user + '/shows/' + id
-  var pointer = $('#movie-list').length > 0 ? $('.pointer') : $('.show-pointer')
-  var that = $(this).parent('div')
-  var posterArt = $(this).children('img')
-  var title = $(this).siblings('p')
-  var index = $(that).index()
-  var itemsPerRow = $('#movie-list').length > 0 ? 7 : 6
-  var col = (index % itemsPerRow) + 1
-  var endOfRow = indexPreview.eq(index + itemsPerRow - col)
-  if (!endOfRow.length) endOfRow = indexPreview.last()
+  var tile = $(this).parent('div')
+  var kind = $('#movie-list').length > 0 ? 'movies' : 'shows'
+  var route = '/users/' + tile.attr('id') + '/' + kind + '/' + $(this).attr('id')
 
-  if (id != activeItem) {
-    var request = $.ajax({
-      url: route
-    })
-    request.done(function (response) {
-      $('.footer').fadeOut()
-      var c = $('#movie-list').length > 0 ? $('#movie-list > div') : $('#show-list > div')
-      if (c.hasClass('info')) {
-        activeItem = id
-        $('.info').remove()
-        $('img.active').removeClass('active')
-        switchInfoDiv(posterArt, title)
-        if ($('#show-list').length > 0) {
-          endOfRow.after('<div class="info" style="margin-top: 1px; max-height: 100%;"></div>')
-        } else {
-          endOfRow.after('<div class="info"></div>')
-        }
-        $(that).nextAll('div.info').toggleClass('active').append('<div class="info-wrapper">' + response + '</div>')
-        $('#movie-list').length > 0 ? $(that).find('.pointer').addClass('notransition').addClass('active') : $(that).find('.show-pointer').addClass('notransition').addClass('active')
-        $(that).find('.new-label').addClass('active').addClass('notransition')
-        $(that).find('.new-text').addClass('active').addClass('notransition')
-      } else {
-        activeItem = id
-        var filteredList = c.filter('.index-preview')
-        filtered(filteredList)
-        if ($('#show-list').length > 0) {
-          endOfRow.after('<div class="info" style="margin-top: 1px; max-height: 100%;"></div>')
-        } else {
-          endOfRow.after('<div class="info"></div>')
-        }
-        $(posterArt).toggleClass('active')
-        if ($('#movie-list').length > 0) {
-          $(title).hide()
-        }
-        $('#movie-list').length > 0 ? $(that).find('.pointer').toggleClass('active') : $(that).find('.show-pointer').toggleClass('active')
-        $(that).find('.new-label').toggleClass('active')
-        $(that).find('.new-text').toggleClass('active')
-        $(that).nextAll('div.info').first().toggleClass('active').append('<div class="info-wrapper">' + response + '</div>')
-      }
-    })
-  } else {
-    var removeInfoClass = function () {
-      $('.info').remove()
-    }
-    pointer.removeClass('notransition').removeClass('active').removeAttr('style')
-    $('.info').removeClass('active')
-    $('.truncate').fadeIn(400, 'linear')
-    $('.new-label').removeClass('active').removeClass('notransition')
-    $('.new-text').removeClass('active').removeClass('notransition')
-    $('img.active').removeClass('notransition').removeClass('active')
-    setTimeout(removeInfoClass, 1000)
-    activeItem = $('body')
-    $('.footer').fadeIn()
-  }
+  if (drawer.isOpen() && drawer.tile.is(tile)) return drawer.close()
+
+  $.ajax({ url: route }).done(function (response) {
+    drawer.show(tile, response)
+  })
 }
 
 var expandPlot = function () {
@@ -769,19 +789,6 @@ var expandPlot = function () {
     $(this).text('less')
   } else {
     $(this).text('more')
-  }
-}
-
-var switchInfoDiv = function (posterArt, title) {
-  var pointer = $('#movie-list').length > 0 ? $('.pointer') : $('.show-pointer')
-  $('.truncate').fadeIn(400, 'linear')
-  $('.lazy').removeClass('active').removeClass('notransition')
-  pointer.removeClass('notransition').removeClass('active')
-  $('.new-label').removeClass('active').removeClass('notransition')
-  $('.new-text').removeClass('active').removeClass('notransition')
-  posterArt.toggleClass('active').addClass('notransition')
-  if ($('#movie-list').length > 0) {
-    title.hide()
   }
 }
 
@@ -809,17 +816,7 @@ var ratingSubmit = function (event) {
 
 var closeInfo = function (event) {
   event.preventDefault()
-  var removeInfoClass = function () {
-    $('.info').remove()
-  }
-  var pointer = $('#movie-list').length > 0 ? $('.pointer') : $('.show-pointer')
-  pointer.removeClass('notransition').removeClass('active').removeAttr('style')
-  $('.info').removeClass('active')
-  $('.truncate').fadeIn(400, 'linear')
-  $('.new-label').removeClass('active')
-  $('.new-text').removeClass('active')
-  $('.lazy').removeClass('notransition').removeClass('active')
-  setTimeout(removeInfoClass, 0)
+  drawer.close()
 }
 
 var activateModal = function (event) {
@@ -999,31 +996,9 @@ var submitPreviewUpdate = function(event) {
 }
 
 var displayUpdatedMovie = function (response) {
+  drawer.close(true)
   $('#movie-list').empty().append(response.query)
-  var that = $('#' + response.id).parent('div')
-  var posterArt = $('#' + response.id).children('img')
-  var title = $('#' + response.id).siblings('p')
-  var index = $(that).index()
-  var itemsPerRow = 7
-  var col = (index % itemsPerRow) + 1
-  var endOfRow = $('.index-preview').eq(index + itemsPerRow - col)
-  if (!endOfRow.length) endOfRow = $('.index-preview').last()
-  if ($('.index-preview:hidden').length !== 0) {
-  var filteredList = $('#movie-list > div').filter('.index-preview:visible')
-    filteredWithInfo(filteredList)
-  } else {
-    var filteredList = $('#movie-list > div').filter('.index-preview')
-    filtered(filteredList)
-    endOfRow.after('<div class="info"></div>')
-  }
-  $(posterArt).toggleClass('active').addClass('notransition')
-  if ($('#movie-list').length > 0) {
-    title.hide()
-  }
-  $(that).find('.pointer').toggleClass('active').addClass('notransition')
-  $(that).find('.new-label').toggleClass('active').addClass('notransition')
-  $(that).find('.new-text').toggleClass('active').addClass('notransition')
-  $(that).nextAll('div.info').first().toggleClass('active').addClass('notransition').append('<div class="info-wrapper">' + response.page + '</div>')
+  drawer.open($('#' + response.id).parent('div'), response.page, true)
 }
 
 var deleteMovie = function (event) {
@@ -1039,17 +1014,7 @@ var deleteMovie = function (event) {
     data: data,
     success: listMovie
   })
-
-  var removePointerClass = function () {
-    var pointer = $('#movie-list').length > 0 ? $('.pointer') : $('.show-pointer')
-    pointer.removeClass('active').removeAttr('style')
-  }
-  $('.info').removeClass('active')
-  $('.truncate').show()
-  $('.lazy').removeClass('active')
-  pointer.css('border-top', '#fff').css('border-left', '#fff')
-  setTimeout(removePointerClass, 100)
-
+  drawer.close()
 }
 
 var getUser = function (event) {
