@@ -46,3 +46,21 @@ test('setting the default season opens the show on it', async ({ page }) => {
   await expect(page.getByText('Harbor Lights 2x1', { exact: true })).toBeVisible()
   await expect(page.getByText('Harbor Lights 1x1', { exact: true })).toHaveCount(0)
 })
+
+test('a long episode plot expands and collapses', async ({ page }) => {
+  await showPoster(page).click()
+  const plot = page.locator('.plot-truncate', { hasText: 'lighthouse dark' })
+  const toggle = page.locator('.expand-plot').first()
+  await expect(toggle).toHaveText('more')
+  const truncated = (await plot.boundingBox()).height
+  // The toggle's row tucks under the plot and its word sits at the right end, which is the only part a user can click.
+  const word = async () => { const { width, height } = await toggle.boundingBox(); return { position: { x: width - 5, y: height / 2 } } }
+
+  await toggle.click(await word())
+  await expect(toggle).toHaveText('less')
+  await expect.poll(async () => (await plot.boundingBox()).height).toBeGreaterThan(truncated)
+
+  await toggle.click(await word())
+  await expect(toggle).toHaveText('more')
+  await expect.poll(async () => (await plot.boundingBox()).height).toBe(truncated)
+})

@@ -1,5 +1,5 @@
 var lastPos = 0
-// Also written by public/js/mmdb/filters.js; stays until the jQuery code that reads it moves to modules.
+// Also written by public/js/mmdb/filters.js and credits.js; stays until the jQuery code that reads it moves to modules.
 var filterValue = ''
 
 var bindListeners = function () {
@@ -31,9 +31,6 @@ var dynamicListener = function () {
   $('#user-page').on('submit', '#create-show', showToDB)
   $('#user-page').on('submit', '#create-episode', episodeToDB)
   $('#user-page').on('click', '#more', showYear)
-  $('#user-page').on('click', '.movie-modal', getMovieModal)
-  $('#user-page').on('click', '.show-modal', getMovieModal)
-  $('#user-page').on('click', '.close', closeInfo)
   $('#user-page').on('click', '.movie-edit', editMovie)
   $('#user-page').on('click', '.show-edit', editShow)
   $('#user-page').on('click', '#edit-button', submitUpdate)
@@ -41,10 +38,7 @@ var dynamicListener = function () {
   $('#user-page').on('click', '#update-search', updateDatabase)
   $('#user-page').on('click', '#update-movie', submitPreviewUpdate)
   $('#user-page').on('click', '.rating-input', ratingSubmit)
-  $('#user-page').on('click', '.description-details a', searchByName)
-  $('#user-page').on('click', '.studio a', searchByName)
   $('#user-page').on('change', '.hd input:checkbox', toggleHD)
-  $('#user-page').on('click', '.expand-plot', expandPlot)
   $('#user-page').on('click', '.season-submit', seasonDefault)
   $('#logIn').on('click', '#update-submit', userUpdateSubmit)
   $('#logIn').on('keyup', '#confirm', testPassword)
@@ -344,7 +338,7 @@ var seasonDefault = function (event) {
   })
   request.done(function (response) {
     $('.info-wrapper').empty().append(response.page)
-    if (drawer.tile) drawer.tile.find('img').attr('src', response.poster)
+    if (window.drawer.tile) $(window.drawer.tile).find('img').attr('src', response.poster)
   })
 }
 
@@ -459,34 +453,6 @@ var episodeToDB = function (event) {
   $.post(route, movie, listShow)
 }
 
-var searchByName = function (event) {
-  event.preventDefault()
-
-  $('#filter-input').trigger('reset')
-
-  filterValue = $(this).text()
-  var id = $('.index-preview').length > 0 ? $('.index-preview').attr('id') : window.sessionStorage.id
-  var data = $.param({filter:filterValue, id:id})
-  var route = '/movies/search'
-
-  var request = $.ajax({
-    url: route,
-    data: data
-  })
-  request.done(function (response) {
-    if (response.url === "no-image") {
-      $('#profile-image').hide()
-      $('#profile-name').css({'margin-top':'100px', 'left':'0','text-align':'center'})
-    } else {
-      $('#profile-image').attr('src',response.url).show()
-      $('#profile-name').attr('style','')
-    }
-    $('#profile-name').text(filterValue)
-    $('#profile-wrapper').addClass('active')
-    $('#movie-list').empty().append(response.page)
-  })
-}
-
 var listMovie = function (response) {
   if (response.status === 'true') {
     $('#preview').slideUp(500, 'linear')
@@ -585,136 +551,6 @@ var closeUpdatePreview = function () {
 
 var first = true
 
-// The longest drawer transition (.35s) plus slack, for when no transitionend arrives.
-var DRAWER_MS = 450
-
-// Runs done once, when el's transition on property ends or, if none runs (reduced motion, older browsers), after DRAWER_MS.
-var afterTransition = function (el, property, done) {
-  var finished = false
-  var onEnd = function (event) {
-    if (event.target === el[0] && event.originalEvent.propertyName === property) finish()
-  }
-  var finish = function () {
-    if (finished) return
-    finished = true
-    el.off('transitionend', onEnd)
-    done()
-  }
-  el.on('transitionend', onEnd)
-  setTimeout(finish, DRAWER_MS)
-}
-
-// A drawer closing above the clicked row pulls the row up as it shrinks; scrolling by the same amount each frame keeps the poster still.
-var holdStill = function (tile, top) {
-  var until = Date.now() + DRAWER_MS
-  var step = function () {
-    var moved = tile[0].getBoundingClientRect().top - top
-    if (moved) window.scrollBy(0, moved)
-    if (Date.now() < until) requestAnimationFrame(step)
-  }
-  requestAnimationFrame(step)
-}
-
-// The one details drawer, opened under the clicked poster's row.
-var drawer = {
-  tile: null,
-  el: null,
-
-  // Filters and updates re-render the list wholesale, which takes an open drawer with it.
-  isOpen: function () {
-    return this.el !== null && $.contains(document.documentElement, this.el[0])
-  },
-
-  // Rows come from where tiles sit, so the drawer lands right at any width and with tiles hidden.
-  rowEnd: function (tile) {
-    var top = tile[0].offsetTop
-    var end = tile
-    tile.nextAll('.index-preview, .index-preview-show').filter(':visible').each(function () {
-      if (this.offsetTop !== top) return false
-      end = $(this)
-    })
-    return end
-  },
-
-  mark: function (tile) {
-    if (this.tile) this.tile.removeClass('open')
-    this.tile = tile.addClass('open')
-  },
-
-  open: function (tile, html, instant) {
-    var el = $('<div class="info"><div class="info-wrapper"></div></div>')
-    el.children().html(html)
-    this.rowEnd(tile).after(el)
-    this.mark(tile)
-    this.el = el
-    $('.footer').fadeOut()
-    if (instant) return el.addClass('open')
-    // Reading the height commits the closed state, so adding .open animates instead of appearing at once.
-    el[0].offsetHeight
-    requestAnimationFrame(function () { el.addClass('open') })
-  },
-
-  close: function (instant) {
-    if (this.tile) this.tile.removeClass('open')
-    var el = this.el
-    this.tile = null
-    this.el = null
-    $('.footer').fadeIn()
-    if (!el) return
-    if (instant) return el.remove()
-    el.removeClass('open')
-    afterTransition(el, 'grid-template-rows', function () { el.remove() })
-  },
-
-  swap: function (tile, html) {
-    var wrapper = this.el.children('.info-wrapper')
-    var from = wrapper[0].offsetHeight
-    wrapper.css('height', from).html(html)
-    var to = wrapper[0].scrollHeight
-    this.mark(tile)
-    if (from === to) return wrapper.css('height', '')
-    wrapper[0].offsetHeight
-    wrapper.css('height', to)
-    afterTransition(wrapper, 'height', function () { wrapper.css('height', '') })
-  },
-
-  show: function (tile, html) {
-    if (!this.isOpen()) {
-      this.tile = null
-      this.el = null
-      return this.open(tile, html)
-    }
-    if (this.rowEnd(tile).is(this.rowEnd(this.tile))) return this.swap(tile, html)
-    var top = tile[0].getBoundingClientRect().top
-    this.close()
-    this.open(tile, html)
-    holdStill(tile, top)
-  }
-}
-
-var getMovieModal = function (event) {
-  event.preventDefault()
-
-  var tile = $(this).parent('div')
-  var kind = $('#movie-list').length > 0 ? 'movies' : 'shows'
-  var route = '/users/' + tile.attr('id') + '/' + kind + '/' + $(this).attr('id')
-
-  if (drawer.isOpen() && drawer.tile.is(tile)) return drawer.close()
-
-  $.ajax({ url: route }).done(function (response) {
-    drawer.show(tile, response)
-  })
-}
-
-var expandPlot = function () {
-  $(this).prev('p').toggleClass('active')
-  if ($(this).prev('p').hasClass('active')) {
-    $(this).text('less')
-  } else {
-    $(this).text('more')
-  }
-}
-
 var ratingSubmit = function (event) {
   event.preventDefault()
 
@@ -735,11 +571,6 @@ var ratingSubmit = function (event) {
   request.done(function (response) {
     $('#ratings-container').html(response)
   })
-}
-
-var closeInfo = function (event) {
-  event.preventDefault()
-  drawer.close()
 }
 
 var activateModal = function (event) {
@@ -919,9 +750,9 @@ var submitPreviewUpdate = function(event) {
 }
 
 var displayUpdatedMovie = function (response) {
-  drawer.close(true)
+  window.drawer.close(true)
   $('#movie-list').empty().append(response.query)
-  drawer.open($('#' + response.id).parent('div'), response.page, true)
+  window.drawer.open($('#' + response.id).parent('div')[0], response.page, true)
 }
 
 var deleteMovie = function (event) {
@@ -937,7 +768,7 @@ var deleteMovie = function (event) {
     data: data,
     success: listMovie
   })
-  drawer.close()
+  window.drawer.close()
 }
 
 var getUser = function (event) {

@@ -1,6 +1,8 @@
 // @ts-check
 import { on } from '#mmdb/events.js'
 import { request } from '#mmdb/request.js'
+import { close as closeDrawer } from '#mmdb/drawer.js'
+import { fadeIn } from '#mmdb/motion.js'
 
 const SEARCH_PAUSE_MS = 300
 
@@ -18,7 +20,7 @@ const showCount = (document, count) => {
   const footer = /** @type {HTMLElement | null} */ (document.querySelector('.footer'))
   if (!footer) return
   footer.textContent = `${count} Movies`
-  footer.style.display = ''
+  fadeIn(footer)
 }
 
 /** @param {Document} document */
@@ -46,7 +48,7 @@ const clear = async (document) => {
   const window = windowOf(document)
   const form = /** @type {HTMLFormElement | null} */ (document.getElementById('filter-input'))
   form?.reset()
-  window.drawer.close(true)
+  closeDrawer(true)
   document.getElementById('unwatched')?.classList.remove('active')
   document.getElementById('four-k')?.classList.remove('active')
   window.filterValue = ''
