@@ -64,3 +64,29 @@ export const stubAnimate = (el) => {
   el.getAnimations = /** @type {any} */ (() => [...running])
   return animations
 }
+
+/**
+ * Gives a page's dialogs the showModal, close and getAnimations that jsdom lacks. As in browsers, closing an open
+ * dialog fires close, and closing a closed one does nothing. Every dialog reports the animations in the returned list
+ * as its own; other elements report none unless a test gives one its own getAnimations. As in browsers, `{ subtree: true }`
+ * adds the descendants' and is needed for a pseudo-element's, such as `::backdrop`.
+ * @param {Window & typeof globalThis} window
+ * @returns {Animation[]} what a test pushes here is running on every dialog
+ */
+export const stubDialogs = (window) => {
+  /** @type {Animation[]} */
+  const running = []
+  const dialog = window.HTMLDialogElement.prototype
+  dialog.showModal = function () { this.open = true }
+  dialog.close = function () {
+    if (!this.open) return
+    this.open = false
+    this.dispatchEvent(new window.Event('close'))
+  }
+  window.Element.prototype.getAnimations = () => []
+  dialog.getAnimations = function (options) {
+    if (!options?.subtree) return running.filter((animation) => !(/** @type {KeyframeEffect | null} */ (animation.effect))?.pseudoElement)
+    return [...running, ...[...this.querySelectorAll('*')].flatMap((element) => element.getAnimations())]
+  }
+  return running
+}

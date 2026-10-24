@@ -1,7 +1,7 @@
 // @ts-check
 import { on, onSubmit } from '#mmdb/events.js'
 import { request, fields } from '#mmdb/request.js'
-import { modal, onModal } from '#mmdb/bootstrap.js'
+import { open, close } from '#mmdb/dialog.js'
 import { closeMenu } from '#mmdb/navigation.js'
 
 const CHECK_DELAY = 1500
@@ -64,7 +64,7 @@ const save = async (document, form, saved) => {
     const navbar = /** @type {HTMLElement} */ (document.querySelector('.navbar-text'))
     saved.theme = theme(document)?.getAttribute('href') ?? undefined
     navbar.textContent = `Signed in as ${response.name}`
-    return modal(document, '#logIn', 'hide')
+    return close(document, 'logIn')
   }
   const dialog = settings(document)
   show(dialog, '.login-errors', true)
@@ -102,6 +102,7 @@ export const init = (document, go = (url) => /** @type {Window} */ (document.def
   /** @type {ReturnType<typeof setTimeout> | undefined} */
   let registrationCheck
 
+  on(document, 'click', '#open-sign-in', () => open(document, 'logIn'))
   on(document, 'submit', '#sign-in-form', onSubmit((document, form) => signIn(document, form, go), document))
   on(document, 'click', '#logout', async (event, link) => {
     event.preventDefault()
@@ -112,7 +113,7 @@ export const init = (document, go = (url) => /** @type {Window} */ (document.def
     event.preventDefault()
     const content = /** @type {HTMLElement} */ (settings(document).querySelector('.modal-content'))
     content.innerHTML = await request(/** @type {string} */ (link.getAttribute('href')))
-    modal(document, '#logIn', 'show')
+    open(document, 'logIn')
     closeMenu(document)
   })
   on(document, 'change', '#logIn input[name="current"]', () => currentChanged(document))
@@ -127,9 +128,11 @@ export const init = (document, go = (url) => /** @type {Window} */ (document.def
     registrationCheck = setTimeout(() => checkRegistration(document), CHECK_DELAY)
   })
 
-  onModal(document, '.modal', 'shown.bs.modal', (dialog) => /** @type {HTMLElement | null} */ (dialog.querySelector('[autofocus]'))?.focus())
-  onModal(document, '#logIn', 'hidden.bs.modal', (dialog) => {
-    /** @type {HTMLFormElement | null} */ (dialog.querySelector('#sign-in-form'))?.reset()
+  // close fires however the dialog was closed, Escape included, and only once its fade-out has run.
+  settings(document)?.addEventListener('close', () => {
+    const dialog = settings(document)
+    const form = /** @type {HTMLFormElement | null} */ (dialog.querySelector('#sign-in-form'))
+    form?.reset()
     show(dialog, '.login-errors', false)
     const link = theme(document)
     if (link && saved.theme) link.setAttribute('href', saved.theme)

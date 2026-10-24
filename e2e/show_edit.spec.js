@@ -90,6 +90,29 @@ test('a failed save keeps the dialog open and says so', async ({ page }) => {
   await expect(field(page, 'episode[plot]')).toHaveValue('Kept as typed.')
 })
 
+test('Enter in a field saves and closes like OK', async ({ page }) => {
+  await openDialog(page)
+  await field(page, 'episode[plot]').fill('Saved by Enter.')
+  const url = page.url()
+
+  await field(page, 'episode[tv_episode]').press('Enter')
+
+  await closed(page)
+  expect(page.url()).toBe(url)
+  await page.locator('.info a[href$="/edit"]').click()
+  await expect(field(page, 'episode[plot]')).toHaveValue('Saved by Enter.')
+})
+
+test('a failed save by Enter keeps the dialog open and says so', async ({ page }) => {
+  await fail(page, 'PUT')
+  await openDialog(page)
+
+  await field(page, 'episode[tv_episode]').press('Enter')
+
+  await expect(dialog(page).getByRole('alert')).toHaveText("Couldn't save Tide Tables. Try again.")
+  await expect(dialog(page)).toBeVisible()
+})
+
 test('the arrows save, then move between episodes', async ({ page }) => {
   await openDialog(page)
   const [previous, next] = [dialog(page).locator('.edit-next').first(), dialog(page).locator('.edit-next').last()]
@@ -200,6 +223,19 @@ test.describe('Create New Show', () => {
     await closed(page)
     await page.locator('#show-list img[alt="Handmade Poster"]').click()
     await expect(page.locator('.info #counts')).toHaveText('1 season, 1 episode')
+  })
+
+  test('Enter adds the show with its titled episode', async ({ page }) => {
+    await searchShows(page, { status: 500, body: 'error' })
+    await page.getByRole('button', { name: 'Create New Show' }).click()
+    await create(page)
+    await episode(page, 1)
+
+    await field(page, 'episode[tv_episode]').press('Enter')
+
+    await closed(page)
+    await page.locator('#show-list img[alt="Handmade Poster"]').click()
+    await expect(page.locator('.info').getByText('Handmade 1x1', { exact: true })).toBeVisible()
   })
 
   test('a season with no episodes offers it', async ({ page }) => {

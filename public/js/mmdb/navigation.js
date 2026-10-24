@@ -1,7 +1,7 @@
 // @ts-check
 import { on } from '#mmdb/events.js'
 import { request } from '#mmdb/request.js'
-import { modal } from '#mmdb/bootstrap.js'
+import { open } from '#mmdb/dialog.js'
 
 const TRIANGLE = '#user-profile .glyphicon-triangle-right'
 
@@ -34,7 +34,7 @@ const switchCollection = async (document, link) => {
 const previewMovie = async (document, poster) => {
   const content = /** @type {HTMLElement} */ (document.querySelector('#movie .modal-content'))
   content.innerHTML = await request(/** @type {string} */ (poster.querySelector('a')?.getAttribute('href')))
-  modal(document, '#movie', 'show')
+  open(document, 'movie')
 }
 
 /** @param {Document} document */
