@@ -39,7 +39,7 @@ beforeEach(() => {
   mock.timers.enable({ apis: ['setTimeout', 'Date'] })
   const tiles = ROWS.flatMap((row) => row.map((title) =>
     `<div class="index-preview" id="7" data-title="${title}"><a class="movie-modal" id="${title.length}${title}"><img></a><p>${title}</p></div>`))
-  page = makePage(`<div id="user-page"><div id="movie-list">${tiles.join('')}</div><footer><div class="footer">6 Movies</div></footer></div>`)
+  page = makePage(`<div id="user-page"><div id="search"></div><div id="preview"></div><a id="dismiss"></a><div id="scroll-left"></div><div id="scroll-right"></div><div id="movie-list">${tiles.join('')}</div><footer><div class="footer">6 Movies</div></footer></div>`)
   ROWS.forEach((row, index) => row.forEach((title) => place(tile(title), { top: index * 300 })))
   frames = []
   page.window.requestAnimationFrame = (frame) => { frames.push(() => frame(0)); return frames.length }

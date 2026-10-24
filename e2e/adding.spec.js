@@ -85,6 +85,31 @@ test.describe('on the movies page', () => {
 
     await expect(panel(page).locator('#update-movie img, #update-movie input[type=image]').first()).toBeVisible()
   })
+
+  test('opening a poster closes the add search’s results', async ({ page }) => {
+    await searchMovies(page, json(recorded('movie_search')))
+    await expect(page.getByRole('button', { name: 'Nova Drift Poster' })).toBeVisible()
+
+    await page.locator('#movie-list img[alt="Birch Poster"]').click()
+
+    await expect(page.getByText('Birch is a seeded movie.')).toBeVisible()
+    await expect(panel(page)).toBeHidden()
+    await expect(page.getByRole('button', { name: 'Add Movie' })).toBeVisible()
+  })
+
+  // The results update the movie they were searched for, so they mustn't outlive its drawer.
+  test('opening another poster closes the edit search’s results', async ({ page }) => {
+    await page.route('**/movies/update?*', (route) => route.fulfill(json(recorded('movie_update_search'))))
+    await page.locator('#movie-list img[alt="Edit Target Poster"]').click()
+    await page.locator('a[href*="/movies/"][href$="/edit"]').click()
+    await page.locator('#update-search').click()
+    await expect(panel(page).locator('#update-movie img, #update-movie input[type=image]').first()).toBeVisible()
+
+    await page.locator('#movie-list img[alt="Birch Poster"]').click()
+
+    await expect(page.getByText('Birch is a seeded movie.')).toBeVisible()
+    await expect(panel(page)).toBeHidden()
+  })
 })
 
 test.describe('on the shows page', () => {
