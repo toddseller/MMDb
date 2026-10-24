@@ -17,7 +17,7 @@ A search SHALL return one entry per season from the matching database shows, App
 - **THEN** the result is the same as when Apple answers first
 
 ### Requirement: The same season means the same name and nearly the same year
-Two entries SHALL count as the same season only when they share the "Title, Season N" collection name and their years are at most one apart. Same-named shows further apart in years SHALL all keep their seasons, and a show that Apple and TMDB date a year apart SHALL stay one show.
+Two entries SHALL count as the same season only when they share the "Title, Season N" collection name and their years are at most one apart. Names SHALL match ignoring case and treating curly single quotes (’ and ‘) as a straight apostrophe ('). The same rule SHALL decide when an entry is the same show as one in the database. Same-named shows further apart in years SHALL all keep their seasons, and a show that Apple and TMDB date a year apart SHALL stay one show.
 
 #### Scenario: Same-named shows from different years are both kept
 - **WHEN** TMDB returns the UK "The Office" (2001) and the US "The Office" (2005)
@@ -30,6 +30,14 @@ Two entries SHALL count as the same season only when they share the "Title, Seas
 #### Scenario: Same name and year is still one season
 - **WHEN** TMDB returns two shows named "The Office" that both started in 2005
 - **THEN** each "The Office, Season N" appears once, from the show TMDB listed first, even if the second show's details arrive first
+
+#### Scenario: Curly and straight apostrophes are the same name
+- **WHEN** Apple returns "Lupin’s Tales" (2020) seasons 1 and 2 and TMDB returns "Lupin's Tales" (2021) seasons 1 and 2
+- **THEN** "Lupin’s Tales, Season 1" and "Season 2" each appear once, from Apple, with Apple's spelling
+
+#### Scenario: Apostrophe style does not hide a show in the database
+- **WHEN** the database has "Lupin's Tales" (2021) with TMDB id 129874 and season 1, and Apple returns "Lupin’s Tales" (2020) seasons 1 and 2
+- **THEN** the result is the database's season 1 and no Apple entries
 
 ### Requirement: Apple matches partial titles, ranked and capped
 Apple TV SHALL contribute shows whose title contains the search term, ignoring case. It SHALL fetch at most 10 shows per search, ranked with exact title matches first, then titles starting with the term, then titles containing it, keeping Apple's order within each rank. Shows whose title does not contain the term SHALL be ignored.

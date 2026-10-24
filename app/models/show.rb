@@ -42,10 +42,10 @@ class Show < ActiveRecord::Base
     series = db_rows || []
     series_response, tmdb_response = [series_response, tmdb_response].map { |rows| (rows || []).select { |s| from_stored_source?(series, s) } }
     (series_response || []).each do |s|
-      series << s if series.all? {|el| el[:collectionName].downcase != s[:collectionName].downcase || !same_year?(el[:year], s[:year]) || el[:show_collection_id] != s[:show_collection_id] && is_number?(s[:season])}
+      series << s if series.all? {|el| !same_name?(el[:collectionName], s[:collectionName]) || !same_year?(el[:year], s[:year]) || el[:show_collection_id] != s[:show_collection_id] && is_number?(s[:season])}
     end
     (tmdb_response || []).each do |s|
-      series << s if series.all? {|el| el[:collectionName].downcase != s[:collectionName].downcase || !same_year?(el[:year], s[:year])}
+      series << s if series.all? {|el| !same_name?(el[:collectionName], s[:collectionName]) || !same_year?(el[:year], s[:year])}
     end
     series.sort {|a, b| [a[:year], a[:title], a[:season].to_i] <=> [b[:year], b[:title], b[:season].to_i]}
   end
@@ -55,9 +55,14 @@ class Show < ActiveRecord::Base
     (a.to_i - b.to_i).abs <= 1
   end
 
+  # Apple spells some titles with a curly apostrophe where TMDB uses a straight one (Lupin’s Tales).
+  def self.same_name?(a, b)
+    a.downcase.tr('‘’', "''") == b.downcase.tr('‘’', "''")
+  end
+
   # Adding a season finds its show by show_collection_id, so a season of a stored show under another id would create a second copy of the show.
   def self.from_stored_source?(db_rows, s)
-    stored = db_rows.select { |el| el[:title].downcase == s[:title].downcase && same_year?(el[:year], s[:year]) }
+    stored = db_rows.select { |el| same_name?(el[:title], s[:title]) && same_year?(el[:year], s[:year]) }
     stored.empty? || stored.any? { |el| el[:show_collection_id] == s[:show_collection_id] } && stored.none? { |el| el[:season].to_i == s[:season].to_i }
   end
 
