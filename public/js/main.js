@@ -3,7 +3,9 @@
 import { init as initCredits } from '#mmdb/credits.js'
 import { init as initDrawer } from '#mmdb/drawer.js'
 import { init as initFilters } from '#mmdb/filters.js'
+import { init as initPreview } from '#mmdb/preview.js'
 
 initCredits(document)
 initDrawer(document)
 initFilters(document)
+initPreview(document)

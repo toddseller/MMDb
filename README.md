@@ -715,7 +715,7 @@ dropdb MMDb_test && createdb MMDb_test
 
 ### Browser tests
 
-Playwright drives a real Chromium through the major flows: the movie details drawer, searching by a credit or studio, the filters, adding a movie, editing and rating, shows (adding an episode, the default season, expanding an episode plot), the modals, tabs and theme switch, artwork upload, and deleting a movie. They check what a user sees, so they keep passing when the front-end JavaScript is rewritten. They run in CI after the RSpec suite, in the same required check.
+Playwright drives a real Chromium through the major flows: the movie details drawer, searching by a credit or studio, the filters, adding a movie (the search panel, its arrows and dismiss, a failed search, a title with markup), editing and rating (including the edit form's search), shows (adding an episode or a whole season, a failed search, the default season, expanding an episode plot), the modals, tabs and theme switch, artwork upload, and deleting a movie. They check what a user sees, so they keep passing when the front-end JavaScript is rewritten. They run in CI after the RSpec suite, in the same required check.
 
 ```bash
 npm ci                              # once; installs Playwright
