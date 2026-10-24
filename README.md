@@ -569,17 +569,18 @@ chmod 600 .env
 
 ## Deployment
 
-### Production deploys (tag and push)
+### Production deploys (release a version tag)
 
-mmdb.online runs on a server that is only reachable from the local network. Pushing a version tag deploys it: the `Deploy` workflow (`.github/workflows/deploy.yml`) checks that the tagged commit is on `master` and passed the `test` check, then connects through the `mmdb-tunnel` Cloudflare tunnel and runs `bin/deploy` on the server. That script fast-forwards the server's `master` to the tag, restarts the app (or rebuilds it when `Gemfile`, `Gemfile.lock`, a `Dockerfile` or a compose file changed), and checks that https://mmdb.online/ answers 200.
+mmdb.online runs on a server that is only reachable from the local network. Creating a version tag deploys it: the `Deploy` workflow (`.github/workflows/deploy.yml`) checks that the tagged commit is on `master` and passed the `test` check, then connects through the `mmdb-tunnel` Cloudflare tunnel and runs `bin/deploy` on the server. That script fast-forwards the server's `master` to the tag, restarts the app (or rebuilds it when `Gemfile`, `Gemfile.lock`, a `Dockerfile` or a compose file changed), and checks that https://mmdb.online/ answers 200.
 
-**Deploy** the latest `master`:
+**Deploy** the latest `master` by publishing a release on GitHub:
 
-```bash
-git switch master && git pull --ff-only
-git tag v2026.10.24 && git push origin v2026.10.24   # a second deploy that day: v2026.10.24.2
-gh run watch                                         # or follow it in the Actions tab
-```
+1. Open Releases, then Draft a new release.
+2. Under Choose a tag, type a new tag such as `v2026.10.24` (a second deploy that day: `v2026.10.24.2`) and pick Create new tag on publish, with target `master`.
+3. Add a title and click Publish release.
+4. Follow the `Deploy` run in the Actions tab, or with `gh run watch`.
+
+Use the release page rather than `git push origin <tag>`: the `Version tags` ruleset rejects a pushed tag with "Cannot create ref due to creations being restricted", even from your account, while the release page applies your bypass. Publish in one go: if the tag gets created, deleted and created again (for example by discarding a release and starting over), each creation starts its own `Deploy` run. The extra run is harmless, a redeploy of the same commit.
 
 **Redeploy** a tag the server is already on (for example after a failed health check): re-run that tag's `Deploy` run from the Actions tab. The script restarts the app and checks it again without moving the checkout.
 
@@ -609,20 +610,28 @@ SERVER="$SERVER_USER@<server-lan-address>"
    ssh "$SERVER" "echo 'command=\"/home/$SERVER_USER/MMDb/bin/deploy\",no-pty,no-port-forwarding,no-agent-forwarding,no-X11-forwarding,no-user-rc $(cat ~/.ssh/mmdb-deploy.pub)' >> ~/.ssh/authorized_keys"
    ssh -i ~/.ssh/mmdb-deploy -o IdentitiesOnly=yes "$SERVER" whoami   # prints "deploy: usage: deploy <tag>", not your username
    ```
-3. **Cloudflare route.** In Zero Trust, open Networks, Tunnels, the `mmdb-tunnel` tunnel, and add a public hostname: subdomain `ssh-deploy`, domain `mmdb.online`, service type `SSH`, URL `<server-lan-address>:22` (the same address as in `$SERVER`).
-4. **Cloudflare service token.** In Access, Service Auth, create a service token named `mmdb-deploy` and keep its Client ID and Client Secret for step 7. The secret is shown only once.
-5. **Cloudflare Access application.** In Access, Applications, add a self-hosted application for `ssh-deploy.mmdb.online` with one policy: action `Service Auth`, include the `mmdb-deploy` service token. Without this, the SSH route would be open to anyone.
-6. **GitHub environment.** In the repository's Settings, Environments, create `production`. Under deployment branches and tags, choose selected branches and tags and add the tag pattern `v*`.
-7. **GitHub secrets.** Add five secrets to the `production` environment. These commands read the values from files or prompts, so they don't appear in your shell history (they need `gh` logged in with permission to manage secrets; the Settings page works too):
+3. **Cloudflare service token.** In Zero Trust, Access, Service Auth, create a service token named `mmdb-deploy`. Copy its Client ID and Client Secret into a password manager for step 7; the secret is shown only once.
+4. **Cloudflare Access application.** In Access, Applications, add a self-hosted application for `ssh-deploy.mmdb.online` with a session duration of 15 minutes and one policy: action `Service Auth`, include the `mmdb-deploy` service token. Create it before the route in step 5, so the hostname is never reachable without the token.
+5. **Cloudflare route.** In Networks, Tunnels, open the `mmdb-tunnel` tunnel and add a route of type published application: subdomain `ssh-deploy`, domain `mmdb.online`, service `ssh://<server-lan-address>:22` (the same address as in `$SERVER`). The tunnel was created from its container, so it has no Configure button, but routes can still be added here. To check the route, run the step 2 test through it (needs `cloudflared` on your Mac and the token from step 3); it prints the same usage line:
    ```bash
-   gh secret set DEPLOY_SSH_KEY --env production < ~/.ssh/mmdb-deploy
-   gh secret set DEPLOY_SSH_TARGET --env production --body "$SERVER_USER@ssh-deploy.mmdb.online"
-   ssh "$SERVER" 'ssh-keyscan -t ed25519 localhost 2>/dev/null' | sed 's/^localhost/ssh-deploy.mmdb.online/' | gh secret set DEPLOY_KNOWN_HOSTS --env production
-   gh secret set CF_ACCESS_CLIENT_ID --env production       # paste the Client ID when asked
-   gh secret set CF_ACCESS_CLIENT_SECRET --env production   # paste the Client Secret when asked
+   TUNNEL_SERVICE_TOKEN_ID=<client-id> TUNNEL_SERVICE_TOKEN_SECRET="$(pbpaste)" \
+     ssh -i ~/.ssh/mmdb-deploy -o IdentitiesOnly=yes \
+     -o ProxyCommand='cloudflared access ssh --hostname %h' "$SERVER_USER@ssh-deploy.mmdb.online" whoami
    ```
-8. **Protect the tags.** In Settings, Rules, Rulesets, add a tag ruleset named `Version tags` targeting `v*`, enforcement Active, with Repository admin allowed to bypass, and turn on Restrict creations, Restrict updates and Restrict deletions. Only you can then create version tags, and nobody can move or delete one.
-9. **First deploy.** Tag the commit the server is on and push the tag. Because the server is already there, the run is a redeploy: it restarts the app and checks the site, which tests the whole path without changing any files.
+6. **GitHub environment.** In the repository's Settings, Environments, create `production`. Under deployment branches and tags, choose selected branches and tags and add the tag pattern `v*`.
+7. **GitHub secrets.** Add five secrets to the `production` environment in Settings, Environments, `production`, Environment secrets. Move each value with the clipboard so it never appears in the terminal or your shell history; avoid `read -s` and pasting at prompts, which can swallow or split a pasted value:
+
+   | Secret | Value |
+   |---|---|
+   | `DEPLOY_SSH_KEY` | `pbcopy < ~/.ssh/mmdb-deploy`, then paste |
+   | `DEPLOY_SSH_TARGET` | `<user>@ssh-deploy.mmdb.online`, typed |
+   | `DEPLOY_KNOWN_HOSTS` | `ssh "$SERVER" 'ssh-keyscan -t ed25519 localhost 2>/dev/null' \| sed 's/^localhost/ssh-deploy.mmdb.online/' \| pbcopy`, then paste |
+   | `CF_ACCESS_CLIENT_ID` | the service token's Client ID, from your password manager |
+   | `CF_ACCESS_CLIENT_SECRET` | the service token's Client Secret, from your password manager |
+
+   Clear the clipboard afterwards with `pbcopy < /dev/null`.
+8. **Protect the tags.** In Settings, Rules, Rulesets, add a tag ruleset named `Version tags` targeting `v*`, enforcement Active, with Repository admin allowed to bypass, and turn on Restrict creations, Restrict updates and Restrict deletions. Only you can then create version tags, through the release page (see Deploy above), and nobody else can move or delete one. Your bypass still lets you delete a tag; avoid it, because recreating the tag deploys it again.
+9. **First deploy.** Publish a release whose new tag points at the commit the server is on. Because the server is already there, the run is a redeploy: it restarts the app and checks the site, which tests the whole path without changing any files.
 
 ### Docker Production Deployment
 
