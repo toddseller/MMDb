@@ -22,12 +22,15 @@ titles.each_with_index do |title, i|
   user.movies << movie
 end
 Movie.find_by!(title: 'Cedar').update_columns(isnew: true)
+Movie.find_by!(title: 'Amber').update_columns(studio: 'Amber Films', actors: 'Ann Lee, Bo Chen, Cy Dunn')
 
 show = Show.create!(title: 'Harbor Lights', year: '2019', show_collection_id: '999', poster: 'https://is1-ssl.mzstatic.com/image/thumb/harbor-lights/600x600.jpg')
 [1, 2, 3].each do |number|
   # A show's details open on its active season, as every real show has one.
   season = show.seasons.create!(season: number, collectionName: "Harbor Lights, Season #{number}", collectionId: "tmdb999#{number}", is_active: number == 1)
-  season.episodes.create!(title: "Harbor Lights #{number}x1", tv_episode: 1)
+  # Plots over 130 characters get a "more" toggle; this one is long enough to be cut off at any width the tests use.
+  plot = 'The harbor town wakes to find its lighthouse dark, and the keeper gone without a word, leaving only a logbook full of dates nobody remembers. By nightfall the ferry has not come back, the radio hisses with a voice nobody admits to knowing, and the keeper’s daughter starts reading the logbook from the back.'
+  season.episodes.create!(title: "Harbor Lights #{number}x1", tv_episode: 1, plot: plot)
 end
 user.shows << show
 
@@ -65,5 +68,15 @@ form = Nokogiri::HTML(JSON.parse(show_search.body)['page']).at_css('form#create-
 season_pick = app.post(form['action'], xhr.merge(params: form.css('input[type=hidden]').to_h { |input| [input['name'], input['value']] }))
 raise "recording the season pick failed: #{season_pick.status}" unless season_pick.ok?
 File.write(generated.join('show_episodes.json'), season_pick.body)
+
+# A credit click searches the collection and asks TMDB for the person's picture; the picture lookup is canned.
+def Movie.search_person(name)
+  name == 'Cy Dunn' ? 'https://image.tmdb.org/t/p/w342/cy-dunn.jpg' : nil
+end
+{ 'credit_search' => 'Cy Dunn', 'studio_search' => 'Amber Films' }.each do |file, name|
+  credit = app.get('/movies/search', xhr.merge(params: { filter: name, id: user.id }))
+  raise "recording the #{name} search failed: #{credit.status}" unless credit.ok?
+  File.write(generated.join("#{file}.json"), credit.body)
+end
 
 puts "seeded #{DB_NAME}: user #{user.email}, #{user.movies.count} movies, #{user.shows.count} show"

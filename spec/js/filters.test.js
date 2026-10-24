@@ -3,6 +3,7 @@ import { test, beforeEach, afterEach, mock } from 'node:test'
 import assert from 'node:assert/strict'
 import { makePage, stubFetch, json, html } from './dom.js'
 import { init } from '#mmdb/filters.js'
+import { open, isOpen } from '#mmdb/drawer.js'
 
 // The parts of the collection page the filters use, as users/show.erb renders them.
 const collection = (titles = ['Amber', 'Birch']) => `
@@ -20,8 +21,6 @@ const collection = (titles = ['Amber', 'Birch']) => `
 let page
 /** @type {ReturnType<typeof stubFetch>} */
 let fetched
-/** @type {Array<boolean | undefined>} */
-let drawerCloses
 
 /** @param {(url: string) => Response} respond */
 const answer = (respond) => { fetched = stubFetch((url) => respond(url)) }
@@ -47,9 +46,7 @@ const titles = () => [...page.document.querySelectorAll('#movie-list p')].map((p
 beforeEach(() => {
   mock.timers.enable({ apis: ['setTimeout'] })
   page = makePage(collection())
-  drawerCloses = []
   page.window.filterValue = ''
-  page.window.drawer = { close: (instant) => { drawerCloses.push(instant) } }
   init(page.document)
 })
 
@@ -108,12 +105,13 @@ for (const control of ['#clear-btn input', '#library']) {
     page.window.sessionStorage.setItem('id', '7')
     page.window.filterValue = 'amb'
     page.document.getElementById('unwatched')?.classList.add('active')
+    open(/** @type {HTMLElement} */ (page.document.querySelector('.index-preview')), 'Amber details', true)
 
     click(control)
     await settle()
 
     assert.equal(fetched.calls[0].url, '/users/7')
-    assert.deepEqual(drawerCloses, [true])
+    assert.ok(!isOpen())
     assert.equal(page.window.filterValue, '')
     assert.deepEqual(titles(), ['Amber', 'Birch', 'Cedar'])
     assert.equal(page.document.querySelector('.footer')?.textContent, '3 Movies')
