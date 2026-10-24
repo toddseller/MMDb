@@ -31,6 +31,12 @@ describe 'detail drawer' do
       expect(z_index.call('.pointer')).to be_between(1, z_index.call('.index-preview.open img') - 1)
     end
 
+    # Rendering every one of thousands of movie tiles each frame is what made the drawer stutter.
+    it 'lets the browser skip off-screen movie tiles, except the open one' do
+      expect(rule('drawer.css', '#movie-list > .index-preview')).to include('content-visibility: auto', 'contain-intrinsic-size: 174px 303px')
+      expect(rule('drawer.css', '#movie-list > .index-preview.open')).to include('content-visibility: visible')
+    end
+
     it 'turns the motion off for reduced motion' do
       expect(css('drawer.css')).to include('@media (prefers-reduced-motion: reduce)')
     end
@@ -45,6 +51,15 @@ describe 'detail drawer' do
         expect(rules(path, '.info.active')).to be_empty
         expect(rules(path, '.notransition')).to be_empty
         expect(css(path)).not_to match(/nth-child\(\dn\)/)
+      end
+
+      # A layer per image meant thousands of GPU layers to move each frame on the movies page.
+      it 'puts no transform on every image' do
+        expect(rule(path, 'img')).not_to match(/transform/)
+      end
+
+      it 'imports the versions that carry the rendering changes' do
+        expect(css("#{theme}.css")).to include("@import url('themes/#{theme}/movies.css?v=3');", "@import url('drawer.css?v=3');")
       end
 
       it 'imports drawer.css and the changed movies.css with versions' do

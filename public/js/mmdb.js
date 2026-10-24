@@ -153,7 +153,6 @@ var clearFilter = function () {
     $('#profile-wrapper').removeClass('active')
     $('#user-page').empty().append(response.page)
     $('.footer').empty().append(response.movie_count + ' Movies').fadeIn()
-    $('img.lazy').lazyload()
     $('#profile-image').empty()
     $('#profile-name').empty()
   })
@@ -577,7 +576,6 @@ var listMovie = function (response) {
     $('#more').show()
     $('#movie-list').empty().append(response.page)
     $('.footer').empty().append(response.movie_count + ' Movies').fadeIn()
-    $('img.lazy').lazyload()
   }
 }
 
@@ -617,7 +615,6 @@ var listShow = function (response) {
     $('#more').show()
     $('#show-list').empty().append(response.page)
     $('.footer').empty().append(response.show_count + ' TV Shows &#8212; ' + response.episode_count + ' Episodes')
-    $('img.lazy').lazyload()
   }
 }
 
