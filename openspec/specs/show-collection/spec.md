@@ -51,8 +51,8 @@ Each tile SHALL show the same season label as before this change, derived from t
 Show posters in the collection grid SHALL be marked for deferred loading so that the browser fetches only the posters near the viewport.
 
 #### Scenario: Poster marked lazy
-- **WHEN** the collection grid is rendered
-- **THEN** every poster image in it carries `loading="lazy"`, or is already deferred by the existing script-based lazy loader
+- **WHEN** the collection grid is rendered, including after adding episodes or a show
+- **THEN** every poster image in it carries `loading="lazy"` and a `src`, and none depends on a script-based lazy loader
 
 ### Requirement: Grid posters use thumbnail-sized images
 The collection grid SHALL request a thumbnail-sized poster when the image host supports sizing in the URL, and the full-size URL otherwise. The stored poster URL SHALL NOT change.
