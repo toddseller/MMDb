@@ -25,11 +25,12 @@ describe 'responses that re-render the show grid' do
       expect(queries { add_episode(large) }.size).to eq small_count
     end
 
-    it 'defers grid posters at thumbnail size' do
+    it 'loads grid posters lazily at thumbnail size' do
       images = grid(add_episode(owner_with_shows(2)))
       expect(images.size).to eq 2
-      expect(images.map { |img| img['class'] }).to all eq 'lazy'
-      expect(images.map { |img| img['data-original'] }).to all end_with '/400x400.jpg'
+      expect(images.map { |img| img['loading'] }).to all eq 'lazy'
+      expect(images.map { |img| img['src'] }).to all end_with '/400x400.jpg'
+      expect(images.map { |img| img['data-original'] }).to all be_nil
     end
   end
 
@@ -60,7 +61,7 @@ describe 'responses that re-render the show grid' do
       expect(images.size).to eq 2
       expect(images.map { |img| img['loading'] }).to all eq 'lazy'
       expect(images.map { |img| img['src'] }).to all end_with '/400x400.jpg'
-      expect(images.map { |img| img['data-original'] }).to all end_with '/400x400.jpg'
+      expect(images.map { |img| img['data-original'] }).to all be_nil
     end
   end
 end

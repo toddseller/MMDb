@@ -18,6 +18,11 @@ class Movie < ActiveRecord::Base
 
   scope :sorted_list, -> {order(:sort_name, :year)}
   scope :recently_added, -> {order(created_at: :desc)}
+
+  # Grid-sized poster: Apple artwork is sized in the URL (often stored at 2000x3000); other hosts stay as stored.
+  def thumbnail
+    poster.to_s.sub(%r{(mzstatic\.com/.+)/\d+x\d+[a-z]*\.(jpg|png|webp)\z}, '\1/348x522bb.\2')
+  end
   scope :top_movies, -> {order(user_count: :desc)}
 
   def self.get_titles(t)

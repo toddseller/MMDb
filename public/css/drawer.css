@@ -25,6 +25,19 @@
     gap: 0 1.53em;
 }
 
+/* Thousands of movie tiles made every drawer frame slow; skipped tiles keep their 174x303 size so the page doesn't jump. */
+#movie-list > .index-preview
+{
+    content-visibility: auto;
+    contain-intrinsic-size: 174px 303px;
+}
+
+/* content-visibility clips a tile to its box, and the open tile draws outside it: the scaled poster, its shadow, the pointer and the ribbon. */
+#movie-list > .index-preview.open
+{
+    content-visibility: visible;
+}
+
 /* A 0fr row grows to the content's real height as it becomes 1fr, so no height has to be guessed. */
 .info
 {

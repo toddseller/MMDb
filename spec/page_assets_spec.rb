@@ -9,7 +9,7 @@ describe 'page assets' do
   it 'gives every script and the stylesheet a version' do
     urls = asset_urls
 
-    expect(urls.size).to eq 5
+    expect(urls.size).to eq 4
     expect(urls).to all(match(%r{\A/(js|css)/[\w.-]+\?v=\w+\z}))
   end
 
@@ -40,5 +40,13 @@ describe 'page assets' do
 
     expect(versioned.status).to eq 200
     expect(versioned.body).to eq plain.body
+  end
+
+  # Posters load natively now; the plugin's scroll handler also made content-visibility freeze long scrolls.
+  it 'loads no script-based lazy loader' do
+    expect(asset_urls.grep(/lazyload/)).to be_empty
+    %w[mmdb.js application.js].each do |script|
+      expect(File.read(APP_ROOT.join('public', 'js', script))).not_to include('.lazyload(')
+    end
   end
 end
