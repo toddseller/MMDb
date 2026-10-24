@@ -569,6 +569,61 @@ chmod 600 .env
 
 ## Deployment
 
+### Production deploys (tag and push)
+
+mmdb.online runs on a server that is only reachable from the local network. Pushing a version tag deploys it: the `Deploy` workflow (`.github/workflows/deploy.yml`) checks that the tagged commit is on `master` and passed the `test` check, then connects through the `mmdb-tunnel` Cloudflare tunnel and runs `bin/deploy` on the server. That script fast-forwards the server's `master` to the tag, restarts the app (or rebuilds it when `Gemfile`, `Gemfile.lock`, a `Dockerfile` or a compose file changed), and checks that https://mmdb.online/ answers 200.
+
+**Deploy** the latest `master`:
+
+```bash
+git switch master && git pull --ff-only
+git tag v2026.10.24 && git push origin v2026.10.24   # a second deploy that day: v2026.10.24.2
+gh run watch                                         # or follow it in the Actions tab
+```
+
+**Redeploy** a tag the server is already on (for example after a failed health check): re-run that tag's `Deploy` run from the Actions tab. The script restarts the app and checks it again without moving the checkout.
+
+**Roll back** by reverting the change on `master` through a pull request and tagging the result. Tags only move the server forward.
+
+**Changes to `.env`** are still made by hand on the server, followed by `docker compose up -d` so the container reloads them.
+
+**Stop automated deploys** at any time by deleting the `mmdb-deploy` line from the server's `~/.ssh/authorized_keys`. Manual deploys keep working.
+
+#### One-time setup
+
+`bin/deploy` has to be on the server first, so merge the change that adds it and pull it by hand (`cd ~/MMDb && git pull --ff-only`) before these steps.
+
+The server's LAN address and username aren't in this public repo. Set them in your terminal from your own notes before running the commands below:
+
+```bash
+SERVER_USER=<user>
+SERVER="$SERVER_USER@<server-lan-address>"
+```
+
+1. **Deploy key.** On your Mac, make a key that is only for deploys:
+   ```bash
+   ssh-keygen -t ed25519 -N '' -C mmdb-deploy -f ~/.ssh/mmdb-deploy
+   ```
+2. **Lock the key to the deploy script.** Add it to the server's `authorized_keys` with a forced command, so it can run nothing else:
+   ```bash
+   ssh "$SERVER" "echo 'command=\"/home/$SERVER_USER/MMDb/bin/deploy\",no-pty,no-port-forwarding,no-agent-forwarding,no-X11-forwarding,no-user-rc $(cat ~/.ssh/mmdb-deploy.pub)' >> ~/.ssh/authorized_keys"
+   ssh -i ~/.ssh/mmdb-deploy -o IdentitiesOnly=yes "$SERVER" whoami   # prints "deploy: usage: deploy <tag>", not your username
+   ```
+3. **Cloudflare route.** In Zero Trust, open Networks, Tunnels, the `mmdb-tunnel` tunnel, and add a public hostname: subdomain `ssh-deploy`, domain `mmdb.online`, service type `SSH`, URL `<server-lan-address>:22` (the same address as in `$SERVER`).
+4. **Cloudflare service token.** In Access, Service Auth, create a service token named `mmdb-deploy` and keep its Client ID and Client Secret for step 7. The secret is shown only once.
+5. **Cloudflare Access application.** In Access, Applications, add a self-hosted application for `ssh-deploy.mmdb.online` with one policy: action `Service Auth`, include the `mmdb-deploy` service token. Without this, the SSH route would be open to anyone.
+6. **GitHub environment.** In the repository's Settings, Environments, create `production`. Under deployment branches and tags, choose selected branches and tags and add the tag pattern `v*`.
+7. **GitHub secrets.** Add five secrets to the `production` environment. These commands read the values from files or prompts, so they don't appear in your shell history (they need `gh` logged in with permission to manage secrets; the Settings page works too):
+   ```bash
+   gh secret set DEPLOY_SSH_KEY --env production < ~/.ssh/mmdb-deploy
+   gh secret set DEPLOY_SSH_TARGET --env production --body "$SERVER_USER@ssh-deploy.mmdb.online"
+   ssh "$SERVER" 'ssh-keyscan -t ed25519 localhost 2>/dev/null' | sed 's/^localhost/ssh-deploy.mmdb.online/' | gh secret set DEPLOY_KNOWN_HOSTS --env production
+   gh secret set CF_ACCESS_CLIENT_ID --env production       # paste the Client ID when asked
+   gh secret set CF_ACCESS_CLIENT_SECRET --env production   # paste the Client Secret when asked
+   ```
+8. **Protect the tags.** In Settings, Rules, Rulesets, add a tag ruleset named `Version tags` targeting `v*`, enforcement Active, with Repository admin allowed to bypass, and turn on Restrict creations, Restrict updates and Restrict deletions. Only you can then create version tags, and nobody can move or delete one.
+9. **First deploy.** Tag the commit the server is on and push the tag. Because the server is already there, the run is a redeploy: it restarts the app and checks the site, which tests the whole path without changing any files.
+
 ### Docker Production Deployment
 
 ```bash

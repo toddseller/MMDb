@@ -1,0 +1,69 @@
+#!/usr/bin/env bash
+# Deploys a version tag of MMDb on the production server. The deploy key's authorized_keys entry
+# forces this script, so the only request it takes over SSH is "deploy <tag>".
+set -euo pipefail
+
+TAG_FORMAT='^v[0-9]+(\.[0-9]+)*$'
+
+refuse() {
+  echo "deploy: $1" >&2
+  exit "${2:-1}"
+}
+
+main() {
+  local verb tag extra
+  # sshd puts the client's command here and ignores what the key's holder asked to run.
+  if [[ -n "${SSH_ORIGINAL_COMMAND:-}" ]]; then
+    read -r verb tag extra <<< "$SSH_ORIGINAL_COMMAND"
+  else
+    verb="${1:-}" tag="${2:-}" extra="${3:-}"
+  fi
+  [[ "$verb" == deploy && -z "$extra" ]] || refuse 'usage: deploy <tag>' 2
+  [[ "$tag" =~ $TAG_FORMAT ]] || refuse "not a version tag: $tag" 2
+
+  cd "$(dirname "${BASH_SOURCE[0]}")/.."
+  # .env is untracked, so only edits to tracked files stop a deploy.
+  [[ -z "$(git status --porcelain --untracked-files=no)" ]] || refuse 'the server checkout has uncommitted changes'
+  [[ "$(git rev-parse --abbrev-ref HEAD)" == master ]] || refuse 'the server checkout is not on master'
+
+  # No "+" on the tag refspec: a tag that was moved since the last fetch is rejected, not followed.
+  git fetch --quiet origin master "refs/tags/$tag:refs/tags/$tag" || refuse "could not fetch $tag"
+  local old new
+  old="$(git rev-parse HEAD)"
+  new="$(git rev-parse "$tag^{commit}")"
+  git merge-base --is-ancestor "$new" origin/master || refuse "$tag is not on master"
+  if [[ "$new" != "$old" ]]; then
+    git merge-base --is-ancestor "$old" "$new" || refuse "$tag is behind the server, which is at ${old:0:7}"
+    git merge --quiet --ff-only "$new"
+  fi
+
+  if [[ "$new" == "$old" ]]; then
+    echo "Redeploying $tag (${new:0:7}), already checked out"
+  else
+    echo "Deploying $tag: ${old:0:7} -> ${new:0:7}"
+  fi
+
+  # The code is mounted into the container, so a restart picks it up; gems and the image need a rebuild.
+  if git diff --name-only "$old" "$new" | grep -qE '^(Gemfile|Gemfile\.lock|Dockerfile[^/]*|docker-compose[^/]*\.yml)$'; then
+    echo 'Gems, Dockerfile or compose changed: rebuild'
+    docker compose up -d --build
+  else
+    echo 'Code only: restart'
+    docker compose restart web
+  fi
+
+  local url="${DEPLOY_HEALTH_URL:-https://mmdb.online/}" tries="${DEPLOY_HEALTH_TRIES:-10}" interval="${DEPLOY_HEALTH_INTERVAL:-3}"
+  local attempt code
+  for ((attempt = 1; attempt <= tries; attempt++)); do
+    code="$(curl -sS -o /dev/null -w '%{http_code}' --max-time 10 "$url" || true)"
+    if [[ "$code" == 200 ]]; then
+      echo "$url answered 200: deployed $tag"
+      return 0
+    fi
+    if ((attempt < tries)); then sleep "$interval"; fi
+  done
+  refuse "$url answered ${code:-nothing} after $tries tries"
+}
+
+# Called last so bash has read the whole file before the deploy rewrites it.
+main "$@"
