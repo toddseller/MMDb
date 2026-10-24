@@ -17,15 +17,15 @@ Clicking a poster SHALL open its details in a drawer that spans the full width o
 - **WHEN** the user clicks a poster in a last row that holds fewer posters than the others
 - **THEN** the drawer appears below that row, at the end of the list
 
-### Requirement: The drawer eases open and closed to its content's height
-The drawer SHALL grow from closed to the height of its content when it opens, and shrink back to closed when it closes, easing in both directions. It SHALL animate whether closed by clicking its poster again or by its close button. Content that grows after opening, such as images loading, SHALL make the drawer grow with it.
+### Requirement: The drawer eases open and closed to fit its content
+The drawer SHALL grow from closed to the height of its content when it opens, and shrink back to closed when it closes, easing in both directions. Content that grows after opening, such as images loading, SHALL make the drawer grow with it.
 
 #### Scenario: Opening
 - **WHEN** a drawer opens
 - **THEN** it is first shown closed, then grows to its content's height without pausing at full size
 
-#### Scenario: Closing with the close button
-- **WHEN** the user clicks the drawer's close button
+#### Scenario: Closing by clicking the poster again
+- **WHEN** the user clicks the poster of the open drawer
 - **THEN** the drawer shrinks closed, and clicking the same poster then opens it again with one click
 
 ### Requirement: One drawer at a time, switched smoothly
