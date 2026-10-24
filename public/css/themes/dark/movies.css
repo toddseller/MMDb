@@ -5,37 +5,12 @@ img
 
 .info
 {
-    overflow: hidden;
-
-    width: 100vw;
-    max-height: 0;
-    margin-top: -16px;
-    margin-right: calc(-50vw + 50%);
-    margin-left: calc(-50vw + 50%);
-
-    transition: all .3s linear;
-
     background: #222;
 }
 
-.info.active
+.info.open
 {
-    overflow: hidden;
-
-    height: auto;
-    max-height: 900px;
-    margin-top: 20px;
-
-    transition: all .3s linear;
-
-    border-top: 1px solid #000;
-    border-bottom: 1px solid #000;
-}
-
-.info-wrapper
-{
-    width: 100vw;
-    margin: 0 auto;
+    border-color: #000;
 }
 
 #info-header
@@ -262,31 +237,11 @@ img
 .pointer,
 .show-pointer
 {
-    height: 0;
-}
-
-.pointer.active,
-.show-pointer.active
-{
-    width: 15px;
-    height: 15px;
-    margin: 0 auto;
-    margin-top: 15px;
-
-    transition-delay: .15s;
-    transform: rotate(45deg);
-
     border-top: 1px solid #000;
     border-right: 1px solid #222;
     border-bottom: 1px solid #222;
     border-left: 1px solid #000;
-    border-radius: 2px;
     background: #222;
-}
-
-.show-pointer.active
-{
-    margin-bottom: -9px;
 }
 
 #movie-search
@@ -743,12 +698,6 @@ a.movie-edit:hover
 
     width: 174px;
     height: 303px;
-    margin-right: 2em;
-}
-
-.index-preview:nth-child(7n)
-{
-    margin-right: 0;
 }
 
 .index-preview img
@@ -763,18 +712,9 @@ a.movie-edit:hover
     background-color: #080808;
 }
 
-.index-preview img.active
+.index-preview.open img,
+.index-preview-show.open img
 {
-    position: relative;
-    z-index: 2;
-
-    width: 194px;
-    height: 291px;
-    margin-top: 10px;
-    margin-left: -10px;
-
-    transition: all .3s ease-in-out;
-
     box-shadow: 0 15px 25px #000;
 }
 
@@ -784,12 +724,6 @@ a.movie-edit:hover
 
     width: 213px;
     height: auto;
-    margin-right: 1.53em;
-}
-
-.index-preview-show:nth-child(6n)
-{
-    margin-right: 0;
 }
 
 .index-preview-show img
@@ -887,29 +821,6 @@ a.movie-edit:hover
     color: #fff;
 }
 
-.new-label.active
-{
-    top: 10px;
-    right: -10px;
-
-    width: 70px;
-    height: 70px;
-
-    transition: all .3s ease-in-out;
-}
-
-.new-text.active
-{
-    font-size: 16px;
-
-    transition: all .3s ease-in-out;
-}
-
-.notransition
-{
-    transition: none !important;
-}
-
 .top-preview img
 {
     width: 100px;
@@ -980,17 +891,6 @@ a.movie-edit:hover
 .description
 {
     display: none;
-}
-
-#movie-list,
-#show-list
-{
-    display: flex;
-
-    margin-top: 80px;
-    margin-bottom: 55px;
-
-    flex-wrap: wrap;
 }
 
 .index-user h4

@@ -1,0 +1,152 @@
+/* Layout and motion for the movie and show grids and their details drawer.
+   Colours live in themes/<theme>/movies.css. */
+
+/* Gaps are the old tile margins: they make 7 movies or 6 shows exactly fill the 1386px page. */
+#movie-list,
+#show-list
+{
+    display: grid;
+
+    margin-top: 80px;
+    margin-bottom: 55px;
+
+    justify-content: space-between;
+}
+
+#movie-list
+{
+    grid-template-columns: repeat(auto-fill, 174px);
+    gap: 0 2em;
+}
+
+#show-list
+{
+    grid-template-columns: repeat(auto-fill, 213px);
+    gap: 0 1.53em;
+}
+
+/* A 0fr row grows to the content's real height as it becomes 1fr, so no height has to be guessed. */
+.info
+{
+    display: grid;
+    grid-column: 1 / -1;
+    grid-template-rows: 0fr;
+
+    width: 100vw;
+    margin-top: 0;
+    margin-right: calc(-50vw + 50%);
+    margin-left: calc(-50vw + 50%);
+
+    transition: grid-template-rows .25s ease-in, margin-top .25s ease-in, border-color .25s ease-in;
+
+    border-top: 1px solid transparent;
+    border-bottom: 1px solid transparent;
+}
+
+.info.open
+{
+    grid-template-rows: 1fr;
+
+    margin-top: 20px;
+
+    transition: grid-template-rows .35s cubic-bezier(.2, .8, .2, 1), margin-top .35s cubic-bezier(.2, .8, .2, 1), border-color .35s;
+}
+
+.info-wrapper
+{
+    overflow: hidden;
+
+    width: 100vw;
+    min-height: 0;
+    margin: 0 auto;
+
+    transition: height .35s cubic-bezier(.2, .8, .2, 1);
+}
+
+/* Transforms don't affect layout, so the open poster grows without moving its neighbours. */
+.index-preview img,
+.index-preview-show img
+{
+    transition: transform .3s ease-in-out, box-shadow .3s ease-in-out;
+    transform-origin: top center;
+}
+
+.index-preview.open img,
+.index-preview-show.open img
+{
+    position: relative;
+    z-index: 2;
+
+    transform: translateY(-10px) scale(1.115);
+}
+
+.index-preview .truncate
+{
+    transition: opacity .2s;
+}
+
+.index-preview.open .truncate
+{
+    opacity: 0;
+}
+
+.pointer,
+.show-pointer
+{
+    position: absolute;
+    /* Under the open poster, so its shadow darkens the pointer along with the drawer edge around it. */
+    z-index: 1;
+    bottom: -28px;
+    left: 50%;
+
+    width: 15px;
+    height: 15px;
+
+    transition: opacity .2s;
+    transform: translateX(-50%) rotate(45deg);
+    pointer-events: none;
+
+    opacity: 0;
+    border-radius: 2px;
+}
+
+.open .pointer,
+.open .show-pointer
+{
+    transition-delay: .15s;
+
+    opacity: 1;
+}
+
+.open .new-label
+{
+    top: 10px;
+    right: -10px;
+
+    width: 70px;
+    height: 70px;
+}
+
+.open .new-text
+{
+    font-size: 16px;
+}
+
+@media (prefers-reduced-motion: reduce)
+{
+    .info,
+    .info.open,
+    .info-wrapper,
+    .index-preview img,
+    .index-preview-show img,
+    .index-preview .truncate,
+    .pointer,
+    .show-pointer,
+    .open .pointer,
+    .open .show-pointer,
+    .new-label,
+    .new-text
+    {
+        transition: none;
+    }
+}
