@@ -1,4 +1,5 @@
 get '/shows' do
+  require_sign_in!
   title = params[:query].downcase
   @user = current_user
   @show_previews = Show.get_series(title)
@@ -16,6 +17,7 @@ get '/shows/new' do
 end
 
 post '/shows' do
+  require_sign_in!
   @user = current_user
   @my_shows = @user.shows.sorted_list.includes(:seasons)
   @show = Show.find_by("show_collection_id = ?", params[:show]['show_collection_id']) || Show.new(title: params[:show]['title'], year: params[:show]['year'], rating: params[:show]['rating'], genre: params[:show]['genre'], poster: params[:season]['poster'], show_collection_id: params[:show]['show_collection_id'])

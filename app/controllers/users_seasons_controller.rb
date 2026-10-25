@@ -1,5 +1,6 @@
 post '/users/:user_id/shows/:show_id/seasons/:id' do
-  user = current_user == User.find(params[:user_id]) ? current_user : User.find(params[:user_id])
+  require_owner!(:shows, params[:show_id])
+  user = current_user
   show = Show.find(params[:show_id])
   p '+' * 80
   p seasons = show.seasons.sorted_seasons

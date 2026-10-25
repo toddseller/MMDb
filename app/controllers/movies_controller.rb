@@ -1,4 +1,5 @@
 get '/movies' do
+  require_sign_in!
   title = params[:query].downcase
   @user = current_user
   @movie_previews = Movie.get_titles(title)
@@ -52,6 +53,7 @@ get '/movies/4k/:id' do
 end
 
 get '/movies/update' do
+  require_sign_in!
   title = params[:title].downcase
   @id = params[:route].split('/').last
   @movie_previews = Movie.update_title_search(title)
@@ -62,6 +64,8 @@ get '/movies/update' do
 end
 
 put '/movies/update/:id' do
+  require_sign_in!
+  halt 403 unless current_user.movies.exists?(params[:id])
   @movie = Movie.find(params[:id])
   params[:movie][:rating] = params[:movie][:rating].upcase
   @movie.update(params[:movie])

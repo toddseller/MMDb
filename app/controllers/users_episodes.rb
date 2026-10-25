@@ -1,4 +1,5 @@
 post '/users/:user_id/shows/:show_id/seasons/:season_id/episodes' do
+  require_owner!(:shows, params[:show_id])
   @user = current_user
   @my_shows = @user.shows.sorted_list.includes(:seasons)
   @show = Show.find(params[:show_id])
@@ -44,6 +45,7 @@ get '/users/:user_id/shows/:show_id/seasons/:season_id/episodes/:id/edit' do
 end
 
 delete '/users/:user_id/shows/:show_id/seasons/:season_id/episodes/:id' do
+  require_owner!(:shows, params[:show_id])
   @show = Show.find(params[:show_id])
   @season = @show.seasons.find(params[:season_id])
   @episodes = @season.episodes.sorted_list

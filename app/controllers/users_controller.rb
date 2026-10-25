@@ -39,6 +39,8 @@ get '/users/:id/edit' do
 end
 
 put '/users/:id' do
+  require_sign_in!
+  halt 403 unless current_user.id == params[:id].to_i
   @user = current_user
   if params[:current] == ''
     @user.update(first_name: params[:first_name], last_name: params[:last_name], user_name: params[:user_name], email: params[:email], theme: params[:theme] || 'default', password_hash: @user.password_hash)
