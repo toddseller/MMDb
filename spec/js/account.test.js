@@ -23,6 +23,7 @@ const PAGE = `
       <form id="sign-in-form" action="/sessions" method="POST">
         <input type="text" name="username_email" value="" autofocus="">
         <input type="password" name="password" value="">
+        <input id="remember" type="checkbox" name="remember" value="true">
         <button id="sign-in-submit" type="submit">Sign in</button>
       </form>
     </div>
@@ -136,6 +137,28 @@ test('an empty sign-in shows the error without a request', async () => {
   assert.ok(shown('.login-errors'))
 })
 
+test('signing in with Remember me sends it', async () => {
+  answer = () => json({ status: 'true', user_id: 1 })
+  type('username_email', 'e2e')
+  type('password', 'pw')
+  field('remember').checked = true
+
+  submit('#sign-in-form')
+  await settle()
+
+  assert.equal(body(0).toString(), 'username_email=e2e&password=pw&remember=true')
+})
+
+test('a sign-in with only Remember me ticked shows the error without a request', async () => {
+  field('remember').checked = true
+
+  submit('#sign-in-form')
+  await settle()
+
+  assert.equal(fetched.calls.length, 0)
+  assert.ok(shown('.login-errors'))
+})
+
 test('a refused sign-in shows the error and empties the form', async () => {
   answer = () => json({ status: 'false' })
   type('username_email', 'e2e')
@@ -154,10 +177,12 @@ test('closing the sign-in dialog empties it and hides the error', async () => {
   logIn().showModal()
   submit('#sign-in-form')
   type('username_email', 'e2e')
+  field('remember').checked = true
 
   logIn().close()
 
   assert.equal(field('username_email').value, '')
+  assert.equal(field('remember').checked, false)
   assert.ok(!shown('.login-errors'))
 })
 

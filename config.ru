@@ -5,7 +5,7 @@ set :app_file, __FILE__
 
 configure do
   # See: http://www.sinatrarb.com/faq.html#sessions
-  enable :sessions
+  set :sessions, same_site: :lax
   set :session_secret, ENV['SESSION_SECRET'] || 'this_is_a_secret_shhhhh_that_is_at_least_64_bytes_long_for_rack_3'
 
   # Set the views to

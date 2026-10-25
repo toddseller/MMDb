@@ -38,8 +38,11 @@ module QueryCounter
   end
 end
 
+require 'active_support/testing/time_helpers'
+
 RSpec.configure do |config|
   config.include QueryCounter
+  config.include ActiveSupport::Testing::TimeHelpers
 
   config.around do |example|
     ActiveRecord::Base.transaction do

@@ -32,7 +32,7 @@ const theme = (document) => /** @type {HTMLLinkElement | null} */ (document.getE
 /** @param {Document} document @param {HTMLFormElement} form @param {(url: string) => void} go */
 const signIn = async (document, form, go) => {
   const filled = new URLSearchParams([...fields(form)].filter(([, value]) => value !== ''))
-  if (filled.size === 0) return show(settings(document), '.login-errors', true)
+  if (!filled.has('username_email') && !filled.has('password')) return show(settings(document), '.login-errors', true)
   const response = await request('/sessions', { method: 'POST', body: filled })
   if (response.status === 'true') return go(`/users/${response.user_id}`)
   show(settings(document), '.login-errors', true)

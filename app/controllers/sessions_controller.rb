@@ -4,6 +4,8 @@ post '/sessions' do
     session[:user_id] = user.id
     session[:name] = user.full_name
     session[:theme] = user.theme
+    session[:remember] = params[:remember] == 'true'
+    extend_session
     if request.xhr?
       json status: "true", user_id: user.id
     else
@@ -17,8 +19,6 @@ post '/sessions' do
 end
 
 post '/sessions/:id' do
-  session[:user_id] = nil
-  session[:name] = nil
-  session[:theme] = 'default'
+  sign_out!
   redirect '/'
 end
