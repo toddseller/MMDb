@@ -16,7 +16,8 @@ concurrency:
 jobs:
   # The master ruleset requires a check named "test"; renaming this job silently drops the requirement.
   test:
-    runs-on: ubuntu-latest
+    # Pinned: setup-ruby had no Ruby 3.4.8 build when ubuntu-latest moved to 26.04 (2026-10-25). Move both workflows together once it does.
+    runs-on: ubuntu-24.04
 
     services:
       postgres:
