@@ -1,5 +1,5 @@
 <% @my_shows.each do |show| %>
-  <div class="index-preview-show text-center" id="<%="#{user.id}"%>">
+  <div class="index-preview-show text-center" data-letter="<%= RailLetter.of(show.sort_name) %>" id="<%="#{user.id}"%>">
     <a class="show-modal" id="<%="#{show.id}"%>"><img src='<%= show.thumbnail %>' loading='lazy' alt='<%="#{show.title}" %> Poster' width='200' height='200' style='display: inline-block !important;'></a>
     <p class="show-truncate"><%= show.title %></p>
     <p class="season">

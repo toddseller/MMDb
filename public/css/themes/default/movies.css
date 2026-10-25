@@ -973,3 +973,29 @@ a.index-user:hover,
     border-radius: 4px;
     background-color: #d9534f;
 }
+
+/* Every rail letter shares one muted look; only a letter with titles answers a hover. */
+#letter-rail a
+{
+    color: #6e6e6e;
+}
+
+#letter-rail a:not([aria-disabled="true"]):hover,
+#letter-rail a:not([aria-disabled="true"]):focus
+{
+    color: #c9302c;
+}
+
+/* On a phone the rail sits over posters, on the navbar's colour at half strength in either theme. */
+@media (max-width: 767px)
+{
+    #letter-rail
+    {
+        background: rgba(34, 34, 34, .5);
+    }
+
+    #letter-rail a
+    {
+        color: #ddd;
+    }
+}

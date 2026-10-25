@@ -1,4 +1,4 @@
-<div class="index-preview text-center" id="<%="#{user.id}"%>">
+<div class="index-preview text-center" data-letter="<%= RailLetter.of(movie.sort_name) %>" id="<%="#{user.id}"%>">
   <% if movie.isnew %>
     <div class="new-label"><span class="new-text">New</span></div>
   <% end %>
