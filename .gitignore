@@ -62,6 +62,7 @@ chromedriver.log
 bin/*
 !bin/deploy
 !bin/migrate-tvdb
+!bin/repair-producers
 .rdb
 
 # Puma
