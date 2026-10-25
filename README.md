@@ -1,6 +1,6 @@
 # MMDb - My Movie Database
 
-A full-featured personal media library manager built with Sinatra and PostgreSQL. Track your movie and TV show collection with automatic metadata fetching from multiple sources (TMDB, TVDB, Apple TV), Plex integration, and a modern REST API.
+A full-featured personal media library manager built with Sinatra and PostgreSQL. Track your movie and TV show collection with automatic metadata fetching from multiple sources (TMDB, Apple TV), Plex integration, and a modern REST API.
 
 ## Overview
 
@@ -8,7 +8,7 @@ MMDb is a Sinatra-based web application that helps you catalog and manage your p
 
 ### Key Features
 
-- **Multi-source metadata aggregation**: TMDB, TVDB, and Apple TV APIs
+- **Multi-source metadata aggregation**: TMDB and Apple TV APIs
 - **TV show management**: Season and episode tracking with automatic metadata
 - **Plex integration**: Webhook support for automatic library updates
 - **RESTful API**: v2 and v3 endpoints with JWT authentication
@@ -69,7 +69,6 @@ MMDb/
 
 You'll need API keys from:
 - [TMDB](https://www.themoviedb.org/settings/api) (The Movie Database)
-- [TVDB](https://thetvdb.com/api-information) (TheTVDB v4)
 - Optional: Plex server token, Tautulli API key
 
 ## Installation & Configuration
@@ -107,15 +106,7 @@ JWT_SECRET=your_jwt_secret_at_least_64_characters_long_for_security
 JWT_ISSUER=mmdb.yourdomain.com
 
 # TMDB API (required)
-TMDB_KEY=your_tmdb_api_key
 TMDB_TOKEN=your_tmdb_bearer_token
-
-# TVDB API (required)
-TVDB_APIKEY=your_tvdb_api_key
-TVDB_PIN=your_tvdb_pin
-TVDB_USERNAME=your_tvdb_username
-TVDB_USERKEY=your_tvdb_user_key
-TVDB_TOKEN=your_tvdb_jwt_token
 
 # Plex Integration (optional)
 PLEX_USER=your_plex_username
@@ -395,7 +386,7 @@ MMDb can automatically update your library via Plex webhooks.
 
 3. Supported events:
    - `library.new` - Automatically adds new media to MMDb
-   - Matches movies and shows using TMDB/TVDB/Apple TV APIs
+   - Matches movies and shows using the TMDB and Apple TV APIs
 
 ## Database Management
 
@@ -482,12 +473,7 @@ kill -9 <PID>
 PORT=4667 bundle exec puma -C config/puma.rb
 ```
 
-#### 4. TVDB API Token Expired
-**Symptom**: 401 errors when fetching TV show metadata
-
-**Solution**: Token auto-refreshes via `Show.tvdb_auth()`. Ensure `TVDB_APIKEY` and `TVDB_PIN` are correct in `.env`.
-
-#### 5. Docker Build Failures
+#### 4. Docker Build Failures
 ```bash
 # Clear Docker cache
 docker system prune -a

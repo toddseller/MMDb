@@ -13,7 +13,6 @@ class Movie < ActiveRecord::Base
   before_save :create_search_name
   before_save :create_director_check
   before_save :update_user_count
-  # before_update :sanitize_input
   before_update :adjust_url
 
   scope :sorted_list, -> {order(:sort_name, :year)}
@@ -26,36 +25,7 @@ class Movie < ActiveRecord::Base
   scope :top_movies, -> {order(user_count: :desc)}
 
   def self.get_titles(t)
-    movie_array = Movie.where("search_name LIKE ?", "%#{t}%").sorted_list.first(10)
-    movie_response = appletv_call(t)
-
-    if movie_response.length > 0
-      movie_response.each do |m|
-        movie_array << m if movie_array.all? {|el| el[:title] != m[:title] && el[:year] != m[:year] || el[:director_check] != m[:director_check]}
-      end
-    end
-
-    title_response = HTTParty.get('https://api.themoviedb.org/3/search/movie?api_key=' + ENV['TMDB_KEY'] + '&query=' + t)
-
-    return movie_array.sort_by {|k| k[:year]} if title_response['results'] == []
-    title_response['results'].each do |movie|
-      movie_response = HTTParty.get('https://api.themoviedb.org/3/movie/' + movie['id'].to_s + '?api_key=' + ENV['TMDB_KEY'] + '&append_to_response=credits,releases')
-      if movie_response.code == 200 && movie['poster_path'] != nil
-        year = movie_response['release_date'] != nil && movie_response['release_date'] != '' ? movie['release_date'].split('-').slice(0, 1).join() : ''
-        runtime = movie_response['runtime'] != nil ? movie_response['runtime'].to_s : '0'
-        title = movie['title']
-        plot = get_plot(movie['overview'])
-        poster = 'https://image.tmdb.org/t/p/w342' + movie['poster_path']
-        director = get_director(movie_response)
-        genre = get_genres(movie_response)
-        rating = get_rating(movie_response)
-        studio = get_studio(movie_response)
-        director_check = director != '' ? director.split(' ').slice(-1, 1).join() : ''
-        test_movie = {title: title, plot: plot, poster: poster, year: year, actors: get_actors(movie_response), director: director, genre: genre, producer: get_producers(movie_response), rating: rating, runtime: runtime, studio: studio, writer: get_writers(movie_response), director_check: director_check}
-        movie_array << test_movie if movie_array.all? {|el| el[:title] != test_movie[:title] && el[:year] != year || el[:director_check] != test_movie[:director_check]}
-      end
-    end
-    movie_array.sort_by {|k| k[:year]}
+    MovieSearch.titles(t, Movie.where("search_name LIKE ?", "%#{t}%").sorted_list.first(10))
   end
 
   def self.plex_add(data, user)
@@ -85,42 +55,12 @@ class Movie < ActiveRecord::Base
   end
 
   def self.update_title_search(t)
-    movie_array = []
-    movie_response = appletv_call(t)
-
-    if movie_response.length > 0
-      movie_response.each do |m|
-        movie_array << m
-      end
-    end
-
-    title_response = HTTParty.get('https://api.themoviedb.org/3/search/movie?api_key=' + ENV['TMDB_KEY'] + '&query=' + t)
-
-    return nil if title_response['results'] == []
-    title_response['results'].each do |movie|
-      movie_response = HTTParty.get('https://api.themoviedb.org/3/movie/' + movie['id'].to_s + '?api_key=' + ENV['TMDB_KEY'] + '&append_to_response=credits,releases')
-      if movie_response.code == 200 && movie['poster_path'] != nil
-        year = movie_response['release_date'] != nil && movie_response['release_date'] != '' ? movie['release_date'].split('-').slice(0, 1).join() : ''
-        runtime = movie_response['runtime'] != nil ? movie_response['runtime'].to_s : '0'
-        title = movie['title']
-        plot = get_plot(movie['overview'])
-        poster = 'https://image.tmdb.org/t/p/w342' + movie['poster_path']
-        director = get_director(movie_response)
-        genre = get_genres(movie_response)
-        rating = get_rating(movie_response)
-        studio = get_studio(movie_response)
-        director_check = director != '' ? director.split(' ').slice(-1, 1).join() : ''
-        test_movie = {title: title, plot: plot, poster: poster, year: year, actors: get_actors(movie_response), director: director, genre: genre, producer: get_producers(movie_response), rating: rating, runtime: runtime, studio: studio, writer: get_writers(movie_response), director_check: director_check}
-        movie_array << test_movie if movie_array.all? {|el| el[:title] != test_movie[:title] && el[:year] != year || el[:director_check] != test_movie[:director_check]}
-      end
-    end
-    movie_array.sort_by {|k| k[:year]}
+    MovieSearch.titles(t)
   end
 
   def self.search_person(n)
-    person_response = HTTParty.get('https://api.themoviedb.org/3/search/person?api_key=' + ENV['TMDB_KEY'] + '&query=' + n)
-    person_response['results'].length
-    person_response['results'].length == 0 || person_response['results'][0]['profile_path'] == nil ? nil : 'https://image.tmdb.org/t/p/w342' + person_response['results'][0]['profile_path']
+    person = Tmdb.get('search/person', query: n)[:body]['results'].first
+    person && person['profile_path'] ? 'https://image.tmdb.org/t/p/w342' + person['profile_path'] : nil
   end
 
   # def self.user_count
@@ -173,10 +113,6 @@ class Movie < ActiveRecord::Base
     self.user_count = self.users.count
   end
 
-  def set_image
-    self.poster.gsub!(/^(http)/, 'https')
-  end
-
   def create_duration
     time = self.runtime.to_i
     hour = time.round / 60
@@ -190,36 +126,11 @@ class Movie < ActiveRecord::Base
     end
   end
 
-  def sanitize_input
-    self.title.gsub!(/(\s*\<.*\/.*\>)/, '')
-    self.year.gsub!(/\s*\<.*\/.*\>/, '')
-    self.rating.gsub!(/\s*\<.*\/.*\>/, '')
-    self.plot.gsub!(/\s*\<.*\/.*\>/, '')
-    self.actors.gsub!(/\s*\<.*\/.*\>/, '')
-    self.director.gsub!(/\s*\<.*\/.*\>/, '')
-    self.writer.gsub!(/\s*\<.*\/.*\>/, '')
-    self.genre.gsub!(/\s*\<.*\/.*\>/, '')
-    self.producer.gsub!(/\s*\<.*\/.*\>/, '')
-    self.runtime.gsub!(/\s*\<.*\/.*\>/, '')
-    self.poster.gsub!(/\s*\<.*\/.*\>/, '')
-    self.sort_name.gsub!(/\s*\<.*\/.*\>/, '')
-  end
-
   def adjust_url
     if self.poster =~ /http:/ && !(self.poster =~ /-ssl.mzstatic/)
       self.poster.gsub!(/^(http)/, 'https')
       self.poster.gsub!(/(\.mzstatic)/, '-ssl.mzstatic')
     end
-  end
-
-  def self.get_itunes_info_by_title(a, n, e)
-    t = a.detect {|x| x[:title] == n}
-    t[e]
-  end
-
-  def self.get_itunes_info_by_year(a, y, e)
-    t = a.detect {|x| x[:year] == y}
-    t[e]
   end
 
   def self.get_actors(r)
@@ -261,16 +172,6 @@ class Movie < ActiveRecord::Base
     rating != '' ? rating.upcase : 'NR'
   end
 
-  def self.itunes_info(r)
-    info = []
-    r.each {|i| info << i.text.gsub(/\n\s*/, '')}
-    info.length != 0 ? info.first(6).join(', ') : ''
-  end
-
-  def self.itunes_studio(r)
-    r.include?(';') ? r.split(';').first(1).join() : r.include?(',') ? r.split(',').first(1).join() : r.include?(':') ? r.split(':').first(1).join() : r
-  end
-
   def self.get_studio(r)
     studio = []
     r['production_companies'].each {|k| studio << k['name']} if r['production_companies']
@@ -287,62 +188,4 @@ class Movie < ActiveRecord::Base
     a.length != 0 ? a.first(6).join(', ') : ''
   end
 
-  def self.appletv_call(s_term)
-    movies = []
-    storeIds = ['143441', '143444', '143455', '143460']
-
-    storeIds.each do |store|
-      begin
-        response = HTTParty.get('https://uts-api.itunes.apple.com/uts/v2/search/incremental?sf=' + store + '&locale=en-US&utsk=0&caller=wta&v=58&pfm=appletv&q=' + CGI.escape(s_term))
-
-        if response.code == 200 && response['data'] && response['data']['canvas']
-          response['data']['canvas']['shelves'].each do |movie|
-            if movie['items'] && movie['items'].length > 0
-              movie['items'].each do |m|
-                if m['type'] == 'Movie' && m['title'] && m['title'].downcase == s_term.downcase
-                  request = HTTParty.get('https://uts-api.itunes.apple.com/uts/v2/view/product/' + m['id'] + '?sf=' + store + '&locale=en-US&utsk=0&caller=wta&v=58&pfm=appletv')
-                  if request.code == 200 && request['data'] && request['data']['content']
-                    content = request['data']['content']
-                    credits = request['data']['roles'] ? request['data']['roles'] : []
-                    actors = []
-                    director = []
-                    producer = []
-                    writer = []
-                    credits.each do |credit|
-                      case credit['type']
-                      when 'Actor', 'Voice'
-                        actors << credit['personName'].strip if credit['personName']
-                      when 'Director'
-                        director << credit['personName'].strip if credit['personName']
-                      when 'Producer'
-                        producer << credit['personName'].strip if credit['personName']
-                      when 'Writer'
-                        writer << credit['personName'].strip if credit['personName']
-                      end
-                    end
-                    title = content['title']
-                    plot = content['description'] ? get_plot(content['description']) : ''
-                    year = content['releaseDate'] ? Time.at(content['releaseDate'] / 1000).to_datetime.year.to_s : ''
-                    poster = content['images'] && content['images']['coverArt'] ? content['images']['coverArt']['url'].gsub(/({w}x{h}.{f})/, content['images']['coverArt']['width'].to_s + 'x' + content['images']['coverArt']['height'].to_s + '.jpg') : ''
-                    genre = content['genres'] ? content['genres'][0]['name'] : ''
-                    rating = content['rating'] ? content['rating']['displayName'] : ''
-                    runtime = content['duration'] ? (content['duration'] / 60).to_s : ''
-                    studio = content['studio'] ? content['studio'] : ''
-                    director_check = director.length > 0 ? director[0].split(' ').last : ''
-
-                    movies << {title: title, plot: plot, poster: poster, year: year, actors: get_first_six(actors), director: get_first_six(director), genre: genre, producer: get_first_six(producer), rating: rating, runtime: runtime, studio: studio, writer: get_first_six(writer), director_check: director_check} if movies.all? {|el| el[:title] != title && el[:year] != year || el[:director_check] != director_check}
-                  end
-                end
-              end
-            end
-          end
-        end
-      rescue JSON::ParserError
-        puts "Error parsing JSON in Movie.appletv_call for store: #{store}"
-      rescue => e
-        puts "Error in Movie.appletv_call: #{e.message}"
-      end
-    end
-    return movies
-  end
 end

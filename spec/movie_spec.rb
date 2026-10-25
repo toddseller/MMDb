@@ -26,3 +26,36 @@ describe Movie, '#thumbnail' do
     expect(thumbnail_for(nil)).to eq ''
   end
 end
+
+describe Movie, '.search_person' do
+  def stub_person(results)
+    stub_request(:get, 'https://api.themoviedb.org/3/search/person')
+      .with(query: { 'query' => 'Sylvester Stallone' }, headers: { 'Authorization' => "Bearer #{ENV['TMDB_TOKEN']}" })
+      .to_return(body: { results: results }.to_json, headers: { 'Content-Type' => 'application/json' })
+  end
+
+  it "returns the first person's profile image" do
+    stub_person([{ profile_path: '/stallone.jpg' }])
+
+    expect(Movie.search_person('Sylvester Stallone')).to eq 'https://image.tmdb.org/t/p/w342/stallone.jpg'
+  end
+
+  it 'returns nil when nobody is found' do
+    stub_person([])
+
+    expect(Movie.search_person('Sylvester Stallone')).to be_nil
+  end
+end
+
+describe 'GET /movies/search' do
+  it "looks up the person's image once" do
+    user = create_user
+    stub = stub_request(:get, %r{\Ahttps://api\.themoviedb\.org/3/search/person\?})
+      .to_return(body: { results: [{ profile_path: '/stallone.jpg' }] }.to_json, headers: { 'Content-Type' => 'application/json' })
+
+    response = get('/movies/search', params: { filter: 'Sylvester Stallone', id: user.id })
+
+    expect(JSON.parse(response.body)['url']).to eq 'https://image.tmdb.org/t/p/w342/stallone.jpg'
+    expect(stub).to have_been_requested.once
+  end
+end
