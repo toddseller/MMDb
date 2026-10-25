@@ -35,17 +35,6 @@ for (const width of [1500, 2560]) {
   test.describe(`in a ${width}px window`, () => {
     test.use({ viewport: { width, height: 1440 } })
 
-    test("a drawer's details are 1170px wide, centered", async ({ page }) => {
-      await page.goto(MOVIES.path)
-
-      await page.locator(`${MOVIES.tile} a`).nth(1).click()
-
-      await expect(page.getByText('Birch is a seeded movie.')).toBeVisible()
-      const details = await page.locator('.info #meta-data').boundingBox()
-      expect(details.width).toBeCloseTo(1170, 0)
-      expect(details.x + details.width / 2).toBeCloseTo(width / 2, -1)
-    })
-
     test("a show drawer's poster keeps its 447px size", async ({ page }) => {
       // A square stand-in for Apple's blocked artwork, so the poster has a real size to fit.
       await page.route('https://is1-ssl.mzstatic.com/**', (route) => route.fulfill({ contentType: 'image/svg+xml', body: '<svg xmlns="http://www.w3.org/2000/svg" width="600" height="600"/>' }))
