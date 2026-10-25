@@ -76,10 +76,11 @@ test('Remember me keeps the sign-in for 30 days', async ({ page, context }) => {
       }), theme)
       const password = signInDialog(page).getByPlaceholder('Password')
       const remember = signInDialog(page).getByLabel('Remember me')
-      const borderOf = (locator) => locator.evaluate((el) => getComputedStyle(el).borderTopColor)
 
       expect((await remember.boundingBox()).x).toBeCloseTo((await password.boundingBox()).x, 0)
-      expect(await borderOf(remember)).toBe(await borderOf(password))
+      // Both borders ease to the new theme's colour over 0.15s, so a single read can land mid-transition; toHaveCSS retries.
+      await expect(password).toHaveCSS('border-top-color', 'rgb(204, 204, 204)')
+      await expect(remember).toHaveCSS('border-top-color', 'rgb(204, 204, 204)')
     })
   }
 
