@@ -25,12 +25,11 @@ describe 'page text' do
 
   def snapshot(html)
     doc = Nokogiri::HTML(html)
-    ids = [user, show, movie, *show.seasons, *show.seasons.flat_map(&:episodes)].map(&:id).uniq.sort_by(&:-@)
     text = doc.text.squish
     attrs = doc.css('[alt], [src], [data-original], [value]').flat_map do |node|
       %w[alt src data-original value].filter_map { |name| "#{node.name}[#{name}]=#{node[name]}" if node[name] }
     end
-    ids.reduce([text, *attrs].join("\n").gsub(/User\d+|user\d+/, 'USER')) { |out, id| out.gsub(/\b#{id}\b/, 'ID') } + "\n"
+    [text, *attrs].join("\n").gsub(/User\d+|user\d+/, 'USER') + "\n"
   end
 
   def expect_snapshot(name, html)

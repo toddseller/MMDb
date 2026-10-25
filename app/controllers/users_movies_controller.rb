@@ -12,6 +12,7 @@ get '/users/:user_id/movies' do
 end
 
 post '/users/:user_id/movies' do
+  require_owner!
   @user = current_user
   movie = Movie.find_by("title = ? AND year = ?", params[:movie]['title'], params[:movie]['year']) || Movie.new(params[:movie])
   if movie.save
@@ -53,6 +54,7 @@ get '/users/:user_id/movies/:id/edit' do
 end
 
 put '/users/:user_id/movies/:id' do
+  require_owner!(:movies, params[:id])
   @movie = Movie.find(params[:id])
   params[:movie][:rating] = params[:movie][:rating].upcase
   @movie.update(params[:movie])
@@ -72,6 +74,7 @@ put '/users/:user_id/movies/:id' do
 end
 
 delete '/users/:user_id/movies/:id' do
+  require_owner!(:movies, params[:id])
   @movie = Movie.find(params[:id])
   @user = current_user
   @movie.users.destroy(@user)

@@ -1,4 +1,5 @@
 post '/movies/:id/ratings' do
+  require_sign_in!
   movie = Movie.find(params[:id])
   user = current_user
   rating = movie.ratings.find_or_create_by(user_id: user.id)

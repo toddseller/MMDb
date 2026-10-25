@@ -123,7 +123,7 @@ describe 'POST /users/:user_id/shows/:id/artwork' do
     it "refuses a signed-in user uploading for a show outside their collection" do
       log_in(other, 'secret')
 
-      expect(upload(JPEG, user_id: other.id).status).to eq 401
+      expect(upload(JPEG, user_id: other.id).status).to eq 403
       expect(a_request(:put, S3_OBJECT)).not_to have_been_made
     end
 
@@ -139,7 +139,7 @@ describe 'POST /users/:user_id/shows/:id/artwork' do
     it "refuses a signed-in user using another user's URL" do
       log_in(other, 'secret')
 
-      expect(upload(JPEG, user_id: user.id).status).to eq 401
+      expect(upload(JPEG, user_id: user.id).status).to eq 403
       expect(a_request(:put, S3_OBJECT)).not_to have_been_made
     end
   end

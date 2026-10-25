@@ -21,6 +21,7 @@ get '/users/:user_id/shows/new' do
 end
 
 post '/users/:user_id/shows' do
+  require_owner!
   @user = current_user
   @show = Show.find_by("show_collection_id = ?", params[:show]['show_collection_id']) || Show.new(title: params[:show]['title'], year: params[:show]['year'], rating: params[:show]['rating'], genre: params[:show]['genre'], poster: params[:season]['poster'], show_collection_id: params[:show]['show_collection_id'])
   @season = Season.find_by(collectionId: params[:season]['collectionId']) || @show.seasons.new(params[:season])
@@ -73,6 +74,7 @@ get '/users/:user_id/shows/:id/edit' do
 end
 
 put '/users/:user_id/shows/:id' do
+  require_owner!(:shows, params[:id])
   @show = Show.find(params[:id])
   if params[:show][:hd]
     @show.update(params[:show])
@@ -97,26 +99,11 @@ put '/users/:user_id/shows/:id' do
 end
 
 post '/users/:user_id/shows/:id/artwork' do
-  halt 401 unless current_user && current_user.id == params[:user_id].to_i && current_user.shows.exists?(params[:id])
+  require_owner!(:shows, params[:id])
   upload = params[:artwork]
   json url: Artwork.store(upload.is_a?(Hash) ? upload[:tempfile] : nil)
 rescue Artwork::Invalid => e
   halt 422, json(error: e.message)
 rescue Artwork::StoreFailed
   halt 502, json(error: "The artwork couldn't be stored. Try again.")
-end
-
-delete '/users/:user_id/shows/:id' do
-  @movie = Movie.find(params[:id])
-  @user = current_user
-  @movie.users.destroy(@user)
-  if request.xhr?
-    @my_movies = params[:filter] != nil ? Movie.filter_movies(params[:filter], @user.id).sorted_list : Movie.search(params[:name], @user.id).sorted_list
-    page = erb :'/partials/_filtered_list', locals: {movie: @my_movies, user: @user}, layout: false
-    count = Episode.episode_count(@user.id)
-    json status: "true", page: page, count: count
-  else
-    @my_movies = @user.movies.sorted_list
-    erb :'/users/show'
-  end
 end
