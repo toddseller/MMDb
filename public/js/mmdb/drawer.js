@@ -151,6 +151,19 @@ const togglePoster = async (document, poster) => {
  * @param {Document} document
  */
 export const init = (document) => {
+  const window = /** @type {Window} */ (document.defaultView)
+  // Turning a phone changes how many posters fit a row. The drawer leaves the grid first, as its own row would end the
+  // poster's row early and hide where that row now ends. iPhone Safari also resizes as its address bar moves during a
+  // scroll; that changes only the height, and moving the drawer then would cost a layout of the grid and drop focus.
+  let width = window.innerWidth
+  window.addEventListener('resize', () => {
+    if (window.innerWidth === width) return
+    width = window.innerWidth
+    if (!isOpen() || !current || !drawer) return
+    const el = drawer
+    el.remove()
+    rowEnd(current).after(el)
+  })
   for (const poster of ['.movie-modal', '.show-modal']) {
     on(document, 'click', poster, (event, link) => {
       event.preventDefault()

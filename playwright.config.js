@@ -13,7 +13,7 @@ export default defineConfig({
     trace: 'retain-on-failure',
   },
   projects: [
-    // The pages are a fixed 1386px wide, so the window must be wider than that.
+    // The drawer specs expect the seeded movies in rows of 7, which this width gives.
     { name: 'chromium', use: { ...devices['Desktop Chrome'], viewport: { width: 1500, height: 900 } } },
   ],
   webServer: {

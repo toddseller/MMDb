@@ -35,11 +35,25 @@ const togglePlot = (toggle) => {
   toggle.textContent = expanded ? 'less' : 'more'
 }
 
+// Every episode comes with a "more"; whether its plot is cut off depends on the screen, so it shows only when it is.
+/** @param {Document} document */
+const fitToggles = (document) => {
+  for (const toggle of document.querySelectorAll('.expand-plot')) {
+    const plot = toggle.previousElementSibling
+    if (!plot || plot.classList.contains('active')) continue
+    /** @type {HTMLElement} */ (toggle).hidden = plot.scrollWidth <= plot.clientWidth && plot.scrollHeight <= plot.clientHeight
+  }
+}
+
 /**
  * Binds the links inside the details drawer: credits and the studio search the collection, long plots expand.
  * @param {Document} document
  */
 export const init = (document) => {
+  const window = /** @type {Window & typeof globalThis} */ (document.defaultView)
+  // Episodes arrive with a drawer, a season switch or a new show, so any change to the page is checked.
+  new window.MutationObserver(() => fitToggles(document)).observe(document.body, { childList: true, subtree: true })
+  window.addEventListener('resize', () => fitToggles(document))
   on(document, 'click', '.description-details a', (event, link) => {
     event.preventDefault()
     searchByName(document, link.textContent ?? '')

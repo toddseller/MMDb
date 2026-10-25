@@ -37,14 +37,21 @@ const showCount = (document, count) => {
   fadeIn(footer)
 }
 
+// Each tile's id is its owner's, so the page says whose collection it is; storage covers a filter that left no tiles.
+/** @param {Document} document */
+const collectionOwner = (document) => {
+  const window = windowOf(document)
+  const id = document.querySelector('.index-preview')?.id || window.sessionStorage.getItem('id') || ''
+  if (window.sessionStorage.getItem('id') !== id) window.sessionStorage.setItem('id', id)
+  return id
+}
+
 /** @param {Document} document */
 const search = async (document) => {
-  const window = windowOf(document)
   const filter = /** @type {HTMLInputElement | null} */ (document.getElementById('search-movie-title'))?.value ?? ''
   rememberQuery(filter)
   const kind = document.getElementById('movie-list') ? 'movies' : 'shows'
-  const id = document.querySelector('.index-preview')?.id || window.sessionStorage.getItem('id') || ''
-  if (window.sessionStorage.getItem('id') !== id) window.sessionStorage.setItem('id', id)
+  const id = collectionOwner(document)
   const { page, count } = await request(`/${kind}/filter?${new URLSearchParams({ filter, id })}`)
   replaceContents(document, '#movie-list', page)
   showCount(document, count)
@@ -59,14 +66,14 @@ const showOnly = async (document, link, otherSelector) => {
 
 /** @param {Document} document */
 const clear = async (document) => {
-  const window = windowOf(document)
+  const id = collectionOwner(document)
   const form = /** @type {HTMLFormElement | null} */ (document.getElementById('filter-input'))
   form?.reset()
   closeDrawer(true)
   document.getElementById('unwatched')?.classList.remove('active')
   document.getElementById('four-k')?.classList.remove('active')
   rememberQuery('')
-  const { page, movie_count: count } = await request(`/users/${window.sessionStorage.getItem('id')}`)
+  const { page, movie_count: count } = await request(`/users/${id}`)
   replaceContents(document, '#user-page', page)
   showCount(document, count)
 }
