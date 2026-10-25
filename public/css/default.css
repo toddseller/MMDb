@@ -1,9 +1,10 @@
 @import url('normalize.css');
 @import url('bootstrap.min.css');
-@import url('themes/default/layout.css');
+@import url('themes/default/layout.css?v=1');
 @import url('typography.css');
-@import url('navigation.css');
-@import url('themes/default/modals.css?v=2');
-@import url('themes/default/movies.css?v=4');
-@import url('drawer.css?v=3');
+@import url('navigation.css?v=1');
+@import url('themes/default/modals.css?v=3');
+@import url('themes/default/movies.css?v=5');
+@import url('drawer.css?v=6');
 @import url('dialog.css?v=3');
+@import url('responsive.css');

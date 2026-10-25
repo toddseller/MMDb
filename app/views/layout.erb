@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link rel="prefetch" href="/imgs/animated.svg">
   <% themes = { 'default' => asset_path('/css/default.css'), 'dark' => asset_path('/css/dark.css') } %>
   <link id="theme" rel='stylesheet' href='<%= session[:theme] == 'default' ? themes['default'] : themes['dark'] %>' data-default='<%= themes['default'] %>' data-dark='<%= themes['dark'] %>' type='text/css'>

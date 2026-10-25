@@ -1,4 +1,4 @@
-<div id="meta-data" style="width: 1386px;">
+<div id="meta-data" style="max-width: 1386px;">
   <div class="modal-header">
   </div>
   <div class="modal-body">
@@ -68,7 +68,7 @@
                 <p class="episode-title"><%= e.title %></p>
                 <p class="episode-runtime"><%= e.runtime %></p>
                 <p class="plot-truncate"><%= e.plot %></p>
-                <% if e.plot && e.plot.length > 130 %>
+                <% if e.plot.present? %>
                   <p class="expand-plot">more</p>
                 <% end %>
               </div>
@@ -79,7 +79,7 @@
                 <p class="episode-title"><%= e.title %></p>
                 <p class="episode-runtime"><%= e.runtime %></p>
                 <p class="plot-truncate"><%= e.plot %></p>
-                <% if e.plot && e.plot.length > 130 %>
+                <% if e.plot.present? %>
                   <p class="expand-plot">more</p>
                 <% end %>
               </div>

@@ -221,7 +221,7 @@
 
 #meta-data
 {
-  width: 1170px;
+  max-width: 1170px;
   margin: 0 auto;
 }
 
@@ -796,12 +796,4 @@ li
 .onoffswitch-checkbox:checked + .onoffswitch-label .onoffswitch-switch
 {
   right: 0;
-}
-
-@media (max-width: 768px)
-{
-  .modal-lg
-  {
-    max-width: 400px;
-  }
 }

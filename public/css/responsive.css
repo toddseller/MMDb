@@ -1,0 +1,274 @@
+/* How the page fits the window at every width, shared by both themes. Colours live in themes/<theme>/. */
+
+/* 40px lines the page up with the navbar's logo and menu button. On wide screens the margins grow, to about one
+   poster at 2560px (10 movies or 9 shows a row, with room for a scrollbar) and two posters from about 3350px. */
+:root
+{
+    --gutter: clamp(40px, (100vw - 1640px) * .22, 376px);
+}
+
+@media (max-width: 767px)
+{
+    :root
+    {
+        --gutter: 16px;
+    }
+}
+
+body
+{
+    padding-inline: var(--gutter);
+}
+
+#search-boxes
+{
+    right: 0;
+    left: 0;
+
+    padding-inline: var(--gutter);
+}
+
+/* .row's -15px margins put the band 15px nearer the window's edges than the page's content. */
+#profile-wrapper.active
+{
+    margin-inline: calc(15px - var(--gutter));
+}
+
+/* Desktop tiles keep their size and wide windows gain columns; a phone gets a fixed 3 or 2 that shrink to fit.
+   minmax(0, ...) keeps a long title from widening its column, as 1fr alone won't shrink below its content. */
+@media (max-width: 767px)
+{
+    #movie-list
+    {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 0 12px;
+    }
+
+    #show-list
+    {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 0 12px;
+    }
+
+    .index-preview,
+    .index-preview-show,
+    .movie-modal,
+    .truncate,
+    .show-truncate
+    {
+        width: auto;
+        height: auto;
+    }
+
+    /* A fixed shape, not the loaded image's: the fallback shown for a failed poster is 140x208, which isn't 2:3. */
+    .index-preview img,
+    .index-preview-show img
+    {
+        width: 100%;
+        height: auto;
+        aspect-ratio: 2 / 3;
+    }
+
+    .index-preview-show img
+    {
+        aspect-ratio: 1;
+    }
+
+    /* A third of the width less gutters and gaps, at 2:3, plus the title: the size skipped tiles hold while off screen. */
+    #movie-list > .index-preview
+    {
+        contain-intrinsic-size: auto 110px auto calc((100vw - 56px) / 2 + 42px);
+    }
+}
+
+/* A phone pins one row: logo, search, then the menu or Sign in. The search form is moved up into the navbar's row
+   by position alone, because filters.js and three views own its markup; the rest of the header scrolls away.
+   A phone on its side gets the same bar, as the desktop header would cover a third of its height. */
+@media (max-width: 767px), (max-height: 500px)
+{
+    .navbar-text,
+    #tmdb
+    {
+        display: none;
+    }
+
+    .logo img
+    {
+        width: 72px;
+        margin-top: 13px;
+        margin-left: 1px;
+    }
+
+    .navbar-right
+    {
+        position: absolute;
+        top: 0;
+        right: 0;
+
+        margin: 0;
+    }
+
+    #menu-toggle
+    {
+        right: var(--gutter);
+    }
+
+    #sign-in
+    {
+        margin-right: var(--gutter);
+    }
+
+    #search-boxes
+    {
+        position: static;
+
+        padding-inline: 0;
+    }
+
+    #filter-input
+    {
+        position: fixed;
+        z-index: 1031;
+        top: 8px;
+        right: calc(var(--gutter) + 42px);
+        left: calc(var(--gutter) + 84px);
+
+        margin: 0;
+    }
+
+    body:has(#sign-in) #filter-input
+    {
+        right: calc(var(--gutter) + 80px);
+    }
+
+    #search-movies
+    {
+        float: none;
+
+        width: 100%;
+        padding: 0;
+    }
+
+    /* iOS zooms the page in on focusing an input set smaller than 16px. */
+    #search-movie-title
+    {
+        font-size: 16px;
+    }
+
+    #movie-list,
+    #show-list
+    {
+        margin-top: 0;
+    }
+
+    #drop-down
+    {
+        left: 0;
+
+        width: auto;
+    }
+}
+
+/* Below 1200px the show drawer's columns stack, so the episode list fills the line. On wider screens the runtime and
+   "more" hang 40px into the column beside it, with "more" pulled up beside the plot; stacked, they'd leave the screen
+   or cover the plot. */
+@media (max-width: 1199px)
+{
+    .episode-runtime,
+    .expand-plot
+    {
+        margin-right: 0;
+    }
+
+    .expand-plot
+    {
+        margin-top: 4px;
+    }
+}
+
+/* A show's poster is 447px, wider than its column below about a 1500px window. It may still use the column's right
+   padding, as it always has, but no more, so it never runs under the details beside it. */
+#info-header > .description-poster img
+{
+    max-width: calc(100% + 15px);
+    height: auto;
+}
+
+/* 60% of its column, which the old 1386px page held to about this size. */
+#main-logo
+{
+    max-width: 600px;
+}
+
+@media (max-width: 767px)
+{
+    #meta-data .description-poster img,
+    #info-header > .description-poster img,
+    #meta-data hr
+    {
+        max-width: 100%;
+        height: auto;
+    }
+
+    /* Runtime, year, genre, badges and stars wrap as whole pieces rather than squeeze each other. */
+    .description-info
+    {
+        display: flex;
+        flex-wrap: wrap;
+        row-gap: 6px;
+    }
+
+    .description-info > *
+    {
+        flex-shrink: 0;
+    }
+
+    /* The edit button floats right with a negative bottom margin; the full-width poster goes below it instead, and
+       15px of margin, the poster column's padding, lines the button up with the poster's edge. */
+    #info-header > .show-edit
+    {
+        margin-right: 15px;
+        margin-bottom: 8px;
+    }
+
+    #info-header > .description-poster
+    {
+        clear: right;
+    }
+
+    /* Three lines show most plots whole on a phone; "more" appears only for a plot that is still cut off. */
+    .plot-truncate
+    {
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 3;
+
+        white-space: normal;
+    }
+
+    .plot-truncate.active
+    {
+        display: block;
+        -webkit-line-clamp: unset;
+    }
+
+    /* Content taller than the screen scrolls inside the dialog, as the page behind it is held still. */
+    dialog.modal
+    {
+        width: calc(100% - 16px);
+        max-height: calc(100dvh - 16px);
+
+        overflow-y: auto;
+    }
+
+    .modal-lg
+    {
+        width: auto;
+    }
+
+    /* The home page's posters are floated, and without this the user list below them wraps up beside them. */
+    .col-sm-9:has(> #main-logo)
+    {
+        display: flow-root;
+    }
+}

@@ -288,17 +288,9 @@
     z-index: 4;
     top: 50px;
 
-    width: 100vw;
-    margin-left: calc((100vw - 1386px)/-2);
-    padding: 1.5em 5em;
+    padding-block: 1.5em;
 
     background: rgba(44, 44, 44, .97);
-}
-
-#search-wrapper
-{
-    width: 1386px;
-    margin: 0 auto;
 }
 
 #filter-input
@@ -349,8 +341,6 @@
 .preview-wrapper
 {
     position: relative;
-
-    width: 1386px;
 }
 
 #preview
@@ -406,12 +396,9 @@
 {
     display: block;
 
-    width: 100vw;
     height: 301px;
     margin-top: 110px;
-    margin-right: calc(-50vw + 50%);
     margin-bottom: -75px;
-    margin-left: calc(-50vw + 50%);
 }
 
 #profile-header

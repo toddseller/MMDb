@@ -1,7 +1,7 @@
 /* Layout and motion for the movie and show grids and their details drawer.
    Colours live in themes/<theme>/movies.css. */
 
-/* Gaps are the old tile margins: they make 7 movies or 6 shows exactly fill the 1386px page. */
+/* Gaps are the old tile margins, which made 7 movies or 6 shows exactly fill the old 1386px page. */
 #movie-list,
 #show-list
 {
@@ -43,12 +43,13 @@
 {
     display: grid;
     grid-column: 1 / -1;
+    /* A plain column would grow to its widest unbreakable child, pushing the details off a narrow screen. */
+    grid-template-columns: minmax(0, 1fr);
     grid-template-rows: 0fr;
 
-    width: 100vw;
     margin-top: 0;
-    margin-right: calc(-50vw + 50%);
-    margin-left: calc(-50vw + 50%);
+    /* Out through the page's side margins to the window's edges; 100vw would also count a scrollbar and scroll sideways. */
+    margin-inline: calc(-1 * var(--gutter));
 
     transition: grid-template-rows .25s ease-in, margin-top .25s ease-in, border-color .25s ease-in;
 
@@ -69,9 +70,9 @@
 {
     overflow: hidden;
 
-    width: 100vw;
     min-height: 0;
-    margin: 0 auto;
+    /* The drawer spans the window; its content keeps the page's side margins. */
+    padding-inline: var(--gutter);
 
     transition: height .35s cubic-bezier(.2, .8, .2, 1);
 }

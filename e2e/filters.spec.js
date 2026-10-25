@@ -41,6 +41,18 @@ test.describe('collection filters', () => {
     await expect(page.getByPlaceholder('Search Collection')).toHaveValue('')
   })
 
+  // A new tab has searched nothing yet, so nothing is remembered about whose collection is on screen.
+  for (const name of ['Library', 'Clear']) {
+    test(`${name} restores the full collection in a new tab`, async ({ page }) => {
+      await page.getByRole('link', { name: 'Unwatched' }).click()
+      await expect(grid(page)).toHaveCount(1)
+
+      await (name === 'Library' ? page.getByRole('link', { name }) : page.getByRole('button', { name })).click()
+
+      await expect(grid(page)).toHaveCount(30)
+    })
+  }
+
   test('4K still works after the collection is cleared', async ({ page }) => {
     await page.getByPlaceholder('Search Collection').pressSequentially('amb')
     await expect(grid(page)).toHaveCount(1)
