@@ -44,6 +44,12 @@
     color: #fff;
 }
 
+/* The dark movies.css zeroes .checkbox label padding for the edit form, which pads its .checkbox instead; this gives Bootstrap's pulled-left checkbox room to line up with the fields. */
+#sign-in-form .checkbox
+{
+    padding-left: 20px;
+}
+
 .modal#edit-show
 {
     width: 450px;

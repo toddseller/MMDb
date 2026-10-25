@@ -77,3 +77,36 @@ html:has(dialog.modal[open]) {
     transform: translate(0, -25%);
   }
 }
+
+/* Drawn by the page rather than the browser, so its border matches the sign-in fields' .form-control. */
+#sign-in-form input[type="checkbox"] {
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  margin-top: 3px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background: #fff center / 10px no-repeat;
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);
+  /* Bootstrap gives a clicked checkbox the browser's focus ring; the keyboard keeps the fields' glow below. */
+  outline: 0;
+  transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
+}
+
+#sign-in-form input[type="checkbox"]:focus-visible {
+  border-color: #66afe9;
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px rgba(102, 175, 233, .6);
+}
+
+#sign-in-form input[type="checkbox"]:checked {
+  border-color: #d43f3a;
+  background-color: #d9534f;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M2.5 6.2l2.3 2.3 4.7-5' fill='none' stroke='%23fff' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+}
+
+/* High-contrast mode drops background colours and images, which would hide the tick. */
+@media (forced-colors: active) {
+  #sign-in-form input[type="checkbox"] {
+    appearance: auto;
+  }
+}
