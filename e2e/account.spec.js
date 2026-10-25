@@ -65,6 +65,31 @@ test('Remember me keeps the sign-in for 30 days', async ({ page, context }) => {
     await expect(signInDialog(page).getByPlaceholder('Password')).toHaveValue('')
   })
 
+  for (const theme of ['dark', 'default']) {
+    test(`Remember me lines up with the fields and shares their border (${theme} theme)`, async ({ page }) => {
+      // A signed-out visitor already has the dark theme, and re-setting the same stylesheet fires no load event.
+      await page.evaluate((name) => new Promise((loaded) => {
+        const link = document.getElementById('theme')
+        if (link.getAttribute('href') === link.dataset[name]) return loaded()
+        link.addEventListener('load', loaded, { once: true })
+        link.href = link.dataset[name]
+      }), theme)
+      const password = signInDialog(page).getByPlaceholder('Password')
+      const remember = signInDialog(page).getByLabel('Remember me')
+      const borderOf = (locator) => locator.evaluate((el) => getComputedStyle(el).borderTopColor)
+
+      expect((await remember.boundingBox()).x).toBeCloseTo((await password.boundingBox()).x, 0)
+      expect(await borderOf(remember)).toBe(await borderOf(password))
+    })
+  }
+
+  test("Remember me is the browser's own checkbox in high-contrast mode", async ({ page }) => {
+    await page.emulateMedia({ forcedColors: 'active' })
+
+    const remember = signInDialog(page).getByLabel('Remember me')
+    expect(await remember.evaluate((el) => getComputedStyle(el).appearance)).toBe('auto')
+  })
+
   test('an empty form shows the error without asking the server', async ({ page }) => {
     const posts = []
     page.on('request', (request) => { if (new URL(request.url()).pathname === '/sessions') posts.push(request) })
