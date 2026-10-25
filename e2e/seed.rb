@@ -51,6 +51,23 @@ night_season = night.seasons.create!(season: 1, collectionName: 'Night Ferry, Se
 (1..2).each { |number| night_season.episodes.create!(title: "Night Ferry 1x#{number}", tv_episode: number, plot: "Episode #{number}.") }
 other.shows << night
 
+# The letter rail needs a collection many screens long, with a gap at Q, a leading article and titles under #.
+long = User.create!(first_name: 'Lena', last_name: 'Long', user_name: 'long', email: 'long@example.test', password: 'long-password')
+words = %w[Amber Birch Cedar Delta Ember Fable Garnet Harbor Indigo Juniper Kestrel Lantern Meadow Nimbus Orchid
+           Pebble Raven Saffron Thistle Umber Velvet Willow Xenon Yarrow Zephyr]
+long_titles = words.flat_map { |word| ['', ' Rising', ' Road', ' Season', ' Signal', ' Station'].map { |end_of_title| "#{word}#{end_of_title}" } }
+long_titles += ['The Matrix', '12 Angry Men', '21 Grams', '300', '1917', '42']
+long_titles.each_with_index do |title, i|
+  long.movies << Movie.create!(title: title, year: (1950 + i % 70).to_s, director: 'Jane Doe', actors: 'Ann Lee', writer: 'Sam Ray', producer: 'Pat Kim',
+                               plot: "#{title} is a seeded movie.", genre: 'Drama', rating: 'PG', runtime: '95',
+                               poster: apple.call("long-#{title.parameterize}"), isnew: false, hd: 1080)
+end
+(words + ['24']).each_with_index do |word, i|
+  long_show = Show.create!(title: "#{word} Bay", year: '2020', show_collection_id: "long-#{i}", poster: "https://is1-ssl.mzstatic.com/image/thumb/long-#{i}/600x600.jpg")
+  long_show.seasons.create!(season: 1, collectionName: "#{word} Bay, Season 1", collectionId: "tmdb-long-#{i}", is_active: true)
+  long.shows << long_show
+end
+
 # The real search asks Apple and TMDB, which the tests can't reach. Record what the app renders for a canned
 # result instead, so the browser test answers the search with markup from the real _preview partial.
 def Movie.get_titles(_title)

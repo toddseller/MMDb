@@ -4,7 +4,7 @@
 @import url('typography.css');
 @import url('navigation.css?v=1');
 @import url('themes/dark/modals.css?v=4');
-@import url('themes/dark/movies.css?v=5');
+@import url('themes/dark/movies.css?v=6');
 @import url('drawer.css?v=6');
 @import url('dialog.css?v=4');
-@import url('responsive.css');
+@import url('responsive.css?v=1');

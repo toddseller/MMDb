@@ -272,3 +272,129 @@ body
         display: flow-root;
     }
 }
+
+/* The letter rail runs the full height between whatever is pinned at the top (the 160px navbar and search band on
+   desktop, the 50px bar on phones and short screens) and the 25px count footer. Its letters share that height, each
+   clickable over its share. 30px fits the 40px margin, the narrowest a desktop has, so it never covers a poster. */
+#letter-rail
+{
+    position: fixed;
+    z-index: 4;
+    top: 160px;
+    right: calc((var(--gutter) - 30px) / 2);
+    bottom: 25px;
+
+    display: flex;
+    flex-direction: column;
+
+    width: 30px;
+    padding: 16px 0;
+
+    /* A finger dragging along the rail picks letters rather than scrolling the page or selecting text. */
+    touch-action: none;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+#letter-rail a
+{
+    display: flex;
+    align-items: center;
+    flex: 1;
+    justify-content: center;
+
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1;
+
+    text-decoration: none;
+}
+
+#letter-rail a[aria-disabled="true"]
+{
+    cursor: default;
+}
+
+/* Bootstrap rings every focused link, so a click or tap would leave one on the chosen letter; Tab still gets it. */
+#letter-rail a:focus:not(:focus-visible)
+{
+    outline: none;
+}
+
+/* A jump puts a letter's first row just below the pinned header rather than under it. */
+.index-preview,
+.index-preview-show
+{
+    scroll-margin-top: 170px;
+}
+
+@media (max-width: 767px), (max-height: 500px)
+{
+    #letter-rail
+    {
+        top: 50px;
+    }
+
+    .index-preview,
+    .index-preview-show
+    {
+        scroll-margin-top: 60px;
+    }
+}
+
+/* A phone's rail sits over the last column, so it shows only while letter-rail.js marks it shown. */
+@media (max-width: 767px)
+{
+    #letter-rail
+    {
+        right: 2px;
+        bottom: 33px;
+
+        width: 22px;
+        margin-top: 8px;
+        padding: 4px 0;
+
+        transition: opacity .15s, visibility 0s linear .15s;
+
+        border-radius: 11px;
+
+        -webkit-backdrop-filter: blur(6px);
+        backdrop-filter: blur(6px);
+    }
+
+    #letter-rail:not(.shown)
+    {
+        visibility: hidden;
+
+        opacity: 0;
+    }
+
+    #letter-rail.shown
+    {
+        transition: opacity .15s;
+    }
+
+    #letter-rail a
+    {
+        font-size: 12px;
+    }
+}
+
+@media (max-width: 767px) and (prefers-reduced-motion: reduce)
+{
+    #letter-rail,
+    #letter-rail.shown
+    {
+        transition: none;
+    }
+}
+
+/* 27 letters would get about 13px each on a phone held sideways, so every other one is left out; a finger between
+   two still picks the letter under it. */
+@media (max-height: 500px)
+{
+    #letter-rail a:nth-child(odd):not(:first-child):not(:last-child)
+    {
+        display: none;
+    }
+}

@@ -6,6 +6,7 @@ import { init as initDialog } from '#mmdb/dialog.js'
 import { init as initDrawer } from '#mmdb/drawer.js'
 import { init as initEdit } from '#mmdb/edit.js'
 import { init as initFilters } from '#mmdb/filters.js'
+import { init as initLetterRail } from '#mmdb/letter-rail.js'
 import { init as initNavigation } from '#mmdb/navigation.js'
 import { init as initPreview } from '#mmdb/preview.js'
 import { init as initShowEdit } from '#mmdb/show-edit.js'
@@ -16,6 +17,7 @@ initCredits(document)
 initDrawer(document)
 initEdit(document)
 initFilters(document)
+initLetterRail(document)
 initNavigation(document)
 initPreview(document)
 initShowEdit(document)
