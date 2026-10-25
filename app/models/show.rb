@@ -29,9 +29,9 @@ class Show < ActiveRecord::Base
       end
     end
 
-    db_rows, series_response, tmdb_response = in_parallel([:db, :apple, :tmdb], limit: 3) do |source|
+    db_rows, series_response, tmdb_response = InParallel.map([:db, :apple, :tmdb], limit: 3) do |source|
       case source
-      when :db then in_parallel(db_seasons) { |db_season| refresh_apple_count(db_season) }
+      when :db then InParallel.map(db_seasons) { |db_season| refresh_apple_count(db_season) }
       when :apple then appletv_call(t)
       when :tmdb then tmdb_call(t)
       end
@@ -42,34 +42,24 @@ class Show < ActiveRecord::Base
     series = db_rows || []
     series_response, tmdb_response = [series_response, tmdb_response].map { |rows| (rows || []).select { |s| from_stored_source?(series, s) } }
     (series_response || []).each do |s|
-      series << s if series.all? {|el| !same_name?(el[:collectionName], s[:collectionName]) || !same_year?(el[:year], s[:year]) || el[:show_collection_id] != s[:show_collection_id] && is_number?(s[:season])}
+      series << s if series.all? {|el| !Match.same_name?(el[:collectionName], s[:collectionName]) || !Match.same_year?(el[:year], s[:year]) || el[:show_collection_id] != s[:show_collection_id] && is_number?(s[:season])}
     end
     (tmdb_response || []).each do |s|
-      series << s if series.all? {|el| !same_name?(el[:collectionName], s[:collectionName]) || !same_year?(el[:year], s[:year])}
+      series << s if series.all? {|el| !Match.same_name?(el[:collectionName], s[:collectionName]) || !Match.same_year?(el[:year], s[:year])}
     end
     series.sort {|a, b| [a[:year], a[:title], a[:season].to_i] <=> [b[:year], b[:title], b[:season].to_i]}
   end
 
-  # Apple and TMDB often date the same show a year apart (the UK Office: 2001 on TMDB, 2002 on Apple).
-  def self.same_year?(a, b)
-    (a.to_i - b.to_i).abs <= 1
-  end
-
-  # Apple spells some titles with a curly apostrophe where TMDB uses a straight one (Lupin’s Tales).
-  def self.same_name?(a, b)
-    a.downcase.tr('‘’', "''") == b.downcase.tr('‘’', "''")
-  end
-
   # Adding a season finds its show by show_collection_id, so a season of a stored show under another id would create a second copy of the show.
   def self.from_stored_source?(db_rows, s)
-    stored = db_rows.select { |el| same_name?(el[:title], s[:title]) && same_year?(el[:year], s[:year]) }
+    stored = db_rows.select { |el| Match.same_name?(el[:title], s[:title]) && Match.same_year?(el[:year], s[:year]) }
     stored.empty? || stored.any? { |el| el[:show_collection_id] == s[:show_collection_id] } && stored.none? { |el| el[:season].to_i == s[:season].to_i }
   end
 
   def self.refresh_apple_count(db_season)
     return db_season if db_season[:appleTvId] == nil || db_season[:appleTvId] == ""
     storeId = db_season[:storeId] ? db_season[:storeId] : '143441'
-    request = HTTParty.get('https://tv.apple.com/api/uts/v2/view/show/' + db_season[:appleTvId] + '/episodes?sf=' + storeId + APPLE_PARAMS)
+    request = HTTParty.get('https://tv.apple.com/api/uts/v2/view/show/' + db_season[:appleTvId] + '/episodes?sf=' + storeId + AppleTv::PARAMS)
     if request.code == 200 && request['data'] && request['data']['seasonSummaries']
       db_season[:storeId] = storeId if db_season[:storeId] == nil
       db_season[:count] = request['data']['seasonSummaries'][db_season[:season] - 1]['episodeCount'].to_s
@@ -85,17 +75,7 @@ class Show < ActiveRecord::Base
 
   def self.get_episodes(id, season, skip=0, count=0, storeId='143441')
     episodes = []
-    if id.include? 'tvdb'
-      id = id.gsub(/tvdb/,'')
-      id = id[0...-season.to_s.length]
-      tvdb_episodes = tvdb_episodes(id, season)
-
-      if tvdb_episodes.length > 0
-        tvdb_episodes.each do |e|
-          episodes << e if e[:tv_episode] != nil
-        end
-      end
-    elsif id.include? 'tmdb'
+    if id.include? 'tmdb'
       id = id.gsub(/tmdb/,'')
       id = id[0...-season.to_s.length]
       tmdb_episodes = tmdb_episodes(id, season)
@@ -158,9 +138,7 @@ class Show < ActiveRecord::Base
         s.except!(:genre, :rating, :title, :year, :show_collection_id)
         season = Season.find_by(collectionId: s[:collectionId]) || show.seasons.new(s)
 
-        if season.collectionId.include? 'tvdb'
-          episodes = data['type'] == 'show' ? tvdb_episodes(show.show_collection_id, season_number) : tvdb_episodes(show.show_collection_id, season_number, episode_number)
-        elsif season.collectionId.include? 'tmdb'
+        if season.collectionId.include? 'tmdb'
           episodes = data['type'] == 'show' ? tmdb_episodes(show.show_collection_id, season_number) : tmdb_episodes(show.show_collection_id, season_number, episode_number)
         else
           episodes = data['type'] == 'show' ? appletv_episodes(season.appleTvId, (season.skip.to_i).to_s, season.count.to_s, season.storeId) : appletv_episodes(season.appleTvId, (season.skip.to_i + episode_number - 1).to_s, 1.to_s, season.storeId)
@@ -202,10 +180,6 @@ class Show < ActiveRecord::Base
     self.episodeCount = self.episode_count.to_s
   end
 
-  def self.set_image(p)
-    p.gsub!(/100x100/, '600x600')
-  end
-
   def self.get_plot(p)
     return if p == nil
     new_p = p.gsub(/\<[i|b]\>|\<\/[i|b]\>/, '')
@@ -234,18 +208,8 @@ class Show < ActiveRecord::Base
     end
   end
 
-  def self.get_season(s)
-    new_s = s.gsub(/.*(Season\s)/) {''}
-    new_s = new_s.gsub(/.*(Series\s)/) {''}
-    new_s = new_s.gsub(/\W.*/) {''}
-  end
-
   def self.get_collection_name(s, i)
     collection_name = s + ', Season ' + i if s != nil && i != nil
-  end
-
-  def self.get_tvdb_collection_id(s, i)
-    collection_id = "tvdb#{s}#{i}"
   end
 
   def self.get_tmdb_collection_id(s, i)
@@ -258,19 +222,6 @@ class Show < ActiveRecord::Base
 
   def self.plex_title(t)
     new_t = t.gsub(/\s\(.*\)/,'').downcase()
-  end
-
-  def self.get_ratings(s)
-    if !s.empty?
-      rating = s.select { |rating| rating['country'] == 'usa' }
-      if !rating.empty?
-        rating[0]['name']
-      else
-        ''
-      end
-    else
-      ''
-    end
   end
 
   def self.get_tmdb_rating(s)
@@ -286,187 +237,24 @@ class Show < ActiveRecord::Base
     end
   end
 
-  def self.get_overview(s)
-    if s != nil
-      overview = s.select { |overview| overview['language'] == 'eng' }
-      # overview[0]['language'] == 'eng' ? overview[0]['overview'] : ''
-      overview.length != 0 ? overview[0]['overview'] : ''
-    else
-      ''
-    end
-  end
-
-  def self.tvdb_auth
-    uri = URI.parse("https://api4.thetvdb.com/v4/login")
-    request = Net::HTTP::Post.new(uri)
-    request.content_type = "application/json"
-    request["Accept"] = "application/json"
-    request.body = JSON.dump({
-      "apikey" => ENV['TVDB_APIKEY'],
-      "pin" => ENV['TVDB_PIN']
-    })
-
-    req_options = {
-      use_ssl: uri.scheme == "https",
-    }
-
-    response = Net::HTTP.start(uri.hostname, uri.port, req_options) do |http|
-      http.request(request)
-    end
-    response = {code: response.code, body: JSON.parse(response.body)}
-  end
-
-  def self.tvdb_call(url)
-    uri = URI.parse(url)
-    request = Net::HTTP::Get.new(uri)
-    request["Accept"] = "application/json"
-    request["Authorization"] = "Bearer " + ENV['TVDB_TOKEN']
-
-
-    req_options = {
-      use_ssl: uri.scheme == "https",
-    }
-
-    response = Net::HTTP.start(uri.hostname, uri.port, req_options) do |http|
-      http.request(request)
-    end
-    if !response.body.nil? || !response.body.empty?
-      response = {code: response.code, body: JSON.parse(response.body)}
-    end
-  end
-
-  def self.tmdb_request(url)
-    uri = URI.parse(url)
-    request = Net::HTTP::Get.new(uri)
-    request["Accept"] = "application/json"
-    request["Authorization"] = "Bearer " + ENV['TMDB_TOKEN']
-
-
-    req_options = {
-      use_ssl: uri.scheme == "https",
-    }
-
-    response = Net::HTTP.start(uri.hostname, uri.port, req_options) do |http|
-      http.request(request)
-    end
-    if !response.body.nil? || !response.body.empty?
-      response = {code: response.code, body: JSON.parse(response.body)}
-    end
-  end
-
-  def self.heroku_call(token)
-    uri = URI.parse("https://api.heroku.com/apps/mmdb-online/config-vars")
-    request = Net::HTTP::Patch.new(uri)
-    request.content_type = "application/json"
-    request["Accept"] = "application/vnd.heroku+json; version=3"
-    request["Authorization"] = "Bearer " + ENV['HEROKU_KEY']
-    request.body = JSON.dump({
-      'TVDB_TOKEN' => token
-    })
-
-    req_options = {
-      use_ssl: uri.scheme == "https",
-    }
-
-    response = Net::HTTP.start(uri.hostname, uri.port, req_options) do |http|
-      http.request(request)
-    end
-    response.code
-  end
-
-  def self.use_tvdb(s_term)
-    details = []
-    if JwtAuth.has_expired?(ENV['TVDB_TOKEN'])
-      token_response = tvdb_auth()
-      ENV['TVDB_TOKEN'] = token_response[:body]['data']['token']
-    end
-
-    first_response = tvdb_call("https://api4.thetvdb.com/v4/search?query=" + CGI.escape(s_term) + "&type=series&limit=1")
-    if first_response && first_response[:code] == '200'
-      first_response[:body]['data'].each do |s|
-        second_response = tvdb_call("https://api4.thetvdb.com/v4/series/" + s['tvdb_id'].to_s + "/extended?meta=translations&short=true")
-        aired_seasons = []
-        if !second_response[:body].nil? || !second_response[:body].empty? && second_response[:code] == '200'
-            second_response[:body]['data']['seasons'].each do |sea|
-            aired_seasons << sea['number'] if sea['number'] != 0 && sea['type']['type'] == 'official'
-          end
-          aired_seasons.each do |a|
-            season_number = a
-            collection_name = get_collection_name(s['name'], season_number.to_s)
-            artwork = tvdb_call("https://api4.thetvdb.com/v4/series/" + s['tvdb_id'] + "/artworks?lang=eng&type=5" )
-              if !artwork[:body].nil? || !artwork[:body].empty? && artwork[:code] == '200'
-                if artwork[:body]['data'].has_key?('artworks') && artwork[:body]['data']['artworks'].length > 0
-                  poster = artwork[:body]['data']['artworks'][0]['image']
-                else
-                  poster = s['image_url']
-                  squared = false
-                end
-              else
-                poster = 'https://s3-us-west-2.amazonaws.com/toddseller/tedflix/imgs/Artboard+1-196x196.jpg'
-              end
-              overview = second_response[:body]['data'].has_key?('overviewTranslations') || second_response[:body]['data'].has_key?(:overviewTranslations) ? get_overview(second_response[:body]['data']['translations']['overviewTranslations']) : ''
-              year = s.has_key?('year') && s['year'] != nil ? s['year'] : ''
-              genre = second_response[:body]['data'].has_key?('genres') && second_response[:body]['data']['genres'].length != 0 ? second_response[:body]['data']['genres'][0]['name'] : ''
-              rating = second_response[:body]['data'].has_key?('contentRatings') || second_response[:body]['data'].has_key?(:contentRatings) ? get_ratings(second_response[:body]['data']['contentRatings']) : ''
-              details << {title: s['name'], collectionName: collection_name, collectionId: get_tvdb_collection_id(s['tvdb_id'], season_number.to_s), season: season_number.to_s, poster: poster, rating: rating, year: year, plot: overview, genre: genre, show_collection_id: s['tvdb_id']}
-          end
-        end
-      end
-    end
-    return details
-  end
-
-  def self.tvdb_episodes(id, season, episode_number=nil)
-    episodes = []
-    if JwtAuth.has_expired?(ENV['TVDB_TOKEN'])
-      token_response = tvdb_auth()
-      ENV['TVDB_TOKEN'] = token_response[:body]['data']['token']
-    end
-
-    if episode_number.nil?
-      first_response = tvdb_call("https://api4.thetvdb.com/v4/series/" + id.to_s + "/episodes/official?page=0&season=" + season.to_s)
-      first_response[:body]['data']['episodes'].each do |e|
-        if e['aired'] != ''
-          preview = e['image'] ? e['image'] : ''
-          plot = e.has_key?('overview') || e.has_key?(:overview) ? get_plot(e['overview']) : ''
-          runtime = e['runtime'] ? e['runtime'].to_s : ''
-          episodes << {title: e['name'], date: convert_date(e['aired']), plot: HTMLEntities.new.decode(plot), runtime: runtime, tv_episode: e['number'], preview: preview}
-        end
-      end
-    else
-      first_response = tvdb_call("https://api4.thetvdb.com/v4/series/" + id.to_s + "/episodes/official?page=0&season=" + season.to_s)
-      first_response[:body]['data']['episodes'].each do |e|
-        if e['number'] == episode_number
-          if e['aired'] != ''
-            preview = e['image'] ? e['image'] : ''
-            plot = e.has_key?('overview') || e.has_key?(:overview) ? get_plot(e['overview']) : ''
-            runtime = e['runtime'] ? e['runtime'].to_s : ''
-            episodes << {title: e['name'], date: convert_date(e['aired']), plot: HTMLEntities.new.decode(plot), runtime: runtime, tv_episode: e['number'], preview: preview}
-          end
-        end
-      end
-    end
-    return episodes
-  end
-
   # TMDB allows 20 appended items per request; content_ratings takes one of them on the first request.
   TMDB_SEASONS_PER_REQUEST = 19
 
   def self.tmdb_call(s_term)
-    search_response = tmdb_request('https://api.themoviedb.org/3/search/tv?query=' + CGI.escape(s_term))
+    search_response = Tmdb.get('search/tv', query: s_term)
     return [] unless search_response && search_response[:code] == '200'
-    in_parallel(search_response[:body]['results']) { |show| tmdb_show(show) }.compact.flatten(1)
+    InParallel.map(search_response[:body]['results']) { |show| tmdb_show(show) }.compact.flatten(1)
   end
 
   # Missing seasons are left out of the response, so seasons 1-19 can be asked for before the count is known.
   def self.tmdb_show(show)
     details = []
-    url = 'https://api.themoviedb.org/3/tv/' + show['id'].to_s + '?append_to_response='
+    path = 'tv/' + show['id'].to_s
     seasons = (1..TMDB_SEASONS_PER_REQUEST).map { |n| "season/#{n}" }
-    series_response = tmdb_request(url + (['content_ratings'] + seasons).join(','))
+    series_response = Tmdb.get(path, append_to_response: (['content_ratings'] + seasons).join(','))
     later = series_response[:body]['seasons'].map { |s| s['season_number'] }.select { |n| n > TMDB_SEASONS_PER_REQUEST }
     later.each_slice(TMDB_SEASONS_PER_REQUEST + 1) do |numbers|
-      series_response[:body].merge!(tmdb_request(url + numbers.map { |n| "season/#{n}" }.join(','))[:body].select { |key, _| key.start_with?('season/') })
+      series_response[:body].merge!(Tmdb.get(path, append_to_response: numbers.map { |n| "season/#{n}" }.join(','))[:body].select { |key, _| key.start_with?('season/') })
     end
     series_response[:body]['seasons'].each do |s|
       season = series_response[:body]["season/#{s['season_number']}"]
@@ -486,7 +274,7 @@ class Show < ActiveRecord::Base
   def self.tmdb_episodes(id, season, episode_number=nil)
     episodes = []
     if episode_number.nil?
-      first_response = tmdb_request('https://api.themoviedb.org/3/tv/' + id.to_s + '/season/' + season.to_s)
+      first_response = Tmdb.get('tv/' + id.to_s + '/season/' + season.to_s)
       first_response[:body]['episodes'].each do |e|
         if e['air_date'] != ''
           preview = e['still_path'] ? 'https://image.tmdb.org/t/p/original' + e['still_path'] : ''
@@ -497,7 +285,7 @@ class Show < ActiveRecord::Base
         end
       end
     else
-      first_response = tmdb_request('https://api.themoviedb.org/3/tv/' + id.to_s + '/season/' + season.to_s + '/episode/' + episode_number.to_s)
+      first_response = Tmdb.get('tv/' + id.to_s + '/season/' + season.to_s + '/episode/' + episode_number.to_s)
       e = first_response[:body]
       if e['air_date'] != ''
         preview = e['still_path'] ? 'https://image.tmdb.org/t/p/original' + e['still_path'] : ''
@@ -510,37 +298,16 @@ class Show < ActiveRecord::Base
     return episodes
   end
 
-  APPLE_STORES = ['143441', '143444', '143455', '143460']
   APPLE_SHOW_LIMIT = 10
-  APPLE_PARAMS = '&locale=en-US&utsk=0&caller=wta&v=58&pfm=appletv'
 
   def self.appletv_call(s_term)
-    term = s_term.downcase
-    hits = in_parallel(APPLE_STORES) { |store| appletv_search(store, s_term) }.compact.flatten(1)
-    # Storefronts are searched in priority order, so the first store seen for a show is the one to fetch it from.
-    shows = hits.each_with_object({}) { |(id, title, store), found| found[id] ||= [title, store] }
-    matches = shows.select { |_, (title, _)| title.downcase.include?(term) }.to_a
-    ranked = matches.each_with_index.sort_by { |((_, (title, _)), index)| [apple_rank(title.downcase, term), index] }.map(&:first)
-    in_parallel(ranked.first(APPLE_SHOW_LIMIT)) { |id, (_, store)| appletv_show(id, store) }.compact.flatten(1)
-  end
-
-  def self.apple_rank(title, term)
-    return 0 if title == term
-    title.start_with?(term) ? 1 : 2
-  end
-
-  def self.appletv_search(store, s_term)
-    response = HTTParty.get('https://uts-api.itunes.apple.com/uts/v2/search/incremental?sf=' + store + APPLE_PARAMS + '&q=' + CGI.escape(s_term))
-    return [] unless response.code == 200 && response['data'] && response['data']['canvas']
-    response['data']['canvas']['shelves'].flat_map { |shelf| shelf['items'] }
-      .select { |s| s['type'] == 'Show' && s['title'] }
-      .map { |s| [s['id'], s['title'], store] }
+    InParallel.map(AppleTv.matches(s_term, 'Show', APPLE_SHOW_LIMIT)) { |id, store| appletv_show(id, store) }.compact.flatten(1)
   end
 
   def self.appletv_show(id, store)
     details = []
-    request1, request2 = in_parallel(['', '/episodes'], limit: 2) do |path|
-      HTTParty.get('https://uts-api.itunes.apple.com/uts/v2/view/show/' + id + path + '?sf=' + store + APPLE_PARAMS)
+    request1, request2 = InParallel.map(['', '/episodes'], limit: 2) do |path|
+      AppleTv.view('show/' + id + path, store)
     end
     if request1 && request1.code == 200 && request1['data'] && request1['data']['content']
       title =  request1['data']['content']['title']
@@ -577,7 +344,7 @@ class Show < ActiveRecord::Base
   def self.appletv_episodes(id, skip, count, storeId)
     episodes = []
     # Seasons added in 2019, before the storefront was stored, have none; every lookup then used the US store.
-    storeId = storeId.presence || APPLE_STORES.first
+    storeId = storeId.presence || AppleTv::STORES.first
     begin
       episodes_response = HTTParty.get('https://tv.apple.com/api/uts/v2/view/show/' + id + '/episodes?skip=' + skip + '&count=' + count + '&sf=' + storeId + '&locale=en-US&utsk=0&caller=wta&v=58&pfm=appletv')
       if episodes_response.code == 200 && episodes_response['data'] && episodes_response['data']['episodes']
@@ -614,27 +381,6 @@ class Show < ActiveRecord::Base
 
   def self.is_number?(string)
     true if Float(string) rescue false
-  end
-
-  # Net::HTTP releases Ruby's lock while waiting, so threads overlap the slow Apple and TMDB calls.
-  # Keep ActiveRecord out of the block: each thread would check out its own connection.
-  def self.in_parallel(items, limit: 8)
-    queue = Queue.new
-    items.each_with_index { |item, index| queue << [item, index] }
-    results = Array.new(items.size)
-    Array.new([limit, items.size].min) do
-      Thread.new do
-        while (job = queue.pop(true) rescue nil)
-          item, index = job
-          begin
-            results[index] = yield(item)
-          rescue => e
-            puts "in_parallel: #{e.class}: #{e.message}"
-          end
-        end
-      end
-    end.each(&:join)
-    results
   end
 
 end

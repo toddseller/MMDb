@@ -43,4 +43,12 @@ describe 'Apple episode lookups' do
 
     expect(season.episodes.pluck(:tv_episode, :title)).to eq [[2, 'Chapter 2']]
   end
+
+  it 'lists no episodes for a season stored with a TVDB id, without asking TVDB' do
+    season = Show.create!(title: 'NOVA', year: '1974', show_collection_id: '761193')
+                 .seasons.create!(season: 32, collectionName: 'NOVA, Season 32', collectionId: 'tvdb7611932')
+
+    expect(Show.get_episodes(season.collectionId, season.season)).to eq []
+    expect(a_request(:any, /thetvdb/)).not_to have_been_made
+  end
 end

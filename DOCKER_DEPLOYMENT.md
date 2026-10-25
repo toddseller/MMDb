@@ -52,7 +52,7 @@ cp .env.example .env
 2. Edit `.env` and configure all required variables:
    - Set a strong `SESSION_SECRET` (minimum 64 characters)
    - Configure database credentials
-   - Add API keys (TVDB, TMDB, Tautulli)
+   - Add API keys (TMDB, Tautulli)
 
 ### Build and Deploy
 
@@ -112,9 +112,7 @@ docker compose -f docker-compose.production.yml exec web bundle exec rake db:mig
 
 Configure these based on your external service accounts:
 - `TAUTULLI_KEY`
-- `TVDB_API_KEY`
-- `TVDB_PIN`
-- `TMDB_API_KEY`
+- `TMDB_TOKEN`
 
 ## Generating a Secure Session Secret
 

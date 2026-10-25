@@ -1,6 +1,0 @@
-#!/usr/bin/env ruby
-# Moves TVDB shows and seasons onto Apple or TMDB ids in two steps: `plan <file>` asks the sources and
-# writes the changes for review, then `apply <file>` makes exactly those changes. See TvdbMigration.
-require_relative '../config/environment'
-
-exit TvdbMigration.cli(ARGV)

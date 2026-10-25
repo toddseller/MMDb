@@ -29,7 +29,7 @@ get '/movies/search' do
   user = User.find(params[:id])
   @my_movies = Movie.search(params[:filter], params[:id]).sorted_list
   page = erb :"/partials/_filtered_list", layout: false, locals: {user: user}
-  url = Movie.search_person(params[:filter]) != nil ? Movie.search_person(params[:filter]) : "no-image"
+  url = Movie.search_person(params[:filter]) || "no-image"
   if request.xhr?
     json page: page, url: url
   end

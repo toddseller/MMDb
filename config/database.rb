@@ -21,8 +21,7 @@ end
 # the first time it sees "Person" and will only throw an exception if
 # that file doesn't define the Person class.
 
-# Heroku controls what database we connect to by setting the DATABASE_URL environment variable
-# We need to respect that if we want our Sinatra apps to run on Heroku without modification
+# Production and the test suite name their database in DATABASE_URL; the local fallback is only for a bare checkout.
 db = URI.parse(ENV['DATABASE_URL'] || "postgres://localhost/#{APP_NAME}_#{Sinatra::Application.environment}")
 
 DB_NAME = db.path[1..-1]
