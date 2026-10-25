@@ -44,6 +44,17 @@ test.describe('signed out', () => {
     await expect(page).toHaveURL(new RegExp(`/users/${USER.id}$`))
   })
 
+test('Remember me keeps the sign-in for 30 days', async ({ page, context }) => {
+  await signInDialog(page).getByPlaceholder('User Name or Email').fill(USER.email)
+  await signInDialog(page).getByPlaceholder('Password').fill(USER.password)
+  await signInDialog(page).getByLabel('Remember me').check()
+  await signInDialog(page).getByPlaceholder('Password').press('Enter')
+
+  await expect(page.getByText('Signed in as')).toBeVisible()
+  const session = (await context.cookies()).find((cookie) => cookie.name === 'rack.session')
+  expect(session.expires - Date.now() / 1000).toBeCloseTo(30 * 86400, -3)
+})
+
   test('a wrong password shows the error and empties the form', async ({ page }) => {
     await signInDialog(page).getByPlaceholder('User Name or Email').fill(USER.email)
     await signInDialog(page).getByPlaceholder('Password').fill('not-the-password')
