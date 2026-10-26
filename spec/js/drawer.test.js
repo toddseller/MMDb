@@ -2,7 +2,7 @@
 import { test, beforeEach, afterEach, mock } from 'node:test'
 import assert from 'node:assert/strict'
 import { makePage, stubFetch, json } from './dom.js'
-import { init, rowEnd, show, close, isOpen, openTile, keepOpen } from '#mmdb/drawer.js'
+import { init, rowEnd, show, open, close, isOpen, openTile, keepOpen, reveal } from '#mmdb/drawer.js'
 
 // Two rows of three movie tiles, as _movie_list.erb renders them; layout is stubbed since jsdom has none.
 const ROWS = [['Amber', 'Birch', 'Cedar'], ['Delta', 'Ember', 'Fable']]
@@ -278,4 +278,194 @@ test('keepOpen holds the poster where it was on screen for as long as it is aske
   mock.timers.tick(470)
   runFrames()
   assert.equal(frames.length, 1, 'still holding after the drawer’s own 450ms')
+})
+
+// A 900px window with the desktop header (scroll-margin-top 170px) and the 25px footer; every position is on screen.
+/** @type {Array<{ top: number, behavior: string }>} */
+let glides
+/** @param {{ tile?: number, wrapper?: number, height?: number, margin?: number, reduced?: boolean }} layout */
+const screen = ({ tile: tileTop = 400, wrapper = 600, height = 200, margin = 20, reduced = false } = {}) => {
+  glides = []
+  page.window.scrollBy = /** @type {any} */ ((/** @type {any} */ options) => { if (typeof options === 'object') glides.push(options) })
+  Object.defineProperty(page.window, 'innerHeight', { value: 900, configurable: true })
+  page.window.matchMedia = /** @type {any} */ ((/** @type {string} */ query) => ({ matches: reduced && query.includes('reduce') }))
+  const computed = page.window.getComputedStyle.bind(page.window)
+  page.window.getComputedStyle = /** @type {any} */ ((/** @type {Element} */ el) => {
+    if (el.classList.contains('info')) return { marginTop: `${margin}px` }
+    if (el.matches('.index-preview')) return { scrollMarginTop: '170px' }
+    return computed(el)
+  })
+  const proto = page.window.HTMLElement.prototype
+  proto.getBoundingClientRect = function () {
+    if (this.tagName === 'FOOTER') return /** @type {DOMRect} */ ({ top: 875, height: 25 })
+    return /** @type {DOMRect} */ ({ top: this.matches('.info-wrapper') ? wrapper : tileTop, height: 0 })
+  }
+  Object.defineProperty(proto, 'scrollHeight', { get() { return /** @type {HTMLElement} */ (this).matches('.info-wrapper') ? height : 0 }, configurable: true })
+}
+/** @param {Parameters<typeof screen>[0]} layout */
+const openAt = (layout) => {
+  show(tile('Ember'), 'Ember')
+  screen(layout)
+}
+
+test('reveal glides down until the drawer’s bottom clears the footer', () => {
+  openAt({ wrapper: 600, height: 400 })
+
+  reveal()
+
+  assert.deepEqual(glides, [{ top: 125, behavior: 'smooth' }])
+})
+
+test('reveal stops when the poster’s row reaches the pinned header', () => {
+  openAt({ tile: 400, wrapper: 600, height: 1200 })
+
+  reveal()
+
+  assert.deepEqual(glides, [{ top: 230, behavior: 'smooth' }])
+})
+
+test('reveal leaves a drawer already in view alone', () => {
+  openAt({ wrapper: 500, height: 300 })
+
+  reveal()
+
+  assert.deepEqual(glides, [])
+})
+
+test('reveal counts the open margin still to come while the drawer eases open', () => {
+  openAt({ wrapper: 600, height: 260, margin: 0 })
+
+  reveal()
+
+  assert.deepEqual(glides, [{ top: 5, behavior: 'smooth' }])
+})
+
+test('reveal glides up to a poster under the header only when asked to', () => {
+  openAt({ tile: 100, wrapper: 300, height: 200 })
+
+  reveal()
+  assert.deepEqual(glides, [])
+  reveal(true)
+  assert.deepEqual(glides, [{ top: -70, behavior: 'smooth' }])
+})
+
+test('reveal goes at once under reduced motion', () => {
+  openAt({ wrapper: 600, height: 400, reduced: true })
+
+  reveal()
+
+  assert.deepEqual(glides, [{ top: 125, behavior: 'auto' }])
+})
+
+test('reveal with no drawer open does nothing', () => {
+  screen()
+
+  reveal(true)
+
+  assert.deepEqual(glides, [])
+})
+
+/** Lets a hold of ms run out, then the frame after it. */
+const holdFor = (/** @type {number} */ ms) => {
+  runFrames()
+  mock.timers.tick(ms)
+  runFrames()
+}
+
+test('opening a drawer glides it into view at once', () => {
+  screen({ wrapper: 600, height: 400, margin: 0 })
+
+  show(tile('Ember'), 'Ember')
+
+  assert.deepEqual(glides, [{ top: 145, behavior: 'smooth' }])
+})
+
+test('opening a drawer glides up to a poster under the header', () => {
+  screen({ tile: 100, wrapper: 300, height: 200 })
+
+  show(tile('Ember'), 'Ember')
+
+  assert.deepEqual(glides, [{ top: -70, behavior: 'smooth' }])
+})
+
+test('a movie save’s instant reopen glides down only', () => {
+  screen({ tile: 100, wrapper: 300, height: 200 })
+
+  open(tile('Ember'), 'Ember', true)
+  assert.deepEqual(glides, [])
+
+  close(true)
+  screen({ wrapper: 600, height: 400 })
+  open(tile('Ember'), 'Ember', true)
+  assert.deepEqual(glides, [{ top: 125, behavior: 'smooth' }])
+})
+
+test('switching posters in the same row glides to the new height, down only', () => {
+  show(tile('Delta'), 'Delta')
+  screen({ tile: 100, wrapper: 300, height: 200 })
+  show(tile('Ember'), 'Ember')
+  assert.deepEqual(glides, [])
+
+  screen({ wrapper: 600, height: 400 })
+  show(tile('Fable'), 'Fable')
+  assert.deepEqual(glides, [{ top: 125, behavior: 'smooth' }])
+})
+
+test('switching rows glides only once the poster’s hold ends, and may glide up', () => {
+  show(tile('Amber'), 'Amber')
+  screen({ tile: 100, wrapper: 300, height: 200 })
+
+  show(tile('Ember'), 'Ember')
+  runFrames()
+  assert.deepEqual(glides, [])
+  mock.timers.tick(449)
+  runFrames()
+  assert.deepEqual(glides, [])
+  holdFor(1)
+  assert.deepEqual(glides, [{ top: -70, behavior: 'smooth' }])
+})
+
+test('keepOpen glides once its hold ends, down only', () => {
+  show(tile('Ember'), 'Ember')
+  screen({ tile: 100, wrapper: 300, height: 200 })
+  keepOpen(redraw(), 'Ember again', 500)
+  holdFor(500)
+  assert.deepEqual(glides, [])
+
+  screen({ wrapper: 600, height: 400 })
+  keepOpen(redraw(), 'Ember again', 500)
+  holdFor(500)
+  assert.deepEqual(glides, [{ top: 125, behavior: 'smooth' }])
+})
+
+test('an image loading in the drawer glides down only', () => {
+  show(tile('Ember'), '<img alt="Ember Poster">')
+  screen({ tile: 100, wrapper: 300, height: 200 })
+  const image = /** @type {HTMLElement} */ (drawers()[0].querySelector('img'))
+  image.dispatchEvent(new page.window.Event('load'))
+  assert.deepEqual(glides, [])
+
+  screen({ wrapper: 600, height: 400 })
+  image.dispatchEvent(new page.window.Event('load'))
+  assert.deepEqual(glides, [{ top: 125, behavior: 'smooth' }])
+})
+
+test('an image loading in a drawer that has closed does nothing', () => {
+  show(tile('Ember'), '<img alt="Ember Poster">')
+  const image = /** @type {HTMLElement} */ (drawers()[0].querySelector('img'))
+  close()
+  screen({ wrapper: 600, height: 400 })
+
+  image.dispatchEvent(new page.window.Event('load'))
+
+  assert.deepEqual(glides, [])
+})
+
+test('an image loading in the movie edit form doesn’t glide', () => {
+  show(tile('Ember'), '<form class="edit-form"><img alt=""></form>')
+  screen({ wrapper: 600, height: 400 })
+
+  drawers()[0].querySelector('.edit-form img')?.dispatchEvent(new page.window.Event('load'))
+
+  assert.deepEqual(glides, [])
 })
