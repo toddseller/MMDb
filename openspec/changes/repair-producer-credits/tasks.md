@@ -66,8 +66,8 @@ Test-first in `spec/producer_repair_spec.rb`, on the local branch `retry-apple-r
 
 ## 6. Second pass
 
-- [ ] 6.1 After 4.3, run the dry run on the server with the patched module (see design.md) into `tmp/producers-2.csv`, and copy it and its cover page to the owner. Verify it covers only movies still affected, its log names any failures with reasons, and the owner approves it.
-- [ ] 6.2 Back up `movies` again, apply the reviewed second report, and verify the counts, and check Metropia and Mask on mmdb.online. Repeat 6.1 and 6.2 for any movies still failing or not reached until a run reports no failures, or the owner decides to leave the rest.
+- [x] 6.1 After 4.3, run the dry run on the server with the patched module (see design.md) into `tmp/producers-2.csv`, and copy it and its cover page to the owner. Verify it covers only movies still affected, its log names any failures with reasons, and the owner approves it. (Ran 2026-10-26 from 05:00 to 10:48 PDT with no 429s: 2,815 movies, 1,727 artwork, 965 title_year_director, 59 other_source, 64 unmatched, 0 failed, 937 cover changes. Approved unedited.)
+- [x] 6.2 Back up `movies` again, apply the reviewed second report, and verify the counts, and check Metropia and Mask on mmdb.online. Repeat 6.1 and 6.2 for any movies still failing or not reached until a run reports no failures, or the owner decides to leave the rest. (Applied 2026-10-26 after a `pg_dump` to `~/mmdb-movies-2026-10-26-pass2.sql`: 2,815 written, 0 failed, 0 changed. No movie's producer holds its non-blank rating any more, so no repeat was needed. Metropia and Mask checked in the database: Kristina Åberg with a new Apple cover, and Martin Starger.)
 
 ## Workflow follow-up
 
