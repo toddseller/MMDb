@@ -9,6 +9,11 @@ These counts come from read-only queries and lookups on 2026-10-25:
 - In a 24-movie sample, exact artwork found 16 (4 of 8 old Apple, 5 of 8 new Apple, 7 of 8 TMDB) and title, year and director found the other 8. 15 of the 16 Apple movies were found in the US store, usually on its first result.
 - The two sources list different producers for the same film (Bruce Almighty: Apple has Tom Shadyac, Mark O'Keefe, Jim Carrey; TMDB has Michael Bostick, James D. Brubaker, Jim Carrey).
 
+The first full dry run on the server (2026-10-26, from 00:14) ran into Apple's rate limit:
+- No movie failed in the first 432. After that, failures grew until about half of all movies failed, all with Apple posters.
+- Apple's search kept answering, but its product endpoint (`view/product`, which carries the credits and cover) answered `429 Too Many Requests` even to a single request. The run had been making about 100 Apple requests a minute.
+- It was stopped at 01:32 after 2,139 movies: 1,372 matched, 7 unmatched and 754 failed. That partial report is valid and is being reviewed.
+
 There is no TMDB or Apple id column on `movies`, so a movie can only be found again from its title, year, director and poster.
 
 The existing source helpers hide failures: `MovieSearch.apple_movie` and `MovieSearch.tmdb_movie` return nil for any non-200 answer, and `AppleTv.search` returns `[]`. That suits the search box, but the repair has to tell "not found" (clear the producer) apart from "failed" (leave it).
@@ -57,7 +62,13 @@ That lets the specs call the class directly with WebMock. The explore session ag
 - The other source is tried only when the first found nothing (`other_source`); a failure in the first source marks the row `failed` without trying the other.
 - A movie with no director can still match by artwork. By title and year it matches only as `Match.same_director?` already allows: a blank director on either side matches.
 
-**One movie at a time, with a pause.** The dry run handles movies one after another, with 0.2 seconds between Apple requests. Apple publishes no limits for this API, so the run stays gentle; at about 2 to 3 requests per movie it takes around an hour. The script prints progress every 100 movies and flushes the CSV as it goes, so an interrupted run still leaves a usable partial report.
+**One movie at a time, with a pause.** The dry run handles movies one after another, with one second between Apple requests. The first server run used 0.2 seconds and Apple limited it after about 430 movies; one second keeps it near 60 requests a minute. At about 2 to 3 Apple requests per movie, a pass over the remaining 2,800 or so movies takes about two hours, less where movies fail fast or match on TMDB. The script prints progress every 100 movies and flushes the CSV as it goes, so an interrupted run still leaves a usable partial report.
+
+**Apple's 429 gets one five-minute wait, then stops the run.** `apple_get` waits five minutes after a 429 and repeats the request once. The one wait covers a brief limit. In the first run the limit held even for single requests, so a longer schedule (up to half an hour was considered) would most likely only delay the stop; stopping at the first 429 was also considered, but a brief limit would then end runs early and add review rounds. A 429 is not a failure: failing it would mark every remaining movie failed while the block lasts, which is what made the first run wasteful. If the repeat is also 429, `apple_get` raises `ProducerRepair::Limited`, which `lookup` doesn't rescue (it rescues only `Failed`). It ends `plan` before the movie's row is built, and `write_plan` writes the cover page for the rows so far in an `ensure` and logs the stop. The report up to that point stays valid: apply it, and the next dry run takes up the movies still affected.
+
+**The retry reaches the server without a deploy.** The tool is temporary, so its changes after the first run are tested locally, committed on a local branch and not pushed, and copied to the server as `tmp/producer_repair.rb`. The run loads it over the deployed module: `docker exec -w /app mmdb-web-1 ruby -r ./config/environment -r ./tmp/producer_repair.rb -e '$stdout.sync = true; ProducerRepair.write_plan("tmp/producers-2.csv")'`. `tmp/` is ignored by git, so the server's checkout stays clean; `bin/deploy` refuses to deploy over changed tracked files, so editing `app/models/producer_repair.rb` there would block deploys. The local branch's commits go into the final PR that archives this change and removes the tool, so the history keeps what actually ran.
+
+**Failures are logged with their reason, and the log isn't buffered.** A failed row carries the `Failed` message (not a CSV column), and `write_plan` logs it as `Failed <id> <title>: <reason>`. The first run recorded only that movies failed, which left the 429s to be found by hand. The run sets `$stdout.sync = true` (in `bin/repair-producers`, and in the `-e` above), because writing to a file made Ruby hold its progress lines until the end.
 
 **Apply in one transaction with `update_columns`.** It writes only `producer`, and `poster` when `new_poster` isn't blank, and skips the callbacks, which would recompute fields this repair doesn't own and touch `updated_at`. (`adjust_url` only upgrades old `http:` Apple links, and Apple's covers are already `https`.) For each row it loads the movie and writes only if `producer == rating`, `producer == old_producer` and `poster == old_poster`. Otherwise the row is skipped and listed. Rows marked `failed` are skipped. Unlike the TVDB migration, a stale row skips just that row rather than stopping the whole apply: with 4,201 rows and a long review, an edit by hand in between is likely and shouldn't block the rest.
 
@@ -65,7 +76,8 @@ That lets the specs call the class directly with WebMock. The explore session ag
 
 - [A title, year and director match picks a different film with the same name, year and director] → Unlikely, and visible in the report as `title_year_director` for review.
 - [Apple answers empty in the US store for a movie it does carry (it has been flaky before)] → The other stores, then TMDB, are tried. A wrong source is visible in the report as `other_source`.
-- [Apple throttles the run] → Throttling shows up as errors, so those movies are `failed` and left unchanged. Rerunning the dry run later covers only the movies still affected.
+- [Apple throttles the run] → A 429 gets one five-minute wait, then stops the run with a usable partial report. Rerunning the dry run later covers only the movies still affected.
+- [Apple's limit returns often] → Each stop means another review and apply. If runs keep stopping early, slow the pace further rather than lengthening the wait.
 - [A reviewed CSV is saved by a spreadsheet with changed encoding or quoting] → `apply` reads it with Ruby's CSV, and the stale check on `old_producer` skips any row whose old value no longer matches.
 - [A cover the owner chose on purpose is replaced by Apple's current one] → Every cover change is on the review page, and blanking `new_poster` keeps the old one.
 - [Bad apply] → Restore `movies` from the `pg_dump`. Every old producer also equals the movie's rating, so `UPDATE movies SET producer = rating WHERE id IN (...)` undoes producers; the report's `old_poster` column restores covers.
@@ -77,7 +89,7 @@ That lets the specs call the class directly with WebMock. The explore session ag
 3. Copy the reviewed CSV back to `tmp/producers.csv` in the container.
 4. Back up: `docker run --rm postgres:11 pg_dump -t movies "$DATABASE_URL" > ~/mmdb-movies-<date>.sql`.
 5. Apply: `docker compose exec -T web bin/repair-producers apply tmp/producers.csv`, and keep its list of skipped rows.
-6. Run the dry run again; it should list only the movies that were skipped or failed.
+6. Run the dry run again for the movies still affected: the failed, the skipped and any a stopped run didn't reach. Review and apply that report the same way, and repeat until a run reports no failures.
 7. Spot-check Hook, Bruce Almighty (new producers and cover) and Metropia on mmdb.online.
 
 Rollback: restore `movies` from the dump.

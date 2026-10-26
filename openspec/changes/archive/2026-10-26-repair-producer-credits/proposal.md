@@ -18,6 +18,7 @@
 - A movie matched on Apple by title, year and director (so its stored cover is one Apple no longer uses) also gets Apple's current cover. The old covers still load; this brings about 1,300 covers up to date. No other movie's poster changes.
 - Beside the CSV, the dry run writes an HTML page showing each changed cover, old beside new, so about 1,300 cover changes can be reviewed by eye.
 - Movies no step can match get an empty producer, which the details view hides; the rating copy carries no information. A lookup that failed (a network or server error) is reported, not cleared.
+- When Apple rate-limits the run (`429`), it waits five minutes and tries once more, and if the limit is still there it stops with a usable partial report; the next dry run takes up the movies still affected. (Added after the first server run hit Apple's limit.)
 - The apply step only writes rows whose producer still equals both their rating and the reported old value, and whose poster still equals the reported old poster, so a movie fixed by hand in the meantime is left alone. It makes no network requests.
 
 A sample of 24 affected movies matched all 24: 16 by exact artwork and 8 by title, year and director. 15 of the 16 Apple movies were found in the US store alone.

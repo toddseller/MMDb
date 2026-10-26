@@ -87,7 +87,7 @@ When a movie is matched on Apple by title, year and director, its new poster SHA
 - **THEN** it gets no new poster
 
 ### Requirement: Unmatched movies are cleared and failed lookups are not
-A movie that no step matches SHALL get an empty producer. A movie whose lookup failed, because a request errored or timed out or a source answered with an error, SHALL be reported as failed with no new producer, and the apply step SHALL leave it unchanged.
+A movie that no step matches SHALL get an empty producer. A movie whose lookup failed, because a request errored or timed out or a source answered with an error other than Apple's rate limit, SHALL be reported as failed with no new producer, and the apply step SHALL leave it unchanged.
 
 #### Scenario: Unmatched
 - **WHEN** neither source returns a movie that matches by artwork or by title, year and director
@@ -96,6 +96,24 @@ A movie that no step matches SHALL get an empty producer. A movie whose lookup f
 #### Scenario: TMDB is down
 - **WHEN** TMDB answers a movie's search with status 503
 - **THEN** the report marks the movie as failed, and applying the report leaves its producer as it is
+
+### Requirement: Apple's rate limit gets one wait, then stops the run
+When Apple answers a request with status 429, the dry run SHALL wait five minutes and repeat the request once. An answered repeat SHALL count as that request's answer, so the limit alone never marks a movie failed. If the repeat is also answered 429, the dry run SHALL stop: it SHALL keep the report of the movies it finished, write the cover page for them, leave the movie it was looking up out of the report, and say that Apple's limit stopped it and how many movies it reached.
+
+#### Scenario: A brief limit
+- **WHEN** Apple answers a movie's product request with 429, and five minutes later with the product
+- **THEN** the movie is matched as if the first answer had been the product
+
+#### Scenario: A limit that lasts
+- **WHEN** Apple answers 429 to a request and to its repeat while the dry run looks up its 431st movie
+- **THEN** the run stops with 430 rows in the report and a cover page for them, and says Apple's limit stopped it after 430 movies
+
+### Requirement: The dry run logs failures and progress as they happen
+The dry run SHALL log each failed movie's id, title and reason when it fails, and SHALL write its progress lines to the log as it prints them, so a long run can be followed.
+
+#### Scenario: A failure
+- **WHEN** TMDB answers Hook's search with 503
+- **THEN** the log gains a line naming Hook's id, its title and the 503 straight away
 
 ### Requirement: The dry run writes a report and changes nothing
 The dry run SHALL write a CSV report with one row per covered movie: id, title, year, poster source, how it was matched (`artwork`, `title_year_director`, `other_source`, `unmatched` or `failed`), the old and new producer, and the old and new poster. The new poster SHALL be blank when the poster is not to change. It SHALL NOT change the database.

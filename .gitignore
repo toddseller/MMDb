@@ -61,8 +61,6 @@ chromedriver.log
 # bin/ holds Bundler binstubs, except the scripts production runs.
 bin/*
 !bin/deploy
-!bin/migrate-tvdb
-!bin/repair-producers
 .rdb
 
 # Puma

@@ -52,10 +52,24 @@ Groups 1 to 3 work test-first in `spec/producer_repair_spec.rb`: write the examp
 ## 4. Run it
 
 - [x] 4.1 Run the dry run locally against 20 affected movies read from production (chosen through `write_plan`'s `movies:` option, in a read-only database session) and verify the report against the sample results from the explore session: Bruce Almighty `title_year_director` on Apple with a new poster, Metropia `other_source`, Layer Cake `artwork`; and the review page shows Bruce Almighty's old and new covers.
-- [ ] 4.2 After merge and deploy, run the full dry run on the server and copy the CSV and its HTML page to the owner. Verify by the owner's review: they approve the report and the covers, edited as they see fit.
-- [ ] 4.3 Back up `movies` with `pg_dump`, apply the reviewed report, and verify the printed written and skipped counts add up to the report's rows. Rerun the dry run and verify it covers only skipped or failed movies. Check Hook, Bruce Almighty (producers and cover) and Metropia on mmdb.online.
+- [x] 4.2 After merge and deploy, run the full dry run on the server and copy the CSV and its HTML page to the owner. (The first run, on 2026-10-26, was stopped at 2,139 movies when Apple rate-limited it; its partial report is what the owner reviews.) Verify by the owner's review: they approve the report and the covers, edited as they see fit. (Approved unedited on 2026-10-26.)
+- [x] 4.3 Back up `movies` with `pg_dump`, apply the reviewed report, and verify the printed written, failed and changed counts add up to the report's rows. Check Hook, Bruce Almighty (producers and cover) and Metropia on mmdb.online. (Applied 2026-10-26 after a `pg_dump` to `~/mmdb-movies-2026-10-26.sql`: 1,385 written, 754 failed, 0 changed, which is all 2,139 rows; 2,816 movies remain affected. Hook and Bruce Almighty checked live; Metropia was beyond the stopped run, so its check moves to 6.2.)
+
+## 5. Waiting out Apple's rate limit
+
+Test-first in `spec/producer_repair_spec.rb`, on the local branch `retry-apple-rate-limit`, which is committed but not pushed until the final PR.
+
+- [x] 5.1 Add examples: an Apple search or product request answered 429 and then 200 is repeated once after a five-minute wait and the movie matches normally (`sleep` stubbed, waits recorded). Verify they fail, add the wait and repeat to `apple_get`, and verify they pass.
+- [x] 5.2 Add examples: a request answered 429 again after the wait raises `ProducerRepair::Limited`, which `write_plan` turns into a stop that keeps the rows so far, writes the cover page for them, leaves out the movie being looked up, and logs `Apple's rate limit stopped the run after <n> movies`. Verify they fail, add it, and verify they pass.
+- [x] 5.3 Add examples: a failed movie is logged straight away as `Failed <id> <title>: <reason>`, and the reason is not a CSV column. Verify they fail, add it, set `$stdout.sync = true` in `bin/repair-producers`, raise `APPLE_PAUSE` to 1 second, and verify they pass. Run the whole suite and verify it passes.
+- [x] 5.4 Run the ponytail review on the branch's diff, commit on the local branch, and copy `app/models/producer_repair.rb` to the server as `~/MMDb/tmp/producer_repair.rb`. Verify `git status --porcelain --untracked-files=no` on the server prints nothing.
+
+## 6. Second pass
+
+- [x] 6.1 After 4.3, run the dry run on the server with the patched module (see design.md) into `tmp/producers-2.csv`, and copy it and its cover page to the owner. Verify it covers only movies still affected, its log names any failures with reasons, and the owner approves it. (Ran 2026-10-26 from 05:00 to 10:48 PDT with no 429s: 2,815 movies, 1,727 artwork, 965 title_year_director, 59 other_source, 64 unmatched, 0 failed, 937 cover changes. Approved unedited.)
+- [x] 6.2 Back up `movies` again, apply the reviewed second report, and verify the counts, and check Metropia and Mask on mmdb.online. Repeat 6.1 and 6.2 for any movies still failing or not reached until a run reports no failures, or the owner decides to leave the rest. (Applied 2026-10-26 after a `pg_dump` to `~/mmdb-movies-2026-10-26-pass2.sql`: 2,815 written, 0 failed, 0 changed. No movie's producer holds its non-blank rating any more, so no repeat was needed. Metropia and Mask checked in the database: Kristina Åberg with a new Apple cover, and Martin Starger.)
 
 ## Workflow follow-up
 
 - Work on a feature branch from master, run the ponytail review on the diff before the first commit, and archive the change in the same PR.
-- Remove `ProducerRepair` and `bin/repair-producers` in a later change once the repair is done, as with the TVDB migration.
+- Once the repair is done, one PR archives this change and removes `ProducerRepair`, `bin/repair-producers`, their spec and the `.gitignore` exception. It carries the `retry-apple-rate-limit` branch's commits, so the history keeps the code that ran. Delete `~/MMDb/tmp/producer_repair.rb` and the reports from the server.
