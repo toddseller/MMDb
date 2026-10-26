@@ -52,8 +52,8 @@ Groups 1 to 3 work test-first in `spec/producer_repair_spec.rb`: write the examp
 ## 4. Run it
 
 - [x] 4.1 Run the dry run locally against 20 affected movies read from production (chosen through `write_plan`'s `movies:` option, in a read-only database session) and verify the report against the sample results from the explore session: Bruce Almighty `title_year_director` on Apple with a new poster, Metropia `other_source`, Layer Cake `artwork`; and the review page shows Bruce Almighty's old and new covers.
-- [ ] 4.2 After merge and deploy, run the full dry run on the server and copy the CSV and its HTML page to the owner. (The first run, on 2026-10-26, was stopped at 2,139 movies when Apple rate-limited it; its partial report is what the owner reviews.) Verify by the owner's review: they approve the report and the covers, edited as they see fit.
-- [ ] 4.3 Back up `movies` with `pg_dump`, apply the reviewed report, and verify the printed written, failed and changed counts add up to the report's rows. Check Hook, Bruce Almighty (producers and cover) and Metropia on mmdb.online.
+- [x] 4.2 After merge and deploy, run the full dry run on the server and copy the CSV and its HTML page to the owner. (The first run, on 2026-10-26, was stopped at 2,139 movies when Apple rate-limited it; its partial report is what the owner reviews.) Verify by the owner's review: they approve the report and the covers, edited as they see fit. (Approved unedited on 2026-10-26.)
+- [x] 4.3 Back up `movies` with `pg_dump`, apply the reviewed report, and verify the printed written, failed and changed counts add up to the report's rows. Check Hook, Bruce Almighty (producers and cover) and Metropia on mmdb.online. (Applied 2026-10-26 after a `pg_dump` to `~/mmdb-movies-2026-10-26.sql`: 1,385 written, 754 failed, 0 changed, which is all 2,139 rows; 2,816 movies remain affected. Hook and Bruce Almighty checked live; Metropia was beyond the stopped run, so its check moves to 6.2.)
 
 ## 5. Waiting out Apple's rate limit
 
@@ -67,7 +67,7 @@ Test-first in `spec/producer_repair_spec.rb`, on the local branch `retry-apple-r
 ## 6. Second pass
 
 - [ ] 6.1 After 4.3, run the dry run on the server with the patched module (see design.md) into `tmp/producers-2.csv`, and copy it and its cover page to the owner. Verify it covers only movies still affected, its log names any failures with reasons, and the owner approves it.
-- [ ] 6.2 Back up `movies` again, apply the reviewed second report, and verify the counts. Repeat 6.1 and 6.2 for any movies still failing or not reached until a run reports no failures, or the owner decides to leave the rest.
+- [ ] 6.2 Back up `movies` again, apply the reviewed second report, and verify the counts, and check Metropia and Mask on mmdb.online. Repeat 6.1 and 6.2 for any movies still failing or not reached until a run reports no failures, or the owner decides to leave the rest.
 
 ## Workflow follow-up
 
