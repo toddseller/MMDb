@@ -6,6 +6,10 @@ module ProducerRepair
   # A lookup that errored rather than found nothing: its movie must be left alone, not cleared.
   class Failed < StandardError; end
 
+  # Apple's rate limit outlasted the wait. Failing each movie while it holds would waste the rest of the run, so the
+  # run stops instead and the next dry run takes up whatever is still affected.
+  class Limited < StandardError; end
+
   def self.affected = Movie.where('producer = rating').where.not(rating: ['', nil]).order(:id)
 
   # each, when given, gets every row as soon as it's built, so a long run can write as it goes.
@@ -20,8 +24,12 @@ module ProducerRepair
   def self.write_plan(path, movies: affected, log: $stdout)
     total = movies.count
     counts = Hash.new(0)
-    rows = CSV.open(path, 'w', write_headers: true, headers: COLUMNS) do |csv|
+    tally = -> { MATCHES.map { |match| "#{counts[match]} #{match}" }.join(', ') }
+    rows = []
+    CSV.open(path, 'w', write_headers: true, headers: COLUMNS) do |csv|
       plan(movies) do |row|
+        rows << row
+        log.puts "Failed #{row[:id]} #{row[:title]}: #{row[:reason]}" if row[:matched_by] == 'failed'
         csv << row.values_at(*COLUMNS)
         csv.flush
         counts[row[:matched_by]] += 1
@@ -29,8 +37,11 @@ module ProducerRepair
         log.puts "#{done} of #{total} movies" if (done % 100).zero? && done < total
       end
     end
-    write_covers("#{path}.html", rows.reject { |row| row[:new_poster].empty? })
-    log.puts "#{total} movies: " + MATCHES.map { |match| "#{counts[match]} #{match}" }.join(', ')
+    log.puts "#{total} movies: #{tally.call}"
+  rescue Limited
+    log.puts "Apple's rate limit stopped the run after #{rows.size} movies: #{tally.call}"
+  ensure
+    write_covers("#{path}.html", rows.reject { |row| row[:new_poster].empty? }) if rows
   end
 
   # About 1,300 cover changes are easier to judge by eye than as addresses, so they get a page beside the CSV.
@@ -114,7 +125,7 @@ module ProducerRepair
     found = lookup(movie)
     { id: movie.id, title: movie.title, year: movie.year, source: source(movie.poster),
       matched_by: found ? found[:matched_by] : 'unmatched', old_producer: movie.producer, new_producer: found&.dig(:producers) || '',
-      old_poster: movie.poster, new_poster: found&.dig(:poster) || '' }
+      old_poster: movie.poster, new_poster: found&.dig(:poster) || '', reason: found&.dig(:reason) }
   end
 
   # The other source is asked only when the first found nothing; a failure leaves the movie for a later run instead.
@@ -122,8 +133,8 @@ module ProducerRepair
   def self.lookup(movie)
     first, other = source(movie.poster) == 'apple' ? %i[apple tmdb] : %i[tmdb apple]
     public_send(first, movie) || public_send(other, movie)&.merge(matched_by: 'other_source', poster: nil)
-  rescue Failed
-    { matched_by: 'failed' }
+  rescue Failed => e
+    { matched_by: 'failed', reason: e.message }
   end
 
   # A TMDB poster is the same image at any size, so it is compared by file name alone.
@@ -150,8 +161,9 @@ module ProducerRepair
     { matched_by: matched_by, producers: Movie.get_producers(details), director: Movie.get_director(details) }
   end
 
-  # Apple publishes no rate limit for these endpoints, so a run of thousands of lookups goes gently.
-  APPLE_PAUSE = 0.2
+  # Apple publishes no rate limit for these endpoints. At 0.2 seconds it limited the first full run after about 430
+  # movies, so a second apart keeps a run of thousands near 60 requests a minute.
+  APPLE_PAUSE = 1
   APPLE_RESULTS = 10
 
   # An Apple cover is the same image on any isN host and at any size: compare the path between /image/thumb/ and the size.
@@ -194,17 +206,28 @@ module ProducerRepair
     { matched_by: 'title_year_director', producers: producers, poster: poster } if same
   end
 
-  def self.apple_get
+  # A 429 is Apple's rate limit, not an answer about the movie. One wait covers a brief limit; in October 2026 one held
+  # even for single requests, and waiting longer would only have delayed stopping.
+  LIMIT_WAIT = 300
+
+  def self.apple_get(&request)
     sleep APPLE_PAUSE
-    response = begin
-      yield
-    rescue StandardError => e
-      raise Failed, "Apple: #{e.message}"
+    response = apple_request(&request)
+    if response.code == 429
+      sleep LIMIT_WAIT
+      response = apple_request(&request)
+      raise Limited, 'Apple answered 429 again after a five-minute wait' if response.code == 429
     end
     raise Failed, "Apple answered #{response.code}" unless response.code == 200
     # A busy Apple can answer 200 with an HTML page, which isn't an answer about the movie.
     raise Failed, 'Apple answered without JSON' unless response.parsed_response.is_a?(Hash)
     response.parsed_response
+  end
+
+  def self.apple_request
+    yield
+  rescue StandardError => e
+    raise Failed, "Apple: #{e.message}"
   end
 
   def self.tmdb_get(path, params = {})

@@ -37,9 +37,10 @@ describe ProducerRepair do
   end
 
   # cover: the path after /image/thumb/, as Apple serves it with {w}x{h}.{f} for the size.
-  def stub_apple_product(id, title: 'Hook', year: 1991, director: 'Steven Spielberg', producers: HOOK_PRODUCERS, cover: 'Video/aa/bb/hook.jpg', host: 'is4-ssl', width: 1400, height: 2100)
+  # first: answers Apple gives before the product, such as a 429.
+  def stub_apple_product(id, title: 'Hook', year: 1991, director: 'Steven Spielberg', producers: HOOK_PRODUCERS, cover: 'Video/aa/bb/hook.jpg', host: 'is4-ssl', width: 1400, height: 2100, first: [])
     roles = [{ type: 'Director', personName: director }] + producers.map { |name| { type: 'Producer', personName: name } }
-    stub_request(:get, %r{\Ahttps://uts-api\.itunes\.apple\.com/uts/v2/view/product/#{Regexp.escape(id)}\?}).to_return(json(data: {
+    stub_request(:get, %r{\Ahttps://uts-api\.itunes\.apple\.com/uts/v2/view/product/#{Regexp.escape(id)}\?}).to_return(*first, json(data: {
       content: { title: title, releaseDate: Time.utc(year, 6, 1).to_i * 1000,
                  images: { coverArt: { url: "https://#{host}.mzstatic.com/image/thumb/#{cover}/{w}x{h}.{f}", width: width, height: height }.compact } },
       roles: roles
@@ -164,6 +165,57 @@ describe ProducerRepair do
     end
   end
 
+  describe "Apple's rate limit" do
+    let(:hook) { movie('Hook', poster: 'https://is1-ssl.mzstatic.com/image/thumb/Video/aa/bb/hook.jpg/2000x3000.jpg') }
+    let(:waits) { [] }
+    let(:limited) { { status: 429, body: '' } }
+
+    before { allow(ProducerRepair).to receive(:sleep) { |seconds| waits << seconds } }
+
+    it 'waits five minutes after a 429 on a search, asks once more, and matches as normal' do
+      stub_request(:get, APPLE_SEARCH).with(query: hash_including('sf' => US, 'q' => 'Hook'))
+        .to_return(limited, json(data: { canvas: { shelves: [{ items: [{ type: 'Movie', id: 'umc.hook', title: 'Hook' }] }] } }))
+      stub_apple_product('umc.hook')
+
+      expect(row_for(hook)).to include(matched_by: 'artwork', new_producer: HOOK_PRODUCERS.join(', '))
+      expect(waits.count(300)).to eq 1
+    end
+
+    it 'waits five minutes after a 429 on a product, asks once more, and matches as normal' do
+      stub_apple_search('Hook', ids: ['umc.hook'])
+      stub_apple_product('umc.hook', first: [limited])
+
+      expect(row_for(hook)).to include(matched_by: 'artwork')
+      expect(waits.count(300)).to eq 1
+    end
+
+    describe 'when it lasts' do
+      let(:dir) { Dir.mktmpdir }
+      let(:path) { File.join(dir, 'producers.csv') }
+      let(:log) { StringIO.new }
+
+      after { FileUtils.remove_entry(dir) }
+
+      def apple_movie(title) = movie(title, poster: "https://is1-ssl.mzstatic.com/image/thumb/Video/aa/bb/#{title.downcase}.jpg/2000x3000.jpg")
+
+      it 'stops the run, keeping the report and cover page for the movies it finished' do
+        hook = apple_movie('Hook')
+        apple_movie('Jaws')
+        apple_movie('Twister')
+        stub_apple_search('Hook', ids: ['umc.hook'])
+        stub_apple_product('umc.hook', cover: 'Video124/v4/new/pr_source.lsr')
+        stub_request(:get, APPLE_SEARCH).with(query: hash_including('q' => 'Jaws')).to_return(limited, limited)
+
+        ProducerRepair.write_plan(path, log: log)
+
+        expect(CSV.read(path, headers: true).map { |row| row['id'].to_i }).to eq [hook.id]
+        expect(Nokogiri::HTML(File.read("#{path}.html")).css('tbody tr').map { |row| row.css('td').first.text }).to eq [hook.id.to_s]
+        expect(log.string).to include "Apple's rate limit stopped the run after 1 movies"
+        expect(a_request(:get, APPLE_SEARCH).with(query: hash_including('q' => 'Twister'))).not_to have_been_made
+      end
+    end
+  end
+
   describe 'falling back and failing' do
     let(:apple_hook) { movie('Hook', poster: 'https://is1-ssl.mzstatic.com/image/thumb/Video/aa/bb/hook.jpg/2000x3000.jpg') }
     let(:tmdb_hook) { movie('Hook') }
@@ -258,6 +310,16 @@ describe ProducerRepair do
 
       expect(CSV.read(path, headers: true).map { |row| row['id'].to_i }).to eq [hook.id]
       expect(log.string).to start_with '1 movies:'
+    end
+
+    it 'logs a failed movie with its reason as it happens, without adding a column' do
+      hook = movie('Hook')
+      stub_request(:get, %r{\Ahttps://api\.themoviedb\.org/3/search/movie\?}).to_return(status: 503, body: '{}')
+
+      ProducerRepair.write_plan(path, log: log)
+
+      expect(log.string.lines.first.chomp).to eq "Failed #{hook.id} Hook: TMDB search/movie answered 503"
+      expect(CSV.read(path, headers: true).headers).to eq %w[id title year source matched_by old_producer new_producer old_poster new_poster]
     end
 
     it 'reports its progress every 100 movies and when it finishes' do
