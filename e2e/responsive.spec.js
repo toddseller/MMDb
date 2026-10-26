@@ -112,8 +112,12 @@ test.describe('on a phone held sideways', () => {
       const box = await page.locator(selector).first().boundingBox()
       expect(box.x + box.width, selector).toBeLessThanOrEqual(926)
     }
-    const plot = await page.locator('.plot-truncate').first().boundingBox()
-    expect((await page.locator('.expand-plot').first().boundingBox()).y).toBeGreaterThanOrEqual(plot.y + plot.height)
+    // One frame for both, as the drawer may still be gliding into view.
+    const [plotBottom, moreTop] = await page.evaluate(() => [
+      document.querySelector('.plot-truncate').getBoundingClientRect().bottom,
+      document.querySelector('.expand-plot').getBoundingClientRect().top,
+    ])
+    expect(moreTop).toBeGreaterThanOrEqual(plotBottom)
   })
 
   test('pins only the compact bar, so the filters scroll away', async ({ page }) => {
@@ -324,9 +328,14 @@ for (const theme of ['dark', 'default']) test.describe(`on a phone, ${theme} the
 
     const drawer = page.locator('.info')
     await expect(drawer.getByText('Birch is a seeded movie.')).toBeVisible()
-    const poster = await expectAcrossScreen(drawer.locator('.description-poster img').first())
-    const title = await expectAcrossScreen(drawer.locator('.modal-title'))
-    expect(poster.y + poster.height).toBeLessThanOrEqual(title.y)
+    await expectAcrossScreen(drawer.locator('.description-poster img').first())
+    await expectAcrossScreen(drawer.locator('.modal-title'))
+    // One frame for both: the page may still be gliding the drawer into view, which moves everything between reads.
+    const [posterBottom, titleTop] = await drawer.evaluate((info) => [
+      info.querySelector('.description-poster img').getBoundingClientRect().bottom,
+      info.querySelector('.modal-title').getBoundingClientRect().top,
+    ])
+    expect(posterBottom).toBeLessThanOrEqual(titleTop)
     await expectNoSidewaysScroll(page)
   })
 
