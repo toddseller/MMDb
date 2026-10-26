@@ -6,6 +6,9 @@ import { close as closePanel } from '#mmdb/preview.js'
 
 // The longest drawer transition (.35s) plus slack, for when no transitionend arrives.
 const DRAWER_MS = 450
+// .info.open's margin-top in drawer.css, which a drawer still easing open has yet to add below its row.
+const OPEN_MARGIN = 20
+const REDUCED = '(prefers-reduced-motion: reduce)'
 const TILES = '.index-preview, .index-preview-show'
 
 /** @type {HTMLElement | null} */
@@ -36,16 +39,37 @@ const afterTransition = (el, property, done) => {
 }
 
 // A drawer closing above the clicked row pulls the row up as it shrinks; scrolling by the same amount each frame keeps the poster still.
-/** @param {HTMLElement} tile @param {number} top @param {number} [ms] */
-const holdStill = (tile, top, ms = DRAWER_MS) => {
+/** @param {HTMLElement} tile @param {number} top @param {number} [ms] @param {() => void} [done] */
+const holdStill = (tile, top, ms = DRAWER_MS, done) => {
   const window = windowOf(tile)
   const until = Date.now() + ms
   const step = () => {
     const moved = tile.getBoundingClientRect().top - top
     if (moved) window.scrollBy(0, moved)
     if (Date.now() < until) window.requestAnimationFrame(step)
+    else done?.()
   }
   window.requestAnimationFrame(step)
+}
+
+/**
+ * Glides the page just far enough that the open drawer's bottom, once it has finished easing, clears the pinned footer,
+ * never taking its poster under the pinned header. Only a drawer being opened may glide the page up to its poster:
+ * anything else could pull a reader partway down a tall drawer back to the top.
+ * @param {boolean} [up] @param {number} [height] the content's height once eased, when it is easing to a known one
+ */
+export const reveal = (up = false, height) => {
+  if (!isOpen() || !current || !drawer) return
+  const window = windowOf(current)
+  const wrapper = /** @type {HTMLElement} */ (drawer.querySelector('.info-wrapper'))
+  const margin = parseFloat(window.getComputedStyle(drawer).marginTop) || 0
+  const end = wrapper.getBoundingClientRect().top + (height ?? wrapper.scrollHeight) + OPEN_MARGIN - margin
+  // The tiles' scroll-margin-top is the pinned header's height, kept for the letter rail's jumps.
+  const top = current.getBoundingClientRect().top - (parseFloat(window.getComputedStyle(current).scrollMarginTop) || 0)
+  const footer = current.ownerDocument.querySelector('footer')?.getBoundingClientRect()
+  const floor = footer?.height ? footer.top : window.innerHeight
+  const by = top < 0 ? (up ? top : 0) : Math.max(0, Math.min(end - floor, top))
+  if (by) window.scrollBy({ top: by, behavior: window.matchMedia?.(REDUCED).matches ? 'auto' : 'smooth' })
 }
 
 // Filters and updates re-render the list wholesale, which takes an open drawer with it.
@@ -74,7 +98,7 @@ const mark = (tile) => {
 }
 
 /** @param {HTMLElement} tile @param {string} html @param {boolean} [instant] */
-export const open = (tile, html, instant = false) => {
+const insert = (tile, html, instant = false) => {
   const document = tile.ownerDocument
   const el = document.createElement('div')
   el.className = 'info'
@@ -85,11 +109,23 @@ export const open = (tile, html, instant = false) => {
   rowEnd(tile).after(el)
   mark(tile)
   drawer = el
+  // The drawer's poster has no set size, so it grows again when it loads; load doesn't bubble, so it's caught on the way down.
+  // The edit form's poster is left out: the owner opened that form to read and type in it, so the page stays put.
+  el.addEventListener('load', (event) => {
+    if (el === drawer && !/** @type {Element} */ (event.target).closest('.edit-form')) reveal()
+  }, true)
   fadeFooters(document, fadeOut)
   if (instant) return el.classList.add('open')
   // Reading the height commits the closed state, so adding .open animates instead of appearing at once.
   void el.offsetHeight
   windowOf(tile).requestAnimationFrame(() => el.classList.add('open'))
+}
+
+// An instant open is a reload after a save, where the owner may be reading partway down the drawer.
+/** @param {HTMLElement} tile @param {string} html @param {boolean} [instant] */
+export const open = (tile, html, instant = false) => {
+  insert(tile, html, instant)
+  reveal(!instant)
 }
 
 /** @param {boolean} [instant] */
@@ -115,11 +151,12 @@ const swap = (tile, html) => {
   mark(tile)
   if (from === to) {
     wrapper.style.height = ''
-    return
+    return to
   }
   void wrapper.offsetHeight
   wrapper.style.height = `${to}px`
   afterTransition(wrapper, 'height', () => { wrapper.style.height = '' })
+  return to
 }
 
 /** @param {HTMLElement} tile @param {string} html */
@@ -129,11 +166,12 @@ export const show = (tile, html) => {
     drawer = null
     return open(tile, html)
   }
-  if (rowEnd(tile) === rowEnd(current)) return swap(tile, html)
+  if (rowEnd(tile) === rowEnd(current)) return reveal(false, swap(tile, html))
   const top = tile.getBoundingClientRect().top
   close()
-  open(tile, html)
-  holdStill(tile, top)
+  insert(tile, html)
+  // Gliding during the hold would fight it, so the drawer is brought into view once the old one has closed.
+  holdStill(tile, top, DRAWER_MS, () => reveal(true))
 }
 
 // Redrawing the list takes the open drawer with it. This moves the same drawer under its poster's new tile, so it is
@@ -154,7 +192,7 @@ export const keepOpen = (redraw, html, ms) => {
   rowEnd(moved).after(el)
   if (html === undefined) mark(moved)
   else swap(moved, html)
-  holdStill(moved, top, ms)
+  holdStill(moved, top, ms, () => reveal())
 }
 
 /** @param {Document} document @param {Element} poster */

@@ -365,6 +365,44 @@ test('a season button sets the default season and puts its thumbnail on the tile
   assert.equal(tileImage().getAttribute('src'), 'https://img.test/s2/400x400.jpg')
 })
 
+// The open tile at tileTop under the desktop header (170px), the drawer's content from 600px down, the footer at 875px.
+/** @param {number} tileTop @param {number} height */
+const layout = (tileTop, height) => {
+  /** @type {unknown[]} */
+  const glides = []
+  page.window.scrollBy = /** @type {any} */ ((/** @type {unknown} */ options) => { glides.push(options) })
+  const computed = page.window.getComputedStyle.bind(page.window)
+  page.window.getComputedStyle = /** @type {any} */ ((/** @type {Element} */ node) => {
+    if (node.classList.contains('info')) return { marginTop: '20px' }
+    if (node.classList.contains('index-preview-show')) return { scrollMarginTop: '170px' }
+    return computed(node)
+  })
+  page.window.HTMLElement.prototype.getBoundingClientRect = function () {
+    if (this.tagName === 'FOOTER') return /** @type {DOMRect} */ ({ top: 875, height: 25 })
+    return /** @type {DOMRect} */ ({ top: this.classList.contains('info-wrapper') ? 600 : tileTop, height: 0 })
+  }
+  Object.defineProperty(el('.info .info-wrapper'), 'scrollHeight', { value: height })
+  return glides
+}
+
+test('a season switch that makes the drawer end below the footer glides it into view', async () => {
+  const glides = layout(400, 400)
+
+  click('.season-submit:not(#active-season)')
+  await answerNext(json({ page: '<p>Season 2, with more episodes</p>', poster: 'https://img.test/s2/400x400.jpg' }))
+
+  assert.deepEqual(glides, [{ top: 125, behavior: 'smooth' }])
+})
+
+test('a season switch never glides back up to a show scrolled under the header', async () => {
+  const glides = layout(100, 400)
+
+  click('.season-submit:not(#active-season)')
+  await answerNext(json({ page: '<p>Season 2</p>', poster: 'https://img.test/s2/400x400.jpg' }))
+
+  assert.deepEqual(glides, [])
+})
+
 const openCreate = async () => {
   page.document.getElementById('user-page')?.insertAdjacentHTML('beforeend', '<button type="button" id="create-new" class="add-all"></button>')
   el('#preview').style.display = 'flex'
