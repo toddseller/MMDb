@@ -3,6 +3,7 @@ import { test, beforeEach, afterEach } from 'node:test'
 import assert from 'node:assert/strict'
 import { makePage, stubFetch, json, stubAnimate } from './dom.js'
 import { init, search, close } from '#mmdb/preview.js'
+import { show, close as closeDrawer, isOpen, openTile } from '#mmdb/drawer.js'
 
 // The add controls and panel as users/show.erb and shows/show.erb render them for the collection's owner.
 /** @param {'movies' | 'shows'} kind */
@@ -224,8 +225,84 @@ for (const [what, button, title] of [['an episode', '#episode-video', 'Harbor Li
     assert.ok(shown('#add-show'))
     assert.equal(el('#show-list').textContent, 'Harbor Lights')
     assert.equal(el('.footer').textContent, '1 TV Shows \u2014 3 Episodes')
+    assert.equal(fetched.calls.length, 3, 'no details request without a drawer open')
   })
 }
+
+// Harbor Lights (show 1) with its drawer open, as a poster click leaves it; Anchor Bay sorts before it once added.
+/** @param {string} id @param {string} title */
+const showTile = (id, title) => `<div class="index-preview-show" id="7"><a class="show-modal" id="${id}"><img alt="${title} Poster"></a></div>`
+const withDrawerOpen = () => {
+  load('shows')
+  el('#show-list').innerHTML = showTile('1', 'Harbor Lights')
+  // jsdom lays nothing out: every element counts as shown, and frames are left to the browser.
+  Object.defineProperty(page.window.HTMLElement.prototype, 'offsetParent', { get() { return this.ownerDocument.body }, configurable: true })
+  page.window.requestAnimationFrame = () => 0
+  closeDrawer(true)
+  show(/** @type {HTMLElement} */ (el('.index-preview-show')), '<p>Season 1: one episode</p>')
+}
+const addAnEpisode = async () => {
+  submit('#show-search')
+  await answerNext(json({ query: [{}], page: seasonResult }))
+  submit('#create-show')
+  await answerNext(json({ status: 'true', page: episodeResults, count: 2 }))
+  submit('#create-episode')
+  await answerNext(json({ status: 'true', page: showTile('2', 'Anchor Bay') + showTile('1', 'Harbor Lights'), show_count: 2, episode_count: 3 }))
+}
+const drawer = () => el('#show-list > .info')
+
+test('adding episodes with a drawer open fetches the open show’s details before changing the page', async () => {
+  withDrawerOpen()
+  await addAnEpisode()
+
+  assert.equal(fetched.calls[3].url, '/users/7/shows/1')
+  assert.equal(drawer()?.textContent, 'Season 1: one episode')
+  assert.equal(el('#show-list').querySelectorAll('.index-preview-show').length, 1, 'the list waits for the details')
+
+  await answerNext(json('<p>Season 1: two episodes</p>'))
+
+  assert.equal(drawer()?.textContent, 'Season 1: two episodes')
+  assert.equal(drawer()?.previousElementSibling?.querySelector('a')?.id, '1')
+  assert.ok(isOpen())
+  assert.equal(el('#show-list').querySelectorAll('.index-preview-show').length, 2)
+  assert.equal(el('.footer').textContent, '2 TV Shows \u2014 3 Episodes')
+  assert.ok(!shown('#preview'))
+})
+
+test('a failed details request still shows the new shows, with the drawer closed', async () => {
+  withDrawerOpen()
+  await addAnEpisode()
+
+  await answerNext(json('error', 500))
+
+  assert.equal(drawer(), null)
+  assert.ok(!isOpen())
+  assert.equal(el('#show-list').querySelectorAll('.index-preview-show').length, 2)
+  assert.equal(el('.footer').textContent, '2 TV Shows \u2014 3 Episodes')
+})
+
+test('a drawer switched to another show while the details load keeps that show’s details', async () => {
+  withDrawerOpen()
+  await addAnEpisode()
+  el('#show-list').insertAdjacentHTML('afterbegin', showTile('2', 'Anchor Bay'))
+  show(/** @type {HTMLElement} */ (el('.index-preview-show')), '<p>Anchor Bay</p>')
+
+  await answerNext(json('<p>Season 1: two episodes</p>'))
+
+  assert.equal(drawer()?.textContent, 'Anchor Bay')
+  assert.equal(openTile()?.querySelector('a')?.id, '2')
+})
+
+test('a drawer closed while the details load stays closed', async () => {
+  withDrawerOpen()
+  await addAnEpisode()
+  closeDrawer(true)
+
+  await answerNext(json('<p>Season 1: two episodes</p>'))
+
+  assert.equal(drawer(), null)
+  assert.equal(el('#show-list').querySelectorAll('.index-preview-show').length, 2)
+})
 
 test('dismiss closes the panel and its controls and restores the add button', async () => {
   click('#add')
