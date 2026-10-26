@@ -2,6 +2,7 @@
 import { on, onSubmit } from '#mmdb/events.js'
 import { request, fields } from '#mmdb/request.js'
 import { fadeIn, fadeOut, slideDown, slideUp } from '#mmdb/motion.js'
+import { isOpen, openTile, keepOpen, close as closeDrawer } from '#mmdb/drawer.js'
 
 const OPEN_MS = 300
 const CLOSE_AFTER_ADD_MS = 500
@@ -167,11 +168,11 @@ const adding = (document, form, title) => {
   return post(document, form)
 }
 
-/** @param {Document} document @param {string} page @param {string} count */
-const showCollection = (document, page, count) => {
+/** @param {Document} document @param {string} page @param {string} count @param {(redraw: () => void) => void} [around] */
+const showCollection = (document, page, count, around = (redraw) => redraw()) => {
   close(document, CLOSE_AFTER_ADD_MS)
   const { list, footer } = parts(document)
-  list.innerHTML = page
+  around(() => { list.innerHTML = page })
   if (footer) footer.textContent = count
 }
 
@@ -198,7 +199,14 @@ const addEpisodes = async (document, form) => {
   const title = button?.querySelector(':scope > span.glyphicon') ? `Season ${button.id}` : value(form, 'episode[title]')
   const response = await adding(document, form, title)
   if (response.status !== 'true') return
-  showCollection(document, response.page, `${response.show_count} TV Shows \u2014 ${response.episode_count} Episodes`)
+  // Fetched before the page changes, so the open drawer is never seen gone while its new details load.
+  const tile = isOpen() ? openTile() : null
+  const details = tile && await request(`/users/${tile.id}/shows/${tile.querySelector(':scope > a')?.id}`).catch(() => null)
+  if (tile && !details) closeDrawer(true)
+  // A drawer switched to another show while the details loaded keeps its own content.
+  const html = tile && openTile() === tile ? details : undefined
+  showCollection(document, response.page, `${response.show_count} TV Shows \u2014 ${response.episode_count} Episodes`,
+    (redraw) => keepOpen(redraw, html, CLOSE_AFTER_ADD_MS))
 }
 
 /** @param {Document} document @param {HTMLFormElement} form */

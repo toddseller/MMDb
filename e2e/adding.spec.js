@@ -126,6 +126,43 @@ test.describe('on the shows page', () => {
     await page.getByRole('button', { name: 'Search', exact: true }).click()
   }
 
+  /** Picks Harbor Lights' first season in the panel, then adds its missing episode, 1x2. */
+  const addHarborEpisode = async (page) => {
+    await page.route(`**/users/${USER.id}/shows`, (route) =>
+      route.request().method() === 'POST' ? route.fulfill(json(recorded('show_episodes'))) : route.fallback())
+    await searchShows(page, json(recorded('show_search')))
+    await page.getByRole('button', { name: 'Harbor Lights Poster' }).click()
+    await panel(page).locator('#episode-video').click()
+    await expect(panel(page)).toBeHidden()
+  }
+  const drawer = (page) => page.locator('#show-list > .info')
+  const openPoster = (page, title) => page.locator(`#show-list > .index-preview-show.open img[alt="${title} Poster"]`)
+
+  // Runs before the whole-season test below, which adds 1x2 for good.
+  test('adding episodes to the open show keeps its drawer open with the new episode', async ({ page }) => {
+    await page.locator('#show-list img[alt="Harbor Lights Poster"]').click()
+    await expect(drawer(page).getByText('Harbor Lights 1x1', { exact: true })).toBeVisible()
+    await expect(drawer(page).getByText('Harbor Lights 1x2', { exact: true })).toHaveCount(0)
+
+    await addHarborEpisode(page)
+
+    await expect(drawer(page).getByText('Harbor Lights 1x2', { exact: true })).toBeVisible()
+    await expect(drawer(page)).toHaveCount(1)
+    await expect(openPoster(page, 'Harbor Lights')).toBeVisible()
+  })
+
+  test('adding episodes to another show keeps the open drawer, which changes height at once under reduced motion', async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: 'reduce' })
+    await page.locator('#show-list img[alt="Tide Tables Poster"]').click()
+    await expect(drawer(page).getByText('Tide Tables 1x3', { exact: true })).toBeVisible()
+
+    await addHarborEpisode(page)
+
+    await expect(drawer(page).getByText('Tide Tables 1x3', { exact: true })).toBeVisible()
+    await expect(openPoster(page, 'Tide Tables')).toBeVisible()
+    expect(await drawer(page).locator('.info-wrapper').evaluate((el) => getComputedStyle(el).transitionDuration)).toBe('0s')
+  })
+
   test('adding a whole season lists its episodes under the show', async ({ page }) => {
     await page.route(`**/users/${USER.id}/shows`, (route) =>
       route.request().method() === 'POST' ? route.fulfill(json(recorded('show_episodes'))) : route.fallback())

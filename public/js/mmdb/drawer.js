@@ -36,10 +36,10 @@ const afterTransition = (el, property, done) => {
 }
 
 // A drawer closing above the clicked row pulls the row up as it shrinks; scrolling by the same amount each frame keeps the poster still.
-/** @param {HTMLElement} tile @param {number} top */
-const holdStill = (tile, top) => {
+/** @param {HTMLElement} tile @param {number} top @param {number} [ms] */
+const holdStill = (tile, top, ms = DRAWER_MS) => {
   const window = windowOf(tile)
-  const until = Date.now() + DRAWER_MS
+  const until = Date.now() + ms
   const step = () => {
     const moved = tile.getBoundingClientRect().top - top
     if (moved) window.scrollBy(0, moved)
@@ -134,6 +134,27 @@ export const show = (tile, html) => {
   close()
   open(tile, html)
   holdStill(tile, top)
+}
+
+// Redrawing the list takes the open drawer with it. This moves the same drawer under its poster's new tile, so it is
+// never seen gone, and eases it to the new details. ms covers anything else moving the poster, such as a panel closing.
+/** @param {() => void} redraw @param {string} [html] @param {number} [ms] */
+export const keepOpen = (redraw, html, ms) => {
+  const el = isOpen() ? drawer : null
+  const tile = current
+  const id = tile?.querySelector(':scope > a')?.id
+  if (!el || !tile || !id) return redraw()
+  const list = /** @type {HTMLElement} */ (tile.parentElement)
+  const top = tile.getBoundingClientRect().top
+  el.remove()
+  redraw()
+  // Tiles carry the user's id and poster links the show's or movie's, so the poster is found by its link.
+  const moved = /** @type {HTMLElement | null} */ (list.querySelector(`:scope > * > a[id="${id}"]`)?.parentElement ?? null)
+  if (!moved || moved.offsetParent === null) return close(true)
+  rowEnd(moved).after(el)
+  if (html === undefined) mark(moved)
+  else swap(moved, html)
+  holdStill(moved, top, ms)
 }
 
 /** @param {Document} document @param {Element} poster */

@@ -2,7 +2,7 @@
 import { test, beforeEach, afterEach, mock } from 'node:test'
 import assert from 'node:assert/strict'
 import { makePage, stubFetch, json } from './dom.js'
-import { init, rowEnd, show, close, isOpen, openTile } from '#mmdb/drawer.js'
+import { init, rowEnd, show, close, isOpen, openTile, keepOpen } from '#mmdb/drawer.js'
 
 // Two rows of three movie tiles, as _movie_list.erb renders them; layout is stubbed since jsdom has none.
 const ROWS = [['Amber', 'Birch', 'Cedar'], ['Delta', 'Ember', 'Fable']]
@@ -195,4 +195,87 @@ test('tile() is the open tile, and null once closed', () => {
   close(true)
   assert.equal(openTile(), null)
   assert.equal('drawer' in page.window, false)
+})
+
+// The list as adding a show draws it: Aaron sorts first, so every other tile moves one place along.
+const REDRAWN = [['Aaron', 'Amber', 'Birch'], ['Cedar', 'Delta', 'Ember'], ['Fable']]
+
+/** @param {{ without?: string, hidden?: string }} [options] */
+const redraw = ({ without, hidden } = {}) => () => {
+  const list = /** @type {HTMLElement} */ (page.document.getElementById('movie-list'))
+  list.innerHTML = REDRAWN.flat().filter((title) => title !== without).map((title) =>
+    `<div class="index-preview" id="7" data-title="${title}"><a class="movie-modal" id="${title.length}${title}"><img></a><p>${title}</p></div>`).join('')
+  REDRAWN.forEach((row, index) => row.forEach((title) => { if (title !== without) place(tile(title), { top: index * 300, hidden: title === hidden }) }))
+}
+
+/** @param {HTMLElement} el @param {number} top */
+const at = (el, top) => { el.getBoundingClientRect = () => /** @type {DOMRect} */ ({ top }) }
+
+test('keepOpen puts the open drawer back under its poster’s new row and eases to the new details', () => {
+  show(tile('Ember'), 'Ember')
+  runFrames()
+  const [drawer] = drawers()
+  const wrapper = /** @type {HTMLElement} */ (drawer.querySelector('.info-wrapper'))
+  Object.defineProperty(wrapper, 'offsetHeight', { value: 100 })
+  Object.defineProperty(wrapper, 'scrollHeight', { value: 160 })
+
+  keepOpen(redraw(), 'Ember, two episodes')
+
+  assert.deepEqual(drawers(), [drawer])
+  assert.equal(drawer.previousElementSibling, tile('Ember'))
+  assert.ok(tile('Ember').classList.contains('open'))
+  assert.equal(openTile(), tile('Ember'))
+  assert.equal(wrapper.textContent, 'Ember, two episodes')
+  assert.equal(wrapper.style.height, '160px')
+  transitionEnd(wrapper, 'height')
+  assert.equal(wrapper.style.height, '')
+  assert.ok(isOpen())
+})
+
+test('keepOpen without new details keeps the drawer’s content', () => {
+  show(tile('Ember'), 'Ember')
+
+  keepOpen(redraw())
+
+  assert.equal(drawers()[0].previousElementSibling, tile('Ember'))
+  assert.equal(drawers()[0].textContent, 'Ember')
+  assert.ok(tile('Ember').classList.contains('open'))
+})
+
+for (const [what, options] of /** @type {const} */ ([['missing from', { without: 'Ember' }], ['hidden in', { hidden: 'Ember' }]])) {
+  test(`keepOpen closes the drawer when its poster is ${what} the redrawn list`, () => {
+    show(tile('Ember'), 'Ember')
+
+    keepOpen(redraw(options), 'Ember again')
+
+    assert.equal(drawers().length, 0)
+    assert.ok(!isOpen())
+    assert.equal(openTile(), null)
+    assert.equal(footer().style.display, '')
+  })
+}
+
+test('keepOpen with no drawer open only redraws the list', () => {
+  keepOpen(redraw(), 'Ember')
+
+  assert.ok(tile('Aaron'))
+  assert.equal(drawers().length, 0)
+  assert.ok(!isOpen())
+})
+
+test('keepOpen holds the poster where it was on screen for as long as it is asked', () => {
+  /** @type {number[]} */
+  const scrolled = []
+  page.window.scrollBy = /** @type {any} */ ((/** @type {number} */ _x, /** @type {number} */ y) => { scrolled.push(y) })
+  show(tile('Ember'), 'Ember')
+  runFrames()
+  at(tile('Ember'), 400)
+
+  keepOpen(() => { redraw()(); at(tile('Ember'), 700) }, 'Ember', 500)
+  runFrames()
+
+  assert.deepEqual(scrolled, [300])
+  mock.timers.tick(470)
+  runFrames()
+  assert.equal(frames.length, 1, 'still holding after the drawer’s own 450ms')
 })
