@@ -1,7 +1,7 @@
 # collection-access Specification
 
 ## Purpose
-Defines who may change a collection from the web app (its movies, shows, seasons, episodes and ratings, and the account behind it) and who may run the searches that query Apple and TMDB, so that only a collection's owner can change it.
+Defines who may change a collection from the web app or the JSON APIs (its movies, shows, seasons, episodes and ratings, and the account behind it) and who may run the searches that query Apple and TMDB, so that only a collection's owner can change it.
 
 ## Requirements
 
@@ -68,3 +68,26 @@ Sign-up, sign-in and every page that shows a collection SHALL keep working for v
 #### Scenario: Visitor views a collection
 - **WHEN** a visitor who is not signed in opens user 1's movies page
 - **THEN** the page shows user 1's movies
+
+### Requirement: Only the owner changes a collection through the API
+An `/api/v2` or `/api/v3` request that edits a movie (`PUT /movies/:id`, and `PATCH /movies/:id` in v3) or adds episodes to a show (`POST /add_episodes`) SHALL change nothing and answer 403 unless the movie or show is in the collection of the user the token names. A request without a valid token SHALL still answer 401. The owner's requests SHALL behave as before.
+
+#### Scenario: Editing a movie in someone else's collection
+- **WHEN** user 2, with a valid token, sends `PUT /api/v2/movies/:id` for a movie that is only in user 1's collection
+- **THEN** the response is 403 and the movie is unchanged
+
+#### Scenario: Adding episodes to someone else's show
+- **WHEN** user 2, with a valid token, sends `POST /api/v3/add_episodes` for a show that is only in user 1's collection
+- **THEN** the response is 403 and no episode is added
+
+#### Scenario: Without a token
+- **WHEN** a request without a token sends `PUT /api/v3/movies/:id`
+- **THEN** the response is 401 and the movie is unchanged
+
+#### Scenario: The owner
+- **WHEN** user 1, with a valid token, edits a movie in their collection
+- **THEN** the movie is saved as before
+
+#### Scenario: Adding a show, then its episodes
+- **WHEN** a user adds a show with `POST /add_show` and then adds its episodes with `POST /add_episodes`
+- **THEN** both succeed, because the show is now in their collection
