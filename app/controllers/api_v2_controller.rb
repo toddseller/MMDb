@@ -68,6 +68,7 @@ namespace '/api/v2' do
 
   put '/movies/:id' do
     authenticate!
+    require_api_owner!(:movies, params[:id])
 
     movie = Movie.find(params[:id])
     movie.update(params[:movie])
@@ -153,6 +154,7 @@ namespace '/api/v2' do
 
   post '/add_episodes' do
     authenticate!
+    require_api_owner!(:shows, Array.wrap(params[:episode]).first['show_id'])
 
     if params[:episode].instance_of? Array
       show = Show.find(params[:episode][0]['show_id'])

@@ -76,6 +76,7 @@ namespace '/api/v3' do
 
   put '/movies/:id' do
     authenticate!
+    require_api_owner!(:movies, params[:id])
 
     movie = Movie.find(params[:id])
     movie.update(params[:movie])
@@ -84,6 +85,7 @@ namespace '/api/v3' do
 
   patch '/movies/:id' do
     authenticate!
+    require_api_owner!(:movies, params[:id])
 
     movie = Movie.find(params[:id])
     movie.title = params[:title]
@@ -183,6 +185,7 @@ namespace '/api/v3' do
 
   post '/add_episodes' do
     authenticate!
+    require_api_owner!(:shows, Array.wrap(params[:episode]).first['show_id'])
 
     if params[:episode].instance_of? Array
       show = Show.find(params[:episode][0]['show_id'])
@@ -207,7 +210,7 @@ namespace '/api/v3' do
       end
     end
 
-    show.to_json({include: [seasons: {include: :episodes.order(tv_episode)}]})
+    show.to_json({include: [seasons: {include: :episodes}]})
   end
 
   get '/counts' do
