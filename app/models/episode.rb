@@ -4,7 +4,8 @@ class Episode < ActiveRecord::Base
 
   belongs_to :season, -> { order(:tv_episode) }
 
-  before_create :create_duration
+  # Only bare minute counts from the sources are converted; a hand-entered "1h 5m" would read as 1 minute.
+  before_save :create_duration, if: -> { new_record? || runtime.to_s.match?(/\A\d+\z/) }
   # before_save :update_duration
 
 
