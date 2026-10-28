@@ -80,6 +80,81 @@ for (const { width, margin } of [{ width: 1500, margin: 40 }, { width: 2560, mar
   })
 }
 
+// The full-size poster is never answered, so the drawer is measured as it is while that poster loads.
+const holdPosters = (page) => page.route('https://is1-ssl.mzstatic.com/**', (route) => {
+  if (/\/(2000x3000|600x600)\.jpg$/.test(route.request().url())) return
+  return route.fulfill({ contentType: 'image/svg+xml', body: '<svg xmlns="http://www.w3.org/2000/svg" width="400" height="600"/>' })
+})
+
+const DRAWERS = [
+  { ...MOVIES, name: 'movie', poster: 'Birch Poster', heading: '#meta-data .modal-title', size: [340, 510] },
+  { ...SHOWS, name: 'show', poster: 'Tide Tables Poster', heading: '#info-header h1', size: [447, 447] },
+]
+const drawerPoster = (page) => page.locator('#meta-data .description-poster img')
+
+test.describe('in a 1500px window, while the poster loads', () => {
+  test.use({ viewport: { width: 1500, height: 900 } })
+
+  for (const drawer of DRAWERS) {
+    test(`a ${drawer.name} drawer's poster already has its ${drawer.size.join('x')} size`, async ({ page }) => {
+      await holdPosters(page)
+      await page.goto(drawer.path)
+
+      await page.locator(`${drawer.tile} a`).filter({ has: page.locator(`img[alt="${drawer.poster}"]`) }).click()
+
+      await expect(page.locator(drawer.heading)).toBeVisible()
+      const box = await drawerPoster(page).boundingBox()
+      expect([box.width, box.height]).toEqual(drawer.size)
+    })
+  }
+
+  // The fixture aborts every outside request, so these posters fail; Harbor Lights' seasons have none at all.
+  for (const drawer of [...DRAWERS, { ...SHOWS, name: 'show with no season poster', poster: 'Harbor Lights Poster', heading: '#info-header h1', size: [447, 447] }]) {
+    test(`a ${drawer.name}'s drawer poster that fails keeps its ${drawer.size.join('x')} size`, async ({ page }) => {
+      await page.goto(drawer.path)
+
+      await page.locator(`${drawer.tile} a`).filter({ has: page.locator(`img[alt="${drawer.poster}"]`) }).click()
+
+      await expect(drawerPoster(page)).toHaveJSProperty('complete', true)
+      const box = await drawerPoster(page).boundingBox()
+      expect([box.width, box.height]).toEqual(drawer.size)
+    })
+  }
+
+  test("a portrait show poster keeps the drawer's square", async ({ page }) => {
+    await page.route('https://is1-ssl.mzstatic.com/**', (route) => route.fulfill({ contentType: 'image/svg+xml', body: '<svg xmlns="http://www.w3.org/2000/svg" width="400" height="600"/>' }))
+    await page.goto(SHOWS.path)
+
+    await page.locator(`${SHOWS.tile} a`).filter({ has: page.locator('img[alt="Tide Tables Poster"]') }).click()
+
+    await expect(drawerPoster(page)).toHaveJSProperty('complete', true)
+    const box = await drawerPoster(page).boundingBox()
+    expect([box.width, box.height]).toEqual([447, 447])
+  })
+})
+
+test.describe('on a phone, while the poster loads', () => {
+  test.use(PHONE)
+
+  for (const drawer of DRAWERS) {
+    test(`a ${drawer.name} drawer's title already sits below the poster's full box`, async ({ page }) => {
+      await holdPosters(page)
+      await page.goto(drawer.path)
+
+      await page.locator(`${drawer.tile} a`).filter({ has: page.locator(`img[alt="${drawer.poster}"]`) }).tap()
+
+      await expect(page.locator(drawer.heading)).toBeVisible()
+      // One frame for both, as the drawer may still be gliding into view.
+      const [poster, headingTop] = await page.evaluate((heading) => [
+        document.querySelector('#meta-data .description-poster img').getBoundingClientRect().toJSON(),
+        document.querySelector(heading).getBoundingClientRect().top,
+      ], drawer.heading)
+      expect(poster.height).toBeCloseTo(poster.width * drawer.size[1] / drawer.size[0], 0)
+      expect(headingTop).toBeGreaterThanOrEqual(poster.bottom)
+    })
+  }
+})
+
 // Between 1200px and about 1500px the show drawer's poster column is narrower than its 447px poster.
 test.describe('in a 1300px window', () => {
   test.use({ viewport: { width: 1300, height: 900 } })

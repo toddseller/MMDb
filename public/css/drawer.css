@@ -146,6 +146,25 @@
     font-size: 16px;
 }
 
+/* A fixed shape, so the details don't move when the poster loads; the background is the image already on screen until then.
+   Chrome draws a failed or empty image inline as its alt text, ignoring its size, unless it is a block. */
+#meta-data .description-poster img
+{
+    display: block;
+    aspect-ratio: 2 / 3;
+    object-fit: contain;
+
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+}
+
+/* After the movie rule, which matches a show's poster too. Show posters come square or, from TMDB, portrait. */
+#info-header > .description-poster img
+{
+    aspect-ratio: 1;
+}
+
 @media (prefers-reduced-motion: reduce)
 {
     .info,

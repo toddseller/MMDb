@@ -97,6 +97,21 @@ const mark = (tile) => {
   tile.classList.add('open')
 }
 
+// An image already on screen fills the poster's box until the poster arrives. It stays if the poster fails, which
+// beats a broken image, and goes once it loads so it can't show around a poster of another shape. A poster with no src
+// never loads, so it gets none: the image would stay as if it were this one's.
+/** @param {Element} content @param {string | null | undefined} src */
+export const placehold = (content, src) => {
+  const poster = /** @type {HTMLElement | null} */ (content.querySelector('.description-poster img'))
+  if (!poster?.getAttribute('src') || !src) return
+  // A quoted CSS string, so a stored URL can't end the value early.
+  poster.style.backgroundImage = `url(${JSON.stringify(src)})`
+  poster.addEventListener('load', () => { poster.style.backgroundImage = '' }, { once: true })
+}
+
+/** @param {HTMLElement} tile */
+const tileImage = (tile) => tile.querySelector('img')?.getAttribute('src')
+
 /** @param {HTMLElement} tile @param {string} html @param {boolean} [instant] */
 const insert = (tile, html, instant = false) => {
   const document = tile.ownerDocument
@@ -105,15 +120,11 @@ const insert = (tile, html, instant = false) => {
   const wrapper = document.createElement('div')
   wrapper.className = 'info-wrapper'
   wrapper.innerHTML = html
+  placehold(wrapper, tileImage(tile))
   el.append(wrapper)
   rowEnd(tile).after(el)
   mark(tile)
   drawer = el
-  // The drawer's poster has no set size, so it grows again when it loads; load doesn't bubble, so it's caught on the way down.
-  // The edit form's poster is left out: the owner opened that form to read and type in it, so the page stays put.
-  el.addEventListener('load', (event) => {
-    if (el === drawer && !/** @type {Element} */ (event.target).closest('.edit-form')) reveal()
-  }, true)
   fadeFooters(document, fadeOut)
   if (instant) return el.classList.add('open')
   // Reading the height commits the closed state, so adding .open animates instead of appearing at once.
@@ -147,6 +158,7 @@ const swap = (tile, html) => {
   const from = wrapper.offsetHeight
   wrapper.style.height = `${from}px`
   wrapper.innerHTML = html
+  placehold(wrapper, tileImage(tile))
   const to = wrapper.scrollHeight
   mark(tile)
   if (from === to) {

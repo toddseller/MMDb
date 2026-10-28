@@ -1,7 +1,7 @@
 // @ts-check
 import { on } from '#mmdb/events.js'
 import { request, fields } from '#mmdb/request.js'
-import { openTile, reveal } from '#mmdb/drawer.js'
+import { openTile, reveal, placehold } from '#mmdb/drawer.js'
 import { close as closePanel } from '#mmdb/preview.js'
 import { open, close } from '#mmdb/dialog.js'
 
@@ -54,7 +54,11 @@ const tabFields = (document) => {
 /** @param {Document} document @param {string} page @param {string} poster */
 const showSaved = (document, page, poster) => {
   const wrapper = document.querySelector('.info .info-wrapper')
-  if (wrapper) wrapper.innerHTML = page
+  if (wrapper) {
+    const shown = wrapper.querySelector('.description-poster img')?.getAttribute('src')
+    wrapper.innerHTML = page
+    placehold(wrapper, shown)
+  }
   openTile()?.querySelector('img')?.setAttribute('src', poster)
   reveal()
 }

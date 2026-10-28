@@ -159,7 +159,7 @@ When the owner adds episodes from the search panel while a show's drawer is open
 - **THEN** the shows and their counts update and no drawer opens, as before
 
 ### Requirement: The drawer glides into view when it opens or its content changes
-When a drawer opens, switches poster, has its content reloaded (a season switch, adding episodes, a save) or its poster image loads, the page SHALL glide just far enough that the drawer's bottom is above the footer pinned to the bottom of the screen, without moving the open poster's row under the bar pinned to the top. Only opening a drawer MAY glide the page up.
+When a drawer opens, switches poster, or has its content reloaded (a season switch, adding episodes, a save), the page SHALL glide just far enough that the drawer's bottom is above the footer pinned to the bottom of the screen, without moving the open poster's row under the bar pinned to the top. Only opening a drawer MAY glide the page up.
 
 #### Scenario: A poster near the bottom of the screen
 - **WHEN** the owner clicks a poster whose row is near the bottom of the screen, and its drawer fits on screen below that row
@@ -190,8 +190,8 @@ When a drawer opens, switches poster, has its content reloaded (a season switch,
 - **THEN** the page does not glide back up to the poster's row
 
 #### Scenario: The drawer's poster finishes loading
-- **WHEN** a drawer has just glided into view, and its poster image then loads and makes it taller
-- **THEN** the page glides down again until the drawer's bottom is above the footer, as far as the row allows
+- **WHEN** a drawer has just glided into view, and its poster image then loads
+- **THEN** the drawer keeps its height and the page does not move
 
 #### Scenario: Reduced motion
 - **WHEN** the user's system asks for reduced motion, and a drawer opens near the bottom of the screen
@@ -203,3 +203,45 @@ Height changes the owner makes while reading inside an open drawer, such as expa
 #### Scenario: Expanding a plot or opening the edit form
 - **WHEN** the owner taps "more" on a long plot, or opens a movie's edit form, and the drawer grows below the bottom footer
 - **THEN** the page does not move
+
+### Requirement: The drawer's poster holds its size while it loads
+The drawer's poster SHALL take its full size before its image arrives, so nothing in the drawer moves when it loads. A movie's poster SHALL be 2:3 and a show's square, at the width each has at that window size. A show poster of another shape SHALL fit whole inside the square, centred, without being stretched or cropped.
+
+#### Scenario: Movie on desktop
+- **WHEN** a user on a 1500px wide window opens a movie whose poster has not loaded yet
+- **THEN** the drawer's poster is already 340x510
+
+#### Scenario: Show on desktop
+- **WHEN** a user on a 1500px wide window opens a show whose poster has not loaded yet
+- **THEN** the drawer's poster is already 447x447
+
+#### Scenario: Phone
+- **WHEN** a user on a 390px wide window opens a movie or a show whose poster has not loaded yet
+- **THEN** the title starts below the poster's full 2:3 or square box, and stays there when the poster loads
+
+#### Scenario: A portrait show poster
+- **WHEN** a user on a 1500px wide window opens a show whose poster is 2:3
+- **THEN** the poster stays 447x447 and the whole image shows in it, centred
+
+### Requirement: The drawer's poster shows the image already on screen while it loads
+Until its own image has loaded, the drawer's poster SHALL show the same title's image the user was just looking at: the grid poster that was clicked when the drawer opens or switches to another title, or the previous season's poster when the owner switches seasons. Where there is no such image, the box SHALL show the theme's poster colour. Once the poster has loaded, only the poster SHALL show.
+
+#### Scenario: Opening a drawer
+- **WHEN** a user clicks a grid poster and the drawer's full poster has not loaded yet
+- **THEN** the drawer's poster box shows the grid poster that was clicked
+
+#### Scenario: Another title in the same row
+- **WHEN** a drawer is open and the user clicks another poster in the same row before its full poster has loaded
+- **THEN** the drawer's poster box shows the newly clicked grid poster
+
+#### Scenario: Switching seasons
+- **WHEN** the owner switches a show's drawer to another season whose poster has not loaded yet
+- **THEN** the drawer's poster box shows the previous season's poster until the new one loads
+
+#### Scenario: A season with no poster
+- **WHEN** the owner switches a show's drawer to a season that has no poster
+- **THEN** the drawer's poster box shows the theme's poster colour, not the previous season's poster
+
+#### Scenario: Poster loaded
+- **WHEN** the drawer's poster has loaded and is a different shape from its box
+- **THEN** no placeholder image shows around it

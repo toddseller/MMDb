@@ -365,6 +365,23 @@ test('a season button sets the default season and puts its thumbnail on the tile
   assert.equal(tileImage().getAttribute('src'), 'https://img.test/s2/400x400.jpg')
 })
 
+test('a season switch shows the previous season’s poster behind the new one until it loads', async () => {
+  click('.season-submit:not(#active-season)')
+  await answerNext(json({ page: '<div class="description-poster"><img src="https://img.test/s2/600x600.jpg" alt="Tides Poster"></div>', poster: 'https://img.test/s2/400x400.jpg' }))
+
+  const poster = /** @type {HTMLElement} */ (el('.info .description-poster img'))
+  assert.equal(poster.style.backgroundImage, 'url("https://img.test/old/600x600.jpg")')
+})
+
+// An empty src never loads, so the old season's art would stay as if it were this season's.
+test('a switch to a season with no poster shows no previous poster', async () => {
+  click('.season-submit:not(#active-season)')
+  await answerNext(json({ page: '<div class="description-poster"><img src="" alt="Tides Poster"></div>', poster: '' }))
+
+  const poster = /** @type {HTMLElement} */ (el('.info .description-poster img'))
+  assert.equal(poster.style.backgroundImage, '')
+})
+
 // The open tile at tileTop under the desktop header (170px), the drawer's content from 600px down, the footer at 875px.
 /** @param {number} tileTop @param {number} height */
 const layout = (tileTop, height) => {
