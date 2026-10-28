@@ -28,7 +28,7 @@ const PAGE = `
 // _edit_user.erb, as Account Settings loads it into #logIn.
 const SETTINGS = `
   <div class="modal-body">
-    <p class="login-errors">Couldn't save. Check your current password, email and user name.</p>
+    <p class="login-errors">Couldn't save. Check your current password, email and user name, and that a new password has at least 8 characters.</p>
     <form class="login-form" action="/users/1" method="post">
       <input type="hidden" name="_method" value="PUT">
       <input type="text" name="first_name" value="Edie">

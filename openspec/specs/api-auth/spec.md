@@ -29,7 +29,7 @@ A successful signup through `/api/v2/signup` or `/api/v3/signup` SHALL return a 
 - **THEN** the response is a 201 containing a token that the API accepts until 1 day after issue
 
 ### Requirement: The API rejects tokens it should not trust
-A protected API route SHALL answer 401 with a JSON error message, and SHALL NOT return user data, when the request's token is missing, malformed, expired, has no expiry, was issued by another issuer, or was signed with a different secret.
+A protected API route SHALL answer 401 with a JSON error message, and SHALL NOT return user data, when the request's token is missing, malformed, expired, has no expiry, was issued by another issuer, was signed with a different secret, or was issued before its user's latest password change.
 
 #### Scenario: Expired token
 - **WHEN** a protected route receives a token whose expiry has passed
@@ -49,6 +49,14 @@ A protected API route SHALL answer 401 with a JSON error message, and SHALL NOT 
 
 #### Scenario: No token
 - **WHEN** a protected route receives a request without an `Authorization` header
+- **THEN** the response is a 401
+
+#### Scenario: Password changed since the token was issued
+- **WHEN** a protected route receives an otherwise valid token, and its user has changed their password since it was issued
+- **THEN** the response is a 401 with a JSON error message
+
+#### Scenario: Token from before password tracking
+- **WHEN** a protected route receives an otherwise valid token issued before tokens recorded the password, as every token issued before this rule is
 - **THEN** the response is a 401
 
 ### Requirement: A valid token identifies its user

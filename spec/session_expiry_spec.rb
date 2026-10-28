@@ -9,7 +9,7 @@ describe 'Web session expiry' do
   def rating_status = post("/movies/#{movie.id}/ratings", params: { rating: '4' }).status
 
   it 'signs out a session left unused for more than a day' do
-    log_in(user, 'secret')
+    log_in(user, 'secret-password')
     travel 25.hours
 
     expect(signed_in?).to be false
@@ -18,7 +18,7 @@ describe 'Web session expiry' do
   end
 
   it 'keeps a session used every 20 hours signed in for a week' do
-    log_in(user, 'secret')
+    log_in(user, 'secret-password')
 
     9.times do
       travel 20.hours
@@ -28,7 +28,7 @@ describe 'Web session expiry' do
 
   it 'gives a session that ends the theme Sign Out leaves' do
     user.update_columns(theme: 'dark')
-    log_in(user, 'secret')
+    log_in(user, 'secret-password')
     expect(Nokogiri::HTML(page_html).at_css('html')['data-theme']).to eq 'dark'
     travel 25.hours
 
@@ -37,7 +37,7 @@ describe 'Web session expiry' do
 
   describe 'a session with no end time, such as one from registering or from before expiry existed' do
     before do
-      post('/users', params: { user: { first_name: 'New', last_name: 'User', user_name: 'newuser', email: 'new@example.test', password: 'secret' } }, xhr: false)
+      post('/users', params: { user: { first_name: 'New', last_name: 'User', user_name: 'newuser', email: 'new@example.test', password: 'secret-password' } }, xhr: false)
     end
 
     let(:user) { User.find_by!(user_name: 'newuser') }
@@ -57,10 +57,10 @@ describe 'Web session expiry' do
   describe 'registering in a browser that signed out earlier' do
     def register_after_an_earlier_sign_in(**remember)
       earlier = create_user
-      post('/sessions', params: { username_email: earlier.email, password: 'secret', **remember })
+      post('/sessions', params: { username_email: earlier.email, password: 'secret-password', **remember })
       post("/sessions/#{earlier.id}", xhr: false)
       travel 2.days
-      post('/users', params: { user: { first_name: 'Next', last_name: 'User', user_name: 'nextuser', email: 'next@example.test', password: 'secret' } }, xhr: false)
+      post('/users', params: { user: { first_name: 'Next', last_name: 'User', user_name: 'nextuser', email: 'next@example.test', password: 'secret-password' } }, xhr: false)
     end
 
     it "isn't ended by the end time the earlier sign-in left" do
@@ -77,7 +77,7 @@ describe 'Web session expiry' do
   end
 
   describe 'Remember me' do
-    def sign_in(**extra) = post('/sessions', params: { username_email: user.email, password: 'secret', **extra })
+    def sign_in(**extra) = post('/sessions', params: { username_email: user.email, password: 'secret-password', **extra })
 
     def cookie_expiry(response) = Time.httpdate(response['set-cookie'][/expires=([^;]+)/i, 1])
 
@@ -100,7 +100,7 @@ describe 'Web session expiry' do
   end
 
   describe 'the session cookie' do
-    def sign_in(env = {}) = post('/sessions', params: { username_email: user.email, password: 'secret' }, env: env)
+    def sign_in(env = {}) = post('/sessions', params: { username_email: user.email, password: 'secret-password' }, env: env)
 
     def flags(response) = response['set-cookie'].split(/;\s*/).drop(1).map(&:downcase)
 

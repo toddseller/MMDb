@@ -1,7 +1,7 @@
 describe 'account settings' do
   let(:user) { create_user }
 
-  before { log_in(user, 'secret') }
+  before { log_in(user, 'secret-password') }
 
   def save(**params)
     request('PUT', "/users/#{user.id}", params: { first_name: 'Ann', last_name: 'Lee', user_name: user.user_name, email: user.email, current: '' }.merge(params))
@@ -33,14 +33,14 @@ describe 'account settings' do
   it 'stores the theme when the password changes too' do
     user.update_columns(theme: 'dark')
 
-    save(theme: 'default', current: 'secret', password: 'secret', confirm: 'secret')
+    save(theme: 'default', current: 'secret-password', password: 'secret-password', confirm: 'secret-password')
 
     expect(user.reload.theme).to eq 'default'
   end
 
   it 'refuses an unknown theme, keeping the saved one on the next page' do
     user.update_columns(theme: 'dark')
-    log_in(user, 'secret')
+    log_in(user, 'secret-password')
 
     expect(JSON.parse(save(theme: 'bogus').body)['status']).to eq 'false'
 
@@ -64,7 +64,7 @@ describe 'the page theme' do
     it "is the signed-in user's saved #{theme} theme" do
       user = create_user
       user.update_columns(theme: theme)
-      log_in(user, 'secret')
+      log_in(user, 'secret-password')
 
       expect(page("/users/#{user.id}").at_css('html')['data-theme']).to eq theme
     end
@@ -77,7 +77,7 @@ describe 'the page theme' do
   it 'is System after signing out' do
     user = create_user
     user.update_columns(theme: 'dark')
-    log_in(user, 'secret')
+    log_in(user, 'secret-password')
 
     post("/sessions/#{user.id}", xhr: false)
 
@@ -88,7 +88,7 @@ describe 'the page theme' do
   it 'is System for a theme the page does not know' do
     user = create_user
     user.update_columns(theme: 'sepia')
-    log_in(user, 'secret')
+    log_in(user, 'secret-password')
 
     expect(page("/users/#{user.id}").at_css('html')['data-theme']).to eq 'system'
   end
@@ -104,7 +104,7 @@ end
 describe 'registering' do
   # A visitor is on System, so a new account keeps the theme they were just looking at.
   it 'starts the new account on the System theme' do
-    post('/users', params: { user: { first_name: 'New', last_name: 'User', user_name: 'newcomer', email: 'newcomer@example.test', password: 'secret' } }, xhr: false)
+    post('/users', params: { user: { first_name: 'New', last_name: 'User', user_name: 'newcomer', email: 'newcomer@example.test', password: 'secret-password' } }, xhr: false)
 
     user = User.find_by!(user_name: 'newcomer')
     expect(user.theme).to eq 'system'

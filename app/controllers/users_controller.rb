@@ -12,6 +12,7 @@ post '/users' do
   @user = User.create((params[:user] || {}).merge(theme: 'system'))
   if @user.valid?
     session[:user_id] = @user.id
+    session[:password_fingerprint] = @user.password_fingerprint
     session[:name] = @user.full_name
     redirect '/users'
   else
@@ -49,6 +50,7 @@ put '/users/:id' do
   end
   # A refused update still holds the refused values, so nothing of it may reach the session.
   if saved
+    session[:password_fingerprint] = @user.password_fingerprint
     session[:name] = @user.full_name
     session[:theme] = @user.theme
     json status: "true", name: @user.full_name, theme: @user.theme

@@ -32,12 +32,17 @@ helpers do
     session[:theme] = 'system'
     session.delete(:expires_at)
     session.delete(:remember)
+    session.delete(:password_fingerprint)
+    @current_user = nil
   end
 
   # Templates read the session directly, so this runs before every route rather than inside current_user.
-  # A session with no end time yet (from before expiry existed, registering, or the API logins) starts its first one here.
+  # A session with no end time yet (one just started by registering) starts its first one here.
   def refresh_session
     return unless session[:user_id]
+    # A session from before the user's latest password change, or from before fingerprints existed, ends here.
+    @current_user = User.find_by(id: session[:user_id])
+    return sign_out! unless @current_user && session[:password_fingerprint] == @current_user.password_fingerprint
     return sign_out! if session[:expires_at] && session[:expires_at] < Time.now.to_i
     extend_session
   end

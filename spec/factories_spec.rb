@@ -3,7 +3,7 @@ describe 'test factories' do
     first = create_user
     second = create_user
     expect([first.user_name, first.email]).not_to include(second.user_name, second.email)
-    expect(JSON.parse(log_in(second, 'secret').body)['status']).to eq 'true'
+    expect(JSON.parse(log_in(second, 'secret-password').body)['status']).to eq 'true'
   end
 
   it 'creates a show for a user with the given seasons, one episode each' do

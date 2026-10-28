@@ -19,7 +19,7 @@ describe 'POST /users/:user_id/shows/:id/artwork' do
   end
 
   context 'for the signed-in owner' do
-    before { log_in(user, 'secret') }
+    before { log_in(user, 'secret-password') }
 
     it 'stores a JPEG and answers with its CDN URL' do
       response = upload(JPEG)
@@ -52,7 +52,7 @@ describe 'POST /users/:user_id/shows/:id/artwork' do
   end
 
   context 'with a file it cannot take' do
-    before { log_in(user, 'secret') }
+    before { log_in(user, 'secret-password') }
 
     def error_of(response) = [response.status, JSON.parse(response.body)['error']]
 
@@ -102,7 +102,7 @@ describe 'POST /users/:user_id/shows/:id/artwork' do
     end
 
     it 'answers with the storage failure message' do
-      log_in(user, 'secret')
+      log_in(user, 'secret-password')
       response = nil
       expect { response = upload(JPEG) }.to output(/artwork upload failed: Aws::Errors::MissingCredentialsError/).to_stderr
 
@@ -121,14 +121,14 @@ describe 'POST /users/:user_id/shows/:id/artwork' do
     end
 
     it "refuses a signed-in user uploading for a show outside their collection" do
-      log_in(other, 'secret')
+      log_in(other, 'secret-password')
 
       expect(upload(JPEG, user_id: other.id).status).to eq 403
       expect(a_request(:put, S3_OBJECT)).not_to have_been_made
     end
 
     it "refuses a post from another site even with the owner's cookie" do
-      log_in(user, 'secret')
+      log_in(user, 'secret-password')
       body = Rack::Multipart.build_multipart('artwork' => Rack::Multipart::UploadedFile.new(nil, 'image/jpeg', true, io: StringIO.new(JPEG), filename: 'a.jpg'))
       env = { input: body, 'CONTENT_TYPE' => "multipart/form-data; boundary=#{Rack::Multipart::MULTIPART_BOUNDARY}", 'HTTP_ORIGIN' => 'https://evil.example' }
 
@@ -137,7 +137,7 @@ describe 'POST /users/:user_id/shows/:id/artwork' do
     end
 
     it "refuses a signed-in user using another user's URL" do
-      log_in(other, 'secret')
+      log_in(other, 'secret-password')
 
       expect(upload(JPEG, user_id: user.id).status).to eq 403
       expect(a_request(:put, S3_OBJECT)).not_to have_been_made
@@ -150,7 +150,7 @@ describe 'the show edit modal' do
     user = create_user
     show = create_show(user)
     show.seasons.last.update!(is_active: true)
-    log_in(user, 'secret')
+    log_in(user, 'secret-password')
     tab = Nokogiri::HTML(JSON.parse(get("/users/#{user.id}/shows/#{show.id}/edit").body)).at_css('#artwork')
 
     expect(tab.at_css('input[type="file"][name="artwork"]')&.[]('accept')).to eq 'image/jpeg,image/png'
@@ -163,7 +163,7 @@ describe 'the show edit modal' do
     user = create_user
     show = create_show(user)
     show.seasons.last.update!(is_active: true)
-    log_in(user, 'secret')
+    log_in(user, 'secret-password')
     group = Nokogiri::HTML(JSON.parse(get("/users/#{user.id}/shows/#{show.id}/edit").body)).at_css('#artwork .input-group')
 
     expect(group.at_css('input[name="season[poster]"]')).not_to be_nil

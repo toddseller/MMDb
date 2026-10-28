@@ -64,7 +64,7 @@ describe 'letter rail letters on grid tiles' do
     end
 
     it 'are lettered in the grid returned after adding episodes' do
-      log_in(user, 'secret')
+      log_in(user, 'secret-password')
       response = post("/users/#{user.id}/shows/#{picard.id}/seasons/#{picard.seasons.first.id}/episodes",
                       params: { episode: { title: 'Pilot', tv_episode: '2' } })
       expect(letters(page(response), '.index-preview-show')).to eq expected
@@ -75,7 +75,7 @@ describe 'letter rail letters on grid tiles' do
       picard.update!(show_collection_id: "collection-#{picard.id}")
       season = picard.seasons.first
       season.update!(collectionId: "season-#{season.id}")
-      log_in(user, 'secret')
+      log_in(user, 'secret-password')
       response = post('/shows', params: {
         new: 'true',
         show: { show_collection_id: picard.show_collection_id, title: picard.title },

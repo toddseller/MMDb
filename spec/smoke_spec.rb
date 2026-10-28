@@ -5,7 +5,7 @@ describe 'the app' do
 
   it 'logs in and keeps the session cookie' do
     user = create_user
-    expect(JSON.parse(log_in(user, 'secret').body)['status']).to eq 'true'
+    expect(JSON.parse(log_in(user, 'secret-password').body)['status']).to eq 'true'
     expect(@cookie).to start_with 'rack.session='
   end
 end

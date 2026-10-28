@@ -249,7 +249,7 @@ test.describe('signed in', () => {
 
       await update(page).click()
 
-      await expect(settings(page).getByText("Couldn't save. Check your current password, email and user name.")).toBeVisible()
+      await expect(settings(page).getByText("Couldn't save. Check your current password, email and user name, and that a new password has at least 8 characters.")).toBeVisible()
       await expect(field(page, 'current')).toHaveValue('')
       await expect(field(page, 'current')).toBeFocused()
       for (const name of ['password', 'confirm']) {
@@ -259,13 +259,25 @@ test.describe('signed in', () => {
       await expect(update(page)).toBeEnabled()
     })
 
+    test('a new password under 8 characters is refused', async ({ page }) => {
+      await openSettings(page)
+      await field(page, 'current').fill(USER.password)
+      await field(page, 'current').press('Tab')
+      await field(page, 'password').fill('seven77')
+      await field(page, 'confirm').pressSequentially('seven77')
+
+      await update(page).click()
+
+      await expect(settings(page).getByText("Couldn't save. Check your current password, email and user name, and that a new password has at least 8 characters.")).toBeVisible()
+    })
+
     test("an email another account has isn't saved, and the dialog says so", async ({ page }) => {
       await openSettings(page)
       await field(page, 'email').fill('other@example.test')
 
       await update(page).click()
 
-      await expect(settings(page).getByText("Couldn't save. Check your current password, email and user name.")).toBeVisible()
+      await expect(settings(page).getByText("Couldn't save. Check your current password, email and user name, and that a new password has at least 8 characters.")).toBeVisible()
       await page.reload()
       await openSettings(page)
       await expect(field(page, 'email')).toHaveValue(USER.email)

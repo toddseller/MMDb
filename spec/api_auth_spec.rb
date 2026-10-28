@@ -12,17 +12,17 @@
     let(:user) { create_user }
 
     it 'lasts 30 days for a remembered login' do
-      response = post("/api/#{version}/authenticate", json: { username_email: user.email, password: 'secret', remember: true })
+      response = post("/api/#{version}/authenticate", json: { username_email: user.email, password: 'secret-password', remember: true })
       expect(lifetime_days(response)).to eq 30
     end
 
     it 'lasts 1 day for a login without remember' do
-      response = post("/api/#{version}/authenticate", json: { username_email: user.email, password: 'secret' })
+      response = post("/api/#{version}/authenticate", json: { username_email: user.email, password: 'secret-password' })
       expect(lifetime_days(response)).to eq 1
     end
 
     it 'lasts 1 day after signup' do
-      response = post("/api/#{version}/signup", json: { first_name: 'New', last_name: 'User', user_name: "new#{version}", email: "new#{version}@example.test", password: 'secret' })
+      response = post("/api/#{version}/signup", json: { first_name: 'New', last_name: 'User', user_name: "new#{version}", email: "new#{version}@example.test", password: 'secret-password' })
       expect(response.status).to eq 201
       expect(lifetime_days(response)).to eq 1
     end
@@ -42,7 +42,7 @@ end
     let(:api) { "/api/#{version}" }
 
     def token(secret: ENV['JWT_SECRET'], **claims)
-      JWT.encode({ sub: user.id, iat: now, iss: ENV['JWT_ISSUER'], exp: now + 3600 }.merge(claims).compact, secret, 'HS256')
+      JWT.encode({ sub: user.id, iat: now, iss: ENV['JWT_ISSUER'], exp: now + 3600, pwd: user.password_fingerprint }.merge(claims).compact, secret, 'HS256')
     end
 
     def counts(token)
