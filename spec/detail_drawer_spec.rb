@@ -54,38 +54,30 @@ describe 'detail drawer' do
     end
   end
 
+  context 'movies.css' do
+    it 'leaves drawer sizing and motion to drawer.css' do
+      expect(rule('movies.css', '.info')).not_to match(/max-height|margin|transition|height|width/)
+      expect(rules('movies.css', '.info.active')).to be_empty
+      expect(rules('movies.css', '.notransition')).to be_empty
+      expect(css('movies.css')).not_to match(/nth-child\(\dn\)/)
+    end
+
+    # A layer per image meant thousands of GPU layers to move each frame on the movies page.
+    it 'puts no transform on every image' do
+      expect(rule('movies.css', 'img')).not_to match(/transform/)
+    end
+
+    # A set height or background: none would undo the drawer's square box and its placeholder colour.
+    it "leaves the show poster's shape to drawer.css and gives both posters a theme colour to load over" do
+      expect(rule('movies.css', '#info-header > .description-poster img')).not_to match(/height|background: none/)
+      expect(rule('movies.css', '#info-header > .description-poster img')).to match(/background-color: var\(--[\w-]+\)/)
+      expect(rule('modals.css', '#meta-data .description-poster img')).to match(/background-color: var\(--[\w-]+\)/)
+    end
+  end
+
   %w[default dark].each do |theme|
-    context "#{theme} theme" do
-      let(:path) { "themes/#{theme}/movies.css" }
-
-      it 'leaves drawer sizing and motion to drawer.css' do
-        expect(rule(path, '.info')).not_to match(/max-height|margin|transition|height|width/)
-        expect(rules(path, '.info.active')).to be_empty
-        expect(rules(path, '.notransition')).to be_empty
-        expect(css(path)).not_to match(/nth-child\(\dn\)/)
-      end
-
-      # A layer per image meant thousands of GPU layers to move each frame on the movies page.
-      it 'puts no transform on every image' do
-        expect(rule(path, 'img')).not_to match(/transform/)
-      end
-
-      # A set height or background: none would undo the drawer's square box and its placeholder colour.
-      it "leaves the show poster's shape to drawer.css and gives both posters a colour to load over" do
-        expect(rule(path, '#info-header > .description-poster img')).not_to match(/height|background: none/)
-        expect(rule(path, '#info-header > .description-poster img')).to include('background-color')
-        expect(rule("themes/#{theme}/modals.css", '#meta-data .description-poster img')).to include('background-color')
-      end
-
-      # Later edits to the theme raise its version again, so this checks a floor, not an exact number.
-      it 'imports the versions that carry the rendering changes' do
-        expect(css("#{theme}.css")[%r{themes/#{theme}/movies\.css\?v=(\d+)}, 1].to_i).to be >= 7
-        expect(css("#{theme}.css")[/drawer\.css\?v=(\d+)/, 1].to_i).to be >= 7
-      end
-
-      it 'imports drawer.css and the changed movies.css with versions' do
-        expect(css("#{theme}.css")).to match(%r{@import url\('drawer\.css\?v=\d+'\);}).and match(%r{@import url\('themes/#{theme}/movies\.css\?v=\d+'\);})
-      end
+    it "has the #{theme} theme import drawer.css and movies.css with versions" do
+      expect(css("#{theme}.css")).to match(%r{@import url\('drawer\.css\?v=\d+'\);}).and match(%r{@import url\('movies\.css\?v=\d+'\);})
     end
   end
 end

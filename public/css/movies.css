@@ -1,11 +1,11 @@
 .info
 {
-    background: #fff;
+    background: var(--surface);
 }
 
 .info.open
 {
-    border-color: rgba(51, 51, 51, .60);
+    border-color: var(--drawer-edge);
 }
 
 #info-header
@@ -24,15 +24,14 @@
 
     margin-top: 10px;
 
-    color: rgba(51,51,51,.7);
+    color: var(--muted);
 }
 
 #info-header > .description-poster img
 {
     width: 447px;
-
-    border: rgba(51,51,51,.1) 1px solid;
-    background-color: #000;
+    border: var(--faint) 1px solid;
+    background-color: var(--poster-bg);
 }
 
 .series-info
@@ -52,13 +51,24 @@
 {
     margin-top: -8px;
     margin-bottom: -3px;
-    color: rgba(51,51,51,.7);
+    color: var(--muted);
 }
 
 .series-info .spacing
 {
     margin-right: 5px;
-    color:rgba(51,51,51,.7);
+    color:var(--muted);
+}
+
+.series-details
+{
+    display: inline-flex;
+    align-items: center;
+}
+
+.series-details .spacing
+{
+    margin-right: 10px;
 }
 
 .series-info #description-rating
@@ -66,14 +76,14 @@
     font-family: inherit;
     font-weight: bolder;
     padding: 0 3px;
-    border: 2px solid rgba(51,51,51,.7);
+    border: 2px solid var(--muted);
     border-radius: 3px;
 }
 
 .series-info #description-hd
 {
-    background: rgba(51,51,51,.7);
-    color: #fff;
+    background: var(--muted);
+    color: var(--badge-text);
     padding: 0 3px 1px;
     border-radius: 3px;
     font-weight: bolder;
@@ -83,7 +93,7 @@
 
 .tv-episode
 {
-    color: rgba(51,51,51,.7);
+    color: var(--muted);
     font-size: .8em;
     font-weight: 500;
     margin: 10px 0 0;
@@ -103,7 +113,7 @@
     margin-top: -20px;
     margin-bottom: 0;
     margin-right: -40px;
-    color: rgba(51,51,51,.7);
+    color: var(--muted);
 }
 
 .aired
@@ -113,7 +123,7 @@
 
 .plot-truncate
 {
-    color: rgba(51,51,51,.7);
+    color: var(--muted);
     font-size: .9em;
     overflow: hidden;
 
@@ -151,7 +161,7 @@
 .expand-plot:hover
 {
     cursor: default;
-    color: #333;
+    color: var(--text);
 }
 
 .episode-list hr
@@ -163,7 +173,7 @@
 
 #season-selector
 {
-    color: rgba(51,51,51,.7);
+    color: var(--muted);
     font-size: .9em;
     margin-left: 5px;
 }
@@ -191,7 +201,7 @@
 .season-submit:focus
 {
     border: none;
-    background: rgba(51,51,51,.7);
+    background: var(--muted);
     color: #fff;
     border-radius: 4px;
 }
@@ -200,7 +210,7 @@
 {
     border: none;
     background: none;
-    color: rgba(51,51,51,.7);
+    color: var(--muted);
     padding: 3px 10px;
     display: inline-block;
 }
@@ -221,11 +231,11 @@
 .pointer,
 .show-pointer
 {
-    border-top: 1px solid #333;
-    border-right: 1px solid #fff;
-    border-bottom: 1px solid #fff;
-    border-left: 1px solid #333;
-    background: #fff;
+    border-top: 1px solid var(--pointer-edge);
+    border-right: 1px solid var(--surface);
+    border-bottom: 1px solid var(--surface);
+    border-left: 1px solid var(--pointer-edge);
+    background: var(--surface);
 }
 
 #movie-search
@@ -279,7 +289,7 @@
 
     padding-block: 1.5em;
 
-    background: rgba(234, 234, 234, .97);
+    background: var(--search-bg);
 }
 
 #filter-input
@@ -309,7 +319,7 @@
 
 .movie-preview
 {
-    margin-right: 1em;
+    margin-right: 2em;
 }
 
 .movie-preview-title
@@ -366,14 +376,14 @@
 
 #dismiss .glyphicon
 {
-    opacity: .2;
-    color: #000;
+    opacity: 1;
+    color: var(--close);
 }
 
 #dismiss .glyphicon:hover
 {
-    opacity: .5;
-    color: #000;
+    opacity: 1;
+    color: var(--close-hover);
 }
 
 #profile-wrapper
@@ -415,7 +425,7 @@
     font-size: 4em;
     font-weight: 900;
 
-    color: #333;
+    color: var(--text);
 }
 
 .checkbox .edit-hd,
@@ -434,6 +444,24 @@
     min-height: 0;
     margin-top: -3px;
     padding-top: 0;
+}
+
+.form-horizontal .checkbox.isnew
+{
+    padding-top: 3px;
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+.form-horizontal .checkbox
+{
+    min-height: 0;
+    padding-left: 20px;
+}
+
+.checkbox label
+{
+    padding-left: 0;
 }
 
 .movie-edit,
@@ -461,7 +489,7 @@
 
     text-align: center;
 
-    color: #fff;
+    color: var(--surface);
 }
 
 a.movie-edit:hover,
@@ -476,35 +504,29 @@ a.movie-edit:hover
 }
 
 #scroll-left,
-#scroll-right,
-#show-scroll-left,
-#show-scroll-right
+#scroll-right
 {
     position: absolute;
-    top: 87px;
+    top: 53px;
 
     display: none;
 
-    height: 200px;
+    height: 263px;
 
     background: rgba(0,0,0,.4);
 }
 
 #scroll-left:hover,
-#scroll-right:hover,
-#show-scroll-left:hover,
-#show-scroll-right:hover
+#scroll-right:hover
 {
     cursor: pointer;
 }
 
 #scroll-left .glyphicon,
-#scroll-right .glyphicon,
-#show-scroll-left .glyphicon,
-#show-scroll-right .glyphicon
+#scroll-right .glyphicon
 {
     font-size: 50px;
-    line-height: 4em;
+    line-height: 5em;
 
     color: rgba(255,255,255,.8);
 }
@@ -665,7 +687,7 @@ a.movie-edit:hover
 .index-preview.open img,
 .index-preview-show.open img
 {
-    box-shadow: 0 15px 25px #4f4f4f;
+    box-shadow: 0 15px 25px var(--open-shadow);
 }
 
 .index-preview-show
@@ -679,7 +701,7 @@ a.movie-edit:hover
 .index-preview-show img
 {
     width: 213px;
-    height: auto;
+    height: 213px;
     margin-top: 20px;
 
     transition: all .3s ease-in-out;
@@ -825,7 +847,7 @@ a.movie-edit:hover
 
     text-align: left;
 
-    color: rgba(51,51,51,.7);
+    color: var(--muted);
 }
 
 .preview-truncate
@@ -872,7 +894,7 @@ a.index-user:hover,
     margin-right: 5px;
     padding: 7px 13px;
 
-    color: #333;
+    color: var(--text);
 }
 
 #library:hover
@@ -881,9 +903,9 @@ a.index-user:hover,
 
     text-decoration: none;
 
-    border: 1px solid rgba(0,0,0,.01);
+    border: 1px solid var(--hover-edge);
     border-radius: 4px;
-    background: rgba(0,0,0,.1);
+    background: var(--hover-bg);
 }
 
 #library:focus
@@ -897,7 +919,7 @@ a.index-user:hover,
     margin-right: 5px;
     padding: 7px 13px;
 
-    color: #333;
+    color: var(--text);
 }
 
 #unwatched:hover
@@ -906,9 +928,9 @@ a.index-user:hover,
 
     text-decoration: none;
 
-    border: 1px solid rgba(0,0,0,.01);
+    border: 1px solid var(--hover-edge);
     border-radius: 4px;
-    background: rgba(0,0,0,.1);
+    background: var(--hover-bg);
 }
 
 #unwatched:focus
@@ -916,6 +938,7 @@ a.index-user:hover,
     text-decoration: none;
 
     color: #f3f3f3;
+
     border: 1px solid #d43f3a;
     border-radius: 4px;
     background-color: #d9534f;
@@ -928,6 +951,7 @@ a.index-user:hover,
     cursor: default;
 
     color: #f3f3f3;
+
     border: 1px solid #d43f3a;
     border-radius: 4px;
     background-color: #d9534f;
@@ -938,7 +962,7 @@ a.index-user:hover,
     margin-left: 5px;
     padding: 7px 13px;
 
-    color: #333;
+    color: var(--text);
 }
 
 #four-k:hover
@@ -947,9 +971,9 @@ a.index-user:hover,
 
     text-decoration: none;
 
-    border: 1px solid rgba(0,0,0,.01);
+    border: 1px solid var(--hover-edge);
     border-radius: 4px;
-    background: rgba(0,0,0,.1);
+    background: var(--hover-bg);
 }
 
 #four-k:focus
@@ -957,6 +981,7 @@ a.index-user:hover,
     text-decoration: none;
 
     color: #f3f3f3;
+
     border: 1px solid #d43f3a;
     border-radius: 4px;
     background-color: #d9534f;
@@ -969,21 +994,26 @@ a.index-user:hover,
     cursor: default;
 
     color: #f3f3f3;
+
     border: 1px solid #d43f3a;
     border-radius: 4px;
     background-color: #d9534f;
 }
 
+#update-search {
+    margin-right: 15px;
+}
+
 /* Every rail letter shares one muted look; only a letter with titles answers a hover. */
 #letter-rail a
 {
-    color: #6e6e6e;
+    color: var(--rail-text);
 }
 
 #letter-rail a:not([aria-disabled="true"]):hover,
 #letter-rail a:not([aria-disabled="true"]):focus
 {
-    color: #c9302c;
+    color: var(--rail-hover);
 }
 
 /* On a phone the rail sits over posters, on the navbar's colour at half strength in either theme. */
