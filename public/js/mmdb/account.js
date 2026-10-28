@@ -26,9 +26,6 @@ const settings = (document) => /** @type {HTMLElement} */ (document.getElementBy
 /** @param {Document} document @param {boolean} disabled */
 const holdUpdate = (document, disabled) => settings(document).querySelector('button[type=submit]')?.toggleAttribute('disabled', disabled)
 
-/** @param {Document} document */
-const theme = (document) => /** @type {HTMLLinkElement | null} */ (document.getElementById('theme'))
-
 /** @param {Document} document @param {HTMLFormElement} form @param {(url: string) => void} go */
 const signIn = async (document, form, go) => {
   const filled = new URLSearchParams([...fields(form)].filter(([, value]) => value !== ''))
@@ -62,7 +59,7 @@ const save = async (document, form, saved) => {
   const response = await request(/** @type {string} */ (form.getAttribute('action')), { method: 'PUT', body: fields(form) })
   if (response.status === 'true') {
     const navbar = /** @type {HTMLElement} */ (document.querySelector('.navbar-text'))
-    saved.theme = theme(document)?.getAttribute('href') ?? undefined
+    saved.theme = response.theme
     navbar.textContent = `Signed in as ${response.name}`
     return close(document, 'logIn')
   }
@@ -98,7 +95,7 @@ const checkRegistration = (document) => {
  */
 export const init = (document, go = (url) => /** @type {Window} */ (document.defaultView).location.replace(url)) => {
   /** @type {{ theme?: string }} */
-  const saved = { theme: theme(document)?.getAttribute('href') ?? undefined }
+  const saved = { theme: document.documentElement.dataset.theme }
   /** @type {ReturnType<typeof setTimeout> | undefined} */
   let registrationCheck
 
@@ -118,9 +115,8 @@ export const init = (document, go = (url) => /** @type {Window} */ (document.def
   })
   on(document, 'change', '#logIn input[name="current"]', () => currentChanged(document))
   on(document, 'input', '#logIn input[name="password"], #logIn input[name="confirm"]', () => confirmChanged(document))
-  on(document, 'change', '#logIn #myonoffswitch', (event, toggle) => {
-    const link = theme(document)
-    if (link) link.href = /** @type {string} */ (/** @type {HTMLInputElement} */ (toggle).checked ? link.dataset.dark : link.dataset.default)
+  on(document, 'change', '#logIn input[name="theme"]', (event, radio) => {
+    document.documentElement.dataset.theme = /** @type {HTMLInputElement} */ (radio).value
   })
   on(document, 'submit', '#logIn .login-form', onSubmit((document, form) => save(document, form, saved), document))
   on(document, 'input', '.registration input[name="user[password]"], .registration input[name="confirm"]', () => {
@@ -134,7 +130,6 @@ export const init = (document, go = (url) => /** @type {Window} */ (document.def
     const form = /** @type {HTMLFormElement | null} */ (dialog.querySelector('#sign-in-form'))
     form?.reset()
     show(dialog, '.login-errors', false)
-    const link = theme(document)
-    if (link && saved.theme) link.setAttribute('href', saved.theme)
+    if (saved.theme) document.documentElement.dataset.theme = saved.theme
   })
 }

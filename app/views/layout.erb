@@ -1,11 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="<%= page_theme %>">
 <head>
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link rel="prefetch" href="/imgs/animated.svg">
-  <% themes = { 'default' => asset_path('/css/default.css'), 'dark' => asset_path('/css/dark.css') } %>
-  <link id="theme" rel='stylesheet' href='<%= session[:theme] == 'default' ? themes['default'] : themes['dark'] %>' data-default='<%= themes['default'] %>' data-dark='<%= themes['dark'] %>' type='text/css'>
+  <link rel='stylesheet' href='<%= asset_path('/css/app.css') %>'>
 
   <script type="importmap"><%== import_map %></script>
   <script type="module" src="<%= asset_path('/js/main.js') %>"></script>

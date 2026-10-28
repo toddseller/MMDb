@@ -9,7 +9,7 @@ get '/users/new' do
 end
 
 post '/users' do
-  @user = User.create(params[:user])
+  @user = User.create((params[:user] || {}).merge(theme: 'system'))
   if @user.valid?
     session[:user_id] = @user.id
     session[:name] = @user.full_name
@@ -43,18 +43,16 @@ put '/users/:id' do
   halt 403 unless current_user.id == params[:id].to_i
   @user = current_user
   if params[:current] == ''
-    @user.update(first_name: params[:first_name], last_name: params[:last_name], user_name: params[:user_name], email: params[:email], theme: params[:theme] || 'default', password_hash: @user.password_hash)
-      session[:name] = @user.full_name
-      session[:theme] = @user.theme
+    saved = @user.update(first_name: params[:first_name], last_name: params[:last_name], user_name: params[:user_name], email: params[:email], theme: params[:theme], password_hash: @user.password_hash)
+  elsif @user.authenticate(params[:current])
+    saved = @user.update(first_name: params[:first_name], last_name: params[:last_name], user_name: params[:user_name], email: params[:email], theme: params[:theme], password: params[:password])
+  end
+  # A refused update still holds the refused values, so nothing of it may reach the session.
+  if saved
+    session[:name] = @user.full_name
+    session[:theme] = @user.theme
     json status: "true", name: @user.full_name, theme: @user.theme
   else
-    if @user.authenticate(params[:current])
-      @user.update(first_name: params[:first_name], last_name: params[:last_name], user_name: params[:user_name], email: params[:email], theme: params[:theme] || 'default', password: params[:password])
-      session[:name] = @user.full_name
-      session[:theme] = @user.theme
-      json status: "true", name: @user.full_name, theme: @user.theme
-    else
-      json status: "false"
-    end
+    json status: "false"
   end
 end

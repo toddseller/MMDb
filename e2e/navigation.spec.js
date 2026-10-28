@@ -106,7 +106,7 @@ test.describe('the menu', () => {
 
     await page.getByRole('link', { name: 'Account Settings' }).click()
 
-    await expect(page.getByRole('dialog').filter({ has: page.locator('label[for="myonoffswitch"]') })).toBeVisible()
+    await expect(page.getByRole('dialog').filter({ has: page.getByRole('radiogroup', { name: 'Theme' }) })).toBeVisible()
   })
 
   test('closing the menu closes the submenu and turns its triangle back', async ({ page }) => {

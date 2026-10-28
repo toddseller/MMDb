@@ -9,18 +9,25 @@ describe 'themes' do
 
   it 'holds each theme colour once, light and dark side by side' do
     palette = css('palette.css').gsub(%r{/\*.*?\*/}m, '')
+    root = palette[/:root\s*\{([^{}]*)\}/, 1]
 
-    expect(palette.strip).to match(/\A:root\s*\{[^{}]*\}\z/)
-    declarations = palette[/\{([^{}]*)\}/, 1].split(';').map(&:strip).reject(&:empty?)
+    declarations = root.split(';').map(&:strip).reject(&:empty?)
     expect(declarations).not_to be_empty
     expect(declarations).to all(match(/\A--[\w-]+:\s*light-dark\(.+\)\z/m))
   end
 
-  it 'gives both themes the same versioned stylesheets, differing only in colour scheme' do
-    expect(imports('default.css')).to eq imports('dark.css')
-    expect(imports('default.css')).to include(match(/\Apalette\.css\?v=\d+\z/), match(/\Alayout\.css\?v=\d+\z/), match(/\Amodals\.css\?v=\d+\z/), match(/\Amovies\.css\?v=\d+\z/))
-    expect(css('default.css').gsub(/@import[^;]+;/, '').gsub(/\s+/, '')).to eq ':root{color-scheme:light;}'
-    expect(css('dark.css').gsub(/@import[^;]+;/, '').gsub(/\s+/, '')).to eq ':root{color-scheme:dark;}'
+  # color-scheme picks each light-dark() side; light dark lets the device pick, and follow it live.
+  it 'maps each page theme to a colour scheme' do
+    palette = css('palette.css').gsub(/\s+/, ' ')
+
+    expect(palette).to include('[data-theme="default"] { color-scheme: light; }', '[data-theme="dark"] { color-scheme: dark; }', '[data-theme="system"] { color-scheme: light dark; }')
+  end
+
+  it 'serves every theme from one stylesheet of versioned imports' do
+    expect(APP_ROOT.join('public', 'css', 'default.css')).not_to exist
+    expect(APP_ROOT.join('public', 'css', 'dark.css')).not_to exist
+    expect(imports('app.css')).to include(match(/\Apalette\.css\?v=\d+\z/), match(/\Alayout\.css\?v=\d+\z/), match(/\Amodals\.css\?v=\d+\z/), match(/\Amovies\.css\?v=\d+\z/))
+    expect(css('app.css').gsub(/@import[^;]+;/, '').strip).to be_empty
   end
 
   it 'keeps colour pairs in the palette, not in the shared stylesheets' do
