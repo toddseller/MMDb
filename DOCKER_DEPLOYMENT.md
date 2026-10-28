@@ -32,7 +32,7 @@ docker compose logs -f
 docker compose down
 ```
 
-The application will be available at `http://localhost:4666`
+The application will be available at `http://localhost:4666`. The port is published on localhost only, so other machines on the network can't reach it; on the server, the Cloudflare tunnel reaches the container over the Docker network at `http://web:4666`.
 
 ### Features
 - Live code reloading (volume mounted)

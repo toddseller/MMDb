@@ -6,6 +6,7 @@ describe 'test settings' do
 
   it 'uses fixed test values even when .env holds real ones' do
     expect_test_value('JWT_SECRET', 'test-jwt-secret')
+    expect_test_value('SESSION_SECRET', 'test-session-secret-at-least-64-bytes-long-as-rack-session-requires')
     expect_test_value('TAUTULLI_KEY', 'test-tautulli-key')
   end
 

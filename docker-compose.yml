@@ -6,7 +6,7 @@ services:
       - .:/app
     restart: unless-stopped
     ports:
-      - "4666:4666"
+      - "127.0.0.1:4666:4666"
     env_file:
       - .env
     environment:

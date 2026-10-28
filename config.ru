@@ -6,7 +6,7 @@ set :app_file, __FILE__
 configure do
   # See: http://www.sinatrarb.com/faq.html#sessions
   set :sessions, same_site: :lax
-  set :session_secret, ENV['SESSION_SECRET'] || 'this_is_a_secret_shhhhh_that_is_at_least_64_bytes_long_for_rack_3'
+  set :session_secret, ENV['SESSION_SECRET']
 
   # Set the views to
   set :views, File.join(Sinatra::Application.root, "app", "views")
@@ -18,6 +18,9 @@ configure do
   # where the Host header might not match expectations (e.g., behind proxies)
   set :protection, :except => [:host_authorization, :remote_token]
   set :host_authorization, { allowed_hosts: [nil] }
+
+  # Production runs as RACK_ENV=development, whose exception page would show visitors the stack trace; dump_errors still logs it.
+  set :show_exceptions, false
 end
 
 configure :development do

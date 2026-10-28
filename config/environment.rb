@@ -41,6 +41,9 @@ require 'dotenv'
 # Load .env file if it exists, but don't override existing environment variables
 Dotenv.load if defined?(Dotenv)
 
+# Without these, sessions or API tokens would be signed with a secret anyone could guess.
+%w[SESSION_SECRET JWT_SECRET].each { |name| abort "#{name} must be set" if ENV[name].to_s.empty? }
+
 require 'erb'
 require 'bcrypt'
 require 'httparty'
