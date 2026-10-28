@@ -22,7 +22,18 @@
 
     --hover-bg: light-dark(rgba(0,0,0,.1), rgba(255,255,255,.1));
     --hover-edge: light-dark(rgba(0,0,0,.01), rgba(255,255,255,.01));
-    --button-focus-bg: light-dark(transparent, #fff);
+
+    /* Light sides are Bootstrap's own, so the light theme is unchanged; dark fields sit raised on the --surface box. */
+    --field-bg: light-dark(#fff, #2b2b2b);
+    --field-text: light-dark(#555, #f3f3f3);
+    --field-edge: light-dark(#ccc, #555);
+    --field-disabled-bg: light-dark(#eee, #222);
+    --divider: light-dark(#e5e5e5, #333);
+    --button-hover-bg: light-dark(#e6e6e6, #3a3a3a);
+    --button-hover-edge: light-dark(#adadad, #777);
+    --button-press-bg: light-dark(#d4d4d4, #474747);
+    --button-press-edge: light-dark(#8c8c8c, #888);
+    --button-disabled-bg: light-dark(#e0e0e0, #222);
 
     --close: light-dark(#000, #d9534f);
     --close-hover: light-dark(#000, #f00);

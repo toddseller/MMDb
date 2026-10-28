@@ -30,8 +30,15 @@ describe 'themes' do
     expect(css('app.css').gsub(/@import[^;]+;/, '').strip).to be_empty
   end
 
+  # The e2e suite checks the other dialog colours on screen; the show editor's disabled arrows have no test there.
+  it "takes the show editor's disabled arrow colour from the palette" do
+    rule = css('modals.css')[/^\.btn\.btn-default\.disabled\.edit-next:hover\s*\{([^}]*)\}/, 1]
+
+    expect(rule).to match(/\A[^#]+\z/)
+  end
+
   it 'keeps colour pairs in the palette, not in the shared stylesheets' do
-    %w[layout.css modals.css movies.css].each do |file|
+    %w[layout.css modals.css movies.css dialog.css].each do |file|
       expect(css(file)).not_to include('light-dark(')
     end
   end

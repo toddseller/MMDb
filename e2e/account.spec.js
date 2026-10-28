@@ -84,10 +84,19 @@ test('Remember me keeps the sign-in for 30 days', async ({ page, context }) => {
 
       expect((await remember.boundingBox()).x).toBeCloseTo((await password.boundingBox()).x, 0)
       // Both borders ease to the new theme's colour over 0.15s, so a single read can land mid-transition; toHaveCSS retries.
-      await expect(password).toHaveCSS('border-top-color', 'rgb(204, 204, 204)')
-      await expect(remember).toHaveCSS('border-top-color', 'rgb(204, 204, 204)')
+      const edge = theme === 'dark' ? 'rgb(85, 85, 85)' : 'rgb(204, 204, 204)'
+      await expect(password).toHaveCSS('border-top-color', edge)
+      await expect(remember).toHaveCSS('border-top-color', edge)
     })
   }
+
+  test('sign-in on a dark device is a dark box under the red header', async ({ page }) => {
+    await page.emulateMedia({ colorScheme: 'dark' })
+
+    await expect(signInDialog(page).locator('.modal-content')).toHaveCSS('background-color', 'rgb(34, 34, 34)')
+    await expect(signInDialog(page).getByPlaceholder('Password')).toHaveCSS('background-color', 'rgb(43, 43, 43)')
+    await expect(signInDialog(page).locator('.modal-header')).toHaveCSS('background-color', 'rgb(217, 83, 79)')
+  })
 
   test("Remember me is the browser's own checkbox in high-contrast mode", async ({ page }) => {
     await page.emulateMedia({ forcedColors: 'active' })
@@ -138,6 +147,14 @@ test('registration says when the passwords do not match', async ({ page }) => {
   await expect(register).toBeEnabled()
 })
 
+test('the sign-up panel keeps white fields on a dark device', async ({ page }) => {
+  await page.emulateMedia({ colorScheme: 'dark' })
+  await page.goto('/users/new')
+
+  await expect(page.locator('input[name="user[password]"]')).toHaveCSS('background-color', 'rgb(255, 255, 255)')
+  await expect(page.getByRole('button', { name: 'Register' })).toHaveCSS('background-color', 'rgb(255, 255, 255)')
+})
+
 test.describe('signed in', () => {
   test.beforeEach(async ({ page }) => {
     await signIn(page)
@@ -170,6 +187,32 @@ test.describe('signed in', () => {
     await pickTheme(page, 'System')
 
     await expect(background(page)).toHaveCSS('background-color', DARK)
+  })
+
+  test('Account Settings turns dark with the theme: box, raised fields and buttons', async ({ page }) => {
+    await openSettings(page)
+
+    await pickTheme(page, 'Dark')
+
+    await expect(settings(page).locator('.modal-content')).toHaveCSS('background-color', 'rgb(34, 34, 34)')
+    await expect(settings(page).locator('.modal-content')).toHaveCSS('color', 'rgb(243, 243, 243)')
+    await expect(field(page, 'first_name')).toHaveCSS('background-color', 'rgb(43, 43, 43)')
+    await expect(field(page, 'first_name')).toHaveCSS('border-top-color', 'rgb(85, 85, 85)')
+    await expect(field(page, 'password')).toHaveCSS('background-color', 'rgb(34, 34, 34)')
+    await expect(settings(page).locator('.theme-choice label', { hasText: 'Light' })).toHaveCSS('background-color', 'rgb(43, 43, 43)')
+    await expect(settings(page).locator('.theme-choice label', { hasText: 'Dark' })).toHaveCSS('background-color', 'rgb(58, 58, 58)')
+  })
+
+  test('an open Account Settings follows the device on System, without a reload', async ({ page }) => {
+    await page.emulateMedia({ colorScheme: 'light' })
+    await openSettings(page)
+    await pickTheme(page, 'System')
+    await expect(field(page, 'first_name')).toHaveCSS('background-color', 'rgb(255, 255, 255)')
+
+    await page.emulateMedia({ colorScheme: 'dark' })
+
+    await expect(settings(page).locator('.modal-content')).toHaveCSS('background-color', 'rgb(34, 34, 34)')
+    await expect(field(page, 'first_name')).toHaveCSS('background-color', 'rgb(43, 43, 43)')
   })
 
   test('closing Account Settings puts the saved theme back', async ({ page }) => {
