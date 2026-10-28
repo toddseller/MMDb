@@ -3,7 +3,7 @@
   <h4 class="modal-title">Update Profile</h4>
 </div>
 <div class="modal-body">
-  <p class="login-errors text-center">Couldn't save. Check your current password, email and user name.</p>
+  <p class="login-errors text-center">Couldn't save. Check your current password, email and user name, and that a new password has at least 8 characters.</p>
   <div class="row">
     <form class="login-form" action="<%="/users/#{user.id}"%>" method="post">
       <input type="hidden" name="_method" value="PUT">

@@ -14,6 +14,7 @@ class JwtAuth
         iat: now,
         exp: now + lifetime,
         iss: ENV['JWT_ISSUER'],
+        pwd: u.password_fingerprint,
         user: {
           username: u.user_name,
           fullname: u.full_name
@@ -24,7 +25,11 @@ class JwtAuth
   def self.decode(token)
     # Requiring exp rejects every token issued before expiry existed, whatever secret signed it.
     options = { algorithm: 'HS256', iss: ENV['JWT_ISSUER'], verify_iss: true, required_claims: ['exp'] }
-    JWT.decode token, ENV['JWT_SECRET'], true, options
+    decoded = JWT.decode token, ENV['JWT_SECRET'], true, options
+    # A token from before the user's latest password change, or from before tokens recorded it, no longer counts.
+    payload = decoded.first
+    raise JWT::DecodeError, 'Sign in again' unless User.find_by(id: payload['sub'])&.password_fingerprint == payload['pwd']
+    decoded
   end
 
   def self.has_expired?(token)

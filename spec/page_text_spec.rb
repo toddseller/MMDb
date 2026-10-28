@@ -46,12 +46,12 @@ describe 'page text' do
   it('show info') { expect_snapshot('show_info', page_of(get("/users/#{user.id}/shows/#{show.id}"))) }
 
   it 'movie edit form' do
-    log_in(user, 'secret')
+    log_in(user, 'secret-password')
     expect_snapshot('movie_edit', page_of(get("/users/#{user.id}/movies/#{movie.id}/edit")))
   end
 
   it 'shows grid after adding episodes' do
-    log_in(user, 'secret')
+    log_in(user, 'secret-password')
     season = show.seasons.first
     response = post("/users/#{user.id}/shows/#{show.id}/seasons/#{season.id}/episodes", params: { episode: { title: 'Second', tv_episode: '2' } })
     expect_snapshot('shows_grid_after_episodes', page_of(response))

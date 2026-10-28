@@ -41,7 +41,7 @@ describe 'pages with hostile text' do
 
   it 'escapes the shows grid returned after adding episodes' do
     show = create_show(user, title: '<script>window.__xss = true</script>')
-    log_in(user, 'secret')
+    log_in(user, 'secret-password')
     response = post("/users/#{user.id}/shows/#{show.id}/seasons/#{show.seasons.first.id}/episodes", params: { episode: { title: 'Second', tv_episode: '2' } })
     expect(page_of(response).css('script')).to be_empty
   end

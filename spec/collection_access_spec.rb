@@ -23,14 +23,14 @@ describe 'Collection access' do
 
   it 'treats a session naming a deleted user as signed out' do
     gone = create_user
-    log_in(gone, 'secret')
+    log_in(gone, 'secret-password')
     gone.destroy
 
     expect(post("/users/#{owner.id}/shows/#{show.id}/artwork").status).to eq 401
   end
 
   it 'has no route for deleting a show' do
-    log_in(owner, 'secret')
+    log_in(owner, 'secret-password')
 
     expect_refused(404, 'DELETE', "/users/#{owner.id}/shows/#{movie.id}")
   end
@@ -56,7 +56,7 @@ describe 'Collection access' do
       end
 
       it "is refused with 403 for another user on the owner's URL" do
-        log_in(other, 'secret')
+        log_in(other, 'secret-password')
 
         expect_refused(403, *instance_exec(owner.id, &route))
       end
@@ -64,7 +64,7 @@ describe 'Collection access' do
       next unless on_a_record.include?(name)
 
       it "is refused with 403 on the user's own URL for a record outside their collection" do
-        log_in(other, 'secret')
+        log_in(other, 'secret-password')
 
         expect_refused(403, *instance_exec(other.id, &route))
       end
@@ -84,19 +84,19 @@ describe 'Collection access' do
     end
 
     it "refuses refreshing a movie outside the signed-in user's collection with 403" do
-      log_in(other, 'secret')
+      log_in(other, 'secret-password')
 
       expect_refused(403, *refresh)
     end
 
     it "refuses saving another user's Account Settings with 403" do
-      log_in(other, 'secret')
+      log_in(other, 'secret-password')
 
       expect_refused(403, *account)
     end
 
     it "saves a signed-in user's rating of another collection's movie" do
-      log_in(other, 'secret')
+      log_in(other, 'secret-password')
 
       expect { post("/movies/#{movie.id}/ratings", params: { rating: '4' }) }.to change { movie.ratings.where(user_id: other.id, stars: 4).count }.by(1)
     end
@@ -123,7 +123,7 @@ describe 'Collection access' do
       end
 
       it "answers #{name} for a signed-in user" do
-        log_in(owner, 'secret')
+        log_in(owner, 'secret-password')
 
         expect(get(path, params: params).status).to eq 200
       end

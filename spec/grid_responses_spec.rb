@@ -2,7 +2,7 @@ describe 'responses that re-render the show grid' do
   def owner_with_shows(count)
     user = create_user
     count.times { create_show(user) }
-    log_in(user, 'secret')
+    log_in(user, 'secret-password')
     user
   end
 

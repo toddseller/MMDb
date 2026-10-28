@@ -5,7 +5,7 @@ describe 'show edit responses' do
   let(:episode) { season.episodes.first }
   let(:new_poster) { 'https://is1-ssl.mzstatic.com/image/thumb/new-art/600x600.jpg' }
 
-  before { log_in(user, 'secret') }
+  before { log_in(user, 'secret-password') }
 
   # Another user's episodes, so a count of every user's episodes is told apart from this user's.
   def someone_elses_episodes

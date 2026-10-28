@@ -3,7 +3,7 @@ module Factories
     @number = @number.to_i + 1
   end
 
-  def create_user(password: 'secret')
+  def create_user(password: 'secret-password')
     n = Factories.next_number
     User.create!(first_name: "User#{n}", last_name: 'Test', user_name: "user#{n}", email: "user#{n}@example.test", password: password)
   end
