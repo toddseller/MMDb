@@ -70,36 +70,26 @@ The new and confirm password fields SHALL stay disabled until the current passwo
 - **THEN** the confirm field is marked as not matching and Update is disabled
 
 ### Requirement: A wrong current password is reported in the dialog
-When the server refuses the current password, the dialog SHALL stay open, show "Invalid Password.", clear and focus the current password field, and clear and disable the new and confirm fields. Update SHALL be enabled again, as with an empty current password. Nothing SHALL be saved.
+When the server refuses the save, for a wrong current password or for an email or user name another account has, the dialog SHALL stay open, show "Couldn't save. Check your current password, email and user name.", clear and focus the current password field, and clear and disable the new and confirm fields. Update SHALL be enabled again, as with an empty current password. Nothing SHALL be saved.
 
 #### Scenario: Wrong current password
 - **WHEN** the user submits Account Settings with a wrong current password
-- **THEN** the dialog stays open with "Invalid Password.", the current password field is empty and focused, and the new and confirm fields are empty and disabled
+- **THEN** the dialog stays open with "Couldn't save. Check your current password, email and user name.", the current password field is empty and focused, and the new and confirm fields are empty and disabled
 
-### Requirement: The theme switch previews the theme
-Flipping the theme switch SHALL show the page in that theme at once, by replacing the page's one theme stylesheet with the other theme's versioned stylesheet. The page SHALL NOT gain a stylesheet per flip.
-
-#### Scenario: Flipping to dark
-- **WHEN** a user on the light theme flips the switch in Account Settings
-- **THEN** the page is dark and the page has exactly one theme stylesheet
+#### Scenario: Taken email
+- **WHEN** the user changes their email to one another account has and submits Account Settings
+- **THEN** the dialog stays open with the same message, and the email is not saved
 
 ### Requirement: An unsaved theme does not outlive the dialog
-Closing Account Settings without a successful Update SHALL put back the theme the user last saved.
+Closing Account Settings without a successful Update SHALL put back the theme the user last saved, and the saved choice SHALL be selected the next time the dialog opens.
 
 #### Scenario: Flipping and closing
-- **WHEN** a user on the light theme flips the switch and closes Account Settings without Update
+- **WHEN** a user on the light theme picks Dark and closes Account Settings without Update
 - **THEN** the page is light again
 
 #### Scenario: Flipping and saving
-- **WHEN** a user on the light theme flips the switch, presses Update and reloads the page
+- **WHEN** a user on the light theme picks Dark, presses Update and reloads the page
 - **THEN** the page is dark
-
-### Requirement: The light theme is saved when the switch is off
-Saving Account Settings with the theme switch off SHALL store the light theme, so later pages load light.
-
-#### Scenario: Turning the dark theme off
-- **WHEN** a user on the dark theme turns the switch off, presses Update and reloads the page
-- **THEN** the page is light
 
 ### Requirement: Registration checks the passwords match
 On the registration page, once the user stops typing in either password field for 1.5 seconds, the page SHALL compare it with the password. A match SHALL enable Register and hide any warning; a mismatch SHALL show "Passwords do not match" and disable Register. Only the last pause SHALL be checked.
@@ -163,3 +153,29 @@ A request that carries no session cookie SHALL get no session cookie in its resp
 #### Scenario: toddseller.com's counts
 - **WHEN** toddseller.com requests `/api/movies/count` or `/api/year` with no MMDb cookie
 - **THEN** the response sets no cookie, as before
+
+### Requirement: The theme choice previews the theme
+Account Settings SHALL offer three theme choices, Light, Dark and System, with the saved one selected. Picking a choice SHALL show the page in that theme at once, without loading another stylesheet.
+
+#### Scenario: Picking Dark
+- **WHEN** a user on the light theme picks Dark in Account Settings
+- **THEN** the page is dark and the page still has exactly one stylesheet
+
+#### Scenario: Picking System
+- **WHEN** a user on the dark theme, on a device set to light, picks System
+- **THEN** the page is light
+
+### Requirement: The chosen theme is saved
+Saving Account Settings SHALL store the chosen theme, so later pages load in it. The server SHALL store only Light, Dark or System and SHALL refuse any other value, leaving the saved theme as it was.
+
+#### Scenario: Saving Light
+- **WHEN** a user on the dark theme picks Light, presses Update and reloads the page
+- **THEN** the page is light
+
+#### Scenario: Saving System
+- **WHEN** a user picks System, presses Update and reloads the page on a device set to dark
+- **THEN** the page is dark
+
+#### Scenario: An unknown value
+- **WHEN** a request saves Account Settings with a theme other than Light, Dark or System
+- **THEN** the save is refused and the user's saved theme is unchanged
