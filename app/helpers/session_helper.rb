@@ -21,6 +21,11 @@ helpers do
     halt 403 unless current_user.id == params[:user_id].to_i && (collection.nil? || current_user.public_send(collection).exists?(id))
   end
 
+  # The API's version of require_owner!: the token's user must have the movie or show in their collection.
+  def require_api_owner!(collection, id)
+    halt 403, json(message: 'That is not in your collection.') unless User.find(@auth_payload['sub']).public_send(collection).exists?(id)
+  end
+
   def sign_out!
     session[:user_id] = nil
     session[:name] = nil
