@@ -33,6 +33,14 @@ describe 'POST /v1/webhooks/new' do
     end
   end
 
+  it 'answers 400 to a URL whose query string cannot be parsed' do
+    # Set directly: Rack's mock request refuses to build a URL this malformed, though servers pass it through.
+    response = post('/v1/webhooks/new', json: event, xhr: false, env: { 'QUERY_STRING' => 'token=%zz' })
+    expect(response.status).to eq 400
+    expect(response.body).not_to include '.rb:'
+    expect(Show).not_to have_received(:plex_add)
+  end
+
   it 'answers 400 to a payload that is not JSON' do
     expect(deliver('{not json', token: secret).status).to eq 400
     expect(Show).not_to have_received(:plex_add)

@@ -10,7 +10,7 @@ services:
     env_file:
       - .env
     environment:
-      - RACK_ENV=development
+      - RACK_ENV=${RACK_ENV:-development}
       - DATABASE_URL=${DATABASE_URL}
       - SESSION_SECRET=${SESSION_SECRET}
       - JWT_SECRET=${JWT_SECRET}

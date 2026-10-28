@@ -27,15 +27,6 @@ workers worker_count
 # Preload application for better performance (only in production with workers)
 preload_app! if worker_count > 0
 
-# Logging
-if rack_env == 'production'
-  stdout_redirect(
-    ENV.fetch('PUMA_STDOUT_LOG', 'log/puma_stdout.log'),
-    ENV.fetch('PUMA_STDERR_LOG', 'log/puma_stderr.log'),
-    true
-  )
-end
-
 # Allow puma to be restarted by `rails restart` command
 plugin :tmp_restart
 

@@ -1,8 +1,10 @@
 require 'open3'
+require 'puma'
+require 'puma/configuration'
 
 describe 'origin security' do
   describe 'error pages' do
-    # Production runs as RACK_ENV=development, where Sinatra's default shows the exception page.
+    # Sinatra's default shows the exception page in development, which local Docker runs use.
     around do |example|
       environment = Sinatra::Application.environment
       Sinatra::Application.set :environment, :development
@@ -40,5 +42,22 @@ describe 'origin security' do
   it 'publishes the web port on loopback only' do
     compose = YAML.safe_load_file(APP_ROOT.join('docker-compose.yml'))
     expect(compose['services']['web']['ports']).to eq ['127.0.0.1:4666:4666']
+  end
+
+  # The server's .env says production; a machine whose .env doesn't say otherwise runs as development.
+  it 'takes RACK_ENV from each machine' do
+    compose = YAML.safe_load_file(APP_ROOT.join('docker-compose.yml'))
+    expect(compose['services']['web']['environment']).to include 'RACK_ENV=${RACK_ENV:-development}'
+  end
+
+  # The server's logs are read with `docker logs`, so production must not move them into files.
+  it 'keeps Puma output on stdout in production' do
+    rack_env = ENV['RACK_ENV']
+    ENV['RACK_ENV'] = 'production'
+    config = Puma::Configuration.new(config_files: [APP_ROOT.join('config', 'puma.rb').to_s])
+    config.clamp
+    expect(config.options[:redirect_stdout]).to be_nil
+  ensure
+    ENV['RACK_ENV'] = rack_env
   end
 end
