@@ -1,4 +1,4 @@
-import { test, expect, USER, OTHER, signIn } from './fixtures.js'
+import { test, expect, USER, OTHER, signIn, useTheme } from './fixtures.js'
 
 const PHONE = { viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true }
 
@@ -266,15 +266,10 @@ test.describe('turning a phone', () => {
   }
 })
 
-// The server picks a theme by session (visitors get dark, the seeded user default), so every phone check is run with
-// each theme's stylesheet served in place of the other's, so each theme's colours are checked.
+// The theme comes from the session or the device, so every phone check is run with each theme forced, checking each one's colours.
 for (const theme of ['dark', 'default']) test.describe(`on a phone, ${theme} theme`, () => {
   test.use(PHONE)
-
-  test.beforeEach(async ({ page }) => {
-    const other = theme === 'dark' ? 'default' : 'dark'
-    await page.route(`**/css/${other}.css*`, (route) => route.fulfill({ path: new URL(`../public/css/${theme}.css`, import.meta.url).pathname, contentType: 'text/css' }))
-  })
+  useTheme(test, theme)
 
   test('the side margins are 16px', async ({ page }) => {
     await page.goto(`/users/${USER.id}`)

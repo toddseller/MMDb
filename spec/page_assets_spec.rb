@@ -28,10 +28,8 @@ describe 'page assets' do
     File.utime(original, original, path)
   end
 
-  %w[dark default].each do |theme|
-    it "imports the shared modals.css into the #{theme} theme with a version" do
-      expect(File.read(APP_ROOT.join('public', 'css', "#{theme}.css"))).to match(%r{@import url\('modals\.css\?v=\d+'\);})
-    end
+  it 'imports modals.css with a version' do
+    expect(File.read(APP_ROOT.join('public', 'css', 'app.css'))).to match(%r{@import url\('modals\.css\?v=\d+'\);})
   end
 
   it 'serves a versioned import as the same file' do

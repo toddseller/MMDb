@@ -75,9 +75,7 @@ describe 'detail drawer' do
     end
   end
 
-  %w[default dark].each do |theme|
-    it "has the #{theme} theme import drawer.css and movies.css with versions" do
-      expect(css("#{theme}.css")).to match(%r{@import url\('drawer\.css\?v=\d+'\);}).and match(%r{@import url\('movies\.css\?v=\d+'\);})
-    end
+  it 'imports drawer.css and movies.css with versions' do
+    expect(css('app.css')).to match(%r{@import url\('drawer\.css\?v=\d+'\);}).and match(%r{@import url\('movies\.css\?v=\d+'\);})
   end
 end

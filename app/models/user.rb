@@ -1,5 +1,8 @@
 class User < ActiveRecord::Base
+  # 'default' is the light theme.
+  THEMES = %w[default dark system].freeze
 
+  validates :theme, inclusion: { in: THEMES }
   validates :first_name, :last_name, :user_name, :email, :password_hash, presence: true
   validates :user_name, :email, uniqueness: true
 

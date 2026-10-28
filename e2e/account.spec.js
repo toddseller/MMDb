@@ -5,7 +5,7 @@ const signInDialog = (page) => page.getByRole('dialog').filter({ hasText: 'Sign 
 const settings = (page) => page.locator('#logIn')
 const field = (page, name) => settings(page).locator(`input[name="${name}"]`)
 const update = (page) => settings(page).getByRole('button', { name: 'Update' })
-const themeLinks = (page) => page.locator('link[rel="stylesheet"][href*="/css/dark.css"], link[rel="stylesheet"][href*="/css/default.css"]')
+const stylesheets = (page) => page.locator('link[rel="stylesheet"]')
 const LIGHT = 'rgb(234, 234, 234)'
 const DARK = 'rgb(43, 43, 43)'
 
@@ -14,8 +14,9 @@ const openSettings = async (page) => {
   await page.getByRole('link', { name: 'Account Settings' }).click()
   await expect(field(page, 'first_name')).toBeVisible()
 }
-// The switch's checkbox is hidden; its label is what a user clicks.
-const flipTheme = (page) => page.locator('label[for="myonoffswitch"]').click()
+// Bootstrap hides each radio inside its button; the button is what a user clicks.
+const pickTheme = (page, name) => settings(page).locator('.theme-choice label', { hasText: name }).click()
+const background = (page) => page.locator('body')
 
 test.describe('signed out', () => {
   test.beforeEach(async ({ page }) => {
@@ -65,15 +66,19 @@ test('Remember me keeps the sign-in for 30 days', async ({ page, context }) => {
     await expect(signInDialog(page).getByPlaceholder('Password')).toHaveValue('')
   })
 
+  test("a visitor's page follows the device's light or dark setting", async ({ page }) => {
+    await page.emulateMedia({ colorScheme: 'dark' })
+    await expect(background(page)).toHaveCSS('background-color', DARK)
+
+    await page.emulateMedia({ colorScheme: 'light' })
+
+    await expect(background(page)).toHaveCSS('background-color', LIGHT)
+  })
+
   for (const theme of ['dark', 'default']) {
     test(`Remember me lines up with the fields and shares their border (${theme} theme)`, async ({ page }) => {
-      // A signed-out visitor already has the dark theme, and re-setting the same stylesheet fires no load event.
-      await page.evaluate((name) => new Promise((loaded) => {
-        const link = document.getElementById('theme')
-        if (link.getAttribute('href') === link.dataset[name]) return loaded()
-        link.addEventListener('load', loaded, { once: true })
-        link.href = link.dataset[name]
-      }), theme)
+      // A visitor is on System, so the device's setting picks the theme.
+      await page.emulateMedia({ colorScheme: theme === 'dark' ? 'dark' : 'light' })
       const password = signInDialog(page).getByPlaceholder('Password')
       const remember = signInDialog(page).getByLabel('Remember me')
 
@@ -148,25 +153,34 @@ test.describe('signed in', () => {
     await expect(page.getByRole('button', { name: 'Sign in' })).toBeVisible()
   })
 
-  test('the theme switch changes the page to the dark theme', async ({ page }) => {
-    await expect(page.locator('body')).toHaveCSS('background-color', LIGHT)
+  test('picking Dark changes the page to the dark theme', async ({ page }) => {
+    await expect(background(page)).toHaveCSS('background-color', LIGHT)
     await openSettings(page)
 
-    await flipTheme(page)
+    await pickTheme(page, 'Dark')
 
-    await expect(page.locator('body')).toHaveCSS('background-color', DARK)
-    await expect(themeLinks(page)).toHaveCount(1)
+    await expect(background(page)).toHaveCSS('background-color', DARK)
+    await expect(stylesheets(page)).toHaveCount(1)
+  })
+
+  test('picking System follows the device', async ({ page }) => {
+    await page.emulateMedia({ colorScheme: 'dark' })
+    await openSettings(page)
+
+    await pickTheme(page, 'System')
+
+    await expect(background(page)).toHaveCSS('background-color', DARK)
   })
 
   test('closing Account Settings puts the saved theme back', async ({ page }) => {
     await openSettings(page)
-    await flipTheme(page)
-    await expect(page.locator('body')).toHaveCSS('background-color', DARK)
+    await pickTheme(page, 'Dark')
+    await expect(background(page)).toHaveCSS('background-color', DARK)
 
     await settings(page).getByRole('button', { name: 'Close' }).click()
 
-    await expect(page.locator('body')).toHaveCSS('background-color', LIGHT)
-    await expect(themeLinks(page)).toHaveCount(1)
+    await expect(background(page)).toHaveCSS('background-color', LIGHT)
+    await expect(stylesheets(page)).toHaveCount(1)
   })
 
   test.describe('saving', () => {
@@ -192,7 +206,7 @@ test.describe('signed in', () => {
 
       await update(page).click()
 
-      await expect(settings(page).getByText('Invalid Password.')).toBeVisible()
+      await expect(settings(page).getByText("Couldn't save. Check your current password, email and user name.")).toBeVisible()
       await expect(field(page, 'current')).toHaveValue('')
       await expect(field(page, 'current')).toBeFocused()
       for (const name of ['password', 'confirm']) {
@@ -200,6 +214,18 @@ test.describe('signed in', () => {
         await expect(field(page, name)).toBeDisabled()
       }
       await expect(update(page)).toBeEnabled()
+    })
+
+    test("an email another account has isn't saved, and the dialog says so", async ({ page }) => {
+      await openSettings(page)
+      await field(page, 'email').fill('other@example.test')
+
+      await update(page).click()
+
+      await expect(settings(page).getByText("Couldn't save. Check your current password, email and user name.")).toBeVisible()
+      await page.reload()
+      await openSettings(page)
+      await expect(field(page, 'email')).toHaveValue(USER.email)
     })
 
     test('the right current password saves the new one', async ({ page }) => {
@@ -219,19 +245,33 @@ test.describe('signed in', () => {
 
     test('the saved theme outlives a reload, both ways', async ({ page }) => {
       await openSettings(page)
-      await flipTheme(page)
+      await pickTheme(page, 'Dark')
       await update(page).click()
       await expect(settings(page)).toBeHidden()
       await page.reload()
-      await expect(page.locator('body')).toHaveCSS('background-color', DARK)
+      await expect(background(page)).toHaveCSS('background-color', DARK)
 
       await openSettings(page)
-      await flipTheme(page)
+      await pickTheme(page, 'Light')
       await update(page).click()
       await expect(settings(page)).toBeHidden()
       await page.reload()
 
-      await expect(page.locator('body')).toHaveCSS('background-color', LIGHT)
+      await expect(background(page)).toHaveCSS('background-color', LIGHT)
+    })
+
+    test('a saved System theme follows the device, and changes with it without a reload', async ({ page }) => {
+      await page.emulateMedia({ colorScheme: 'dark' })
+      await openSettings(page)
+      await pickTheme(page, 'System')
+      await update(page).click()
+      await expect(settings(page)).toBeHidden()
+      await page.reload()
+      await expect(background(page)).toHaveCSS('background-color', DARK)
+
+      await page.emulateMedia({ colorScheme: 'light' })
+
+      await expect(background(page)).toHaveCSS('background-color', LIGHT)
     })
   })
 })

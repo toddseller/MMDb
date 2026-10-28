@@ -29,10 +29,10 @@ describe 'Web session expiry' do
   it 'gives a session that ends the theme Sign Out leaves' do
     user.update_columns(theme: 'dark')
     log_in(user, 'secret')
-    expect(Nokogiri::HTML(page_html).at_css('#theme')['href']).to include 'dark.css'
+    expect(Nokogiri::HTML(page_html).at_css('html')['data-theme']).to eq 'dark'
     travel 25.hours
 
-    expect(Nokogiri::HTML(page_html).at_css('#theme')['href']).to include 'default.css'
+    expect(Nokogiri::HTML(page_html).at_css('html')['data-theme']).to eq 'system'
   end
 
   describe 'a session with no end time, such as one from registering or from before expiry existed' do

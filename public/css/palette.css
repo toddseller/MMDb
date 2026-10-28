@@ -1,4 +1,9 @@
-/* Every colour that differs between the themes, light first. default.css and dark.css set color-scheme, which picks the side. */
+/* Every colour that differs between the themes, light first. color-scheme picks the side: the page's data-theme sets it,
+   and for System the device does, live. 'default' is the light theme. */
+[data-theme="default"] { color-scheme: light; }
+[data-theme="dark"] { color-scheme: dark; }
+[data-theme="system"] { color-scheme: light dark; }
+
 :root
 {
     --page-bg: light-dark(#eaeaea, #2b2b2b);

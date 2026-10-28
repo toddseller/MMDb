@@ -21,11 +21,11 @@ Every page SHALL reference the app's own scripts and stylesheets (those under `/
 - **THEN** both use the same version for each file
 
 ### Requirement: Imported theme stylesheets carry a hand-raised version
-A stylesheet that `dark.css` or `default.css` pulls in with `@import` SHALL be imported with a `?v=<n>` version once its contents change, and that version SHALL be raised in the same change as every later edit to the file. Both themes import the same files, so both entry stylesheets SHALL carry the same version for each. Editing the import line also changes the top-level stylesheet, so its own version changes and browsers fetch both.
+A stylesheet that `app.css` pulls in with `@import` SHALL be imported with a `?v=<n>` version once its contents change, and that version SHALL be raised in the same change as every later edit to the file. Editing the import line also changes the top-level stylesheet, so its own version changes and browsers fetch both.
 
 #### Scenario: Changed theme file is versioned
 - **WHEN** `modals.css` is changed
-- **THEN** both `dark.css` and `default.css` import it as `modals.css?v=<n>`, with the same `<n>`, higher than the version it replaced
+- **THEN** `app.css` imports it as `modals.css?v=<n>`, with `<n>` higher than the version it replaced
 
 #### Scenario: Versioned import resolves
 - **WHEN** a browser requests an imported stylesheet with its `?v=` version
@@ -54,5 +54,5 @@ No page SHALL include a script, stylesheet or frame from another site. Every scr
 - **THEN** the page makes no request to any other host for a script, stylesheet or frame
 
 #### Scenario: No experiment restyles the page
-- **WHEN** a visitor using the light theme loads any page, whatever cookies they carry from earlier visits
-- **THEN** the only stylesheet on the page is the light theme's
+- **WHEN** a visitor loads any page in any theme, whatever cookies they carry from earlier visits
+- **THEN** the only stylesheet on the page is the app's own `app.css`

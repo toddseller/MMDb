@@ -1,13 +1,8 @@
-import { test, expect, LONG } from './fixtures.js'
+import { test, expect, LONG, useTheme } from './fixtures.js'
 
 const PHONE = { viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true }
 const SIDEWAYS = { viewport: { width: 926, height: 428 }, isMobile: true, hasTouch: true }
 
-// Visitors get the dark theme; serving one theme's stylesheet in place of the other runs a check under both.
-const useTheme = (theme) => test.beforeEach(async ({ page }) => {
-  const other = theme === 'dark' ? 'default' : 'dark'
-  await page.route(`**/css/${other}.css*`, (route) => route.fulfill({ path: new URL(`../public/css/${theme}.css`, import.meta.url).pathname, contentType: 'text/css' }))
-})
 
 // Read from the layout rather than Playwright's boxes, which are null while the phone rail is hidden.
 const railLayout = (page) => page.evaluate(() => {
@@ -32,7 +27,7 @@ const expectNoOverlaps = (letters) => {
 }
 
 for (const theme of ['dark', 'default']) test.describe(`the letter rail, ${theme} theme`, () => {
-  useTheme(theme)
+  useTheme(test, theme)
 
   test.describe('in a 1500x1000 window', () => {
     test.use({ viewport: { width: 1500, height: 1000 } })

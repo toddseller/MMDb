@@ -6,6 +6,11 @@ helpers do
     @current_user ||= User.find_by(id: session[:user_id]) if session[:user_id]
   end
 
+  # Visitors, and any value the stylesheet doesn't know, get System.
+  def page_theme
+    User::THEMES.include?(session[:theme]) ? session[:theme] : 'system'
+  end
+
   def require_sign_in!
     halt 401 unless current_user
   end
@@ -19,7 +24,7 @@ helpers do
   def sign_out!
     session[:user_id] = nil
     session[:name] = nil
-    session[:theme] = 'default'
+    session[:theme] = 'system'
     session.delete(:expires_at)
     session.delete(:remember)
   end

@@ -4,12 +4,8 @@ import assert from 'node:assert/strict'
 import { makePage, stubFetch, json, html, stubDialogs } from './dom.js'
 import { init } from '#mmdb/account.js'
 
-const LIGHT = '/css/default.css?v=1'
-const DARK = '/css/dark.css?v=1'
-
-// layout.erb's theme link, navbar, Sign in button, menu and sign-in dialog.
+// layout.erb's navbar, Sign in button, menu and sign-in dialog; load() gives <html> its data-theme.
 const PAGE = `
-  <link id="theme" rel="stylesheet" href="${LIGHT}" data-default="${LIGHT}" data-dark="${DARK}">
   <p class="navbar-text">Signed in as Edie Tester</p>
   <div id="sign-in"><button type="button" id="open-sign-in">Sign in</button></div>
   <div id="nav-toggle" class="active"></div>
@@ -32,11 +28,13 @@ const PAGE = `
 // _edit_user.erb, as Account Settings loads it into #logIn.
 const SETTINGS = `
   <div class="modal-body">
-    <p class="login-errors">Invalid Password.</p>
+    <p class="login-errors">Couldn't save. Check your current password, email and user name.</p>
     <form class="login-form" action="/users/1" method="post">
       <input type="hidden" name="_method" value="PUT">
       <input type="text" name="first_name" value="Edie">
-      <input type="checkbox" name="theme" id="myonoffswitch" value="dark">
+      <input type="radio" name="theme" value="default" checked>
+      <input type="radio" name="theme" value="dark">
+      <input type="radio" name="theme" value="system">
       <div id="current"><input type="password" name="current"></div>
       <div class="confirmation"><input type="password" name="password" disabled="disabled"><span></span></div>
       <div id="confirm" class="confirmation"><input type="password" name="confirm" disabled="disabled"><span></span></div>
@@ -87,6 +85,9 @@ const settle = async () => { for (let i = 0; i < 10; i++) await Promise.resolve(
 /** @param {number} n */
 const body = (n) => new URLSearchParams(String(fetched.calls[n].init.body))
 const shown = (/** @type {string} */ selector) => el(selector).style.display !== 'none' && el(selector).style.display !== ''
+/** @param {string} value */
+const pick = (value) => el(`input[name="theme"][value="${value}"]`).click()
+const pageTheme = () => page.document.documentElement.dataset.theme
 const logIn = () => /** @type {HTMLDialogElement} */ (page.document.getElementById('logIn'))
 
 const openSettings = async () => {
@@ -98,6 +99,7 @@ const openSettings = async () => {
 /** @param {string} markup */
 const load = (markup) => {
   page = makePage(markup)
+  page.document.documentElement.dataset.theme = 'default'
   replaced = []
   stubDialogs(page.window)
   init(page.document, (url) => replaced.push(url))
@@ -257,7 +259,7 @@ test('clearing the current password enables Update again', async () => {
 test('saving puts the form, writes the new name as text and keeps the shown theme', async () => {
   await openSettings()
   answer = () => json({ status: 'true', name: '<b>Edith</b> Tester', theme: 'dark' })
-  el('#myonoffswitch').click()
+  pick('dark')
 
   const event = submit('#logIn .login-form')
   await settle()
@@ -270,7 +272,7 @@ test('saving puts the form, writes the new name as text and keeps the shown them
   assert.ok(!body(1).has('password'), 'disabled fields stay out')
   assert.equal(logIn().open, false)
   assert.equal(el('.navbar-text').textContent, 'Signed in as <b>Edith</b> Tester')
-  assert.equal(el('#theme').getAttribute('href'), DARK)
+  assert.equal(pageTheme(), 'dark')
 })
 
 test('a refused password resets the password fields and enables Update', async () => {
@@ -295,24 +297,24 @@ test('a refused password resets the password fields and enables Update', async (
   assert.equal(logIn().open, true)
 })
 
-test('the theme switch swaps the one theme link between versioned URLs', async () => {
+test('picking a theme shows the page in it at once', async () => {
   await openSettings()
 
-  el('#myonoffswitch').click()
-  assert.equal(el('#theme').getAttribute('href'), DARK)
-  el('#myonoffswitch').click()
+  pick('dark')
+  assert.equal(pageTheme(), 'dark')
+  pick('system')
 
-  assert.equal(el('#theme').getAttribute('href'), LIGHT)
-  assert.equal(page.document.querySelectorAll('link').length, 1)
+  assert.equal(pageTheme(), 'system')
+  assert.equal(fetched.calls.length, 1, 'nothing is sent until Update')
 })
 
 test('closing Account Settings without saving puts the saved theme back', async () => {
   await openSettings()
-  el('#myonoffswitch').click()
+  pick('dark')
 
   logIn().close()
 
-  assert.equal(el('#theme').getAttribute('href'), LIGHT)
+  assert.equal(pageTheme(), 'default')
 })
 
 test('registration checks the passwords once typing pauses', () => {

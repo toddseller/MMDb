@@ -3,7 +3,7 @@
   <h4 class="modal-title">Update Profile</h4>
 </div>
 <div class="modal-body">
-  <p class="login-errors text-center">Invalid Password.</p>
+  <p class="login-errors text-center">Couldn't save. Check your current password, email and user name.</p>
   <div class="row">
     <form class="login-form" action="<%="/users/#{user.id}"%>" method="post">
       <input type="hidden" name="_method" value="PUT">
@@ -24,13 +24,11 @@
         <input class="form-control" type="email" name="email" value="<%="#{user.email}"%>">
       </div>
       <div class="form-group col-sm-12">
-        <div class="onoffswitch">
-          <label>Theme:</label>
-          <input type="checkbox" name="theme" class="onoffswitch-checkbox" id="myonoffswitch" value="dark" <% if session[:theme] == 'dark' %> checked <% end %>>
-          <label class="onoffswitch-label" for="myonoffswitch">
-            <span class="onoffswitch-inner"></span>
-            <span class="onoffswitch-switch"></span>
-          </label>
+        <label id="theme-label">Theme:</label>
+        <div class="btn-group theme-choice" data-toggle="buttons" role="radiogroup" aria-labelledby="theme-label">
+          <% { 'default' => 'Light', 'dark' => 'Dark', 'system' => 'System' }.each do |value, name| %>
+            <label class="btn btn-default"><input type="radio" name="theme" value="<%= value %>"<% if user.theme == value %> checked<% end %>> <%= name %></label>
+          <% end %>
         </div>
       </div>
       <div id="current" class="form-group col-sm-12">

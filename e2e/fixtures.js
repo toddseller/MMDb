@@ -32,4 +32,12 @@ export const test = base.extend({
   },
 })
 
+// Every page in the given theme, visitor's or signed-in user's, whatever the saved setting or the device's.
+export const useTheme = (test, theme) => test.beforeEach(async ({ page }) => {
+  await page.route('**/css/app.css*', async (route) => {
+    const response = await route.fetch()
+    await route.fulfill({ response, body: `${await response.text()}\n[data-theme] { color-scheme: ${theme === 'dark' ? 'dark' : 'light'} !important; }` })
+  })
+})
+
 export { expect }
