@@ -146,17 +146,16 @@ class Show < ActiveRecord::Base
 
         if data['type'] == 'episode'
           episodes.each do |episode|
-            if episode[:title].downcase() == plex_title(data['title'])
-              new_episode = season.episodes.find_by(tv_episode: episode[:tv_episode]) || season.episodes.new(episode)
-              save_show(user, s, show, season, new_episode)
-            elsif title == 'matlock' && show[:show_collection_id] == 'umc.cmc.4qkh3w8zjpnf2pwol5809ktfu'
-              new_episode = season.episodes.find_by(tv_episode: episode[:tv_episode]) || season.episodes.new(episode)
+            if episode[:title].downcase() == plex_title(data['title']) || title == 'matlock' && show[:show_collection_id] == 'umc.cmc.4qkh3w8zjpnf2pwol5809ktfu'
+              new_episode = season.episodes.find_or_initialize_by(tv_episode: episode[:tv_episode])
+              new_episode.assign_attributes(episode)
               save_show(user, s, show, season, new_episode)
             end
           end
         else
-          episodes.each do |episode|
-            new_episode = season.episodes.find_by(tv_episode: episode[:tv_episode]) || season.episodes.new(episode)
+          episodes.select { |episode| aired?(episode[:date]) }.each do |episode|
+            new_episode = season.episodes.find_or_initialize_by(tv_episode: episode[:tv_episode])
+            new_episode.assign_attributes(episode)
             save_show(user, s, show, season, new_episode)
           end
         end
@@ -218,6 +217,12 @@ class Show < ActiveRecord::Base
 
   def self.clean_up_title(t)
     new_t = t.gsub(/\"/, '')
+  end
+
+  def self.aired?(date)
+    Date.parse(date) <= Date.today
+  rescue Date::Error
+    false
   end
 
   def self.plex_title(t)
