@@ -1,4 +1,4 @@
-/* How the page fits the window at every width, shared by both themes. Colours live in themes/<theme>/. */
+/* How the page fits the window at every width, shared by both themes. Colours live in palette.css. */
 
 /* 40px lines the page up with the navbar's logo and menu button. On wide screens the margins grow, to about one
    poster at 2560px (10 movies or 9 shows a row, with room for a scrollbar) and two posters from about 3350px. */

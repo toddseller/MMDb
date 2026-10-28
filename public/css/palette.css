@@ -1,0 +1,30 @@
+/* Every colour that differs between the themes, light first. default.css and dark.css set color-scheme, which picks the side. */
+:root
+{
+    --page-bg: light-dark(#eaeaea, #2b2b2b);
+    --text: light-dark(#333, #f3f3f3);
+    --muted: light-dark(rgba(51,51,51,.7), rgba(243,243,243,.7));
+    --faint: light-dark(rgba(51,51,51,.1), rgba(243,243,243,.1));
+    --surface: light-dark(#fff, #222);
+    --dialog-header-bg: light-dark(#e4e4e4, #2b2b2b);
+    --search-bg: light-dark(rgba(234,234,234,.97), rgba(44,44,44,.97));
+    --poster-bg: light-dark(#000, #222);
+    --badge-text: light-dark(#fff, #333);
+
+    --pointer-edge: light-dark(#333, #000);
+    --drawer-edge: light-dark(rgba(51,51,51,.6), #000);
+    --open-shadow: light-dark(#4f4f4f, #000);
+
+    --hover-bg: light-dark(rgba(0,0,0,.1), rgba(255,255,255,.1));
+    --hover-edge: light-dark(rgba(0,0,0,.01), rgba(255,255,255,.01));
+    --button-focus-bg: light-dark(transparent, #fff);
+
+    --close: light-dark(#000, #d9534f);
+    --close-hover: light-dark(#000, #f00);
+    --close-shadow: light-dark(#fff, transparent);
+
+    --rail-text: light-dark(#6e6e6e, #999);
+    --rail-hover: light-dark(#c9302c, #d9534f);
+
+    --switch-edge: light-dark(#2b2b2b, #888);
+}

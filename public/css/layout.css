@@ -2,8 +2,8 @@ body
 {
   padding-top: 70px;
 
-  color: #f3f3f3;
-  background: #2b2b2b;
+  color: var(--text);
+  background: var(--page-bg);
 
   -webkit-font-smoothing: antialiased;
 }
@@ -19,7 +19,7 @@ footer
 {
   position: fixed;
   height: 25px;
-  background-color: #222;
+  background-color: var(--surface);
   bottom: 0;
   left: 0;
   width: 100vw;

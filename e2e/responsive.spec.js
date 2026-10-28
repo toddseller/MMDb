@@ -267,7 +267,7 @@ test.describe('turning a phone', () => {
 })
 
 // The server picks a theme by session (visitors get dark, the seeded user default), so every phone check is run with
-// each theme's stylesheet served in place of the other's: a rule left in only one theme folder fails one of them.
+// each theme's stylesheet served in place of the other's, so each theme's colours are checked.
 for (const theme of ['dark', 'default']) test.describe(`on a phone, ${theme} theme`, () => {
   test.use(PHONE)
 
@@ -280,6 +280,22 @@ for (const theme of ['dark', 'default']) test.describe(`on a phone, ${theme} the
     await page.goto(`/users/${USER.id}`)
 
     expect(await sideMargins(page)).toEqual([16, 16])
+  })
+
+  test("a movie drawer's rating, format and stars sit side by side", async ({ page }) => {
+    await signIn(page)
+    await page.goto(`/users/${USER.id}`)
+    await page.locator('#movie-list img[alt="Birch Poster"]').tap()
+    await expect(page.locator('.info.open')).toBeVisible()
+
+    const boxes = await page.locator('.info .description-info').evaluate((row) =>
+      [...row.querySelectorAll(':scope > :not(#ratings-container), #ratings-container span, #ratings-container p')]
+        .map((el) => el.getBoundingClientRect())
+        .filter((box) => box.width && box.height)
+        .map(({ left, right, top, bottom }) => ({ left, right, top, bottom })))
+    const overlap = (a, b) => a.left < b.right && b.left < a.right && a.top < b.bottom && b.top < a.bottom
+    expect(boxes.length).toBeGreaterThan(1)
+    expect(boxes.flatMap((a, i) => boxes.slice(i + 1).filter((b) => overlap(a, b)).map((b) => [a, b]))).toEqual([])
   })
 
   for (const { name, path, signedIn } of browsingPages) {

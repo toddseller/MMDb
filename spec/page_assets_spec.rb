@@ -29,14 +29,14 @@ describe 'page assets' do
   end
 
   %w[dark default].each do |theme|
-    it "imports the #{theme} theme's modals.css with a version" do
-      expect(File.read(APP_ROOT.join('public', 'css', "#{theme}.css"))).to match(%r{@import url\('themes/#{theme}/modals\.css\?v=\d+'\);})
+    it "imports the shared modals.css into the #{theme} theme with a version" do
+      expect(File.read(APP_ROOT.join('public', 'css', "#{theme}.css"))).to match(%r{@import url\('modals\.css\?v=\d+'\);})
     end
   end
 
   it 'serves a versioned import as the same file' do
-    plain = get('/css/themes/dark/modals.css', xhr: false)
-    versioned = get('/css/themes/dark/modals.css?v=2', xhr: false)
+    plain = get('/css/modals.css', xhr: false)
+    versioned = get('/css/modals.css?v=2', xhr: false)
 
     expect(versioned.status).to eq 200
     expect(versioned.body).to eq plain.body

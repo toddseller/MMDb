@@ -1,5 +1,5 @@
 /* Layout and motion for the movie and show grids and their details drawer.
-   Colours live in themes/<theme>/movies.css. */
+   Colours live in palette.css. */
 
 /* Gaps are the old tile margins, which made 7 movies or 6 shows exactly fill the old 1386px page. */
 #movie-list,

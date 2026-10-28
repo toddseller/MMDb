@@ -44,7 +44,7 @@
     color: #fff;
 }
 
-/* The dark movies.css zeroes .checkbox label padding for the edit form, which pads its .checkbox instead; this gives Bootstrap's pulled-left checkbox room to line up with the fields. */
+/* movies.css zeroes .checkbox label padding for the edit form, which pads its .checkbox instead; this gives Bootstrap's pulled-left checkbox room to line up with the fields. */
 #sign-in-form .checkbox
 {
     padding-left: 20px;
@@ -62,7 +62,7 @@
 
     border-top-left-radius: 5px;
     border-top-right-radius: 5px;
-    background-color: #2b2b2b;
+    background-color: var(--dialog-header-bg);
 }
 
 #edit-show .modal-body
@@ -71,7 +71,7 @@
 
     text-align: left;
 
-    background-color: #222;
+    background-color: var(--surface);
 }
 
 #edit-show .modal-footer
@@ -82,7 +82,7 @@
     border: none;
     border-bottom-right-radius: 5px;
     border-bottom-left-radius: 5px;
-    background-color: #222;
+    background-color: var(--surface);
 }
 
 #edit-show .modal-footer .glyphicon
@@ -180,7 +180,7 @@
     border-color: #ccc;
     outline: none;
     outline-offset: none;
-    background-color: #fff;
+    background-color: var(--button-focus-bg);
 }
 
 #edit-show .btn-default:hover
@@ -188,7 +188,7 @@
     cursor: default;
 
     border-color: #ccc;
-    background-color: #fff;
+    background-color: var(--button-focus-bg);
 }
 
 /* The dialog shrinks its buttons; the Upload button sits against a full-height field, so it keeps Bootstrap's height. */
@@ -253,14 +253,14 @@
 #meta-data .close
 {
     opacity: 1;
-    color: #d9534f;
-    text-shadow: none;
+    color: var(--close);
+    text-shadow: 0 1px 0 var(--close-shadow);
 }
 
 #meta-data .close:hover,
 #meta-data .close:focus
 {
-    color: #f00;
+    color: var(--close-hover);
 }
 
 .info-wrapper .modal-title
@@ -304,7 +304,7 @@
     height: auto;
 
     border-radius: 6px;
-    background-color: #222;
+    background-color: var(--poster-bg);
 }
 
 .modal-body .col-lg-3
@@ -316,20 +316,20 @@
 {
     height: 600px;
 
-    background: #222;
+    background: var(--surface);
 }
 
 .movie-content .close
 {
     opacity: 1;
-    color: #d9534f;
-    text-shadow: none;
+    color: var(--close);
+    text-shadow: 0 1px 0 var(--close-shadow);
 }
 
 .movie-content .close:hover,
 .movie-content .close:focus
 {
-    color: #f00;
+    color: var(--close-hover);
 }
 
 .modal-studio
@@ -348,25 +348,6 @@
 .modal-body hr
 {
     margin-top: 10px;
-}
-
-.glyphicon-option-vertical
-{
-    font-size: 21px;
-
-    float: right;
-
-    margin-top: -2px;
-
-    opacity: 1;
-    color: #d9534f;
-}
-.glyphicon-option-vertical:hover,
-.glyphicon-option-vertical:focus
-{
-    text-decoration: none;
-
-    color: #f00;
 }
 
 .registration
@@ -412,7 +393,7 @@
 
     padding: 1px 3px;
 
-    border: 2px solid #f3f3f3;
+    border: 2px solid var(--text);
     border-radius: 3px;
 }
 
@@ -425,9 +406,9 @@
 
     padding: 2px 5px;
 
-    color: #222;
+    color: var(--surface);
     border-radius: 3px;
-    background: #f3f3f3;
+    background: var(--text);
 }
 
 #description-year
@@ -456,7 +437,7 @@
 {
     text-decoration: none;
 
-    color: #f3f3f3;
+    color: var(--text);
 }
 
 .description-details a:hover
@@ -470,7 +451,7 @@
 {
     text-decoration: none;
 
-    color: #f3f3f3;
+    color: var(--text);
 }
 
 .studio a:hover
@@ -806,7 +787,7 @@ li
 
     cursor: pointer;
 
-    border: 2px solid #888;
+    border: 2px solid var(--switch-edge);
     border-radius: 20px;
 }
 
@@ -893,7 +874,7 @@ li
 
     transition: all .3s ease-in 0s;
 
-    border: 2px solid #888;
+    border: 2px solid var(--switch-edge);
     border-radius: 20px;
     background: #fff;
 }

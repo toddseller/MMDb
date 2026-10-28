@@ -1,5 +1,5 @@
 /* What the three <dialog class="modal"> need beyond the themes' .modal rules, which predate <dialog>.
-   Position, size and colours live in themes/<theme>/modals.css. */
+   Position and size live in modals.css, colours in palette.css. */
 
 /* The browser gives dialogs a box of their own; the themes style .modal-content as the box instead. */
 dialog.modal {
