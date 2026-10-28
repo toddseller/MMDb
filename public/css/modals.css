@@ -22,9 +22,83 @@
     border: none;
 }
 
-#logIn .modal-content
+/* Bootstrap's colours are fixed light ones; these restate them from the palette, state selectors copied so each still wins. */
+.modal-content
 {
-    color: #333;
+    background-color: var(--surface);
+}
+
+.modal-footer
+{
+    border-top-color: var(--divider);
+}
+
+.form-control
+{
+    color: var(--field-text);
+    border-color: var(--field-edge);
+    background-color: var(--field-bg);
+}
+
+.form-control[disabled],
+.form-control[readonly],
+fieldset[disabled] .form-control
+{
+    background-color: var(--field-disabled-bg);
+}
+
+.btn-default
+{
+    color: var(--text);
+    border-color: var(--field-edge);
+    background-color: var(--field-bg);
+}
+
+.btn-default:focus,
+.btn-default.focus
+{
+    color: var(--text);
+    border-color: var(--button-press-edge);
+    background-color: var(--button-hover-bg);
+}
+
+.btn-default:hover,
+.btn-default:active,
+.btn-default.active,
+.open > .dropdown-toggle.btn-default
+{
+    color: var(--text);
+    border-color: var(--button-hover-edge);
+    background-color: var(--button-hover-bg);
+}
+
+.btn-default:active:hover,
+.btn-default.active:hover,
+.open > .dropdown-toggle.btn-default:hover,
+.btn-default:active:focus,
+.btn-default.active:focus,
+.open > .dropdown-toggle.btn-default:focus,
+.btn-default:active.focus,
+.btn-default.active.focus,
+.open > .dropdown-toggle.btn-default.focus
+{
+    color: var(--text);
+    border-color: var(--button-press-edge);
+    background-color: var(--button-press-bg);
+}
+
+.btn-default.disabled:hover,
+.btn-default[disabled]:hover,
+fieldset[disabled] .btn-default:hover,
+.btn-default.disabled:focus,
+.btn-default[disabled]:focus,
+fieldset[disabled] .btn-default:focus,
+.btn-default.disabled.focus,
+.btn-default[disabled].focus,
+fieldset[disabled] .btn-default.focus
+{
+    border-color: var(--field-edge);
+    background-color: var(--field-bg);
 }
 
 #logIn .modal-header
@@ -98,7 +172,7 @@
 .btn.btn-default.disabled.edit-next,
 .btn.btn-default.disabled.edit-next:hover
 {
-    background-color: #e0e0e0 !important;
+    background-color: var(--button-disabled-bg) !important;
 }
 
 #episode-delete
@@ -177,18 +251,18 @@
 #edit-show .btn:focus
 {
     color: inherit;
-    border-color: #ccc;
+    border-color: var(--field-edge);
     outline: none;
     outline-offset: none;
-    background-color: var(--button-focus-bg);
+    background-color: var(--field-bg);
 }
 
 #edit-show .btn-default:hover
 {
     cursor: default;
 
-    border-color: #ccc;
-    background-color: var(--button-focus-bg);
+    border-color: var(--field-edge);
+    background-color: var(--field-bg);
 }
 
 /* The dialog shrinks its buttons; the Upload button sits against a full-height field, so it keeps Bootstrap's height. */
@@ -357,6 +431,8 @@
     margin-top: 25px;
     padding: 25px;
 
+    /* The panel is red in every theme, and dark fields on red read poorly, so its fields stay light. */
+    color-scheme: light;
     color: #fff;
     -webkit-border-radius: 5px;
        -moz-border-radius: 5px;
@@ -898,8 +974,8 @@ li
 
 .theme-choice .btn:has(:checked)
 {
-    border-color: #adadad;
-    background-color: #e6e6e6;
+    border-color: var(--button-hover-edge);
+    background-color: var(--button-hover-bg);
     box-shadow: inset 0 3px 5px rgba(0,0,0,.125);
 }
 
