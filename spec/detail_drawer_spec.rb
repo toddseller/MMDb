@@ -40,6 +40,18 @@ describe 'detail drawer' do
     it 'turns the motion off for reduced motion' do
       expect(css('drawer.css')).to include('@media (prefers-reduced-motion: reduce)')
     end
+
+    # A poster with no height until it loads pushed the details down when it arrived.
+    it "holds the drawer posters' shape before they load, with the placeholder fitted the same way" do
+      movie = rule('drawer.css', '#meta-data .description-poster img')
+      expect(movie).to include('display: block', 'aspect-ratio: 2 / 3', 'object-fit: contain', 'background-size: contain', 'background-position: center', 'background-repeat: no-repeat')
+      expect(rule('drawer.css', '#info-header > .description-poster img')).to include('aspect-ratio: 1')
+    end
+
+    # The movie selector matches the show's poster too, so the show rule only wins by coming later.
+    it 'puts the show poster rule after the movie one' do
+      expect(css('drawer.css').index('#info-header > .description-poster img')).to be > css('drawer.css').index('#meta-data .description-poster img')
+    end
   end
 
   %w[default dark].each do |theme|
@@ -58,10 +70,17 @@ describe 'detail drawer' do
         expect(rule(path, 'img')).not_to match(/transform/)
       end
 
+      # A set height or background: none would undo the drawer's square box and its placeholder colour.
+      it "leaves the show poster's shape to drawer.css and gives both posters a colour to load over" do
+        expect(rule(path, '#info-header > .description-poster img')).not_to match(/height|background: none/)
+        expect(rule(path, '#info-header > .description-poster img')).to include('background-color')
+        expect(rule("themes/#{theme}/modals.css", '#meta-data .description-poster img')).to include('background-color')
+      end
+
       # Later edits to the theme raise its version again, so this checks a floor, not an exact number.
       it 'imports the versions that carry the rendering changes' do
-        expect(css("#{theme}.css")[%r{themes/#{theme}/movies\.css\?v=(\d+)}, 1].to_i).to be >= 3
-        expect(css("#{theme}.css")[/drawer\.css\?v=(\d+)/, 1].to_i).to be >= 3
+        expect(css("#{theme}.css")[%r{themes/#{theme}/movies\.css\?v=(\d+)}, 1].to_i).to be >= 7
+        expect(css("#{theme}.css")[/drawer\.css\?v=(\d+)/, 1].to_i).to be >= 7
       end
 
       it 'imports drawer.css and the changed movies.css with versions' do

@@ -438,34 +438,37 @@ test('keepOpen glides once its hold ends, down only', () => {
   assert.deepEqual(glides, [{ top: 125, behavior: 'smooth' }])
 })
 
-test('an image loading in the drawer glides down only', () => {
-  show(tile('Ember'), '<img alt="Ember Poster">')
-  screen({ tile: 100, wrapper: 300, height: 200 })
-  const image = /** @type {HTMLElement} */ (drawers()[0].querySelector('img'))
-  image.dispatchEvent(new page.window.Event('load'))
-  assert.deepEqual(glides, [])
+// The drawer's poster as _info.erb and _show_info.erb render it.
+const POSTER = '<div id="meta-data"><div class="description-poster"><img src="https://img.test/full/2000x3000.jpg" alt="Poster"></div></div>'
+const drawerPoster = () => /** @type {HTMLImageElement} */ (drawers()[0].querySelector('.description-poster img'))
+/** @param {string} title @param {string} src */
+const tileShows = (title, src) => tile(title).querySelector('img')?.setAttribute('src', src)
 
-  screen({ wrapper: 600, height: 400 })
-  image.dispatchEvent(new page.window.Event('load'))
-  assert.deepEqual(glides, [{ top: 125, behavior: 'smooth' }])
+test('an opening drawer shows the clicked tile’s image behind its poster', () => {
+  tileShows('Birch', 'https://img.test/birch/348x522bb.jpg')
+
+  show(tile('Birch'), POSTER)
+
+  assert.equal(drawerPoster().style.backgroundImage, 'url("https://img.test/birch/348x522bb.jpg")')
 })
 
-test('an image loading in a drawer that has closed does nothing', () => {
-  show(tile('Ember'), '<img alt="Ember Poster">')
-  const image = /** @type {HTMLElement} */ (drawers()[0].querySelector('img'))
-  close()
-  screen({ wrapper: 600, height: 400 })
+test('switching to another title in the row shows the newly clicked tile’s image', () => {
+  show(tile('Birch'), POSTER)
+  runFrames()
+  tileShows('Cedar', 'https://img.test/cedar/348x522bb.jpg')
 
-  image.dispatchEvent(new page.window.Event('load'))
+  show(tile('Cedar'), POSTER)
 
-  assert.deepEqual(glides, [])
+  assert.equal(drawerPoster().style.backgroundImage, 'url("https://img.test/cedar/348x522bb.jpg")')
 })
 
-test('an image loading in the movie edit form doesn’t glide', () => {
-  show(tile('Ember'), '<form class="edit-form"><img alt=""></form>')
-  screen({ wrapper: 600, height: 400 })
+test('the poster loading clears the image behind it, and failing to load keeps it', () => {
+  tileShows('Birch', 'https://img.test/birch/348x522bb.jpg')
+  show(tile('Birch'), POSTER)
 
-  drawers()[0].querySelector('.edit-form img')?.dispatchEvent(new page.window.Event('load'))
+  drawerPoster().dispatchEvent(new page.window.Event('error'))
+  assert.equal(drawerPoster().style.backgroundImage, 'url("https://img.test/birch/348x522bb.jpg")')
 
-  assert.deepEqual(glides, [])
+  drawerPoster().dispatchEvent(new page.window.Event('load'))
+  assert.equal(drawerPoster().style.backgroundImage, '')
 })

@@ -124,3 +124,24 @@ test.describe('the drawer glides into view', () => {
     expect(await settled(page)).toBe(0)
   })
 })
+
+test.describe("a movie drawer's poster while it loads", () => {
+  const SVG = { contentType: 'image/svg+xml', body: '<svg xmlns="http://www.w3.org/2000/svg" width="400" height="600"/>' }
+
+  test('shows the clicked tile’s image behind it, then only the poster', async ({ page }) => {
+    let held
+    await page.route('https://is1-ssl.mzstatic.com/**', (route) => {
+      if (route.request().url().endsWith('/birch/2000x3000.jpg')) held = route
+      else route.fulfill(SVG)
+    })
+    await page.goto(`/users/${USER.id}`)
+
+    await poster(page, 'Birch').click()
+
+    const image = page.locator('#meta-data .description-poster img')
+    await expect(image).toHaveCSS('background-image', 'url("https://is1-ssl.mzstatic.com/image/thumb/birch/348x522bb.jpg")')
+    await expect.poll(() => held).toBeTruthy()
+    await held.fulfill(SVG)
+    await expect(image).toHaveCSS('background-image', 'none')
+  })
+})

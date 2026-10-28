@@ -30,9 +30,8 @@
 #info-header > .description-poster img
 {
     width: 447px;
-    height: 447px;
     border: rgba(243,243,243,.1) 1px solid;
-    background: none;
+    background-color: #222;
 }
 
 .series-info
