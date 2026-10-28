@@ -36,7 +36,7 @@ The application will be available at `http://localhost:4666`. The port is publis
 
 ### Features
 - Live code reloading (volume mounted)
-- Development environment (`RACK_ENV=development`)
+- `RACK_ENV` comes from `.env` and defaults to `development`; the production server's `.env` sets `production`
 - Direct rackup server
 - Source code synced to container
 

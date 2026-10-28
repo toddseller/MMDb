@@ -41,7 +41,7 @@ helpers do
     lifetime = session[:remember] ? JwtAuth::REMEMBERED_LIFETIME : JwtAuth::SESSION_LIFETIME
     session[:expires_at] = Time.now.to_i + lifetime
     request.session_options[:expire_after] = lifetime
-    # Per request, not global: a global secure makes Rack drop the cookie on plain HTTP, and production runs as RACK_ENV=development behind HTTPS.
+    # Per request, not global: a global secure makes Rack drop the cookie on plain HTTP, which local runs and the tests use.
     request.session_options[:secure] = request.ssl?
   end
 end

@@ -66,8 +66,6 @@ bin/*
 # Puma
 tmp/pids/
 tmp/cache/
-log/puma_stdout.log
-log/puma_stderr.log
 
 # Ruby version managers
 .ruby-version

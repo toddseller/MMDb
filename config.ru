@@ -19,7 +19,7 @@ configure do
   set :protection, :except => [:host_authorization, :remote_token]
   set :host_authorization, { allowed_hosts: [nil] }
 
-  # Production runs as RACK_ENV=development, whose exception page would show visitors the stack trace; dump_errors still logs it.
+  # Development's exception page shows the stack trace to whoever made the request; dump_errors still logs it.
   set :show_exceptions, false
 end
 
@@ -57,8 +57,13 @@ class WebhookToken
       env['QUERY_STRING'] = Rack::Utils.build_query(query)
     end
     @app.call(env)
+  rescue Rack::QueryParser::InvalidParameterError
+    # Sinatra answers its own routes' unparseable query strings the same way; this parse runs before Sinatra.
+    [400, { 'content-type' => 'text/plain' }, ['Invalid query parameters']]
   end
 end
+# rackup adds this only in development; it deletes upload temp files once the response is sent.
+use Rack::TempfileReaper
 use WebhookToken
 
 run Sinatra::Application
