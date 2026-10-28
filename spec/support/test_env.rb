@@ -2,6 +2,7 @@
 # Shared by the RSpec suite and the browser-test server, and required before the app loads.
 {
   'JWT_SECRET' => 'test-jwt-secret', 'JWT_ISSUER' => 'test-issuer',
+  'SESSION_SECRET' => 'test-session-secret-at-least-64-bytes-long-as-rack-session-requires',
   'PLEX_USER' => 'test-plex-user', 'PLEX_USER_ID' => '1', 'PLEX_WEBHOOK_SECRET' => 'test-plex-webhook-secret',
   'TMDB_TOKEN' => 'test-tmdb-token',
   'TAUTULLI_KEY' => 'test-tautulli-key', 'LIBRARY_KEY' => 'test-library-key',
