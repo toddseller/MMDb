@@ -1,7 +1,7 @@
 # themes Specification
 
 ## Purpose
-TBD - created by archiving change merge-theme-stylesheets. Update Purpose after archive.
+Lets each person see MMDb in the light theme, the dark theme, or whichever their device is set to, with every page, dialog and form looking the same in each apart from its colours.
 
 ## Requirements
 
