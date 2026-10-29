@@ -1,5 +1,5 @@
 # Multi-stage build for production
-FROM ruby:3.4.8-slim AS builder
+FROM ruby:3.4.12-slim AS builder
 
 # Install build dependencies
 RUN apt-get update -qq && \
@@ -19,7 +19,7 @@ RUN bundle config set --local without 'development test' && \
     bundle install --jobs 4 --retry 3
 
 # Final stage
-FROM ruby:3.4.8-slim
+FROM ruby:3.4.12-slim
 
 # Install runtime dependencies only
 RUN apt-get update -qq && \

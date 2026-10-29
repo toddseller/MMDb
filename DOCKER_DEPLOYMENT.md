@@ -2,7 +2,7 @@
 
 ## Overview
 
-This project includes both development and production Docker configurations for Ruby 3.4.8.
+This project includes both development and production Docker configurations for Ruby 3.4.12.
 
 ## File Structure
 
