@@ -20,4 +20,10 @@ describe 'dependency updates' do
     steps = YAML.safe_load_file(APP_ROOT.join('.github', 'workflows', 'test.yml'))['jobs']['test']['steps']
     expect(steps.map { |step| step['run'].to_s }).to include(start_with('docker build'))
   end
+
+  # The ci-test-gate spec runs tests on production's Postgres major version, now 18 on 192.168.40.5.
+  it 'tests against PostgreSQL 18' do
+    services = YAML.safe_load_file(APP_ROOT.join('.github', 'workflows', 'test.yml'))['jobs']['test']['services']
+    expect(services['postgres']['image']).to eq 'postgres:18'
+  end
 end

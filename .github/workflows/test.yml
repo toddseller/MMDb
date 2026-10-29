@@ -22,7 +22,7 @@ jobs:
     services:
       postgres:
         # Matches production, so db/structure.sql loads exactly as it does there.
-        image: postgres:11
+        image: postgres:18
         env:
           POSTGRES_PASSWORD: postgres
         ports:

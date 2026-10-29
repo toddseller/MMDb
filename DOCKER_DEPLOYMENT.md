@@ -55,6 +55,7 @@ The application will be available at `http://localhost:4666`. The port is publis
 | `WEB_CONCURRENCY` | `2` | Number of Puma workers |
 | `PUMA_THREADS` | `5` | Threads per worker |
 | `PORT` | `4666` | Application port |
+| `PGPASS_FILE` | none | Host path of a `.pgpass` file (mode 600) with the database password; the web container reads it when `DATABASE_URL` has no password |
 
 ### API Keys
 
