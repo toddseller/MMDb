@@ -9,3 +9,7 @@
   'AWS_ACCESS_KEY_ID' => 'test-aws-access-key-id', 'AWS_SECRET_ACCESS_KEY' => 'test-aws-secret-access-key',
   'AWS_REGION' => 'us-west-2', 'ARTWORK_BUCKET' => 'myflix-stream'
 }.each { |name, value| ENV[name] = value }
+
+# bcrypt's default cost takes about 0.2 s per hash, paid by every test user and sign-in; stored hashes keep their own cost.
+require 'bcrypt'
+BCrypt::Engine.cost = BCrypt::Engine::MIN_COST
