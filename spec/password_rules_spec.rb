@@ -1,3 +1,5 @@
+require 'open3'
+
 describe 'password rules' do
   def register(password, user_name: 'newcomer')
     post('/users', params: { user: { first_name: 'New', last_name: 'User', user_name: user_name, email: "#{user_name}@example.test", password: password } }, xhr: false)
@@ -35,5 +37,18 @@ describe 'password rules' do
       register(password)
       expect(signs_in?('newcomer@example.test', password)).to be true
     end
+  end
+
+  # bcrypt's default cost makes every hash take about 0.2 s; tests hash at the minimum, the app must not.
+  it 'hashes test users at the minimum cost' do
+    expect(BCrypt::Password.new(create_user.password_hash).cost).to eq BCrypt::Engine::MIN_COST
+  end
+
+  it 'leaves the app outside the tests at the default cost' do
+    env = { 'RACK_ENV' => 'production', 'DATABASE_URL' => 'postgres://localhost/MMDb_test', 'SESSION_SECRET' => 'x' * 64, 'JWT_SECRET' => 'x' }
+    cost, status = Open3.capture2(env, 'ruby', '-e', 'require "./config/environment"; print BCrypt::Engine.cost', chdir: APP_ROOT.to_s)
+
+    expect(status).to be_success
+    expect(cost.to_i).to eq BCrypt::Engine::DEFAULT_COST
   end
 end
