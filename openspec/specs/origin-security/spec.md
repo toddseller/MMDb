@@ -51,7 +51,7 @@ The web container's port SHALL be published on the host's loopback address only.
 - **THEN** it answers at `http://localhost:4666`
 
 ### Requirement: Pages carry a report-only content security policy
-Every response SHALL carry a `Content-Security-Policy-Report-Only` header that sends violation reports to `/csp-reports` and blocks nothing. Its policy SHALL allow scripts only from the site and the page's import map by its SHA-256 hash; styles only from the site; images from the site, any `https:` host and `data:`; fetches only to the site; no plugins; and the base URL, form targets and framing only for the site.
+Every response SHALL carry a `Content-Security-Policy-Report-Only` header that sends violation reports to `/csp-reports` and blocks nothing. Its policy SHALL allow scripts only from the site, Cloudflare Web Analytics (`https://static.cloudflareinsights.com`) and the page's import map by its SHA-256 hash; styles only from the site; images from the site, any `https:` host and `data:`; fetches only to the site and `https://cloudflareinsights.com`; no plugins; and the base URL, form targets and framing only for the site.
 
 #### Scenario: A page's import map is allowed
 - **WHEN** a visitor requests a page
@@ -60,6 +60,10 @@ Every response SHALL carry a `Content-Security-Policy-Report-Only` header that s
 #### Scenario: Pages break nothing under the policy
 - **WHEN** the browser tests open the site's pages and dialogs
 - **THEN** no content security policy violation occurs
+
+#### Scenario: Cloudflare Web Analytics is allowed
+- **WHEN** Cloudflare adds its Web Analytics script to a page
+- **THEN** the policy allows the script to load and to send its measurements
 
 ### Requirement: Pages use no inline script handlers or inline styles
 Pages and the markup scripts add to them SHALL contain no inline event handler attributes and no `style` attributes. A poster image that fails to load SHALL still be replaced with its fallback image, including one that failed before the page's scripts started.

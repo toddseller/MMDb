@@ -2,12 +2,13 @@
 after do
   headers 'content-security-policy-report-only' => [
     "default-src 'self'",
+    # Cloudflare injects its Web Analytics beacon into pages, and it reports back to cloudflareinsights.com.
     # The import map is the one inline script; its text changes only when a module does.
-    "script-src 'self' 'sha256-#{Digest::SHA256.base64digest(import_map)}'",
+    "script-src 'self' https://static.cloudflareinsights.com 'sha256-#{Digest::SHA256.base64digest(import_map)}'",
     "style-src 'self'",
     # Posters come from whatever host a pasted URL names.
     "img-src 'self' https: data:",
-    "connect-src 'self'",
+    "connect-src 'self' https://cloudflareinsights.com",
     "object-src 'none'",
     "base-uri 'self'",
     "form-action 'self'",
