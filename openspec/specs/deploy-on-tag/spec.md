@@ -17,7 +17,7 @@ Pushing a tag named `v` followed by digits and dots (for example `v2026.10.23` o
 - **THEN** no deploy starts
 
 ### Requirement: Only tested commits on master are deployed
-A deploy SHALL stop before contacting the server unless the tag's commit is reachable from `master` and that commit's `test` check finished successfully.
+A deploy SHALL stop before contacting the server unless the tag's commit is reachable from `master` and that commit's `test` check finished successfully. While the check is running or has not been created yet, the deploy SHALL wait for it, for about 15 minutes at most.
 
 #### Scenario: Commit not on master
 - **WHEN** a version tag points at a commit only on a feature branch
@@ -26,6 +26,10 @@ A deploy SHALL stop before contacting the server unless the tag's commit is reac
 #### Scenario: Tests failed or missing
 - **WHEN** a version tag points at a `master` commit whose `test` check failed or never ran
 - **THEN** the deploy fails with a message naming the check's state, and the server is not contacted
+
+#### Scenario: Tag pushed before the test check exists
+- **WHEN** a version tag is pushed while its commit's test jobs are still running and the final `test` check has not been created yet
+- **THEN** the deploy waits, and continues once the `test` check finishes successfully
 
 ### Requirement: The server is reached only through an authenticated tunnel with a single-purpose key
 The deploy SHALL connect to the server over SSH through Cloudflare Access with a service token, verify the server's host key against a stored value, and authenticate with a key that the server allows to run only the deploy script, with no shell, terminal or forwarding.
