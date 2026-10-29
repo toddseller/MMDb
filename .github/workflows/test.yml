@@ -16,8 +16,8 @@ concurrency:
 jobs:
   # The master ruleset requires a check named "test"; renaming this job silently drops the requirement.
   test:
-    # Pinned: setup-ruby had no Ruby 3.4.8 build when ubuntu-latest moved to 26.04 (2026-10-25). Move both workflows together once it does.
-    runs-on: ubuntu-24.04
+    # Follows GitHub's current image on purpose; if Ruby setup fails after GitHub moves it, the Ruby pinned below needs a newer patch release.
+    runs-on: ubuntu-latest
 
     services:
       postgres:
@@ -45,7 +45,7 @@ jobs:
       # .ruby-version is gitignored, so the version is stated here.
       - uses: ruby/setup-ruby@v1
         with:
-          ruby-version: '3.4.8'
+          ruby-version: '3.4.12'
           bundler-cache: true
 
       # deploy.yml only runs on a tag, so this is where a broken workflow gets caught.

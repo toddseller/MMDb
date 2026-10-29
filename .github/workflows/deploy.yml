@@ -15,8 +15,7 @@ concurrency:
 
 jobs:
   deploy:
-    # Pinned alongside test.yml, so both workflows move to a new runner image together.
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
     # The environment only admits v* tags, so runs from branches and pull requests never see its secrets.
     environment: production
 

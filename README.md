@@ -49,7 +49,7 @@ MMDb/
 
 ## Technology Stack
 
-- **Ruby**: 3.4.8
+- **Ruby**: 3.4.12
 - **Framework**: Sinatra 4.x with Rack 3.x
 - **Database**: PostgreSQL 15
 - **ORM**: ActiveRecord 7.2
@@ -60,7 +60,7 @@ MMDb/
 
 ## Prerequisites
 
-- Ruby 3.4.8 (via rbenv or RVM recommended)
+- Ruby 3.4.12 (via rbenv or RVM recommended)
 - PostgreSQL 15+
 - Bundler 2.x
 - Docker & Docker Compose (for containerized deployment)
