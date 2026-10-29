@@ -59,21 +59,15 @@ class Show < ActiveRecord::Base
   def self.refresh_apple_count(db_season)
     return db_season if db_season[:appleTvId] == nil || db_season[:appleTvId] == ""
     storeId = db_season[:storeId] ? db_season[:storeId] : '143441'
-    request = HTTParty.get('https://tv.apple.com/api/uts/v2/view/show/' + db_season[:appleTvId] + '/episodes?sf=' + storeId + AppleTv::PARAMS)
-    if request.code == 200 && request['data'] && request['data']['seasonSummaries']
+    window = apple_season_window(db_season[:appleTvId], db_season[:season], storeId)
+    if window
       db_season[:storeId] = storeId if db_season[:storeId] == nil
-      db_season[:count] = request['data']['seasonSummaries'][db_season[:season] - 1]['episodeCount'].to_s
+      db_season[:count] = window.last.to_s
     end
-    db_season
-  rescue JSON::ParserError
-    puts "Error parsing JSON from Apple TV API for show: #{db_season[:title]}, appleTvId: #{db_season[:appleTvId]}"
-    db_season
-  rescue => e
-    puts "Error retrieving data from Apple TV API: #{e.message}"
     db_season
   end
 
-  def self.get_episodes(id, season, skip=0, count=0, storeId='143441')
+  def self.get_episodes(id, season, skip=nil, count=nil, storeId='143441')
     episodes = []
     if id.include? 'tmdb'
       id = id.gsub(/tmdb/,'')
@@ -86,7 +80,10 @@ class Show < ActiveRecord::Base
         end
       end
     else
-      episode_response = appletv_episodes(id, skip, count, storeId)
+      # Only Apple seasons have a stored window; any other source (TVDB) has nothing to list here.
+      return [] if skip.nil?
+      skip, count = apple_season_window(id, season, storeId) || [skip, count]
+      episode_response = appletv_episodes(id, skip.to_s, count.to_s, storeId, season)
 
       if episode_response.length > 0
         episode_response.each do |e|
@@ -141,7 +138,8 @@ class Show < ActiveRecord::Base
         if season.collectionId.include? 'tmdb'
           episodes = data['type'] == 'show' ? tmdb_episodes(show.show_collection_id, season_number) : tmdb_episodes(show.show_collection_id, season_number, episode_number)
         else
-          episodes = data['type'] == 'show' ? appletv_episodes(season.appleTvId, (season.skip.to_i).to_s, season.count.to_s, season.storeId) : appletv_episodes(season.appleTvId, (season.skip.to_i + episode_number - 1).to_s, 1.to_s, season.storeId)
+          skip, count = apple_season_window(season.appleTvId, season_number, season.storeId) || [season.skip.to_i, season.count.to_i]
+          episodes = data['type'] == 'show' ? appletv_episodes(season.appleTvId, skip.to_s, count.to_s, season.storeId, season_number) : appletv_episodes(season.appleTvId, (skip + episode_number - 1).to_s, '1', season.storeId, season_number)
         end
 
         if data['type'] == 'episode'
@@ -346,7 +344,20 @@ class Show < ActiveRecord::Base
     details
   end
 
-  def self.appletv_episodes(id, skip, count, storeId)
+  # Apple lists a show's episodes in one run across seasons, and inserts episodes into old seasons later,
+  # so a season's start is summed from Apple's current season sizes rather than trusted from when it was stored.
+  def self.apple_season_window(id, season_number, storeId)
+    data = HTTParty.get('https://tv.apple.com/api/uts/v2/view/show/' + id + '/episodes?sf=' + (storeId.presence || AppleTv::STORES.first) + AppleTv::PARAMS)['data']
+    index = data && data['seasons'] && data['seasons'].index { |season| season['seasonNumber'].to_i == season_number.to_i }
+    return nil unless index && data['seasonSummaries']
+    counts = data['seasonSummaries'].map { |summary| summary['episodeCount'].to_i }
+    [counts.first(index).sum, counts[index]]
+  rescue StandardError => e
+    puts "Apple season list failed for #{id}: #{e.message}"
+    nil
+  end
+
+  def self.appletv_episodes(id, skip, count, storeId, season_number = nil)
     episodes = []
     # Seasons added in 2019, before the storefront was stored, have none; every lookup then used the US store.
     storeId = storeId.presence || AppleTv::STORES.first
@@ -354,6 +365,7 @@ class Show < ActiveRecord::Base
       episodes_response = HTTParty.get('https://tv.apple.com/api/uts/v2/view/show/' + id + '/episodes?skip=' + skip + '&count=' + count + '&sf=' + storeId + '&locale=en-US&utsk=0&caller=wta&v=58&pfm=appletv')
       if episodes_response.code == 200 && episodes_response['data'] && episodes_response['data']['episodes']
         episodes_response['data']['episodes'].each do |e|
+          next if season_number && e['seasonNumber'] && e['seasonNumber'].to_i != season_number.to_i
           poster = e['images']['previewFrame'] ? e['images']['previewFrame']['url'].gsub(/({w}x{h}.{f})/, '300x169.jpg') : e['showImages'] && e['showImages']['keyframe'] ? e['showImages']['keyframe']['url'].gsub(/({w}x{h}.{f})/, '300x169.jpg') : ''
           date = e['releaseDate'] ? Time.at(e['releaseDate'] / 1000).to_datetime.strftime("%b %-d, %Y") : ''
           runtime = e['duration'] ? e['duration'] / 60 : ''

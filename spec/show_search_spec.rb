@@ -312,6 +312,7 @@ describe 'Show.plex_add with the wider Apple match' do
     stub_apple_search('lupin', shows: [['lupin-third', 'Lupin the Third'], ['lupin', 'Lupin']])
     stub_apple_show('lupin-third', title: 'Lupin the Third', seasons: [[1, 23]])
     stub_apple_show('lupin', title: 'Lupin', seasons: [[1, 5]])
+    stub_request(:get, %r{\Ahttps://tv\.apple\.com/api/uts/v2/view/show/lupin/episodes\?}).to_return(json(apple_episodes('lupin', [[1, 5]])))
     stub_request(:get, %r{\Ahttps://tv\.apple\.com/api/uts/v2/view/show/lupin/episodes\?})
       .with(query: hash_including('skip' => '1', 'count' => '1'))
       .to_return(json(data: { episodes: [{ title: 'Chapter 2', description: 'The second chapter', episodeNumber: 2, duration: 2700,
