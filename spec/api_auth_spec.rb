@@ -32,6 +32,12 @@
       expect(response.status).to eq 401
       expect(JSON.parse(response.body)).not_to have_key 'token'
     end
+
+    it 'answers 400 to a body that is not JSON' do
+      response = post("/api/#{version}/authenticate", env: { input: '{not json', 'CONTENT_TYPE' => 'application/json' })
+      expect(response.status).to eq 400
+      expect(JSON.parse(response.body)['error']).to eq 'Failed to parse body as JSON'
+    end
   end
 end
 
