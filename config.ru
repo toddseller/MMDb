@@ -41,7 +41,10 @@ use Rack::Cors do
   end
 end
 
-use Rack::JSONBodyParser
+# rack-contrib's default parser passes create_additions, which json 3 rejects.
+use Rack::JSONBodyParser do |body|
+  JSON.parse(body)
+end
 
 # The access logger writes the query string after the app runs, so moving the Plex webhook
 # secret out of it here keeps the secret out of every log line.
