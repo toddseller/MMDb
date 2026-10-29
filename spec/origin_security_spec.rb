@@ -50,6 +50,13 @@ describe 'origin security' do
     expect(compose['services']['web']['environment']).to include 'RACK_ENV=${RACK_ENV:-development}'
   end
 
+  # The server keeps the database password in ~/.pgpass, named by PGPASS_FILE; elsewhere the mount is an empty file.
+  it 'mounts the database password file read-only and points libpq at it' do
+    web = YAML.safe_load_file(APP_ROOT.join('docker-compose.yml'))['services']['web']
+    expect(web['volumes']).to include '${PGPASS_FILE:-/dev/null}:/run/secrets/pgpass:ro'
+    expect(web['environment']).to include 'PGPASSFILE=/run/secrets/pgpass'
+  end
+
   # The server's logs are read with `docker logs`, so production must not move them into files.
   it 'keeps Puma output on stdout in production' do
     rack_env = ENV['RACK_ENV']

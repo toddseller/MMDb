@@ -613,7 +613,7 @@ bundle exec rspec
 - Tests can't reach the network: an unstubbed HTTP request fails the test and names the URL. Stub external APIs with `stub_request` and JSON fixtures in `spec/fixtures/`.
 - Every run prints line coverage and writes the full report to `coverage/index.html`. Coverage is reported, not enforced.
 - A test that exposes a bug states the correct behavior inside `pending "<reason>"`. It reports as pending while the bug exists and fails once the bug is fixed, as a reminder to remove the marker. Security and data-loss bugs get their own fix instead.
-- If production's schema changes outside the migrations, refresh the dump (dropping the `\restrict` lines newer `pg_dump` versions add), then drop and recreate `MMDb_test`:
+- If production's schema changes outside the migrations, refresh the dump (dropping the `\restrict` lines newer `pg_dump` versions add), then drop and recreate `MMDb_test`. Use `pg_dump` and a local Postgres of production's major version (18): an older `pg_dump` refuses a newer server, and an older Postgres rejects settings a newer dump writes.
 
 ```bash
 pg_dump --schema-only --no-owner --no-privileges "$DATABASE_URL" | grep -Ev '^\\(un)?restrict ' > db/structure.sql

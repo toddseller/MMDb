@@ -4,6 +4,8 @@ services:
     command: bash -c "rm -f tmp/pids/server.pid && bundle exec rackup config.ru -o 0.0.0.0 -p 4666"
     volumes:
       - .:/app
+      # libpq reads this only when DATABASE_URL has no password; /dev/null keeps it a file where PGPASS_FILE isn't set.
+      - ${PGPASS_FILE:-/dev/null}:/run/secrets/pgpass:ro
     restart: unless-stopped
     ports:
       - "127.0.0.1:4666:4666"
@@ -12,6 +14,7 @@ services:
     environment:
       - RACK_ENV=${RACK_ENV:-development}
       - DATABASE_URL=${DATABASE_URL}
+      - PGPASSFILE=/run/secrets/pgpass
       - SESSION_SECRET=${SESSION_SECRET}
       - JWT_SECRET=${JWT_SECRET}
       - JWT_ISSUER=${JWT_ISSUER:-mmdb.online}
