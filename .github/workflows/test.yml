@@ -16,7 +16,7 @@ concurrency:
 jobs:
   # The master ruleset requires a check named "test"; renaming this job silently drops the requirement.
   test:
-    # Follows GitHub's current image on purpose; if Ruby setup fails after GitHub moves it, the Ruby pinned below needs a newer patch release.
+    # Follows GitHub's current image on purpose; if Ruby setup fails after GitHub moves it, setup-ruby has no build of the Ruby below for that image yet.
     runs-on: ubuntu-latest
 
     services:
@@ -42,10 +42,14 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
-      # .ruby-version is gitignored, so the version is stated here.
+      # The tests run outside Docker, so this catches an image that wouldn't build before the deploy does.
+      - name: Build the image
+        run: docker build .
+
+      # The newest 3.4 patch; the Dockerfile decides which one production runs.
       - uses: ruby/setup-ruby@v1
         with:
-          ruby-version: '3.4.12'
+          ruby-version: '3.4'
           bundler-cache: true
 
       # deploy.yml only runs on a tag, so this is where a broken workflow gets caught.

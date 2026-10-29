@@ -43,8 +43,7 @@ MMDb/
 ├── db/
 │   ├── migrate/         # Database migrations
 │   └── seeds.rb         # Seed data
-├── config.ru            # Rack configuration
-└── Dockerfile.production
+└── config.ru            # Rack configuration
 ```
 
 ## Technology Stack
@@ -203,57 +202,7 @@ Configuration:
 - Database connection via `DATABASE_URL` in `.env`
 - Access at `http://localhost:4666`
 
-### Option 4: Docker Compose (Production)
-
-Best for production deployment with security hardening and optimizations.
-
-```bash
-# Start production stack
-docker-compose -f docker-compose.production.yml up -d
-
-# Build from scratch
-docker-compose -f docker-compose.production.yml up --build
-
-# View logs
-docker-compose -f docker-compose.production.yml logs -f web
-
-# Health check
-docker-compose -f docker-compose.production.yml ps
-
-# Stop
-docker-compose -f docker-compose.production.yml down
-```
-
-Features:
-- Uses `Dockerfile.production` with multi-stage build
-- Smaller image size (~200MB vs 800MB)
-- Runs as non-root user (`appuser`)
-- Includes PostgreSQL 15 service with data persistence
-- Puma in clustered mode (2 workers, 5 threads each)
-- Built-in health checks (curl endpoint every 30s)
-- Automatic container restart on failure
-- Isolated bridge network
-- Persistent volumes for PostgreSQL data
-
-Production Configuration:
-```yaml
-# docker-compose.production.yml highlights
-services:
-  web:
-    restart: always
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:4666/"]
-      interval: 30s
-      timeout: 3s
-      retries: 3
-      start_period: 40s
-  db:
-    image: postgres:15-alpine
-    volumes:
-      - postgres-data:/var/lib/postgresql/data
-```
-
-### Option 5: Rake Tasks
+### Option 4: Rake Tasks
 
 ```bash
 # List available tasks
@@ -453,9 +402,6 @@ echo $DATABASE_URL
 
 # Test connection
 psql $DATABASE_URL
-
-# Reset connection pool (in production)
-docker-compose -f docker-compose.production.yml restart web
 ```
 
 #### 3. Puma Won't Start
@@ -487,12 +433,7 @@ docker-compose logs web
 
 ### Health Checks
 
-Production containers include health checks:
 ```bash
-# Check container health
-docker-compose -f docker-compose.production.yml ps
-
-# Manual health check
 curl -f http://localhost:4666/
 ```
 
@@ -618,26 +559,6 @@ SERVER="$SERVER_USER@<server-lan-address>"
    Clear the clipboard afterwards with `pbcopy < /dev/null`.
 8. **Protect the tags.** In Settings, Rules, Rulesets, add a tag ruleset named `Version tags` targeting `v*`, enforcement Active, with Repository admin allowed to bypass, and turn on Restrict creations, Restrict updates and Restrict deletions. Only you can then create version tags, through the release page (see Deploy above), and nobody else can move or delete one. Your bypass still lets you delete a tag; avoid it, because recreating the tag deploys it again.
 9. **First deploy.** Publish a release whose new tag points at the commit the server is on. Because the server is already there, the run is a redeploy: it restarts the app and checks the site, which tests the whole path without changing any files.
-
-### Docker Production Deployment
-
-```bash
-# On production server
-git clone <repository-url>
-cd MMDb
-cp .env.example .env
-# Edit .env with production credentials
-nano .env
-
-# Start services
-docker-compose -f docker-compose.production.yml up -d
-
-# Run migrations
-docker-compose -f docker-compose.production.yml exec web bundle exec rake db:migrate
-
-# Check logs
-docker-compose -f docker-compose.production.yml logs -f
-```
 
 ### Systemd Service (Non-Docker)
 

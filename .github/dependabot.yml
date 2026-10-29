@@ -1,0 +1,39 @@
+# Minor and patch updates arrive as one PR per ecosystem; each major update opens its own.
+version: 2
+updates:
+  - package-ecosystem: bundler
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      gems:
+        update-types: [minor, patch]
+
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      npm:
+        update-types: [minor, patch]
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      actions:
+        update-types: [minor, patch]
+
+  # The Dockerfile pins a digest, so a republished ruby image arrives here too.
+  - package-ecosystem: docker
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      base-image:
+        update-types: [minor, patch]
+    ignore:
+      # A new Ruby minor or major also needs the Gemfile and CI changed, so it stays deliberate.
+      - dependency-name: ruby
+        update-types: [version-update:semver-minor, version-update:semver-major]

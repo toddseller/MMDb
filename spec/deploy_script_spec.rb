@@ -214,7 +214,7 @@ describe 'bin/deploy' do
       expect(docker_calls).to eq ['compose restart web']
     end
 
-    %w[Gemfile Gemfile.lock Dockerfile Dockerfile.production docker-compose.yml docker-compose.production.yml].each do |file|
+    %w[Gemfile Gemfile.lock Dockerfile docker-compose.yml].each do |file|
       it "rebuilds the container when #{file} changed" do
         release('v2', 'app.rb' => "puts 'v2'\n", file => "changed\n")
 
