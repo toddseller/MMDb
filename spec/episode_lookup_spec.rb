@@ -119,6 +119,6 @@ describe 'Apple episode lookups' do
                  .seasons.create!(season: 2, collectionName: 'Lupin, Season 2', collectionId: 'lupin-s2', appleTvId: 'lupin', skip: '0', count: '3', storeId: '143441')
     stub_seasons([[2, 4]])
 
-    expect(Show.refresh_apple_count(season.attributes.symbolize_keys)[:count]).to eq '4'
+    expect(Show.refresh_apple_counts([season.attributes.symbolize_keys]).first[:count]).to eq '4'
   end
 end

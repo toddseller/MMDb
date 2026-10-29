@@ -2,6 +2,8 @@ module AppleTv
   STORES = ['143441', '143444', '143455', '143460']
   PARAMS = '&locale=en-US&utsk=0&caller=wta&v=58&pfm=appletv'
   BASE = 'https://uts-api.itunes.apple.com/uts/v2/'
+  # Seconds before an Apple request gives up; answers normally take under one, and callers fall back on failure.
+  TIMEOUT = 5
 
   # The [id, store] pairs to fetch for a search: items of one type whose title contains the term, best matches first.
   def self.matches(s_term, type, limit)
@@ -20,12 +22,12 @@ module AppleTv
   end
 
   def self.search(store, s_term)
-    response = HTTParty.get(BASE + 'search/incremental?sf=' + store + PARAMS + '&q=' + CGI.escape(s_term))
+    response = HTTParty.get(BASE + 'search/incremental?sf=' + store + PARAMS + '&q=' + CGI.escape(s_term), timeout: TIMEOUT)
     return [] unless response.code == 200 && response['data'] && response['data']['canvas']
     response['data']['canvas']['shelves'].flat_map { |shelf| shelf['items'] || [] }
   end
 
   def self.view(path, store)
-    HTTParty.get(BASE + 'view/' + path + '?sf=' + store + PARAMS)
+    HTTParty.get(BASE + 'view/' + path + '?sf=' + store + PARAMS, timeout: TIMEOUT)
   end
 end

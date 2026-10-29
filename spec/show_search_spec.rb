@@ -35,6 +35,48 @@ describe 'Show.get_series' do
     end
   end
 
+  # Every season of a show comes from the same Apple response, so a long-running show must not repeat it per season.
+  it "refreshes a stored show's seasons from one Apple request" do
+    show = Show.create!(title: 'Harbor Lights', year: '2019', show_collection_id: 'umc.cmc.harbor')
+    (1..3).each { |number| show.seasons.create!(season: number, collectionName: "Harbor Lights, Season #{number}", collectionId: "umc.cmc.harbor-s#{number}", appleTvId: 'umc.cmc.harbor', skip: '0', count: '1', storeId: '143441') }
+    stub_request(:get, %r{\Ahttps://tv\.apple\.com/api/uts/v2/view/show/umc\.cmc\.harbor/episodes\?}).to_return(json(apple_episodes('umc.cmc.harbor', [[1, 4], [2, 5], [3, 6]])))
+
+    rows = Show.get_series('harbor')
+
+    expect(rows.map { |row| row[:count] }).to eq %w[4 5 6]
+    expect(search_requests(%r{/api/uts/v2/view/show/umc\.cmc\.harbor/episodes\?})).to eq 1
+  end
+
+  it "keeps a stored show's counts when Apple doesn't answer in time" do
+    show = Show.create!(title: 'Harbor Lights', year: '2019', show_collection_id: 'umc.cmc.harbor')
+    show.seasons.create!(season: 1, collectionName: 'Harbor Lights, Season 1', collectionId: 'umc.cmc.harbor-s1', appleTvId: 'umc.cmc.harbor', skip: '0', count: '3', storeId: '143441')
+    stub_request(:get, %r{\Ahttps://tv\.apple\.com/api/uts/v2/view/show/umc\.cmc\.harbor/episodes\?}).to_timeout
+
+    rows = nil
+    expect { rows = Show.get_series('harbor') }.to output(/Apple season list failed for umc\.cmc\.harbor/).to_stdout
+    expect(rows.map { |row| [row[:collectionName], row[:count]] }).to eq [['Harbor Lights, Season 1', '3']]
+  end
+
+  # Without a timeout, one stalled Apple answer holds the search for Net::HTTP's 60 seconds.
+  it 'gives every Apple request a 5-second timeout' do
+    apple = []
+    allow(HTTParty).to receive(:get).and_wrap_original do |get, url, *options|
+      apple << options.first&.dig(:timeout) if url.match?(%r{\Ahttps://(tv\.apple\.com|uts-api\.itunes\.apple\.com)/})
+      get.call(url, *options)
+    end
+    show = Show.create!(title: 'Lupin', year: '2021', show_collection_id: 'umc.cmc.lupin')
+    season = show.seasons.create!(season: 1, collectionName: 'Lupin, Season 1', collectionId: 'umc.cmc.lupin-s1', appleTvId: 'umc.cmc.lupin', skip: '0', count: '5', storeId: '143441')
+    stub_request(:get, %r{\Ahttps://tv\.apple\.com/api/uts/v2/view/show/umc\.cmc\.lupin/episodes\?}).to_return(json(apple_episodes('umc.cmc.lupin', [[1, 5]])))
+    stub_apple_search('lupin', shows: [['umc.cmc.lupin', 'Lupin']])
+    stub_apple_show('umc.cmc.lupin', title: 'Lupin', seasons: [[1, 5]])
+
+    Show.get_series('lupin')
+    Show.get_episodes(season.appleTvId, season.season, season.skip, season.count, season.storeId)
+
+    expect(apple.size).to be >= 4
+    expect(apple).to all eq 5
+  end
+
   it 'prefers a season already in the database over Apple’s copy' do
     show = Show.create!(title: 'Lupin', year: '2021', show_collection_id: 'umc.cmc.lupin')
     season = show.seasons.create!(season: 1, collectionName: 'Lupin, Season 1', collectionId: 'umc.cmc.lupin-s1', appleTvId: 'umc.cmc.lupin', storeId: '143441')

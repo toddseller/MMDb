@@ -31,7 +31,7 @@ class Show < ActiveRecord::Base
 
     db_rows, series_response, tmdb_response = InParallel.map([:db, :apple, :tmdb], limit: 3) do |source|
       case source
-      when :db then InParallel.map(db_seasons) { |db_season| refresh_apple_count(db_season) }
+      when :db then refresh_apple_counts(db_seasons)
       when :apple then appletv_call(t)
       when :tmdb then tmdb_call(t)
       end
@@ -56,12 +56,18 @@ class Show < ActiveRecord::Base
     stored.empty? || stored.any? { |el| el[:show_collection_id] == s[:show_collection_id] } && stored.none? { |el| el[:season].to_i == s[:season].to_i }
   end
 
-  def self.refresh_apple_count(db_season)
-    return db_season if db_season[:appleTvId] == nil || db_season[:appleTvId] == ""
-    storeId = db_season[:storeId] ? db_season[:storeId] : '143441'
-    window = apple_season_window(db_season[:appleTvId], db_season[:season], storeId)
+  # Every season of a show comes from the same Apple season list, so it is fetched once per show and storefront.
+  def self.refresh_apple_counts(db_seasons)
+    store_of = ->(db_season) { db_season[:storeId] || AppleTv::STORES.first }
+    shows = db_seasons.select { |db_season| db_season[:appleTvId].present? }.map { |db_season| [db_season[:appleTvId], store_of.(db_season)] }.uniq
+    lists = shows.zip(InParallel.map(shows) { |id, store| apple_seasons(id, store) }).to_h
+    db_seasons.map { |db_season| db_season[:appleTvId].present? ? refresh_apple_count(db_season, lists[[db_season[:appleTvId], store_of.(db_season)]]) : db_season }
+  end
+
+  def self.refresh_apple_count(db_season, seasons_data)
+    window = season_window(seasons_data, db_season[:season])
     if window
-      db_season[:storeId] = storeId if db_season[:storeId] == nil
+      db_season[:storeId] ||= AppleTv::STORES.first
       db_season[:count] = window.last.to_s
     end
     db_season
@@ -346,15 +352,20 @@ class Show < ActiveRecord::Base
 
   # Apple lists a show's episodes in one run across seasons, and inserts episodes into old seasons later,
   # so a season's start is summed from Apple's current season sizes rather than trusted from when it was stored.
-  def self.apple_season_window(id, season_number, storeId)
-    data = HTTParty.get('https://tv.apple.com/api/uts/v2/view/show/' + id + '/episodes?sf=' + (storeId.presence || AppleTv::STORES.first) + AppleTv::PARAMS)['data']
+  def self.apple_season_window(id, season_number, storeId) = season_window(apple_seasons(id, storeId), season_number)
+
+  def self.apple_seasons(id, storeId)
+    HTTParty.get('https://tv.apple.com/api/uts/v2/view/show/' + id + '/episodes?sf=' + (storeId.presence || AppleTv::STORES.first) + AppleTv::PARAMS, timeout: AppleTv::TIMEOUT)['data']
+  rescue StandardError => e
+    puts "Apple season list failed for #{id}: #{e.message}"
+    nil
+  end
+
+  def self.season_window(data, season_number)
     index = data && data['seasons'] && data['seasons'].index { |season| season['seasonNumber'].to_i == season_number.to_i }
     return nil unless index && data['seasonSummaries']
     counts = data['seasonSummaries'].map { |summary| summary['episodeCount'].to_i }
     [counts.first(index).sum, counts[index]]
-  rescue StandardError => e
-    puts "Apple season list failed for #{id}: #{e.message}"
-    nil
   end
 
   def self.appletv_episodes(id, skip, count, storeId, season_number = nil)
@@ -362,7 +373,7 @@ class Show < ActiveRecord::Base
     # Seasons added in 2019, before the storefront was stored, have none; every lookup then used the US store.
     storeId = storeId.presence || AppleTv::STORES.first
     begin
-      episodes_response = HTTParty.get('https://tv.apple.com/api/uts/v2/view/show/' + id + '/episodes?skip=' + skip + '&count=' + count + '&sf=' + storeId + '&locale=en-US&utsk=0&caller=wta&v=58&pfm=appletv')
+      episodes_response = HTTParty.get('https://tv.apple.com/api/uts/v2/view/show/' + id + '/episodes?skip=' + skip + '&count=' + count + '&sf=' + storeId + '&locale=en-US&utsk=0&caller=wta&v=58&pfm=appletv', timeout: AppleTv::TIMEOUT)
       if episodes_response.code == 200 && episodes_response['data'] && episodes_response['data']['episodes']
         episodes_response['data']['episodes'].each do |e|
           next if season_number && e['seasonNumber'] && e['seasonNumber'].to_i != season_number.to_i
