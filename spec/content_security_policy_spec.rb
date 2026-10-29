@@ -12,10 +12,10 @@ describe 'content security policy' do
     let(:page) { get('/', xhr: false) }
     let(:policy) { page['content-security-policy-report-only'].split(/;\s*/) }
 
-    it 'allows only the site, plus the import map by its hash' do
+    it 'allows only the site, Cloudflare Web Analytics, and the import map by its hash' do
       import_map = page.body[%r{<script type="importmap">(.*?)</script>}m, 1]
-      expect(policy).to include("script-src 'self' 'sha256-#{Digest::SHA256.base64digest(import_map)}'")
-      expect(policy).to include("default-src 'self'", "style-src 'self'", "img-src 'self' https: data:", "connect-src 'self'",
+      expect(policy).to include("script-src 'self' https://static.cloudflareinsights.com 'sha256-#{Digest::SHA256.base64digest(import_map)}'")
+      expect(policy).to include("default-src 'self'", "style-src 'self'", "img-src 'self' https: data:", "connect-src 'self' https://cloudflareinsights.com",
                                 "object-src 'none'", "base-uri 'self'", "form-action 'self'", "frame-ancestors 'self'",
                                 'report-uri /csp-reports')
     end
