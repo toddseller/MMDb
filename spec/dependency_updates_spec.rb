@@ -15,15 +15,33 @@ describe 'dependency updates' do
     expect(requirement).to be_satisfied_by(Gem::Version.new("#{major}.#{minor}.#{patch + 1}"))
   end
 
-  # The tests run outside Docker, so only building the image catches an update that breaks it.
-  it 'builds the image in the required check' do
-    steps = YAML.safe_load_file(APP_ROOT.join('.github', 'workflows', 'test.yml'))['jobs']['test']['steps']
-    expect(steps.map { |step| step['run'].to_s }).to include(start_with('docker build'))
-  end
+  describe 'the Tests workflow' do
+    let(:jobs) { YAML.safe_load_file(APP_ROOT.join('.github', 'workflows', 'test.yml'))['jobs'] }
+    let(:runs) { ->(job) { jobs[job]['steps'].map { |step| step['run'].to_s } } }
 
-  # The ci-test-gate spec runs tests on production's Postgres major version, now 18 on 192.168.40.5.
-  it 'tests against PostgreSQL 18' do
-    services = YAML.safe_load_file(APP_ROOT.join('.github', 'workflows', 'test.yml'))['jobs']['test']['services']
-    expect(services['postgres']['image']).to eq 'postgres:18'
+    # The tests run outside Docker, so only building the image catches an update that breaks it.
+    it 'builds the image in a job the required check waits for' do
+      expect(runs.('image')).to include(start_with('docker build'))
+    end
+
+    # The ci-test-gate spec runs tests on production's Postgres major version, now 18 on 192.168.40.5.
+    it 'tests against PostgreSQL 18' do
+      expect(%w[unit browser].map { |job| jobs[job]['services']['postgres']['image'] }).to all eq 'postgres:18'
+    end
+
+    # Browser tests share one seeded database, so they run in parallel only as separate jobs.
+    it 'splits the browser tests into shards that each run' do
+      shards = jobs['browser']['strategy']['matrix']['shard']
+      expect(shards).to eq (1..shards.size).to_a
+      expect(jobs['browser']['strategy']['fail-fast']).to be false
+      expect(runs.('browser')).to include("npx playwright test --shard=${{ matrix.shard }}/#{shards.size}")
+    end
+
+    # The ruleset and deploy.yml wait for "test", and GitHub counts a skipped required job as passed.
+    it 'passes the required check only when every job passed' do
+      expect(jobs['test']['needs']).to match_array %w[image unit browser]
+      expect(jobs['test']['if']).to eq 'always()'
+      expect(runs.('test').join).to include('needs.*.result', "'failure'", "'cancelled'", "'skipped'")
+    end
   end
 end
