@@ -1029,3 +1029,13 @@ a.index-user:hover,
         color: #ddd;
     }
 }
+
+.list-poster
+{
+    display: inline-block !important;
+}
+
+.preview-placeholder
+{
+    width: 174px;
+}

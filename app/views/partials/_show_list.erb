@@ -1,6 +1,6 @@
 <% @my_shows.each do |show| %>
   <div class="index-preview-show text-center" data-letter="<%= RailLetter.of(show.sort_name) %>" id="<%="#{user.id}"%>">
-    <a class="show-modal" id="<%="#{show.id}"%>"><img src='<%= show.thumbnail %>' loading='lazy' alt='<%="#{show.title}" %> Poster' width='213' height='213' style='display: inline-block !important;'></a>
+    <a class="show-modal" id="<%="#{show.id}"%>"><img src='<%= show.thumbnail %>' loading='lazy' alt='<%="#{show.title}" %> Poster' width='213' height='213' class='list-poster'></a>
     <p class="show-truncate"><%= show.title %></p>
     <p class="season">
       <% if show.seasons.size > 1 && show.seasons.size < 5 %>
