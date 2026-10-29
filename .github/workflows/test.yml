@@ -14,8 +14,16 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  # The master ruleset requires a check named "test"; renaming this job silently drops the requirement.
-  test:
+  image:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      # The tests run outside Docker, so this catches an image that wouldn't build before the deploy does.
+      - name: Build the image
+        run: docker build .
+
+  unit:
     # Follows GitHub's current image on purpose; if Ruby setup fails after GitHub moves it, setup-ruby has no build of the Ruby below for that image yet.
     runs-on: ubuntu-latest
 
@@ -42,10 +50,6 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
-      # The tests run outside Docker, so this catches an image that wouldn't build before the deploy does.
-      - name: Build the image
-        run: docker build .
-
       # The newest 3.4 patch; the Dockerfile decides which one production runs.
       - uses: ruby/setup-ruby@v1
         with:
@@ -66,8 +70,6 @@ jobs:
           name: coverage
           path: coverage/
 
-      # Browser tests: Playwright drives Chromium against the app, which runs on its own database (see e2e/).
-      # They stay in this job so the required "test" check covers them.
       - uses: actions/setup-node@v7
         with:
           node-version: '24'
@@ -75,21 +77,74 @@ jobs:
 
       - run: npm ci
 
-      # Type checks and unit tests are quick, so they run before the Chromium download the browser tests need.
       - run: npm run typecheck
 
       - run: npm test
+
+  # Browser tests: Playwright drives Chromium against the app, which runs on its own database (see e2e/).
+  # They share that seeded database, so they run in parallel only as separate jobs, each with its own.
+  browser:
+    runs-on: ubuntu-latest
+
+    strategy:
+      # One failing shard still lets the others report theirs.
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3, 4]
+
+    services:
+      postgres:
+        image: postgres:18
+        env:
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    env:
+      PGHOST: localhost
+      PGUSER: postgres
+      PGPASSWORD: postgres
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.4'
+          bundler-cache: true
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '24'
+          cache: npm
+
+      - run: npm ci
 
       - run: npx playwright install --with-deps chromium
 
       - run: createdb MMDb_e2e
 
-      - run: npx playwright test
+      - run: npx playwright test --shard=${{ matrix.shard }}/4
 
       - uses: actions/upload-artifact@v7
         if: failure()
         with:
-          name: playwright-report
+          name: playwright-report-${{ matrix.shard }}
           path: |
             playwright-report/
             test-results/
+
+  # The master ruleset requires a check named "test", and deploy.yml waits for it; renaming this job silently drops both.
+  test:
+    needs: [image, unit, browser]
+    # GitHub counts a skipped required job as passed, so this runs whatever the others did and checks them itself.
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Every job passed
+        run: test "${{ !contains(needs.*.result, 'failure') && !contains(needs.*.result, 'cancelled') && !contains(needs.*.result, 'skipped') }}" = true
