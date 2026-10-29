@@ -8,20 +8,20 @@
     <form class="login-form" action="<%="/users/#{user.id}"%>" method="post">
       <input type="hidden" name="_method" value="PUT">
       <div class="form-group col-sm-12">
-        <label for="user[first_name]">First Name:</label>
-        <input class="form-control" type="text" name="first_name" value="<%="#{user.first_name}"%>">
+        <label for="settings-first-name">First Name:</label>
+        <input id="settings-first-name" class="form-control" type="text" name="first_name" autocomplete="given-name" value="<%="#{user.first_name}"%>">
       </div>
       <div class="form-group col-sm-12">
-        <label for="user[last_name]">Last Name:</label>
-        <input class="form-control" type="text" name="last_name" value="<%="#{user.last_name}"%>">
+        <label for="settings-last-name">Last Name:</label>
+        <input id="settings-last-name" class="form-control" type="text" name="last_name" autocomplete="family-name" value="<%="#{user.last_name}"%>">
       </div>
       <div class="form-group col-sm-12">
-        <label for="user[user_name]">User name:</label>
-        <input class="form-control" type="text" name="user_name" value="<%="#{user.user_name}"%>">
+        <label for="settings-user-name">User name:</label>
+        <input id="settings-user-name" class="form-control" type="text" name="user_name" autocomplete="username" value="<%="#{user.user_name}"%>">
       </div>
       <div class="form-group col-sm-12">
-        <label for="user[email]">Email:</label>
-        <input class="form-control" type="email" name="email" value="<%="#{user.email}"%>">
+        <label for="settings-email">Email:</label>
+        <input id="settings-email" class="form-control" type="email" name="email" autocomplete="email" value="<%="#{user.email}"%>">
       </div>
       <div class="form-group col-sm-12">
         <label id="theme-label">Theme:</label>
@@ -32,18 +32,18 @@
         </div>
       </div>
       <div id="current" class="form-group col-sm-12">
-        <label for="current">Current Password:</label>
-        <input class="form-control" type="password" name="current" placeholder="Enter New Password to Update Password">
+        <label for="settings-current">Current Password:</label>
+        <input id="settings-current" class="form-control" type="password" name="current" autocomplete="current-password" placeholder="Only needed to change your password">
       </div>
       <div class="col-sm-12" id="no-match"></div>
       <div class="form-group col-sm-6 confirmation">
-        <label for="password">New Password:</label>
-        <input class="form-control" type="password" name="password" disabled="disabled" placeholder="New Password">
+        <label for="settings-password">New Password:</label>
+        <input id="settings-password" class="form-control" type="password" name="password" disabled="disabled" autocomplete="new-password" placeholder="At least 8 characters">
         <span class="glyphicon glyphicon-ok-sign"></span>
       </div>
       <div id="confirm" class="form-group col-sm-6 confirmation">
-        <label for="confirm">Confirm Password:</label>
-        <input class="form-control" type="password" name="confirm" disabled="disabled" placeholder="Confirm Password">
+        <label for="settings-confirm">Confirm Password:</label>
+        <input id="settings-confirm" class="form-control" type="password" name="confirm" disabled="disabled" autocomplete="new-password" placeholder="Confirm Password">
         <span class="glyphicon glyphicon-ok-sign"></span>
       </div>
       <div class="modal-footer col-sm-12">

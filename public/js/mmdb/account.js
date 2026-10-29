@@ -20,6 +20,17 @@ const show = (root, selector, visible, display = 'block') => root.querySelectorA
 /** @param {HTMLElement} field @param {string[]} look */
 const mark = (field, [border, boxShadow]) => Object.assign(field.style, { border, boxShadow })
 
+// Spread counts characters the way the server does; .length would count an emoji twice.
+/** @param {string} password @param {string} confirm */
+const passwordProblem = (password, confirm) =>
+  [...password].length < 8 ? 'Use at least 8 characters' : password === confirm ? '' : 'Passwords do not match'
+
+/** @param {HTMLElement} warning @param {string} problem */
+const warn = (warning, problem) => {
+  warning.textContent = problem
+  warning.style.display = problem ? 'block' : 'none'
+}
+
 /** @param {Document} document */
 const settings = (document) => /** @type {HTMLElement} */ (document.getElementById('logIn'))
 
@@ -42,13 +53,18 @@ const currentChanged = (document) => {
   const hasCurrent = input(dialog, 'current').value !== ''
   holdUpdate(document, hasCurrent)
   if (hasCurrent) dialog.querySelectorAll('.confirmation input').forEach((field) => field.removeAttribute('disabled'))
-  else mark(input(dialog, 'confirm'), NEUTRAL)
+  else {
+    mark(input(dialog, 'confirm'), NEUTRAL)
+    warn(/** @type {HTMLElement} */ (dialog.querySelector('#no-match')), '')
+  }
 }
 
 /** @param {Document} document */
 const confirmChanged = (document) => {
   const dialog = settings(document)
-  const matches = input(dialog, 'password').value === input(dialog, 'confirm').value && input(dialog, 'current').value !== ''
+  const problem = passwordProblem(input(dialog, 'password').value, input(dialog, 'confirm').value)
+  warn(/** @type {HTMLElement} */ (dialog.querySelector('#no-match')), problem)
+  const matches = !problem && input(dialog, 'current').value !== ''
   show(dialog, '.confirmation > span', matches, 'inline')
   holdUpdate(document, !matches)
   mark(input(dialog, 'confirm'), matches ? MATCH : MISMATCH)
@@ -81,12 +97,10 @@ const save = async (document, form, saved) => {
 /** @param {Document} document */
 const checkRegistration = (document) => {
   const form = /** @type {HTMLElement} */ (document.querySelector('.registration'))
-  const warning = /** @type {HTMLElement} */ (form.querySelector('#no-match2'))
-  const matches = input(form, 'user[password]').value === input(form, 'confirm').value
-  show(form, '.confirmation > span', matches, 'inline')
-  form.querySelector('input[type=submit]')?.toggleAttribute('disabled', !matches)
-  warning.style.display = matches ? 'none' : 'block'
-  if (!matches) warning.textContent = 'Passwords do not match'
+  const problem = passwordProblem(input(form, 'user[password]').value, input(form, 'confirm').value)
+  show(form, '.confirmation > span', !problem, 'inline')
+  form.querySelector('input[type=submit]')?.toggleAttribute('disabled', Boolean(problem))
+  warn(/** @type {HTMLElement} */ (form.querySelector('#no-match2')), problem)
 }
 
 /**

@@ -36,6 +36,7 @@ const SETTINGS = `
       <input type="radio" name="theme" value="dark">
       <input type="radio" name="theme" value="system">
       <div id="current"><input type="password" name="current"></div>
+      <div id="no-match"></div>
       <div class="confirmation"><input type="password" name="password" disabled="disabled"><span></span></div>
       <div id="confirm" class="confirmation"><input type="password" name="confirm" disabled="disabled"><span></span></div>
       <button id="update-submit" type="submit">Update</button>
@@ -224,12 +225,12 @@ test('a current password opens the new fields and holds Update until confirm mat
   assert.ok(!field('password').disabled)
   assert.ok(!field('confirm').disabled)
 
-  type('password', 'new')
-  type('confirm', 'ne')
+  type('password', 'new-password')
+  type('confirm', 'new-pass')
   assert.ok(el('#update-submit').hasAttribute('disabled'))
   assert.match(field('confirm').style.border, /rgb\(255, 0, 0\)/)
 
-  type('confirm', 'new')
+  type('confirm', 'new-password')
   assert.ok(!el('#update-submit').hasAttribute('disabled'))
   assert.match(field('confirm').style.border, /rgb\(8, 128, 0\)/)
   assert.ok(shown('#confirm > span'))
@@ -238,22 +239,62 @@ test('a current password opens the new fields and holds Update until confirm mat
 test('editing the new password after a match holds Update again', async () => {
   await openSettings()
   type('current', 'pw', 'change')
-  type('password', 'new')
-  type('confirm', 'new')
+  type('password', 'new-password')
+  type('confirm', 'new-password')
 
-  type('password', 'newer')
+  type('password', 'newer-password')
 
   assert.ok(el('#update-submit').hasAttribute('disabled'))
   assert.match(field('confirm').style.border, /rgb\(255, 0, 0\)/)
 })
 
-test('clearing the current password enables Update again', async () => {
+test('a new password under 8 characters holds Update and says so', async () => {
   await openSettings()
   type('current', 'pw', 'change')
+
+  type('password', 'seven77')
+  type('confirm', 'seven77')
+
+  assert.ok(el('#update-submit').hasAttribute('disabled'))
+  assert.equal(el('#no-match').textContent, 'Use at least 8 characters')
+  assert.ok(shown('#no-match'))
+  assert.ok(!shown('#confirm > span'))
+})
+
+test('a long enough mismatch says the passwords differ, and a match hides the message', async () => {
+  await openSettings()
+  type('current', 'pw', 'change')
+  type('password', 'new-password')
+
+  type('confirm', 'new-pass')
+  assert.equal(el('#no-match').textContent, 'Passwords do not match')
+  assert.ok(shown('#no-match'))
+
+  type('confirm', 'new-password')
+  assert.ok(!shown('#no-match'))
+})
+
+// The server counts characters, not UTF-16 units, so four emoji are four characters.
+test('four emoji are too short, as the server counts them', async () => {
+  await openSettings()
+  type('current', 'pw', 'change')
+
+  type('password', '😀😀😀😀')
+  type('confirm', '😀😀😀😀')
+
+  assert.ok(el('#update-submit').hasAttribute('disabled'))
+  assert.equal(el('#no-match').textContent, 'Use at least 8 characters')
+})
+
+test('clearing the current password enables Update again and drops the message', async () => {
+  await openSettings()
+  type('current', 'pw', 'change')
+  type('password', 'short')
 
   type('current', '', 'change')
 
   assert.ok(!el('#update-submit').hasAttribute('disabled'))
+  assert.ok(!shown('#no-match'))
 })
 
 test('saving puts the form, writes the new name as text and keeps the shown theme', async () => {
@@ -278,8 +319,8 @@ test('saving puts the form, writes the new name as text and keeps the shown them
 test('a refused password resets the password fields and enables Update', async () => {
   await openSettings()
   type('current', 'wrong', 'change')
-  type('password', 'new')
-  type('confirm', 'new')
+  type('password', 'new-password')
+  type('confirm', 'new-password')
   answer = () => json({ status: 'false' })
 
   submit('#logIn .login-form')
@@ -320,12 +361,12 @@ test('closing Account Settings without saving puts the saved theme back', async 
 test('registration checks the passwords once typing pauses', () => {
   mock.timers.enable({ apis: ['setTimeout'] })
   load(REGISTRATION)
-  type('user[password]', 'secret')
+  type('user[password]', 'secret-word')
   const register = el('input[type=submit]')
 
-  type('confirm', 'sec')
+  type('confirm', 'secret-w')
   mock.timers.tick(1000)
-  type('confirm', 'secre')
+  type('confirm', 'secret-wor')
   mock.timers.tick(1000)
   assert.equal(el('#no-match2').textContent, '', 'no check before a 1.5s pause')
 
@@ -333,7 +374,7 @@ test('registration checks the passwords once typing pauses', () => {
   assert.equal(el('#no-match2').textContent, 'Passwords do not match')
   assert.ok(register.disabled)
 
-  type('confirm', 'secret')
+  type('confirm', 'secret-word')
   mock.timers.tick(1500)
   assert.equal(el('#no-match2').style.display, 'none')
   assert.ok(!register.disabled)
@@ -343,13 +384,25 @@ test('registration checks the passwords once typing pauses', () => {
 test('registration checks again when the password changes after a match', () => {
   mock.timers.enable({ apis: ['setTimeout'] })
   load(REGISTRATION)
-  type('user[password]', 'secret')
-  type('confirm', 'secret')
+  type('user[password]', 'secret-word')
+  type('confirm', 'secret-word')
   mock.timers.tick(1500)
 
-  type('user[password]', 'secrets')
+  type('user[password]', 'secrets-word')
   mock.timers.tick(1500)
 
   assert.equal(el('#no-match2').textContent, 'Passwords do not match')
+  assert.ok(el('input[type=submit]').disabled)
+})
+
+test('registration says a password under 8 characters is too short', () => {
+  mock.timers.enable({ apis: ['setTimeout'] })
+  load(REGISTRATION)
+  type('user[password]', 'seven77')
+  type('confirm', 'seven77')
+
+  mock.timers.tick(1500)
+
+  assert.equal(el('#no-match2').textContent, 'Use at least 8 characters')
   assert.ok(el('input[type=submit]').disabled)
 })
