@@ -28,7 +28,8 @@ class JwtAuth
     decoded = JWT.decode token, ENV['JWT_SECRET'], true, options
     # A token from before the user's latest password change, or from before tokens recorded it, no longer counts.
     payload = decoded.first
-    raise JWT::DecodeError, 'Sign in again' unless User.find_by(id: payload['sub'])&.password_fingerprint == payload['pwd']
+    user = User.find_by(id: payload['sub'])
+    raise JWT::DecodeError, 'Sign in again' unless user && user.password_fingerprint == payload['pwd']
     decoded
   end
 

@@ -69,6 +69,13 @@ describe 'changing the password' do
         bare = JWT.encode({ sub: user.id, iat: now, iss: ENV['JWT_ISSUER'], exp: now + 3600 }, ENV['JWT_SECRET'], 'HS256')
         expect(counts(bare).status).to eq 401
       end
+
+      # A missing user and a missing claim are both nil, which must not count as a match.
+      it 'rejects a token without a password fingerprint for a user who does not exist' do
+        now = Time.now.to_i
+        bare = JWT.encode({ sub: 0, iat: now, iss: ENV['JWT_ISSUER'], exp: now + 3600 }, ENV['JWT_SECRET'], 'HS256')
+        expect(counts(bare).status).to eq 401
+      end
     end
   end
 end
