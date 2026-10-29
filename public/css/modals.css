@@ -324,6 +324,11 @@ fieldset[disabled] .btn-default.focus
     margin: 0 auto;
 }
 
+#meta-data.show-info
+{
+    max-width: 1386px;
+}
+
 #meta-data .close
 {
     opacity: 1;

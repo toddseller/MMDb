@@ -5,6 +5,7 @@ import { init as initCredits } from '#mmdb/credits.js'
 import { init as initDialog } from '#mmdb/dialog.js'
 import { init as initDrawer } from '#mmdb/drawer.js'
 import { init as initEdit } from '#mmdb/edit.js'
+import { init as initFallback } from '#mmdb/fallback.js'
 import { init as initFilters } from '#mmdb/filters.js'
 import { init as initLetterRail } from '#mmdb/letter-rail.js'
 import { init as initNavigation } from '#mmdb/navigation.js'
@@ -16,6 +17,7 @@ initAccount(document)
 initCredits(document)
 initDrawer(document)
 initEdit(document)
+initFallback(document)
 initFilters(document)
 initLetterRail(document)
 initNavigation(document)

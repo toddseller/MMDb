@@ -11,8 +11,12 @@ for (const width of [1500, 2560]) {
     test.use({ viewport: { width, height: 900 } })
 
     test("a drawer's details are 1170px wide, centered in the page", async ({ page }) => {
+      // Added to the served stylesheet, as an inline <style> would be a policy violation.
+      await page.route('**/css/app.css*', async (route) => {
+        const response = await route.fetch()
+        await route.fulfill({ response, body: `${await response.text()}\n::-webkit-scrollbar { width: 15px }` })
+      })
       await page.goto(`/users/${USER.id}`)
-      await page.addStyleTag({ content: '::-webkit-scrollbar { width: 15px }' })
       const pageWidth = await page.evaluate(() => document.documentElement.clientWidth)
       expect(pageWidth).toBe(width - 15)
 

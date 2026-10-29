@@ -21,7 +21,7 @@ const LAYOUT = {
 }
 
 // Static markup with no data in it.
-const PLACEHOLDER = '<div style="width: 174px"><img src="/imgs/loading_image.svg" width="174"></div>'
+const PLACEHOLDER = '<div class="preview-placeholder"><img src="/imgs/loading_image.svg" width="174"></div>'
 const CREATE_NEW_SHOW = '<button type="submit" id="create-new" class="add-all"><span class="glyphicon glyphicon-plus"></span><p>Create New Show</p></button>'
 
 /** @param {Document} document */

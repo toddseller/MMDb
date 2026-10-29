@@ -28,7 +28,14 @@ export const test = base.extend({
       if (url.host === app) return route.continue()
       return route.abort()
     })
+    // The policy is report-only, so nothing is blocked, but the browser still fires this for whatever an enforced one would block.
+    const violations = []
+    await page.exposeFunction('cspViolation', (violation) => violations.push(violation))
+    await page.addInitScript(() => document.addEventListener('securitypolicyviolation', (event) => {
+      window.cspViolation(`${event.effectiveDirective} blocked ${event.blockedURI || 'inline'} on ${location.pathname}`)
+    }))
     await use(page)
+    expect(violations, 'content security policy violations').toEqual([])
   },
 })
 
