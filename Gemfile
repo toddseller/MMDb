@@ -12,8 +12,8 @@ gem 'dotenv'
 # Use Puma for our web server
 gem 'puma'
 
-gem 'activesupport', '~> 7.2.0'
-gem 'activerecord', '~> 7.2.0'
+gem 'activesupport', '~> 8.1.4'
+gem 'activerecord', '~> 8.1.4'
 
 gem 'rake'
 gem 'bcrypt'
