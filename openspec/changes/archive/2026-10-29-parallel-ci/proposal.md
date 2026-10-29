@@ -6,7 +6,7 @@ The Tests workflow is one job whose steps run in sequence: about 30 s of setup, 
 
 ## What Changes
 
-- The workflow splits into parallel jobs: `image` (the Docker build), `unit` (lint, RSpec, typecheck, JS unit tests), and `browser`, which runs the Playwright suite in three shards, each on its own runner with its own Postgres and app server.
+- The workflow splits into parallel jobs: `image` (the Docker build), `unit` (lint, RSpec, typecheck, JS unit tests), and `browser`, which runs the Playwright suite in four shards, each on its own runner with its own Postgres and app server.
 - A final job named `test`, the name the master ruleset requires and the deploy workflow waits for, runs after the others, even when one fails, and passes only if every one of them passed.
 - Coverage and failing-browser-test reports are still uploaded, one report per shard.
 - Expected wall time is about 2.5 to 3 minutes, down from about 8; the extra runner minutes are free for this public repository.
