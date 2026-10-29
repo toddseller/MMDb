@@ -31,15 +31,19 @@ test.describe('signed out', () => {
     await expect(signInDialog(page)).toBeHidden()
   })
 
+  test('the sign-in fields tell a password manager they hold the account and its password', async ({ page }) => {
+    await expect(signInDialog(page).getByLabel('User Name or Email:')).toHaveAttribute('autocomplete', 'username')
+    await expect(signInDialog(page).getByLabel('Password:', { exact: true })).toHaveAttribute('autocomplete', 'current-password')
+  })
+
   test('the sign-in dialog focuses its first field', async ({ page }) => {
     await expect(signInDialog(page).getByPlaceholder('User Name or Email')).toBeFocused()
   })
 
   test('signing in through the modal opens the collection signed in', async ({ page }) => {
-    // The labels aren't tied to their inputs, so the fields are found by what they show.
-    await signInDialog(page).getByPlaceholder('User Name or Email').fill(USER.email)
-    await signInDialog(page).getByPlaceholder('Password').fill(USER.password)
-    await signInDialog(page).getByPlaceholder('Password').press('Enter')
+    await signInDialog(page).getByLabel('User Name or Email:').fill(USER.email)
+    await signInDialog(page).getByLabel('Password:', { exact: true }).fill(USER.password)
+    await signInDialog(page).getByLabel('Password:', { exact: true }).press('Enter')
 
     await expect(page.getByText('Signed in as')).toBeVisible()
     await expect(page).toHaveURL(new RegExp(`/users/${USER.id}$`))
@@ -155,6 +159,19 @@ test('the sign-up panel keeps white fields on a dark device', async ({ page }) =
   await expect(page.getByRole('button', { name: 'Register' })).toHaveCSS('background-color', 'rgb(255, 255, 255)')
 })
 
+test('registration names its fields and asks for a new password of at least 8 characters', async ({ page }) => {
+  await page.goto('/users/new')
+  const hints = { 'First Name:': 'given-name', 'Last Name:': 'family-name', 'User name:': 'username', 'Email:': 'email', 'Password:': 'new-password', 'Confirm Password:': 'new-password' }
+
+  // The layout's hidden sign-in dialog has its own "Password:" field.
+  const form = page.locator('.registration')
+
+  for (const [label, hint] of Object.entries(hints)) {
+    await expect(form.getByLabel(label, { exact: true })).toHaveAttribute('autocomplete', hint)
+  }
+  await expect(form.getByLabel('Password:', { exact: true })).toHaveAttribute('placeholder', 'At least 8 characters')
+})
+
 test.describe('signed in', () => {
   test.beforeEach(async ({ page }) => {
     await signIn(page)
@@ -168,6 +185,21 @@ test.describe('signed in', () => {
 
     await expect(page).toHaveURL(/\/$/)
     await expect(page.getByRole('button', { name: 'Sign in' })).toBeVisible()
+  })
+
+  test('Account Settings names its fields and says when the current password is needed', async ({ page }) => {
+    await openSettings(page)
+    const hints = { 'First Name:': 'given-name', 'Last Name:': 'family-name', 'User name:': 'username', 'Email:': 'email', 'Current Password:': 'current-password', 'New Password:': 'new-password', 'Confirm Password:': 'new-password' }
+
+    for (const [label, hint] of Object.entries(hints)) {
+      await expect(settings(page).getByLabel(label, { exact: true })).toHaveAttribute('autocomplete', hint)
+    }
+    await expect(settings(page).getByLabel('Current Password:')).toHaveAttribute('placeholder', 'Only needed to change your password')
+    await expect(settings(page).getByLabel('New Password:')).toHaveAttribute('placeholder', 'At least 8 characters')
+
+    await settings(page).getByText('Current Password:').click()
+
+    await expect(field(page, 'current')).toBeFocused()
   })
 
   test('picking Dark changes the page to the dark theme', async ({ page }) => {
@@ -259,12 +291,25 @@ test.describe('signed in', () => {
       await expect(update(page)).toBeEnabled()
     })
 
-    test('a new password under 8 characters is refused', async ({ page }) => {
+    test('a new password under 8 characters holds Update and says so', async ({ page }) => {
       await openSettings(page)
       await field(page, 'current').fill(USER.password)
       await field(page, 'current').press('Tab')
+
       await field(page, 'password').fill('seven77')
       await field(page, 'confirm').pressSequentially('seven77')
+
+      await expect(settings(page).getByText('Use at least 8 characters')).toBeVisible()
+      await expect(update(page)).toBeDisabled()
+    })
+
+    // The page counts characters, not bytes, so the server is what refuses this one.
+    test('a new password over 72 bytes is refused by the server', async ({ page }) => {
+      await openSettings(page)
+      await field(page, 'current').fill(USER.password)
+      await field(page, 'current').press('Tab')
+      await field(page, 'password').fill('x'.repeat(73))
+      await field(page, 'confirm').fill('x'.repeat(73))
 
       await update(page).click()
 
