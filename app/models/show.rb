@@ -13,8 +13,8 @@ class Show < ActiveRecord::Base
   before_save :create_search_name
   before_save :add_season_count
 
-  scope :sorted_list, -> { order(:sort_name, :year) }
-  scope :recently_added, -> {order(created_at: :desc)}
+  scope :sorted_list, -> { order(:sort_name, :year, :id) }
+  scope :recently_added, -> {order(created_at: :desc, id: :desc)}
 
   # Grid-sized poster: Apple artwork is sized in the URL; other hosts stay full size.
   def thumbnail

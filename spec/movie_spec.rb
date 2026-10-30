@@ -59,3 +59,39 @@ describe 'GET /movies/search' do
     expect(stub).to have_been_requested.once
   end
 end
+
+describe Movie, 'list order' do
+  let(:user) { create_user }
+
+  # An UPDATE writes a new row version at the end of the table, so without a tiebreaker Postgres returns the first movie last.
+  def tied_movies(**attributes)
+    first, second = 2.times.map { create_movie(user, title: 'Solaris').tap { |m| m.update_columns(year: '1972', **attributes) } }
+    first.update_columns(plot: 'moved')
+    [first, second]
+  end
+
+  it 'lists movies sharing a sort name and year oldest first' do
+    first, second = tied_movies
+
+    expect(user.movies.sorted_list.to_a).to eq [first, second]
+  end
+
+  it 'lists top movies with the same owner count oldest first' do
+    first, second = tied_movies(user_count: 3)
+
+    expect(Movie.where(id: [first, second]).top_movies.to_a).to eq [first, second]
+  end
+
+  it 'lists movies added at the same moment newest first' do
+    first, second = 2.times.map { create_movie(user) }
+    second.update_columns(created_at: first.created_at)
+
+    expect(Movie.where(id: [first, second]).recently_added.to_a).to eq [second, first]
+  end
+
+  it 'keeps remakes in year order in the basic list' do
+    %w[2002 1972].each { |year| create_movie(user, title: 'Solaris').update_columns(year: year) }
+
+    expect(Movie.basic_info(user).map { |movie| movie[:year] }).to eq %w[1972 2002]
+  end
+end
