@@ -15,14 +15,14 @@ class Movie < ActiveRecord::Base
   before_save :update_user_count
   before_update :adjust_url
 
-  scope :sorted_list, -> {order(:sort_name, :year)}
-  scope :recently_added, -> {order(created_at: :desc)}
+  scope :sorted_list, -> {order(:sort_name, :year, :id)}
+  scope :recently_added, -> {order(created_at: :desc, id: :desc)}
 
   # Grid-sized poster: Apple artwork is sized in the URL (often stored at 2000x3000); other hosts stay as stored.
   def thumbnail
     poster.to_s.sub(%r{(mzstatic\.com/.+)/\d+x\d+[a-z]*\.(jpg|png|webp)\z}, '\1/348x522bb.\2')
   end
-  scope :top_movies, -> {order(user_count: :desc)}
+  scope :top_movies, -> {order(user_count: :desc, id: :asc)}
 
   def self.get_titles(t)
     MovieSearch.titles(t, Movie.where("search_name LIKE ?", "%#{t}%").sorted_list.first(10))
@@ -67,9 +67,7 @@ class Movie < ActiveRecord::Base
   #   self.all.sort_by { |movie| [movie.users.count, movie[:sort_name]] }.reverse![0, 6]
   # end
   def self.basic_info(u)
-    movies_list = []
-    u.movies.sorted_list.each { |movie| movies_list << {id: movie.id, title: movie.title, sort_name: movie.sort_name, search_name: movie.search_name, poster: movie.poster, year: movie.year, isnew: movie.isnew} }
-    movies_list.sort_by {|k| k[:sort_name]}
+    u.movies.sorted_list.map { |movie| {id: movie.id, title: movie.title, sort_name: movie.sort_name, search_name: movie.search_name, poster: movie.poster, year: movie.year, isnew: movie.isnew} }
   end
 
   def self.ios_movies(user, page)

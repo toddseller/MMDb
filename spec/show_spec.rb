@@ -21,3 +21,22 @@ describe Show, '#thumbnail' do
     expect(thumbnail_for(nil)).to eq ''
   end
 end
+
+describe Show, 'list order' do
+  let(:user) { create_user }
+
+  it 'lists shows sharing a sort name and year oldest first' do
+    # An UPDATE writes a new row version at the end of the table, so without a tiebreaker Postgres returns the first show last.
+    first, second = 2.times.map { create_show(user, title: 'Ghosts', seasons: []).tap { |s| s.update_columns(year: '2021') } }
+    first.update_columns(genre: 'moved')
+
+    expect(user.shows.sorted_list.to_a).to eq [first, second]
+  end
+
+  it 'lists shows added at the same moment newest first' do
+    first, second = 2.times.map { create_show(user, seasons: []) }
+    second.update_columns(created_at: first.created_at)
+
+    expect(Show.where(id: [first, second]).recently_added.to_a).to eq [second, first]
+  end
+end
