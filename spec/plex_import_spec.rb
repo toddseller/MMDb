@@ -10,10 +10,12 @@ describe 'Plex imports' do
   def apple_episode(number, released) = { title: "Chapter #{number}", description: "Chapter #{number} of Lupin", episodeNumber: number, duration: 2700,
                                           releaseDate: released && released.to_time.to_i * 1000, images: { previewFrame: { url: "https://is1-ssl.mzstatic.com/ep#{number}/{w}x{h}.{f}" } } }
 
-  def stub_apple(released, skip: 0)
+  def stub_apple(released, skip: 0) = stub_window(skip, released.map.with_index(skip + 1) { |date, number| apple_episode(number, date) })
+
+  def stub_window(skip, episodes)
     stub_request(:get, episodes_url).to_return(json(apple_episodes('lupin', [[1, 5]])))
-    stub_request(:get, episodes_url).with(query: hash_including('skip' => skip.to_s, 'count' => released.size.to_s))
-      .to_return(json(data: { episodes: released.map.with_index(skip + 1) { |date, number| apple_episode(number, date) } }))
+    stub_request(:get, episodes_url).with(query: hash_including('skip' => skip.to_s, 'count' => episodes.size.to_s))
+      .to_return(json(data: { episodes: episodes }))
   end
 
   def stub_searches
@@ -60,6 +62,24 @@ describe 'Plex imports' do
     Show.plex_add(episode_event, user.id)
 
     expect(season.episodes.pluck(:tv_episode)).to eq [2]
+  end
+
+  it 'adds a reported episode whose title the source spells differently' do
+    season = store_lupin
+    stub_window(1, [apple_episode(2, today).merge(title: 'Chapter 2, Part 1')])
+
+    Show.plex_add(episode_event.merge('title' => 'Chapter 2 (1)'), user.id)
+
+    expect(season.episodes.pluck(:tv_episode, :title)).to eq [[2, 'Chapter 2, Part 1']]
+  end
+
+  it 'adds nothing when the source answers with another episode' do
+    season = store_lupin
+    stub_window(1, [apple_episode(3, today)])
+
+    Show.plex_add(episode_event, user.id)
+
+    expect(season.episodes).to be_empty
   end
 
   it 'refreshes a stored placeholder from a single reported episode' do
