@@ -150,7 +150,7 @@ class Show < ActiveRecord::Base
 
         if data['type'] == 'episode'
           episodes.each do |episode|
-            if episode[:title].downcase() == plex_title(data['title']) || title == 'matlock' && show[:show_collection_id] == 'umc.cmc.4qkh3w8zjpnf2pwol5809ktfu'
+            if episode[:tv_episode].to_i == episode_number.to_i
               new_episode = season.episodes.find_or_initialize_by(tv_episode: episode[:tv_episode])
               new_episode.assign_attributes(episode)
               save_show(user, s, show, season, new_episode)
@@ -227,10 +227,6 @@ class Show < ActiveRecord::Base
     Date.parse(date) <= Date.today
   rescue Date::Error
     false
-  end
-
-  def self.plex_title(t)
-    new_t = t.gsub(/\s\(.*\)/,'').downcase()
   end
 
   def self.get_tmdb_rating(s)
