@@ -150,7 +150,7 @@ GEM
       addressable (>= 2.8.0)
       crack (>= 0.3.2)
       hashdiff (>= 0.4.0, < 2.0.0)
-    will_paginate (3.3.1)
+    will_paginate (4.0.1)
 
 PLATFORMS
   aarch64-linux
@@ -184,7 +184,7 @@ DEPENDENCIES
   sinatra
   sinatra-contrib
   webmock
-  will_paginate (~> 3.3.0)
+  will_paginate (~> 4.0.1)
 
 RUBY VERSION
   ruby 3.4.12
