@@ -175,7 +175,7 @@ Account Settings SHALL offer three theme choices, Light, Dark and System, with t
 
 #### Scenario: Picking Dark
 - **WHEN** a user on the light theme picks Dark in Account Settings
-- **THEN** the page is dark and the page still has exactly one stylesheet
+- **THEN** the page is dark and has the same stylesheets it had before the pick
 
 #### Scenario: Picking System
 - **WHEN** a user on the dark theme, on a device set to light, picks System
