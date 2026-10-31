@@ -7,11 +7,11 @@ Lets a visitor sign in and register, and lets a signed-in user sign out and chan
 ## Requirements
 
 ### Requirement: Signing in from the sign-in dialog
-The Sign in button SHALL open the sign-in dialog with the user name or email field focused. The dialog SHALL offer a Remember me checkbox, unticked when the dialog opens. Submitting it with the button or Enter SHALL sign the user in without a page reload of the dialog and then load their movie collection.
+The Sign in button SHALL open the sign-in dialog with the user name or email field focused. The dialog SHALL offer a Remember me checkbox, unticked when the dialog opens. Submitting it with the button or Enter SHALL sign the user in without a page reload of the dialog and then load their movie collection at its handle's address.
 
 #### Scenario: Signing in
 - **WHEN** a visitor opens the sign-in dialog, enters a valid user name or email and password, and presses Enter
-- **THEN** the browser goes to `/users/<their id>` and the navbar reads "Signed in as <their name>"
+- **THEN** the browser goes to `/u/<their handle>` and the navbar reads "Signed in as <their name>"
 
 #### Scenario: The first field is focused
 - **WHEN** a visitor opens the sign-in dialog
