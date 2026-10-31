@@ -5,8 +5,11 @@ import { test, expect, USER, reseed, signIn } from './fixtures.js'
 const recorded = (name) => readFileSync(new URL(`./.generated/${name}.json`, import.meta.url), 'utf8')
 const json = (body) => ({ body, contentType: 'application/json' })
 const panel = (page) => page.locator('#preview')
-// The first result shows while the panel is still sliding open; a click before it finishes misses what the open panel covers.
-const opened = (page) => panel(page).evaluate((el) => Promise.all(el.getAnimations().map((animation) => animation.finished)))
+// The first result shows while the panel and the room under it are still sliding; a click before they finish misses what the open panel covers.
+const opened = (page) => page.evaluate(() => Promise.all(['preview', 'panel-room']
+  .flatMap((id) => document.getElementById(id)?.getAnimations() ?? []).map((animation) => animation.finished)))
+const poster = (page, title) => page.locator(`#movie-list img[alt="${title} Poster"]`)
+const top = async (locator) => (await locator.boundingBox()).y
 
 /** Opens the movie search and submits it, answered with the named recording (or a failure). */
 const searchMovies = async (page, answer) => {
@@ -99,6 +102,63 @@ test.describe('on the movies page', () => {
     await expect(page.getByText('Meadow is a seeded movie.')).toBeVisible()
     await expect(panel(page)).toBeHidden()
     await expect(page.getByRole('button', { name: 'Add Movie' })).toBeVisible()
+  })
+
+  test('with the results open, the first row is below the panel and opens its details', async ({ page }) => {
+    await searchMovies(page, json(recorded('movie_search')))
+    await expect(page.getByRole('button', { name: 'Nova Drift Poster' })).toBeVisible()
+    await opened(page)
+
+    const panelBox = await panel(page).boundingBox()
+    expect(await top(poster(page, 'Birch'))).toBeGreaterThanOrEqual(panelBox.y + panelBox.height)
+    await poster(page, 'Birch').click()
+
+    await expect(page.getByText('Birch is a seeded movie.')).toBeVisible()
+    await expect(panel(page)).toBeHidden()
+  })
+
+  test('scrolled down, opening and dismissing the panel leaves the posters where they are', async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: 'reduce' })
+    await poster(page, 'Saffron').evaluate((el) => el.scrollIntoView({ block: 'end' }))
+    const before = await top(poster(page, 'Saffron'))
+
+    await searchMovies(page, json(recorded('movie_search')))
+    await expect(page.getByRole('button', { name: 'Nova Drift Poster' })).toBeVisible()
+    expect(await top(poster(page, 'Saffron'))).toBe(before)
+
+    await page.locator('#dismiss').click()
+    await expect(panel(page)).toBeHidden()
+    expect(await top(poster(page, 'Saffron'))).toBe(before)
+  })
+
+  test('opened scrolled down, the panel leaves the first row in reach at the top of the page', async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: 'reduce' })
+    await poster(page, 'Saffron').evaluate((el) => el.scrollIntoView({ block: 'end' }))
+    await searchMovies(page, json(recorded('movie_search')))
+    await expect(page.getByRole('button', { name: 'Nova Drift Poster' })).toBeVisible()
+
+    await page.evaluate(() => window.scrollTo(0, 0))
+
+    const panelBox = await panel(page).boundingBox()
+    expect(await top(poster(page, 'Birch'))).toBeGreaterThanOrEqual(panelBox.y + panelBox.height)
+  })
+
+  test.describe('on a phone', () => {
+    test.use({ viewport: { width: 390, height: 844 } })
+
+    test('the panel pushes the posters down by its own height only', async ({ page }) => {
+      await page.emulateMedia({ reducedMotion: 'reduce' })
+      const band = page.locator('#search-boxes')
+      const [amber, height] = [await top(poster(page, 'Amber')), (await band.boundingBox()).height]
+
+      await searchMovies(page, json(recorded('movie_search')))
+      await expect(page.getByRole('button', { name: 'Nova Drift Poster' })).toBeVisible()
+
+      const grown = (await band.boundingBox()).height - height
+      expect(grown).toBeGreaterThan(0)
+      expect(await top(poster(page, 'Amber'))).toBe(amber + grown)
+      await expect(page.locator('#panel-room')).toBeHidden()
+    })
   })
 
   // The results update the movie they were searched for, so they mustn't outlive its drawer.

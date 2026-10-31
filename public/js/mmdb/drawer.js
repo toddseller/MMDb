@@ -216,8 +216,9 @@ export const keepOpen = (redraw, html, ms) => {
 const togglePoster = async (document, poster) => {
   const tile = /** @type {HTMLElement} */ (poster.parentElement)
   if (isOpen() && current === tile) return close()
-  // An edit search's results update the movie they were searched for, so they can't stay up under another movie.
-  closePanel(document)
+  // An edit search's results update the movie they were searched for, so they can't stay up under another movie. At once,
+  // so the page under the panel has settled before the drawer measures the poster.
+  closePanel(document, 0)
   const kind = document.getElementById('movie-list') ? 'movies' : 'shows'
   show(tile, await request(`/users/${tile.id}/${kind}/${poster.id}`))
 }
