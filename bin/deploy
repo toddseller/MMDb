@@ -43,6 +43,11 @@ main() {
     echo "Deploying $tag: ${old:0:7} -> ${new:0:7}"
   fi
 
+  # Every time, not only when db/migrate changed: master has already moved, so a retry after a failed migration has no diff
+  # to find it by. The running container sees the new code through its mount, and a plain migration needs no newer gems.
+  # An empty input: exec -T passes on the SSH session's, which never closes, and was seen to hang on the server.
+  docker compose exec -T web bundle exec rake db:migrate < /dev/null || refuse 'database migrations failed; the app was not restarted'
+
   # The code is mounted into the container, so a restart picks it up; gems and the image need a rebuild.
   if git diff --name-only "$old" "$new" | grep -qE '^(Gemfile|Gemfile\.lock|Dockerfile[^/]*|docker-compose[^/]*\.yml)$'; then
     echo 'Gems, Dockerfile or compose changed: rebuild'

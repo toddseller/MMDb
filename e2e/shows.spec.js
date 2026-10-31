@@ -27,7 +27,7 @@ test('adding an episode from a show search lists it under its season', async ({ 
 
   // Without the page's script the form would still post, but the browser would leave the shows page.
   await expect(page.getByText('Harbor Lights 1x2', { exact: true })).toHaveCount(0)
-  await expect(page).toHaveURL(new RegExp(`/users/${USER.id}/shows$`))
+  await expect(page).toHaveURL(new RegExp(`/u/${USER.handle}/shows$`))
   await expect(showPoster(page)).toBeVisible()
   await showPoster(page).click()
   await expect(page.getByText('Harbor Lights 1x2', { exact: true })).toBeVisible()

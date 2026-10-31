@@ -26,6 +26,7 @@ CREATE SCHEMA heroku_ext;
 
 SET default_tablespace = '';
 
+
 --
 -- Name: ar_internal_metadata; Type: TABLE; Schema: public; Owner: -
 --
@@ -270,6 +271,38 @@ CREATE TABLE public.shows_users (
 
 
 --
+-- Name: user_handles; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.user_handles (
+    id bigint NOT NULL,
+    handle character varying NOT NULL,
+    user_id integer NOT NULL,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: user_handles_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.user_handles_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: user_handles_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.user_handles_id_seq OWNED BY public.user_handles.id;
+
+
+--
 -- Name: users; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -283,7 +316,8 @@ CREATE TABLE public.users (
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     theme character varying DEFAULT 'default'::character varying,
-    avatar character varying DEFAULT ''::character varying
+    avatar character varying DEFAULT ''::character varying,
+    handle character varying NOT NULL
 );
 
 
@@ -342,6 +376,13 @@ ALTER TABLE ONLY public.shows ALTER COLUMN id SET DEFAULT nextval('public.shows_
 
 
 --
+-- Name: user_handles id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.user_handles ALTER COLUMN id SET DEFAULT nextval('public.user_handles_id_seq'::regclass);
+
+
+--
 -- Name: users id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -394,6 +435,14 @@ ALTER TABLE ONLY public.seasons
 
 ALTER TABLE ONLY public.shows
     ADD CONSTRAINT shows_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: user_handles user_handles_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.user_handles
+    ADD CONSTRAINT user_handles_pkey PRIMARY KEY (id);
 
 
 --
@@ -461,10 +510,39 @@ CREATE INDEX index_shows_users_on_user_id ON public.shows_users USING btree (use
 
 
 --
+-- Name: index_user_handles_on_handle; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_user_handles_on_handle ON public.user_handles USING btree (handle);
+
+
+--
+-- Name: index_user_handles_on_user_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_user_handles_on_user_id ON public.user_handles USING btree (user_id);
+
+
+--
+-- Name: index_users_on_handle; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_users_on_handle ON public.users USING btree (handle);
+
+
+--
 -- Name: unique_schema_migrations; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX unique_schema_migrations ON public.schema_migrations USING btree (version);
+
+
+--
+-- Name: user_handles fk_rails_3bca97b0d4; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.user_handles
+    ADD CONSTRAINT fk_rails_3bca97b0d4 FOREIGN KEY (user_id) REFERENCES public.users(id) ON DELETE CASCADE;
 
 
 --

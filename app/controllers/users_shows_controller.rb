@@ -1,15 +1,27 @@
-get '/users/:user_id/shows' do
-  @user = User.find(params[:user_id])
-  @my_shows = @user.shows.sorted_list.includes(:seasons)
-  @movies = @user.movies
-  @show_count = @user.shows.count.to_s.reverse.gsub(/(\d{3})(?=\d)/, '\1,').reverse
-  @episode_count = Episode.episode_count(@user.id)
-  if request.xhr?
-    page = erb :'/shows/show', layout: false
-    json status: "true", page: page, show_count: @show_count, episode_count: @episode_count
-  else
-    erb :'/shows/show'
+helpers do
+  def shows_page(user)
+    @user = user
+    @my_shows = @user.shows.sorted_list.includes(:seasons)
+    @movies = @user.movies
+    @show_count = @user.shows.count.to_s.reverse.gsub(/(\d{3})(?=\d)/, '\1,').reverse
+    @episode_count = Episode.episode_count(@user.id)
+    if request.xhr?
+      page = erb :'/shows/show', layout: false
+      json status: "true", page: page, show_count: @show_count, episode_count: @episode_count
+    else
+      erb :'/shows/show'
+    end
   end
+end
+
+get '/u/:handle/shows' do
+  shows_page(collection_owner(params[:handle], '/shows'))
+end
+
+get '/users/:user_id/shows' do
+  user = User.find(params[:user_id])
+  redirect_page_to_handle(user, '/shows')
+  shows_page(user)
 end
 
 get '/users/:user_id/shows/new' do

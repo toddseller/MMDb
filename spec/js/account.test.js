@@ -118,7 +118,7 @@ afterEach(() => {
 })
 
 test('signing in posts the filled fields and goes to the collection', async () => {
-  answer = () => json({ status: 'true', user_id: 1 })
+  answer = () => json({ status: 'true', handle: 'todd-seller' })
   type('username_email', 'e2e')
   type('password', 'pw')
 
@@ -129,7 +129,7 @@ test('signing in posts the filled fields and goes to the collection', async () =
   assert.equal(fetched.calls[0].url, '/sessions')
   assert.equal(fetched.calls[0].init.method, 'POST')
   assert.equal(body(0).toString(), 'username_email=e2e&password=pw')
-  assert.deepEqual(replaced, ['/users/1'])
+  assert.deepEqual(replaced, ['/u/todd-seller'])
 })
 
 test('an empty sign-in shows the error without a request', async () => {
@@ -141,7 +141,7 @@ test('an empty sign-in shows the error without a request', async () => {
 })
 
 test('signing in with Remember me sends it', async () => {
-  answer = () => json({ status: 'true', user_id: 1 })
+  answer = () => json({ status: 'true', handle: 'todd-seller' })
   type('username_email', 'e2e')
   type('password', 'pw')
   field('remember').checked = true

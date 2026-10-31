@@ -37,7 +37,7 @@ test('clicking an actor lists their movies under their profile', async ({ page }
   await expect(page.locator('#profile-wrapper')).toHaveClass(/active/)
   await expect(titles(page)).toHaveText(['Amber'])
   await expect(page.locator('#search-movie-title')).toHaveValue('')
-  await expect(page).toHaveURL(new RegExp(`/users/${USER.id}$`))
+  await expect(page).toHaveURL(new RegExp(`/u/${USER.handle}$`))
   expect(searches).toEqual(['Cy Dunn'])
 })
 

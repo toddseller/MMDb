@@ -27,7 +27,7 @@ test.describe('the Movies/TV Shows switch', () => {
 
   test('the menu switches from movies to TV shows', async ({ page }) => {
     await page.goto(`/users/${USER.id}`)
-    const count = requestsTo(page, `/users/${USER.id}/shows`)
+    const count = requestsTo(page, `/u/${USER.handle}/shows`)
     await openSubmenu(page)
 
     await menuLink(page, 'TV Shows').click()
@@ -41,7 +41,7 @@ test.describe('the Movies/TV Shows switch', () => {
 
   test('the menu switches from TV shows to movies', async ({ page }) => {
     await page.goto(`/users/${USER.id}/shows`)
-    const count = requestsTo(page, `/users/${USER.id}`)
+    const count = requestsTo(page, `/u/${USER.handle}`)
     await openSubmenu(page)
 
     await menuLink(page, 'Movies').click()
@@ -55,7 +55,7 @@ test.describe('the Movies/TV Shows switch', () => {
 
   test("another user's TV Shows button switches to their shows", async ({ page }) => {
     await page.goto(`/users/${OTHER.id}`)
-    const count = requestsTo(page, `/users/${OTHER.id}/shows`)
+    const count = requestsTo(page, `/u/${OTHER.handle}/shows`)
 
     await pageButton(page, 'TV Shows').click()
 
@@ -66,7 +66,7 @@ test.describe('the Movies/TV Shows switch', () => {
 
   test("another user's Movies button switches to their movies", async ({ page }) => {
     await page.goto(`/users/${OTHER.id}/shows`)
-    const count = requestsTo(page, `/users/${OTHER.id}`)
+    const count = requestsTo(page, `/u/${OTHER.handle}`)
 
     await pageButton(page, 'Movies').click()
 
@@ -79,7 +79,7 @@ test.describe('the Movies/TV Shows switch', () => {
     await page.goto(`/users/${OTHER.id}`)
     await pageButton(page, 'TV Shows').click()
     await expect(page.locator('#show-list')).toBeVisible()
-    const count = requestsTo(page, `/users/${OTHER.id}`)
+    const count = requestsTo(page, `/u/${OTHER.handle}`)
 
     await pageButton(page, 'Movies').click()
 

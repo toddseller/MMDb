@@ -42,7 +42,7 @@ const signIn = async (document, form, go) => {
   const filled = new URLSearchParams([...fields(form)].filter(([, value]) => value !== ''))
   if (!filled.has('username_email') && !filled.has('password')) return show(settings(document), '.login-errors', true)
   const response = await request('/sessions', { method: 'POST', body: filled })
-  if (response.status === 'true') return go(`/users/${response.user_id}`)
+  if (response.status === 'true') return go(`/u/${response.handle}`)
   show(settings(document), '.login-errors', true)
   form.reset()
 }

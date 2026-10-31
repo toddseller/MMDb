@@ -2,8 +2,8 @@ import { test as base, expect } from '@playwright/test'
 import { execFileSync } from 'node:child_process'
 
 // The seed empties every table and restarts their ids, so its user is always 1.
-export const USER = { id: 1, email: 'e2e@example.test', password: 'e2e-password' }
-export const OTHER = { id: 2 }
+export const USER = { id: 1, handle: 'e2e', email: 'e2e@example.test', password: 'e2e-password' }
+export const OTHER = { id: 2, handle: 'other' }
 // A collection many screens long, for the letter rail.
 export const LONG = { id: 3 }
 

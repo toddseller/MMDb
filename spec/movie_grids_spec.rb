@@ -19,7 +19,7 @@ describe 'movie grids' do
 
   it 'loads the movies page posters lazily at tile size' do
     apple_movie
-    expect_lazy_thumbnails(posters(get("/users/#{user.id}", xhr: false).body))
+    expect_lazy_thumbnails(posters(get("/u/#{user.handle}", xhr: false).body))
   end
 
   it 'loads the movies grid re-rendered by the movies link lazily at tile size' do

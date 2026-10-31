@@ -4,8 +4,8 @@ describe 'the letter rail' do
   def rail_links(html) = Nokogiri::HTML(html).css('nav[aria-label="Jump to letter"] a')
 
   {
-    "a user's movies" => ->(id) { "/users/#{id}" },
-    "a user's shows" => ->(id) { "/users/#{id}/shows" },
+    "a user's movies" => ->(id) { "/u/#{User.find(id).handle}" },
+    "a user's shows" => ->(id) { "/u/#{User.find(id).handle}/shows" },
     "a movie collection's own page" => ->(id) { "/users/#{id}/movies" }
   }.each do |name, path|
     it "is on #{name}, # then A to Z" do
@@ -38,7 +38,7 @@ describe 'letter rail letters on grid tiles' do
     let(:expected) { { 'The Matrix' => 'm', '12 Angry Men' => '#' } }
 
     it 'are lettered on the movies page' do
-      expect(letters(get("/users/#{user.id}", xhr: false).body, '.index-preview')).to eq expected
+      expect(letters(get("/u/#{user.handle}", xhr: false).body, '.index-preview')).to eq expected
     end
 
     it "are lettered on a movie collection's own page" do
