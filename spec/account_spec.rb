@@ -93,10 +93,16 @@ describe 'the page theme' do
     expect(page("/users/#{user.id}").at_css('html')['data-theme']).to eq 'system'
   end
 
-  it 'comes with one stylesheet, the same for every theme' do
-    links = page.css('link[rel="stylesheet"]')
+  it 'comes with the same stylesheets for every theme, all its own' do
+    user = create_user
+    log_in(user, 'secret-password')
+    stylesheets = %w[default dark].map do |theme|
+      user.update_columns(theme: theme)
+      page("/users/#{user.id}").css('link[rel="stylesheet"]').map { |link| link['href'] }
+    end
 
-    expect(links.map { |link| link['href'] }).to contain_exactly(match(%r{\A/css/app\.css\?v=\w+\z}))
+    expect(stylesheets.first).to all(match(%r{\A/css/[\w.-]+\.css\?v=\d+\z}))
+    expect(stylesheets.last).to eq stylesheets.first
     expect(page.at_css('link#theme')).to be_nil
   end
 end

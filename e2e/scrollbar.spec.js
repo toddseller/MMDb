@@ -12,7 +12,7 @@ for (const width of [1500, 2560]) {
 
     test("a drawer's details are 1170px wide, centered in the page", async ({ page }) => {
       // Added to the served stylesheet, as an inline <style> would be a policy violation.
-      await page.route('**/css/app.css*', async (route) => {
+      await page.route('**/css/responsive.css*', async (route) => {
         const response = await route.fetch()
         await route.fulfill({ response, body: `${await response.text()}\n::-webkit-scrollbar { width: 15px }` })
       })

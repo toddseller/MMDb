@@ -5,7 +5,7 @@ const signInDialog = (page) => page.getByRole('dialog').filter({ hasText: 'Sign 
 const settings = (page) => page.locator('#logIn')
 const field = (page, name) => settings(page).locator(`input[name="${name}"]`)
 const update = (page) => settings(page).getByRole('button', { name: 'Update' })
-const stylesheets = (page) => page.locator('link[rel="stylesheet"]')
+const stylesheets = (page) => page.locator('link[rel="stylesheet"]').evaluateAll((links) => links.map((link) => link.href))
 const LIGHT = 'rgb(234, 234, 234)'
 const DARK = 'rgb(43, 43, 43)'
 
@@ -204,12 +204,13 @@ test.describe('signed in', () => {
 
   test('picking Dark changes the page to the dark theme', async ({ page }) => {
     await expect(background(page)).toHaveCSS('background-color', LIGHT)
+    const before = await stylesheets(page)
     await openSettings(page)
 
     await pickTheme(page, 'Dark')
 
     await expect(background(page)).toHaveCSS('background-color', DARK)
-    await expect(stylesheets(page)).toHaveCount(1)
+    expect(await stylesheets(page)).toEqual(before)
   })
 
   test('picking System follows the device', async ({ page }) => {
@@ -248,6 +249,7 @@ test.describe('signed in', () => {
   })
 
   test('closing Account Settings puts the saved theme back', async ({ page }) => {
+    const before = await stylesheets(page)
     await openSettings(page)
     await pickTheme(page, 'Dark')
     await expect(background(page)).toHaveCSS('background-color', DARK)
@@ -255,7 +257,7 @@ test.describe('signed in', () => {
     await settings(page).getByRole('button', { name: 'Close' }).click()
 
     await expect(background(page)).toHaveCSS('background-color', LIGHT)
-    await expect(stylesheets(page)).toHaveCount(1)
+    expect(await stylesheets(page)).toEqual(before)
   })
 
   test.describe('saving', () => {

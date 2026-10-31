@@ -1,7 +1,6 @@
 # Two full copies of each theme stylesheet drifted apart, so a fix reached one theme only. These keep one copy.
 describe 'themes' do
   def css(path) = File.read(APP_ROOT.join('public', 'css', path))
-  def imports(entry) = css(entry).scan(/@import url\('([^']+)'\);/).flatten
 
   it 'keeps no per-theme copies' do
     expect(APP_ROOT.join('public', 'css', 'themes')).not_to exist
@@ -23,11 +22,11 @@ describe 'themes' do
     expect(palette).to include('[data-theme="default"] { color-scheme: light; }', '[data-theme="dark"] { color-scheme: dark; }', '[data-theme="system"] { color-scheme: light dark; }')
   end
 
-  it 'serves every theme from one stylesheet of versioned imports' do
+  it 'serves every theme from the same versioned stylesheets' do
     expect(APP_ROOT.join('public', 'css', 'default.css')).not_to exist
     expect(APP_ROOT.join('public', 'css', 'dark.css')).not_to exist
-    expect(imports('app.css')).to include(match(/\Apalette\.css\?v=\d+\z/), match(/\Alayout\.css\?v=\d+\z/), match(/\Amodals\.css\?v=\d+\z/), match(/\Amovies\.css\?v=\d+\z/))
-    expect(css('app.css').gsub(/@import[^;]+;/, '').strip).to be_empty
+    links = Nokogiri::HTML(get('/', xhr: false).body).css('link[rel="stylesheet"]').map { |link| link['href'] }
+    expect(links).to include(*%w[palette layout modals movies].map { |name| match(%r{\A/css/#{name}\.css\?v=\d+\z}) })
   end
 
   # The e2e suite checks the other dialog colours on screen; the show editor's disabled arrows have no test there.

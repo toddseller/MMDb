@@ -6,11 +6,32 @@ describe 'page assets' do
 
   def version_of(file, urls = asset_urls) = urls.find { |url| url.start_with?(file) }[/\?v=(\w+)\z/, 1]
 
-  it 'gives every script and the stylesheet a version' do
+  STYLESHEETS = %w[normalize bootstrap.min palette layout typography navigation modals movies drawer dialog responsive].freeze
+
+  it 'gives every script and stylesheet a version' do
     urls = asset_urls
 
-    expect(urls.size).to eq 2
-    expect(urls).to all(match(%r{\A/(js|css)/[\w.-]+\?v=\w+\z}))
+    expect(urls.size).to eq 1 + STYLESHEETS.size
+    expect(urls).to all(match(%r{\A/(js|css)/[\w.-]+\?v=\d+\z}))
+  end
+
+  it 'links every stylesheet in cascade order' do
+    stylesheets = asset_urls.grep(%r{\A/css/}).map { |url| url[%r{\A/css/(.+)\.css\?}, 1] }
+
+    expect(stylesheets).to eq STYLESHEETS
+  end
+
+  it 'changes only the changed stylesheet\'s version' do
+    path = APP_ROOT.join('public', 'css', 'movies.css')
+    original = File.mtime(path)
+    before = asset_urls
+    File.utime(original, original + 60, path)
+
+    after = asset_urls
+    expect(after.grep(%r{\A/css/movies\.css})).not_to eq before.grep(%r{\A/css/movies\.css})
+    expect(after.grep_v(%r{\A/css/movies\.css})).to eq before.grep_v(%r{\A/css/movies\.css})
+  ensure
+    File.utime(original, original, path)
   end
 
   it 'keeps the version while the file is unchanged' do
@@ -28,8 +49,9 @@ describe 'page assets' do
     File.utime(original, original, path)
   end
 
-  it 'imports modals.css with a version' do
-    expect(File.read(APP_ROOT.join('public', 'css', 'app.css'))).to match(%r{@import url\('modals\.css\?v=\d+'\);})
+  # An imported stylesheet can't get a version from its file, so it would be served stale after a deploy.
+  it 'imports no stylesheet' do
+    expect(Dir[APP_ROOT.join('public', 'css', '*.css')].select { |path| File.read(path).include?('@import') }).to be_empty
   end
 
   it 'serves a versioned import as the same file' do

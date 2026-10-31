@@ -4,7 +4,10 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link rel="prefetch" href="/imgs/animated.svg">
-  <link rel='stylesheet' href='<%= asset_path('/css/app.css') %>'>
+  <%# Linked one by one, not @imported, so each gets a version from its own file. In cascade order. %>
+  <% %w[normalize bootstrap.min palette layout typography navigation modals movies drawer dialog responsive].each do |name| %>
+  <link rel='stylesheet' href='<%= asset_path("/css/#{name}.css") %>'>
+  <% end %>
 
   <script type="importmap"><%== import_map %></script>
   <script type="module" src="<%= asset_path('/js/main.js') %>"></script>
