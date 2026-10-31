@@ -401,6 +401,12 @@
     justify-content: space-between;
 }
 
+/* Room in the page for the open panel, so the pinned band's panel never covers the first row; preview.js sizes and shows it. */
+#panel-room
+{
+    display: none;
+}
+
 #preview > :last-child
 {
     margin-right: 0;

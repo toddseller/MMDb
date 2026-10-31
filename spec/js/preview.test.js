@@ -11,6 +11,7 @@ const collection = (kind) => {
   const movies = kind === 'movies'
   return `
   <div id="user-page">
+    <div id="search-boxes">
     <input id="search-movie-title" value="amb">
     <button id="${movies ? 'add' : 'add-show'}">Add</button>
     <div id="search" style="display: none">
@@ -22,6 +23,8 @@ const collection = (kind) => {
       <div id="scroll-left" style="display: none"><span class="glyphicon"></span></div>
       <div id="scroll-right" style="display: none"><span class="glyphicon"></span></div>
     </div>
+    </div>
+    <div id="panel-room" style="display: none"></div>
     <div id="${movies ? 'movie-list' : 'show-list'}"><div class="index-preview"><p>Amber</p></div></div>
     <footer><div class="footer">30 Movies</div></footer>
   </div>`
@@ -372,4 +375,91 @@ test('an earlier search that answers late does not replace a later one', async (
   assert.equal(el('#preview input[alt="Stale Poster"]'), null)
   await answerNext(json({ query: [{}], page: movieResult('Fresh') }))
   assert.ok(el('#preview input[alt="Fresh Poster"]'))
+})
+
+// The desktop band: pinned, and 350px taller while the panel shows, with the list pushed down by the room while it shows. jsdom has no
+// layout or scrolling, so all of it is given here.
+/** @param {{ scrollY?: number, position?: string }} [options] */
+const band = ({ scrollY = 0, position = 'fixed' } = {}) => {
+  const box = el('#search-boxes')
+  box.style.position = position
+  Object.defineProperty(box, 'offsetHeight', { get: () => 150 + (el('#preview').style.display === 'flex' ? 350 : 0), configurable: true })
+  page.window.matchMedia = /** @type {any} */ (() => ({ matches: false }))
+  Object.defineProperty(page.window, 'scrollY', { value: scrollY, writable: true, configurable: true })
+  el('#movie-list').getBoundingClientRect = /** @type {any} */ (() => ({ top: el('#panel-room').style.display === 'block' ? 850 : 500 }))
+  /** @type {number[]} */
+  const scrolls = []
+  page.window.scrollBy = /** @type {any} */ ((/** @type {number} */ _x, /** @type {number} */ y) => { scrolls.push(y) })
+  return { scrolls, slides: stubAnimate(el('#panel-room')) }
+}
+const room = () => el('#panel-room')
+
+test('at the top of the page, the room slides open with the panel and nothing scrolls', async () => {
+  const { scrolls, slides } = band()
+
+  submit('#movie-search')
+  await answerNext(json({ query: [{}], page: movieResult() }))
+
+  assert.equal(room().style.display, 'block')
+  assert.equal(room().style.height, '350px')
+  assert.equal(slides.length, 1)
+  assert.deepEqual(scrolls, [])
+})
+
+test('scrolled down, the room opens at once and the page scrolls with it, so the posters stay put', async () => {
+  const { scrolls, slides } = band({ scrollY: 800 })
+
+  submit('#movie-search')
+  await answerNext(json({ query: [{}], page: movieResult() }))
+
+  assert.equal(room().style.display, 'block')
+  assert.equal(room().style.height, '350px')
+  assert.equal(slides.length, 0)
+  assert.deepEqual(scrolls, [350])
+})
+
+test('dismissing scrolled down closes the room at once and scrolls back by the same amount', () => {
+  const { scrolls, slides } = band({ scrollY: 800 })
+  submit('#movie-search')
+  page.window.scrollY = 1150
+  scrolls.length = 0
+
+  click('#dismiss')
+
+  assert.equal(room().style.display, 'none')
+  assert.equal(slides.length, 0)
+  assert.deepEqual(scrolls, [-350])
+})
+
+test('dismissing at the top slides the room shut with the panel', () => {
+  const { scrolls, slides } = band()
+  submit('#movie-search')
+
+  click('#dismiss')
+
+  assert.equal(slides.length, 2)
+  slides[1].finish()
+  assert.equal(room().style.display, 'none')
+  assert.deepEqual(scrolls, [])
+})
+
+test('scrolled down where the browser already held the posters still, the page is not scrolled again', async () => {
+  const { scrolls } = band({ scrollY: 800 })
+  el('#movie-list').getBoundingClientRect = /** @type {any} */ (() => ({ top: 500 }))
+
+  submit('#movie-search')
+  await answerNext(json({ query: [{}], page: movieResult() }))
+
+  assert.equal(room().style.display, 'block')
+  assert.deepEqual(scrolls, [0])
+})
+
+test('a band that scrolls with the page, as on a phone, gets no room and never scrolls the page', () => {
+  const { scrolls } = band({ scrollY: 800, position: 'static' })
+
+  submit('#movie-search')
+  click('#dismiss')
+
+  assert.equal(room().style.display, 'none')
+  assert.deepEqual(scrolls, [])
 })

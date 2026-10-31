@@ -8,7 +8,7 @@ const still = (el) => !el.animate || Boolean(el.ownerDocument.defaultView?.match
 
 // A newer fade or slide wins: a cancelled animation never runs its onfinish, so an earlier hide can't land after a show.
 /** @param {HTMLElement} el */
-const stop = (el) => el.getAnimations?.().forEach((animation) => animation.cancel())
+export const stop = (el) => el.getAnimations?.().forEach((animation) => animation.cancel())
 
 /** @param {number} px */
 const clipped = (px) => ({ height: `${px}px`, overflow: 'hidden' })

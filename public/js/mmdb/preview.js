@@ -1,7 +1,7 @@
 // @ts-check
 import { on, onSubmit } from '#mmdb/events.js'
 import { request, fields } from '#mmdb/request.js'
-import { fadeIn, slideDown, slideUp } from '#mmdb/motion.js'
+import { fadeIn, slideDown, slideUp, stop } from '#mmdb/motion.js'
 import { isOpen, openTile, keepOpen, close as closeDrawer } from '#mmdb/drawer.js'
 import { hideArrows as hideScrollArrows, updateArrows as updateScrollArrows, scrollPage } from '#mmdb/scroll-arrows.js'
 
@@ -32,7 +32,9 @@ const parts = (document) => {
   const movies = document.getElementById('movie-list') !== null
   return {
     movies,
+    band: find('#search-boxes'),
     panel: find('#preview'),
+    room: find('#panel-room'),
     dismiss: find('#dismiss'),
     left: find('#scroll-left'),
     right: find('#scroll-right'),
@@ -65,13 +67,45 @@ const applyLayout = (document, layout) => {
   }
 }
 
+// Scrolls by however far the page below the room moved: nothing where the browser's scroll anchoring already held it, the room's
+// height where it has none (Safari).
+/** @param {HTMLElement} room @param {string} display */
+const setRoomKeepingPlace = (room, display) => {
+  const below = /** @type {HTMLElement} */ (room.nextElementSibling)
+  const before = below.getBoundingClientRect().top
+  stop(room)
+  room.style.display = display
+  room.ownerDocument.defaultView?.scrollBy(0, below.getBoundingClientRect().top - before)
+}
+
+// At the top of the page the room slides with the panel; scrolled down, or closing at once, the posters on screen stay put.
+/** @param {Document} document @param {number} height */
+const openRoom = (document, height) => {
+  const { room } = parts(document)
+  room.style.height = `${height}px`
+  if (document.defaultView?.scrollY === 0) slideDown(room, 'block', OPEN_MS)
+  else setRoomKeepingPlace(room, 'block')
+}
+
+/** @param {Document} document @param {number} ms */
+const closeRoom = (document, ms) => {
+  const { room } = parts(document)
+  // Pages without a search band have no room.
+  if (!room || !isShown(room)) return
+  if (document.defaultView?.scrollY === 0 && ms > 0) slideUp(room, ms)
+  else setRoomKeepingPlace(room, 'none')
+}
+
 /** @param {Document} document @param {string} display @param {(panel: HTMLElement) => void} fill */
 const showPanel = (document, display, fill) => {
-  const { panel, dismiss } = parts(document)
+  const { band, panel, dismiss } = parts(document)
   const opening = !isShown(panel)
+  const before = band.offsetHeight
   fill(panel)
+  panel.style.display = display
+  // A band in the page flow, as on a phone, already pushes the posters down; only the pinned one covers them.
+  if (opening && document.defaultView?.getComputedStyle(band).position === 'fixed') openRoom(document, band.offsetHeight - before)
   if (opening) slideDown(panel, display, OPEN_MS)
-  else panel.style.display = display
   dismiss.style.display = 'block'
 }
 
@@ -127,6 +161,7 @@ export const close = (document, ms = OPEN_MS) => {
   latestSearch++
   const { panel, dismiss, search, add } = parts(document)
   if (isShown(panel)) slideUp(panel, ms)
+  closeRoom(document, ms)
   hideArrows(document)
   for (const el of [dismiss, search]) hide(el)
   // A visitor's page has no add button.

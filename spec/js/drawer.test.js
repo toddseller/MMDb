@@ -1,7 +1,7 @@
 // @ts-check
 import { test, beforeEach, afterEach, mock } from 'node:test'
 import assert from 'node:assert/strict'
-import { makePage, stubFetch, json } from './dom.js'
+import { makePage, stubFetch, json, stubAnimate } from './dom.js'
 import { init, rowEnd, show, open, close, isOpen, openTile, keepOpen, reveal } from '#mmdb/drawer.js'
 
 // Two rows of three movie tiles, as _movie_list.erb renders them; layout is stubbed since jsdom has none.
@@ -164,6 +164,22 @@ test('a movie poster click requests its details and opens them', async () => {
 
   assert.equal(fetched.calls[0].url, '/users/7/movies/5Birch')
   assert.equal(drawers()[0].querySelector('.info-wrapper')?.innerHTML, '<p>Birch details</p>')
+})
+
+// A drawer measures its poster once the details arrive; a page still sliding up under the closing panel would mislead it.
+test('a poster click with the search panel open removes its room at once, before the details arrive', () => {
+  fetched = stubFetch(() => new Promise(() => {}))
+  page.window.matchMedia = /** @type {any} */ (() => ({ matches: false }))
+  const preview = /** @type {HTMLElement} */ (page.document.getElementById('preview'))
+  preview.style.display = 'flex'
+  preview.insertAdjacentHTML('afterend', '<div id="panel-room" style="display: block; height: 350px"></div>')
+  const room = /** @type {HTMLElement} */ (page.document.getElementById('panel-room'))
+  const slides = stubAnimate(room)
+
+  clickPoster('Birch')
+
+  assert.equal(room.style.display, 'none')
+  assert.deepEqual(slides, [])
 })
 
 test('a show poster click requests the show’s details', async () => {

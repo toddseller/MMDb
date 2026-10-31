@@ -15,6 +15,7 @@ const tiles = (movies) => movies.map(([id, title]) =>
 // The collection page as users/show.erb renders it for its owner, with the sign-in/profile modal from layout.erb.
 const PAGE = `
   <div id="user-page">
+    <div id="search-boxes">
     <form id="filter-input"><input id="search-movie-title" type="text"></form>
     <button id="add">Add Movie</button>
     <div id="search" style="display: none"></div>
@@ -24,6 +25,8 @@ const PAGE = `
       <div id="scroll-left" style="display: none"></div>
       <div id="scroll-right" style="display: none"></div>
     </div>
+    </div>
+    <div id="panel-room"></div>
     <div id="movie-list">${tiles([[12, 'Amber'], [7, 'Birch']])}</div>
     <footer><div class="footer">2 Movies</div></footer>
   </div>
