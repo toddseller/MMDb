@@ -472,3 +472,52 @@ test('the poster loading clears the image behind it, and failing to load keeps i
   drawerPoster().dispatchEvent(new page.window.Event('load'))
   assert.equal(drawerPoster().style.backgroundImage, '')
 })
+
+// A show's season line as _show_info.erb renders it, with `seasons` seasons and `active` the active one.
+/** @param {number} seasons @param {number} active */
+const seasonLine = (seasons, active) => `<div class="season-row"><form id="season-default">${
+  Array.from({ length: seasons }, (_, i) => `<input class="season-submit"${i + 1 === active ? ' id="active-season"' : ''} value="${i + 1}">`).join('')
+}</form><button class="season-arrow left"></button><button class="season-arrow right"></button></div>`
+
+// jsdom has no layout: each season is 40px wide in a 1000px line, and the arrows hidden, so 0px.
+const layOutSeasons = () => {
+  const proto = page.window.HTMLElement.prototype
+  /** @param {string} name @param {(el: HTMLElement) => number} get */
+  const define = (name, get) => Object.defineProperty(proto, name, { get() { return get(this) }, configurable: true })
+  define('offsetWidth', (el) => el.classList.contains('season-submit') ? 40 : 0)
+  define('offsetLeft', (el) => el.classList.contains('season-submit') ? (Number(/** @type {HTMLInputElement} */ (el).value) - 1) * 40 : 0)
+  define('clientWidth', (el) => el.id === 'season-default' ? 1000 : 0)
+  define('scrollWidth', (el) => el.id === 'season-default' ? el.children.length * 40 : 0)
+}
+const seasonScroll = () => /** @type {HTMLElement} */ (page.document.getElementById('season-default')).scrollLeft
+
+test('a show drawer opens with its season line already on the active season', () => {
+  layOutSeasons()
+
+  show(tile('Amber'), seasonLine(48, 48))
+
+  assert.equal(seasonScroll(), 48 * 40 - 1000)
+})
+
+test('switching to another show in the same row lands on that show’s active season', () => {
+  layOutSeasons()
+  show(tile('Amber'), seasonLine(48, 3))
+  runFrames()
+  assert.equal(seasonScroll(), 0)
+
+  show(tile('Cedar'), seasonLine(48, 48))
+
+  assert.equal(seasonScroll(), 48 * 40 - 1000)
+})
+
+test('keepOpen with new details keeps the season line where it was', () => {
+  layOutSeasons()
+  show(tile('Ember'), seasonLine(48, 20))
+  runFrames()
+  const line = /** @type {HTMLElement} */ (page.document.getElementById('season-default'))
+  line.scrollLeft = 400
+
+  keepOpen(redraw(), seasonLine(48, 20))
+
+  assert.equal(seasonScroll(), 400)
+})

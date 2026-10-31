@@ -3,6 +3,7 @@ import { on } from '#mmdb/events.js'
 import { request, fields } from '#mmdb/request.js'
 import { openTile, reveal, placehold } from '#mmdb/drawer.js'
 import { close as closePanel } from '#mmdb/preview.js'
+import { placeSeasons } from '#mmdb/season-row.js'
 import { open, close } from '#mmdb/dialog.js'
 
 const FALLBACK_UPLOAD_ERROR = "The artwork couldn't be uploaded. Try again."
@@ -56,8 +57,10 @@ const showSaved = (document, page, poster) => {
   const wrapper = document.querySelector('.info .info-wrapper')
   if (wrapper) {
     const shown = wrapper.querySelector('.description-poster img')?.getAttribute('src')
+    const kept = wrapper.querySelector('#season-default')?.scrollLeft
     wrapper.innerHTML = page
     placehold(wrapper, shown)
+    placeSeasons(wrapper, kept)
   }
   openTile()?.querySelector('img')?.setAttribute('src', poster)
   reveal()

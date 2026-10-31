@@ -49,15 +49,19 @@
         <div id="season-selector">
           <hr/>
           SEASON:
-          <form id="season-default" action="<%="/users/#{user.id}/shows/#{show.id}/seasons/"%>" method="POST">
-            <% show.seasons.sorted_seasons.each do |s| %>
-              <% if s.is_active %>
-                <input class="season-submit" id="active-season" type="submit" name="season[:id]" value="<%="#{s.season}"%>">
-              <% else %>
-                <input class="season-submit" type="submit" name="season[:id]" value="<%="#{s.season}"%>">
+          <div class="season-row">
+            <form id="season-default" action="<%="/users/#{user.id}/shows/#{show.id}/seasons/"%>" method="POST">
+              <% show.seasons.sorted_seasons.each do |s| %>
+                <% if s.is_active %>
+                  <input class="season-submit" id="active-season" type="submit" name="season[:id]" value="<%="#{s.season}"%>">
+                <% else %>
+                  <input class="season-submit" type="submit" name="season[:id]" value="<%="#{s.season}"%>">
+                <% end %>
               <% end %>
-            <% end %>
-          </form>
+            </form>
+            <button type="button" class="season-arrow left" aria-label="Earlier seasons"><span class="glyphicon glyphicon-menu-left" aria-hidden="true"></span></button>
+            <button type="button" class="season-arrow right" aria-label="Later seasons"><span class="glyphicon glyphicon-menu-right" aria-hidden="true"></span></button>
+          </div>
           <hr/>
         </div>
         <div class="episode-list">

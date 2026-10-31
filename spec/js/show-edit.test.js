@@ -29,10 +29,14 @@ const DETAILS = `
   <div id="meta-data"><div class="modal-body"><div id="info-header">
     <a class="show-edit" href="/users/7/shows/3/edit"></a>
     <div class="description-poster"><img src="https://img.test/old/600x600.jpg" alt="Tides Poster"></div>
-    <form id="season-default" action="/users/7/shows/3/seasons/" method="POST">
-      <input class="season-submit" id="active-season" type="submit" name="season[:id]" value="1">
-      <input class="season-submit" type="submit" name="season[:id]" value="2">
-    </form>
+    <div class="season-row">
+      <form id="season-default" action="/users/7/shows/3/seasons/" method="POST">
+        <input class="season-submit" id="active-season" type="submit" name="season[:id]" value="1">
+        <input class="season-submit" type="submit" name="season[:id]" value="2">
+      </form>
+      <button type="button" class="season-arrow left" aria-label="Earlier seasons"></button>
+      <button type="button" class="season-arrow right" aria-label="Later seasons"></button>
+    </div>
   </div></div></div>`
 
 // The edit dialog as _edit_show.erb renders it, one field per tab form.
@@ -363,6 +367,15 @@ test('a season button sets the default season and puts its thumbnail on the tile
 
   assert.equal(el('.info .info-wrapper').innerHTML, '<p>Season 2</p>')
   assert.equal(tileImage().getAttribute('src'), 'https://img.test/s2/400x400.jpg')
+})
+
+test('a season switch keeps the season line where it was', async () => {
+  /** @type {HTMLElement} */ (el('#season-default')).scrollLeft = 400
+
+  click('.season-submit:not(#active-season)')
+  await answerNext(json({ page: DETAILS, poster: 'https://img.test/s2/400x400.jpg' }))
+
+  assert.equal(/** @type {HTMLElement} */ (el('#season-default')).scrollLeft, 400)
 })
 
 test('a season switch shows the previous season’s poster behind the new one until it loads', async () => {

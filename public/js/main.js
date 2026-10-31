@@ -10,6 +10,7 @@ import { init as initFilters } from '#mmdb/filters.js'
 import { init as initLetterRail } from '#mmdb/letter-rail.js'
 import { init as initNavigation } from '#mmdb/navigation.js'
 import { init as initPreview } from '#mmdb/preview.js'
+import { init as initSeasonRow } from '#mmdb/season-row.js'
 import { init as initShowEdit } from '#mmdb/show-edit.js'
 
 initDialog(document)
@@ -22,4 +23,5 @@ initFilters(document)
 initLetterRail(document)
 initNavigation(document)
 initPreview(document)
+initSeasonRow(document)
 initShowEdit(document)

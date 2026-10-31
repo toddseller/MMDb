@@ -172,8 +172,8 @@ test('Delete Episode shows the next episode and the new counts', async ({ page }
   await dialog(page).getByRole('button', { name: 'Delete Episode' }).click()
 
   await expect(field(page, 'episode[title]')).toHaveValue('Tide Tables 1x2')
-  // Harbor Lights has three episodes and Tide Tables had three.
-  await expect(page.locator('.footer')).toHaveText('2 TV Shows — 5 Episodes')
+  // Harbor Lights has three episodes, Tide Tables had three and Old House Hours has one.
+  await expect(page.locator('.footer')).toHaveText('3 TV Shows — 6 Episodes')
 })
 
 test.describe('Create New Show', () => {

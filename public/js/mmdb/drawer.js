@@ -3,6 +3,7 @@ import { on } from '#mmdb/events.js'
 import { request } from '#mmdb/request.js'
 import { fadeIn, fadeOut } from '#mmdb/motion.js'
 import { close as closePanel } from '#mmdb/preview.js'
+import { placeSeasons } from '#mmdb/season-row.js'
 
 // The longest drawer transition (.35s) plus slack, for when no transitionend arrives.
 const DRAWER_MS = 450
@@ -123,6 +124,7 @@ const insert = (tile, html, instant = false) => {
   placehold(wrapper, tileImage(tile))
   el.append(wrapper)
   rowEnd(tile).after(el)
+  placeSeasons(wrapper)
   mark(tile)
   drawer = el
   fadeFooters(document, fadeOut)
@@ -152,13 +154,16 @@ export const close = (instant = false) => {
   afterTransition(el, 'grid-template-rows', () => el.remove())
 }
 
-/** @param {HTMLElement} tile @param {string} html */
-const swap = (tile, html) => {
+// keep is for the same show's details, so its season line stays where the owner left it.
+/** @param {HTMLElement} tile @param {string} html @param {boolean} [keep] */
+const swap = (tile, html, keep = false) => {
   const wrapper = /** @type {HTMLElement} */ (drawer?.querySelector('.info-wrapper'))
   const from = wrapper.offsetHeight
+  const kept = keep ? wrapper.querySelector('#season-default')?.scrollLeft : undefined
   wrapper.style.height = `${from}px`
   wrapper.innerHTML = html
   placehold(wrapper, tileImage(tile))
+  placeSeasons(wrapper, kept)
   const to = wrapper.scrollHeight
   mark(tile)
   if (from === to) {
@@ -203,7 +208,7 @@ export const keepOpen = (redraw, html, ms) => {
   if (!moved || moved.offsetParent === null) return close(true)
   rowEnd(moved).after(el)
   if (html === undefined) mark(moved)
-  else swap(moved, html)
+  else swap(moved, html, true)
   holdStill(moved, top, ms, () => reveal())
 }
 
