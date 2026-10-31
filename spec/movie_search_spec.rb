@@ -159,6 +159,27 @@ describe 'Movie.get_titles' do
 
       expect(Movie.get_titles('rocky')).to eq []
     end
+
+    it "keeps the database and Apple entries when TMDB's search doesn't answer in time" do
+      Movie.create!(title: 'Rocky Balboa', year: '2006', director: 'Sylvester Stallone')
+      stub_apple_movie_search('rocky', items: [['umc.rocky', 'Rocky']])
+      stub_apple_movie('umc.rocky', title: 'Rocky', year: 1976)
+      stub_request(:get, %r{\Ahttps://api\.themoviedb\.org/3/search/movie\?}).to_timeout
+
+      rows = nil
+      expect { rows = Movie.get_titles('rocky') }.to output(/in_parallel: Net::OpenTimeout/).to_stdout
+      expect(titles(rows)).to eq [['Rocky', '1976'], ['Rocky Balboa', '2006']]
+    end
+
+    it "leaves out a movie whose details don't answer in time" do
+      stub_tmdb_movie_search('rocky', [[1366, 'Rocky', 1976], [1367, 'Rocky II', 1979]])
+      stub_tmdb_movie(1366, title: 'Rocky', year: 1976)
+      stub_request(:get, %r{\Ahttps://api\.themoviedb\.org/3/movie/1367\?}).to_timeout
+
+      rows = nil
+      expect { rows = Movie.get_titles('rocky') }.to output(/in_parallel: Net::OpenTimeout/).to_stdout
+      expect(titles(rows)).to eq [['Rocky', '1976']]
+    end
   end
 
   describe 'scheduling' do

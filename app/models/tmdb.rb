@@ -7,7 +7,7 @@ module Tmdb
     request = Net::HTTP::Get.new(uri)
     request['Accept'] = 'application/json'
     request['Authorization'] = 'Bearer ' + ENV['TMDB_TOKEN']
-    response = Net::HTTP.start(uri.hostname, uri.port, use_ssl: true) { |http| http.request(request) }
+    response = Net::HTTP.start(uri.hostname, uri.port, use_ssl: true, open_timeout: AppleTv::TIMEOUT, read_timeout: AppleTv::TIMEOUT) { |http| http.request(request) }
     { code: response.code, body: JSON.parse(response.body) }
   end
 end

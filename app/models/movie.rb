@@ -46,7 +46,7 @@ class Movie < ActiveRecord::Base
   end
 
   def self.plex_count()
-    plex_response = HTTParty.get('https://plex.toddseller.dev/api/v2?apikey=' + ENV['TAUTULLI_KEY'] + '&cmd=get_libraries')
+    plex_response = HTTParty.get('https://plex.toddseller.dev/api/v2?apikey=' + ENV['TAUTULLI_KEY'] + '&cmd=get_libraries', timeout: AppleTv::TIMEOUT)
     movies = plex_response['response']['data'][0]['count']
     shows = plex_response['response']['data'][1]['count']
     episodes = plex_response['response']['data'][1]['child_count']
