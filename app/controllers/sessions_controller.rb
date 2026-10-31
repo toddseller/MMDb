@@ -8,7 +8,7 @@ post '/sessions' do
     session[:remember] = params[:remember] == 'true'
     extend_session
     if request.xhr?
-      json status: "true", user_id: user.id
+      json status: "true", handle: user.handle
     else
       erb :'/users/show'
     end

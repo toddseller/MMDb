@@ -18,5 +18,5 @@ test('deleting a movie from its details removes it from the collection', async (
   await expect(grid(page)).toHaveCount(29)
   await expect(page.locator('#movie-list img[alt="Delete Target Poster"]')).toHaveCount(0)
   await expect(page.getByText('29 Movies')).toBeVisible()
-  await expect(page).toHaveURL(new RegExp(`/users/${USER.id}$`))
+  await expect(page).toHaveURL(new RegExp(`/u/${USER.handle}$`))
 })

@@ -54,20 +54,25 @@ module DeployHarness
 
   def write_stand_ins
     bin = root.join('fake-bin').tap(&:mkpath)
-    File.write(bin.join('docker'), "#!/bin/sh\necho \"$*\" >> '#{docker_log}'\n")
+    # An exec given anything but an empty input (/dev/null is a character device) is logged, as one fed the SSH session can hang.
+    File.write(bin.join('docker'), "#!/bin/sh\necho \"$*\" >> '#{docker_log}'\n" \
+                                   "[ \"$2\" != exec ] || [ -c /dev/stdin ] || echo 'exec with open input' >> '#{docker_log}'\n" \
+                                   "[ \"$2\" != exec ] || [ -z \"$FAKE_MIGRATE_FAILS\" ]\n")
     File.write(bin.join('curl'), "#!/bin/sh\necho \"$*\" >> '#{curl_log}'\nprintf '%s' \"${FAKE_HTTP_STATUS:-200}\"\n[ \"${FAKE_HTTP_STATUS:-200}\" = 200 ]\n")
     [bin.join('docker'), bin.join('curl')].each { |file| File.chmod(0o755, file) }
   end
 
-  def deploy(*args, ssh_command: nil, status: 200)
+  def deploy(*args, ssh_command: nil, status: 200, migrate_fails: false)
     env = isolated_env.merge('PATH' => "#{root.join('fake-bin')}:#{ENV['PATH']}", 'FAKE_HTTP_STATUS' => status.to_s,
                              'DEPLOY_HEALTH_TRIES' => '2', 'DEPLOY_HEALTH_INTERVAL' => '0')
+    env['FAKE_MIGRATE_FAILS'] = '1' if migrate_fails
     env['SSH_ORIGINAL_COMMAND'] = ssh_command if ssh_command
     out, err, result = Open3.capture3(env, server.join('bin', 'deploy').to_s, *args)
     { out: out, err: err, code: result.exitstatus }
   end
 
   def docker_calls = docker_log.exist? ? docker_log.read.lines.map(&:strip) : []
+  def migrate_call = 'compose exec -T web bundle exec rake db:migrate'
   def curl_calls = curl_log.exist? ? curl_log.read.lines.map(&:strip) : []
   def server_head = git(server, 'rev-parse', 'HEAD')
 end
@@ -201,7 +206,7 @@ describe 'bin/deploy' do
 
       deploy('deploy', 'v2')
 
-      expect(docker_calls).to eq ['compose restart web']
+      expect(docker_calls).to eq [migrate_call, 'compose restart web']
     end
 
     it 'restarts the app on a redeploy' do
@@ -211,7 +216,7 @@ describe 'bin/deploy' do
 
       deploy('deploy', 'v2')
 
-      expect(docker_calls).to eq ['compose restart web']
+      expect(docker_calls).to eq [migrate_call, 'compose restart web']
     end
 
     %w[Gemfile Gemfile.lock Dockerfile docker-compose.yml].each do |file|
@@ -220,8 +225,22 @@ describe 'bin/deploy' do
 
         deploy('deploy', 'v2')
 
-        expect(docker_calls).to eq ['compose up -d --build']
+        expect(docker_calls).to eq [migrate_call, 'compose up -d --build']
       end
+    end
+
+    it 'stops without restarting when a migration fails, and runs them again when the tag is redeployed' do
+      release('v2', 'app.rb' => "puts 'v2'\n", 'db/migrate/20261031000000_add_handle.rb' => "# migration\n")
+
+      result = deploy('deploy', 'v2', migrate_fails: true)
+
+      expect(result).to include(code: 1, err: /migrat/i)
+      expect(docker_calls).to eq [migrate_call]
+      expect(curl_calls).to eq []
+      docker_log.delete
+
+      expect(deploy('deploy', 'v2')[:code]).to eq 0
+      expect(docker_calls).to eq [migrate_call, 'compose restart web']
     end
 
     it 'succeeds when the site answers 200, checking mmdb.online by default' do

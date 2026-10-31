@@ -8,6 +8,7 @@ const update = (page) => settings(page).getByRole('button', { name: 'Update' })
 const stylesheets = (page) => page.locator('link[rel="stylesheet"]').evaluateAll((links) => links.map((link) => link.href))
 const LIGHT = 'rgb(234, 234, 234)'
 const DARK = 'rgb(43, 43, 43)'
+const REFUSED = "Couldn't save. Check your current password, email, user name and handle (3 to 30 lowercase letters, digits or hyphens, starting and ending with a letter or digit), and that a new password has at least 8 characters."
 
 const openSettings = async (page) => {
   await page.locator('#menu-toggle').click()
@@ -46,7 +47,7 @@ test.describe('signed out', () => {
     await signInDialog(page).getByLabel('Password:', { exact: true }).press('Enter')
 
     await expect(page.getByText('Signed in as')).toBeVisible()
-    await expect(page).toHaveURL(new RegExp(`/users/${USER.id}$`))
+    await expect(page).toHaveURL(new RegExp(`/u/${USER.handle}$`))
   })
 
 test('Remember me keeps the sign-in for 30 days', async ({ page, context }) => {
@@ -283,7 +284,7 @@ test.describe('signed in', () => {
 
       await update(page).click()
 
-      await expect(settings(page).getByText("Couldn't save. Check your current password, email and user name, and that a new password has at least 8 characters.")).toBeVisible()
+      await expect(settings(page).getByText(REFUSED)).toBeVisible()
       await expect(field(page, 'current')).toHaveValue('')
       await expect(field(page, 'current')).toBeFocused()
       for (const name of ['password', 'confirm']) {
@@ -315,7 +316,7 @@ test.describe('signed in', () => {
 
       await update(page).click()
 
-      await expect(settings(page).getByText("Couldn't save. Check your current password, email and user name, and that a new password has at least 8 characters.")).toBeVisible()
+      await expect(settings(page).getByText(REFUSED)).toBeVisible()
     })
 
     test("an email another account has isn't saved, and the dialog says so", async ({ page }) => {
@@ -324,7 +325,7 @@ test.describe('signed in', () => {
 
       await update(page).click()
 
-      await expect(settings(page).getByText("Couldn't save. Check your current password, email and user name, and that a new password has at least 8 characters.")).toBeVisible()
+      await expect(settings(page).getByText(REFUSED)).toBeVisible()
       await page.reload()
       await openSettings(page)
       await expect(field(page, 'email')).toHaveValue(USER.email)

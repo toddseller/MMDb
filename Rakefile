@@ -98,9 +98,8 @@ namespace :db do
 
   desc "Migrate the database (options: VERSION=x, VERBOSE=false, SCOPE=blog)."
   task :migrate do
-    ActiveRecord::Migrator.migrations_paths << File.dirname(__FILE__) + 'db/migrate'
     ActiveRecord::Migration.verbose = ENV["VERBOSE"] ? ENV["VERBOSE"] == "true" : true
-    ActiveRecord::Migrator.migrate(ActiveRecord::Migrator.migrations_paths, ENV["VERSION"] ? ENV["VERSION"].to_i : nil) do |migration|
+    ActiveRecord::MigrationContext.new(APP_ROOT.join('db', 'migrate').to_s).migrate(ENV["VERSION"] ? ENV["VERSION"].to_i : nil) do |migration|
       ENV["SCOPE"].blank? || (ENV["SCOPE"] == migration.scope)
     end
   end

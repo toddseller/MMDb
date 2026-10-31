@@ -63,6 +63,6 @@ test.describe('collection filters', () => {
 
     await expect(grid(page)).toHaveCount(1)
     expect(await titles(page)).toEqual(['Ultra Sharp'])
-    await expect(page).toHaveURL(new RegExp(`/users/${USER.id}$`))
+    await expect(page).toHaveURL(new RegExp(`/u/${USER.handle}$`))
   })
 })
