@@ -286,6 +286,28 @@ describe 'Show.get_series' do
       expect(rows.map { |row| row[:season] }).to eq (1..25).map(&:to_s)
       expect(search_requests(%r{api\.themoviedb\.org(:443)?/3/tv/})).to eq 2
     end
+
+    it "keeps the stored and Apple seasons when TMDB's search doesn't answer in time" do
+      show = Show.create!(title: 'Lupin', year: '2021', show_collection_id: 'umc.cmc.lupin')
+      show.seasons.create!(season: 3, collectionName: 'Lupin, Season 3', collectionId: 'umc.cmc.lupin-s3', skip: '10', count: '5', storeId: '143441')
+      stub_apple_search('lupin', shows: [['umc.cmc.lupin', 'Lupin']])
+      stub_apple_show('umc.cmc.lupin', title: 'Lupin', seasons: [[1, 5], [2, 5]])
+      stub_request(:get, %r{\Ahttps://api\.themoviedb\.org/3/search/tv\?}).to_timeout
+
+      rows = nil
+      expect { rows = Show.get_series('lupin') }.to output(/in_parallel: Net::OpenTimeout/).to_stdout
+      expect(names(rows)).to eq ['Lupin, Season 1', 'Lupin, Season 2', 'Lupin, Season 3']
+    end
+
+    it "leaves out a show whose details don't answer in time" do
+      stub_tmdb_search('lupin', [[96677, 'Lupin'], [96678, 'Lupin Kids']])
+      stub_tmdb_show(96677, name: 'Lupin', seasons: [1])
+      stub_request(:get, %r{\Ahttps://api\.themoviedb\.org/3/tv/96678\?}).to_timeout
+
+      rows = nil
+      expect { rows = Show.get_series('lupin') }.to output(/in_parallel: Net::OpenTimeout/).to_stdout
+      expect(names(rows)).to eq ['Lupin, Season 1']
+    end
   end
 
   context 'Apple' do
