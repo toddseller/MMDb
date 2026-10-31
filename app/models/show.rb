@@ -97,7 +97,7 @@ class Show < ActiveRecord::Base
         end
       end
     end
-    episodes.sort_by {|k| k[:tv_episode]}
+    episodes.select { |episode| aired?(episode[:date]) }.sort_by {|k| k[:tv_episode]}
   end
 
   def season_numbers

@@ -114,6 +114,31 @@ describe 'Apple episode lookups' do
   end
 
   # Apple's seasons don't always start at 1, so a season is found by its number, not its position.
+  describe 'unaired episodes' do
+    let(:today) { Date.today }
+
+    it 'lists only Apple episodes aired today or earlier' do
+      season = store_lupin('143441')
+      dates = [today - 7, today - 1, today, today + 7, nil]
+      stub_request(:get, episodes_url).with(query: hash_including('skip' => '0', 'count' => '5')).to_return(json(data: { episodes: dates.each_with_index.map do |date, index|
+        apple_episode(index + 1).merge(releaseDate: date && date.to_time.to_i * 1000).compact
+      end }))
+
+      expect(episodes_for(season).map { |episode| episode[:tv_episode] }).to eq [1, 2, 3]
+    end
+
+    it 'lists only TMDB episodes aired today or earlier' do
+      season = Show.create!(title: 'Lupin', year: '2021', show_collection_id: '96677')
+                   .seasons.create!(season: 1, collectionName: 'Lupin, Season 1', collectionId: 'tmdb966771')
+      stub_request(:get, 'https://api.themoviedb.org/3/tv/96677/season/1').to_return(json(episodes: [
+        { episode_number: 1, name: 'Chapter 1', air_date: (today - 1).iso8601, overview: 'Aired', runtime: 45 },
+        { episode_number: 2, name: 'Chapter 2', air_date: (today + 7).iso8601, overview: 'Upcoming', runtime: 45 }
+      ]))
+
+      expect(Show.get_episodes(season.collectionId, season.season).map { |episode| episode[:tv_episode] }).to eq [1]
+    end
+  end
+
   it "refreshes a stored season's count by its season number" do
     season = Show.create!(title: 'Lupin', year: '2021', show_collection_id: 'lupin')
                  .seasons.create!(season: 2, collectionName: 'Lupin, Season 2', collectionId: 'lupin-s2', appleTvId: 'lupin', skip: '0', count: '3', storeId: '143441')
