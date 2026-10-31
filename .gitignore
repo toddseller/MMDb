@@ -39,6 +39,7 @@ Thumbs.db
 .project
 .classpath
 .settings/
+.claude/settings.local.json
 
 # Coverage reports
 coverage/
