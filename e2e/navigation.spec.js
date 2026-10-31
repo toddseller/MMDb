@@ -35,7 +35,7 @@ test.describe('the Movies/TV Shows switch', () => {
     await expect(page.locator('#show-list img[alt="Harbor Lights Poster"]')).toBeVisible()
     await expect(page.locator('#movie-list')).toHaveCount(0)
     await expect(menu(page)).not.toHaveClass(/active/)
-    await expect(page.locator('.footer')).toHaveText('2 TV Shows \u2014 6 Episodes')
+    await expect(page.locator('.footer')).toHaveText('3 TV Shows \u2014 7 Episodes')
     expect(await count()).toBe(1)
   })
 

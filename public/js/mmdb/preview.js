@@ -1,8 +1,9 @@
 // @ts-check
 import { on, onSubmit } from '#mmdb/events.js'
 import { request, fields } from '#mmdb/request.js'
-import { fadeIn, fadeOut, slideDown, slideUp } from '#mmdb/motion.js'
+import { fadeIn, slideDown, slideUp } from '#mmdb/motion.js'
 import { isOpen, openTile, keepOpen, close as closeDrawer } from '#mmdb/drawer.js'
+import { hideArrows as hideScrollArrows, updateArrows as updateScrollArrows, scrollPage } from '#mmdb/scroll-arrows.js'
 
 const OPEN_MS = 300
 const CLOSE_AFTER_ADD_MS = 500
@@ -90,31 +91,11 @@ const loading = (document, text, display) => {
   hideArrows(document)
 }
 
-// What each arrow is meant to show; its display can't say, since a fading-out arrow still reads as shown.
-/** @type {WeakMap<HTMLElement, boolean>} */
-const arrowShown = new WeakMap()
+/** @param {Document} document */
+const hideArrows = (document) => hideScrollArrows(parts(document).left, parts(document).right)
 
 /** @param {Document} document */
-const hideArrows = (document) => {
-  for (const arrow of [parts(document).left, parts(document).right]) {
-    arrowShown.set(arrow, false)
-    hide(arrow)
-  }
-}
-
-/** @param {Document} document */
-const updateArrows = (document) => {
-  const { panel, left, right } = parts(document)
-  /** @param {HTMLElement} arrow @param {boolean} wanted */
-  const toggle = (arrow, wanted) => {
-    if (wanted === (arrowShown.get(arrow) ?? false)) return
-    arrowShown.set(arrow, wanted)
-    if (wanted) fadeIn(arrow, 'block')
-    else fadeOut(arrow)
-  }
-  toggle(left, panel.scrollLeft > 0)
-  toggle(right, panel.scrollLeft + panel.clientWidth < panel.scrollWidth - 1)
-}
+const updateArrows = (document) => { const { panel, left, right } = parts(document); updateScrollArrows(panel, left, right) }
 
 /** @param {Document} document @param {string} html @param {boolean} spread */
 const showResults = (document, html, spread) => {
@@ -216,13 +197,6 @@ const searchFrom = (document, form) => {
   search(document, url, parts(document).movies ? 'movies' : 'shows')
 }
 
-/** @param {Document} document @param {number} direction */
-const scroll = (document, direction) => {
-  const { panel } = parts(document)
-  const reduced = document.defaultView?.matchMedia?.('(prefers-reduced-motion: reduce)').matches
-  panel.scrollBy({ left: direction * panel.clientWidth, behavior: reduced ? 'auto' : 'smooth' })
-}
-
 /**
  * Binds adding to the collection: the add buttons, both searches, the add forms and the panel's controls.
  * @param {Document} document
@@ -240,8 +214,8 @@ export const init = (document) => {
     event.preventDefault()
     close(document)
   })
-  on(document, 'click', '#scroll-left', () => scroll(document, -1))
-  on(document, 'click', '#scroll-right', () => scroll(document, 1))
+  on(document, 'click', '#scroll-left', () => scrollPage(parts(document).panel, -1))
+  on(document, 'click', '#scroll-right', () => scrollPage(parts(document).panel, 1))
   // scroll doesn't bubble, so it's caught on the way down; the panel itself is replaced when Clear re-renders the page.
   document.addEventListener('scroll', (event) => { if (/** @type {Element} */ (event.target).id === 'preview') updateArrows(document) }, true)
 }

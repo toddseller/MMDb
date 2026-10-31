@@ -183,9 +183,54 @@
     margin-bottom: 8px;
 }
 
+/* min-width: 0, or a flex or grid parent grows to fit every season and the line never scrolls. */
+.season-row
+{
+    position: relative;
+    min-width: 0;
+}
+
+/* Positioned so each season's offsetLeft is measured within the line, which placeSeasons scrolls by. */
 #season-default
 {
-    display: inline-block;
+    position: relative;
+    display: flex;
+    overflow-x: auto;
+    scrollbar-width: none;
+    /* The arrows' width, so a season reached by Tab scrolls clear of them rather than to the very edge. */
+    scroll-padding-inline: 34px;
+}
+
+#season-default::-webkit-scrollbar
+{
+    display: none;
+}
+
+/* Shown by season-row.js; each fades from the drawer's own colour so a half-hidden season reads as continuing. */
+.season-arrow
+{
+    display: none;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 34px;
+    padding: 0;
+    border: none;
+    color: var(--text);
+}
+
+.season-arrow.left
+{
+    left: 0;
+    text-align: left;
+    background: linear-gradient(to right, var(--surface) 60%, transparent);
+}
+
+.season-arrow.right
+{
+    right: 0;
+    text-align: right;
+    background: linear-gradient(to left, var(--surface) 60%, transparent);
 }
 
 .season-plot
@@ -212,7 +257,7 @@
     background: none;
     color: var(--muted);
     padding: 3px 10px;
-    display: inline-block;
+    flex: none;
 }
 
 .season-submit#active-season

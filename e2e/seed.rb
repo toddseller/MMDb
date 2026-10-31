@@ -41,6 +41,14 @@ tides_season = tides.seasons.create!(season: 1, collectionName: 'Tide Tables, Se
 (1..3).each { |number| tides_season.episodes.create!(title: "Tide Tables 1x#{number}", tv_episode: number, plot: "Episode #{number}.") }
 user.shows << tides
 
+# Too many seasons for one line in the drawer, on its latest one, as a long-running show such as This Old House is.
+old_house = Show.create!(title: 'Old House Hours', year: '1979', show_collection_id: '996', poster: 'https://is1-ssl.mzstatic.com/image/thumb/old-house/600x600.jpg')
+(1..48).each do |number|
+  season = old_house.seasons.create!(season: number, collectionName: "Old House Hours, Season #{number}", collectionId: "tmdb996#{number}", is_active: number == 48)
+  season.episodes.create!(title: 'Old House Hours 48x1', tv_episode: 1, plot: 'Episode 1.') if number == 48
+end
+user.shows << old_house
+
 # The Movies and TV Shows buttons only show on another user's collection, so a second user owns one of each.
 other = User.create!(first_name: 'Olive', last_name: 'Other', user_name: 'other', email: 'other@example.test', password: 'other-password')
 other.movies << Movie.create!(title: 'Ferry Lights', year: '2001', director: 'Jane Doe', actors: 'Ann Lee', writer: 'Sam Ray', producer: 'Pat Kim',
