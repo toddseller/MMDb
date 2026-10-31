@@ -75,7 +75,9 @@ describe 'detail drawer' do
     end
   end
 
-  it 'imports drawer.css and movies.css with versions' do
-    expect(css('app.css')).to match(%r{@import url\('drawer\.css\?v=\d+'\);}).and match(%r{@import url\('movies\.css\?v=\d+'\);})
+  it 'links drawer.css and movies.css with versions' do
+    links = Nokogiri::HTML(get('/', xhr: false).body).css('link[rel="stylesheet"]').map { |link| link['href'] }
+
+    expect(links).to include(match(%r{\A/css/drawer\.css\?v=\d+\z}), match(%r{\A/css/movies\.css\?v=\d+\z}))
   end
 end
