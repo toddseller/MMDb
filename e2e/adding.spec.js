@@ -5,6 +5,8 @@ import { test, expect, USER, reseed, signIn } from './fixtures.js'
 const recorded = (name) => readFileSync(new URL(`./.generated/${name}.json`, import.meta.url), 'utf8')
 const json = (body) => ({ body, contentType: 'application/json' })
 const panel = (page) => page.locator('#preview')
+// The first result shows while the panel is still sliding open; a click before it finishes misses what the open panel covers.
+const opened = (page) => panel(page).evaluate((el) => Promise.all(el.getAnimations().map((animation) => animation.finished)))
 
 /** Opens the movie search and submits it, answered with the named recording (or a failure). */
 const searchMovies = async (page, answer) => {
@@ -89,10 +91,12 @@ test.describe('on the movies page', () => {
   test('opening a poster closes the add search’s results', async ({ page }) => {
     await searchMovies(page, json(recorded('movie_search')))
     await expect(page.getByRole('button', { name: 'Nova Drift Poster' })).toBeVisible()
+    await opened(page)
 
-    await page.locator('#movie-list img[alt="Birch Poster"]').click()
+    // Not a first-row poster: the open panel covers that row at every scroll position.
+    await page.locator('#movie-list img[alt="Meadow Poster"]').click()
 
-    await expect(page.getByText('Birch is a seeded movie.')).toBeVisible()
+    await expect(page.getByText('Meadow is a seeded movie.')).toBeVisible()
     await expect(panel(page)).toBeHidden()
     await expect(page.getByRole('button', { name: 'Add Movie' })).toBeVisible()
   })
@@ -104,10 +108,12 @@ test.describe('on the movies page', () => {
     await page.locator('a[href*="/movies/"][href$="/edit"]').click()
     await page.locator('#update-search').click()
     await expect(panel(page).locator('#update-movie img, #update-movie input[type=image]').first()).toBeVisible()
+    await opened(page)
 
-    await page.locator('#movie-list img[alt="Birch Poster"]').click()
+    // Not a first-row poster: the open panel covers that row at every scroll position.
+    await page.locator('#movie-list img[alt="Meadow Poster"]').click()
 
-    await expect(page.getByText('Birch is a seeded movie.')).toBeVisible()
+    await expect(page.getByText('Meadow is a seeded movie.')).toBeVisible()
     await expect(panel(page)).toBeHidden()
   })
 })
