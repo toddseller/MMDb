@@ -39,3 +39,38 @@ test('a failed upload shows the server’s message', async ({ page }) => {
 
   await expect(page.getByText(error)).toBeVisible()
 })
+
+const showArtwork = async (page, width, height) => {
+  const url = `https://cdn.myflix.stream/images/${width}x${height}.svg`
+  await page.route(url, (route) => route.fulfill({ contentType: 'image/svg+xml', body: `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}"><rect width="100%" height="100%" fill="teal"/></svg>` }))
+  await openArtworkTab(page)
+  const poster = page.locator('input[name="season[poster]"]:visible')
+  await poster.fill(url)
+  await poster.dispatchEvent('change')
+  const preview = page.locator('#artwork img')
+  await expect(preview).toHaveJSProperty('naturalWidth', width)
+  return preview
+}
+
+test('a vertical poster fits the tab and leaves its controls usable', async ({ page }) => {
+  const preview = await showArtwork(page, 300, 450)
+
+  const image = await preview.boundingBox()
+  const body = await page.locator('#edit-show .modal-body').boundingBox()
+  expect(image.y + image.height).toBeLessThanOrEqual(body.y + body.height)
+  await expect(preview).toHaveCSS('object-fit', 'contain')
+  const controls = [page.getByText('Upload', { exact: true }), page.locator('#ok'), page.locator('#cancel')]
+  // Checked before any click: Playwright scrolls the dialog's clipped overflow to reach a target, which a mouse can't.
+  for (const control of controls) {
+    await expect(control).toBeInViewport({ ratio: 1 })
+  }
+  for (const control of controls) {
+    await control.click({ trial: true, timeout: 2000 })
+  }
+})
+
+test('landscape artwork fills the tab’s width', async ({ page }) => {
+  const preview = await showArtwork(page, 1600, 900)
+
+  expect((await preview.boundingBox()).width).toBe(450)
+})

@@ -192,9 +192,12 @@ fieldset[disabled] .btn-default.focus
 #edit-show .edit-poster img
 {
     width: 120px;
+    /* Square art's height: taller art would grow the header and push the footer out of the fixed-height dialog. */
+    max-height: 120px;
     margin-left: -15px;
 
     border-radius: 0;
+    object-fit: contain;
 }
 
 #edit-show .modal-header .edit-show
@@ -298,7 +301,11 @@ fieldset[disabled] .btn-default.focus
 #artwork img
 {
     width: 450px;
+    /* The body is a fixed 600px, so a tall poster is scaled to leave room for the URL field below it. */
+    max-height: 450px;
     margin-left: -15px;
+
+    object-fit: contain;
 }
 
 #artwork .input-group
