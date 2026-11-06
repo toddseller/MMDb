@@ -192,6 +192,18 @@ namespace '/api/v2' do
     {moviesCount: movies_count, showsCount: shows_count, episodesCount: episodes_count}.to_json
   end
 
+  post '/avatar' do
+    authenticate!
+    upload = params[:avatar]
+    url = Artwork.store(upload.is_a?(Hash) ? upload[:tempfile] : nil, folder: 'avatars', name: 'Avatars')
+    User.find(@auth_payload['sub']).update!(avatar: url)
+    json avatar: url
+  rescue Artwork::Invalid => e
+    halt 422, json(error: e.message)
+  rescue Artwork::StoreFailed
+    halt 502, json(error: "The avatar couldn't be stored. Try again.")
+  end
+
 
   def authenticate!
     supplied_token = String(request.env['HTTP_AUTHORIZATION']).slice(7..-1)
