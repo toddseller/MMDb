@@ -43,19 +43,14 @@ main() {
     echo "Deploying $tag: ${old:0:7} -> ${new:0:7}"
   fi
 
-  # Every time, not only when db/migrate changed: master has already moved, so a retry after a failed migration has no diff
-  # to find it by. The running container sees the new code through its mount, and a plain migration needs no newer gems.
-  # An empty input: exec -T passes on the SSH session's, which never closes, and was seen to hang on the server.
-  docker compose exec -T web bundle exec rake db:migrate < /dev/null || refuse 'database migrations failed; the app was not restarted'
-
-  # The code is mounted into the container, so a restart picks it up; gems and the image need a rebuild.
-  if git diff --name-only "$old" "$new" | grep -qE '^(Gemfile|Gemfile\.lock|Dockerfile[^/]*|docker-compose[^/]*\.yml)$'; then
-    echo 'Gems, Dockerfile or compose changed: rebuild'
-    docker compose up -d --build
-  else
-    echo 'Code only: restart'
-    docker compose restart web
-  fi
+  # Build, migrate and recreate every time, not only when a diff says so: master has already moved, so a retry has no diff
+  # to go by. The running container already sees the new Gemfile.lock through its mount but has the old gems, so the
+  # migrations run from the new image. Docker's layer cache keeps a build without gem changes to seconds.
+  docker compose build web || refuse 'the image did not build; the app was not restarted'
+  # An empty input: run -T passes on the SSH session's, which never closes, and exec was seen to hang on the server.
+  docker compose run --rm -T web bundle exec rake db:migrate < /dev/null || refuse 'database migrations failed; the app was not restarted'
+  # Forced, because a redeploy with nothing changed builds the same image, and up would then leave the container running.
+  docker compose up -d --force-recreate web
 
   local url="${DEPLOY_HEALTH_URL:-https://mmdb.online/}" tries="${DEPLOY_HEALTH_TRIES:-10}" interval="${DEPLOY_HEALTH_INTERVAL:-3}"
   local attempt code

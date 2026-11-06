@@ -54,17 +54,19 @@ module DeployHarness
 
   def write_stand_ins
     bin = root.join('fake-bin').tap(&:mkpath)
-    # An exec given anything but an empty input (/dev/null is a character device) is logged, as one fed the SSH session can hang.
+    # A run given anything but an empty input (/dev/null is a character device) is logged, as one fed the SSH session can hang.
     File.write(bin.join('docker'), "#!/bin/sh\necho \"$*\" >> '#{docker_log}'\n" \
-                                   "[ \"$2\" != exec ] || [ -c /dev/stdin ] || echo 'exec with open input' >> '#{docker_log}'\n" \
-                                   "[ \"$2\" != exec ] || [ -z \"$FAKE_MIGRATE_FAILS\" ]\n")
+                                   "[ \"$2\" != run ] || [ -c /dev/stdin ] || echo 'run with open input' >> '#{docker_log}'\n" \
+                                   "[ \"$2\" != build ] || [ -z \"$FAKE_BUILD_FAILS\" ] || exit 1\n" \
+                                   "[ \"$2\" != run ] || [ -z \"$FAKE_MIGRATE_FAILS\" ]\n")
     File.write(bin.join('curl'), "#!/bin/sh\necho \"$*\" >> '#{curl_log}'\nprintf '%s' \"${FAKE_HTTP_STATUS:-200}\"\n[ \"${FAKE_HTTP_STATUS:-200}\" = 200 ]\n")
     [bin.join('docker'), bin.join('curl')].each { |file| File.chmod(0o755, file) }
   end
 
-  def deploy(*args, ssh_command: nil, status: 200, migrate_fails: false)
+  def deploy(*args, ssh_command: nil, status: 200, build_fails: false, migrate_fails: false)
     env = isolated_env.merge('PATH' => "#{root.join('fake-bin')}:#{ENV['PATH']}", 'FAKE_HTTP_STATUS' => status.to_s,
                              'DEPLOY_HEALTH_TRIES' => '2', 'DEPLOY_HEALTH_INTERVAL' => '0')
+    env['FAKE_BUILD_FAILS'] = '1' if build_fails
     env['FAKE_MIGRATE_FAILS'] = '1' if migrate_fails
     env['SSH_ORIGINAL_COMMAND'] = ssh_command if ssh_command
     out, err, result = Open3.capture3(env, server.join('bin', 'deploy').to_s, *args)
@@ -72,7 +74,9 @@ module DeployHarness
   end
 
   def docker_calls = docker_log.exist? ? docker_log.read.lines.map(&:strip) : []
-  def migrate_call = 'compose exec -T web bundle exec rake db:migrate'
+  def build_call = 'compose build web'
+  def migrate_call = 'compose run --rm -T web bundle exec rake db:migrate'
+  def deploy_calls = [build_call, migrate_call, 'compose up -d --force-recreate web']
   def curl_calls = curl_log.exist? ? curl_log.read.lines.map(&:strip) : []
   def server_head = git(server, 'rev-parse', 'HEAD')
 end
@@ -201,31 +205,31 @@ describe 'bin/deploy' do
       expect(server_head).to eq sha
     end
 
-    it 'restarts the app when only code changed' do
+    it 'builds, migrates and recreates the app when only code changed' do
       release('v2', 'app.rb' => "puts 'v2'\n", 'spec/app_spec.rb' => "# spec\n")
 
       deploy('deploy', 'v2')
 
-      expect(docker_calls).to eq [migrate_call, 'compose restart web']
+      expect(docker_calls).to eq deploy_calls
     end
 
-    it 'restarts the app on a redeploy' do
-      release('v2', 'Gemfile.lock' => "GEM\n  rack\n")
+    it 'builds, migrates and recreates the app on a redeploy' do
+      release('v2', 'app.rb' => "puts 'v2'\n")
       deploy('deploy', 'v2')
       docker_log.delete
 
       deploy('deploy', 'v2')
 
-      expect(docker_calls).to eq [migrate_call, 'compose restart web']
+      expect(docker_calls).to eq deploy_calls
     end
 
     %w[Gemfile Gemfile.lock Dockerfile docker-compose.yml].each do |file|
-      it "rebuilds the container when #{file} changed" do
+      it "builds before migrating when #{file} changed" do
         release('v2', 'app.rb' => "puts 'v2'\n", file => "changed\n")
 
         deploy('deploy', 'v2')
 
-        expect(docker_calls).to eq [migrate_call, 'compose up -d --build']
+        expect(docker_calls).to eq deploy_calls
       end
     end
 
@@ -235,12 +239,32 @@ describe 'bin/deploy' do
       result = deploy('deploy', 'v2', migrate_fails: true)
 
       expect(result).to include(code: 1, err: /migrat/i)
-      expect(docker_calls).to eq [migrate_call]
+      expect(docker_calls).to eq [build_call, migrate_call]
       expect(curl_calls).to eq []
       docker_log.delete
 
       expect(deploy('deploy', 'v2')[:code]).to eq 0
-      expect(docker_calls).to eq [migrate_call, 'compose restart web']
+      expect(docker_calls).to eq deploy_calls
+    end
+
+    it 'stops without migrating or restarting when the image does not build' do
+      release('v2', 'Gemfile.lock' => "GEM\n  rack\n")
+
+      result = deploy('deploy', 'v2', build_fails: true)
+
+      expect(result).to include(code: 1, err: /build/i)
+      expect(docker_calls).to eq [build_call]
+      expect(curl_calls).to eq []
+    end
+
+    # v2026.11.06.0: the first attempt failed for want of the new gems, and the retry, with no diff left, never rebuilt.
+    it 'builds again when a failed gem update is redeployed' do
+      release('v2', 'Gemfile.lock' => "GEM\n  rack\n")
+      deploy('deploy', 'v2', migrate_fails: true)
+      docker_log.delete
+
+      expect(deploy('deploy', 'v2')[:code]).to eq 0
+      expect(docker_calls).to eq deploy_calls
     end
 
     it 'succeeds when the site answers 200, checking mmdb.online by default' do
@@ -266,7 +290,7 @@ describe 'bin/deploy' do
 
       out = deploy('deploy', 'v2')[:out]
 
-      expect(out).to include('v2', old[0, 7], new[0, 7], 'rebuild')
+      expect(out).to include('v2', old[0, 7], new[0, 7])
     end
 
     it 'says when it is redeploying' do
