@@ -492,7 +492,7 @@ test('the poster loading clears the image behind it, and failing to load keeps i
 // A show's season line as _show_info.erb renders it, with `seasons` seasons and `active` the active one.
 /** @param {number} seasons @param {number} active */
 const seasonLine = (seasons, active) => `<div class="season-row"><form id="season-default">${
-  Array.from({ length: seasons }, (_, i) => `<input class="season-submit"${i + 1 === active ? ' id="active-season"' : ''} value="${i + 1}">`).join('')
+  Array.from({ length: seasons }, (_, i) => `<button class="season-submit"${i + 1 === active ? ' id="active-season"' : ''} value="${i + 1}">${i + 1}</button>`).join('')
 }</form><button class="season-arrow left"></button><button class="season-arrow right"></button></div>`
 
 // jsdom has no layout: each season is 40px wide in a 1000px line, and the arrows hidden, so 0px.
@@ -501,7 +501,7 @@ const layOutSeasons = () => {
   /** @param {string} name @param {(el: HTMLElement) => number} get */
   const define = (name, get) => Object.defineProperty(proto, name, { get() { return get(this) }, configurable: true })
   define('offsetWidth', (el) => el.classList.contains('season-submit') ? 40 : 0)
-  define('offsetLeft', (el) => el.classList.contains('season-submit') ? (Number(/** @type {HTMLInputElement} */ (el).value) - 1) * 40 : 0)
+  define('offsetLeft', (el) => el.classList.contains('season-submit') ? (Number(/** @type {HTMLButtonElement} */ (el).value) - 1) * 40 : 0)
   define('clientWidth', (el) => el.id === 'season-default' ? 1000 : 0)
   define('scrollWidth', (el) => el.id === 'season-default' ? el.children.length * 40 : 0)
 }

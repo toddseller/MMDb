@@ -7,7 +7,7 @@ describe 'the handles migration' do
   # db/structure.sql already has the handles, so the scratch database is taken back to before this migration, as production is.
   around do |example|
     build_scratch_database
-    output, status = scratch_rake('db:migrate', 'VERSION' => (migration_versions - [VERSION]).last)
+    output, status = scratch_rake('db:migrate', 'VERSION' => migration_versions.take_while { |version| version < VERSION }.last)
     raise output unless status.success?
 
     example.run

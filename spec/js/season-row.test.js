@@ -12,7 +12,7 @@ const LINE_WIDTH = 1000
 /** @param {{ seasons?: number, active?: number }} [options] */
 const drawer = ({ seasons = 48, active = 48 } = {}) => {
   const buttons = Array.from({ length: seasons }, (_, i) => i + 1)
-    .map((n) => `<input class="season-submit"${n === active ? ' id="active-season"' : ''} type="submit" name="season[:id]" value="${n}">`).join('')
+    .map((n) => `<button class="season-submit"${n === active ? ' id="active-season"' : ''} type="submit" name="season[:id]" value="${n}">${n}</button>`).join('')
   const page = makePage(`<div class="info-wrapper"><div class="season-row">
     <form id="season-default" action="/users/7/shows/3/seasons/" method="POST">${buttons}</form>
     <button type="button" class="season-arrow left" aria-label="Earlier seasons"></button>
@@ -25,7 +25,7 @@ const drawer = ({ seasons = 48, active = 48 } = {}) => {
     for (const [name, value] of Object.entries(sizes)) Object.defineProperty(el, name, { value, configurable: true })
   }
   size(line, { clientWidth: LINE_WIDTH, scrollWidth: seasons * SEASON_WIDTH })
-  line.querySelectorAll('input').forEach((input, i) => size(input, { offsetLeft: i * SEASON_WIDTH, offsetWidth: SEASON_WIDTH }))
+  line.querySelectorAll('.season-submit').forEach((button, i) => size(button, { offsetLeft: i * SEASON_WIDTH, offsetWidth: SEASON_WIDTH }))
   const left = /** @type {HTMLElement} */ (document.querySelector('.season-arrow.left'))
   const right = /** @type {HTMLElement} */ (document.querySelector('.season-arrow.right'))
   // The arrows are display: none until placeSeasons shows them, so they measure 0px; the CSS gives the line their width as scroll padding.

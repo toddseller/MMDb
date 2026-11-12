@@ -1,4 +1,4 @@
-1 season, 1 episode Law & Order Season 1 Tom & Jerry SEASON: EPISODE 1 Pilot & Co 45 min A & B more
+1 season, 1 episode Law & Order Season 1 Tom & Jerry SEASON: 1 EPISODE 1 Pilot & Co 45 min A & B more
 img[alt]=Law & Order Poster
 img[src]=
-input[value]=1
+button[value]=1

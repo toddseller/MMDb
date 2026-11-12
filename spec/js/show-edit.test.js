@@ -31,8 +31,8 @@ const DETAILS = `
     <div class="description-poster"><img src="https://img.test/old/600x600.jpg" alt="Tides Poster"></div>
     <div class="season-row">
       <form id="season-default" action="/users/7/shows/3/seasons/" method="POST">
-        <input class="season-submit" id="active-season" type="submit" name="season[:id]" value="1">
-        <input class="season-submit" type="submit" name="season[:id]" value="2">
+        <button class="season-submit" id="active-season" type="submit" name="season[:id]" value="1">1</button>
+        <button class="season-submit" type="submit" name="season[:id]" value="2">2</button>
       </form>
       <button type="button" class="season-arrow left" aria-label="Earlier seasons"></button>
       <button type="button" class="season-arrow right" aria-label="Later seasons"></button>
