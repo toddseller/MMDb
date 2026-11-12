@@ -18,7 +18,7 @@
         <input type="hidden" name="season[storeId]" value="<%="#{show[:storeId]}"%>">
         <input type="image" id="show-poster" name="submit" src="<%="#{show[:poster]}"%>" width="300" height="300" border="0" alt="<%="#{show[:title]} Poster"%>">
         <p class="preview-truncate"><%="#{show[:title]}"%></p>
-        <p id="year"><%="Season #{show[:season]}"%></p>
+        <p id="year"><%= Season.label(show[:season]) %></p>
       </form>
     </div>
   <% end %>

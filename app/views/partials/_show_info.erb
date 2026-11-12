@@ -8,23 +8,12 @@
       <% end %>
       <div class="col-lg-4 description-poster">
         <img src="<%= "#{season.poster}" %>" alt="<%= "#{show.title} Poster" %>">
-        <% if show.seasons.count == 1 && show.episode_count == 1 %>
-          <p id="counts">1 season, 1 episode</p>
-        <% elsif show.seasons.count == 1 && show.episode_count > 1 %>
-          <p id="counts">1 season, <%= "#{show.episode_count}" %> episodes</p>
-        <% elsif show.seasons.count > 1 && show.episode_count == 1 %>
-          <p id="counts"><%= "#{show.seasons.count}" %> seasons, 1 episode</p>
-        <% else %>
-          <p id="counts"><%= "#{show.seasons.count}" %> seasons, <%= "#{show.episode_count}" %> episodes</p>
-        <% end %>
+        <% regular, episode_count = show.regular_seasons.size, show.episode_count %>
+        <p id="counts"><%= regular.zero? ? 'Specials' : "#{regular} #{'season'.pluralize(regular)}" %>, <%= "#{episode_count} #{'episode'.pluralize(episode_count)}" %></p>
       </div>
       <div class="col-lg-7 series-info">
         <h1><%= show.title %></h1>
-        <% if show.seasons.count > 1 %>
-          <p id="series-count"><%= "#{show.seasons.count} seasons" %></p>
-        <% else %>
-          <p id="series-count"><%= "Season #{show.season_numbers}" %></p>
-        <% end %>
+        <p id="series-count"><%= regular > 1 ? "#{regular} seasons" : show.season_caption %></p>
         <div class="series-details">
           <span class="spacing"><%= show.genre %></span>
           <span class="spacing"><%= show.year %></span>
@@ -51,11 +40,11 @@
           SEASON:
           <div class="season-row">
             <form id="season-default" action="<%="/users/#{user.id}/shows/#{show.id}/seasons/"%>" method="POST">
-              <% show.seasons.sorted_seasons.each do |s| %>
+              <% show.seasons.each do |s| %>
                 <% if s.is_active %>
-                  <input class="season-submit" id="active-season" type="submit" name="season[:id]" value="<%="#{s.season}"%>">
+                  <button class="season-submit" id="active-season" type="submit" name="season[:id]" value="<%= s.season %>"><%= s.specials? ? 'Specials' : s.season %></button>
                 <% else %>
-                  <input class="season-submit" type="submit" name="season[:id]" value="<%="#{s.season}"%>">
+                  <button class="season-submit" type="submit" name="season[:id]" value="<%= s.season %>"><%= s.specials? ? 'Specials' : s.season %></button>
                 <% end %>
               <% end %>
             </form>

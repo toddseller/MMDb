@@ -5,7 +5,7 @@ class Show < ActiveRecord::Base
   validates :title, presence: true
 
   has_and_belongs_to_many :users
-  has_many :seasons, -> { order(season: :asc) }
+  has_many :seasons, -> { sorted_seasons }
 
   accepts_nested_attributes_for :seasons
 
@@ -101,9 +101,17 @@ class Show < ActiveRecord::Base
   end
 
   def season_numbers
-    numbers = []
-    self.seasons.each {|s| numbers << s.season.to_i}
+    numbers = regular_seasons.map { |s| s.season.to_i }
     numbers.sort.each_cons(2).all? { |x,y| y == x + 1 } && numbers.length == 3 || numbers.length == 4 ? numbers.sort.values_at(0,-1).join('–') : numbers.length < 5 ? numbers.sort.join(', ') : numbers.length
+  end
+
+  def regular_seasons = seasons.reject(&:specials?)
+
+  def season_caption
+    regular = regular_seasons
+    return 'Specials' if regular.empty?
+    return regular.first.label if regular.one?
+    regular.size < 5 ? "Seasons #{season_numbers}" : "#{regular.size} seasons"
   end
 
   def episode_count
@@ -179,7 +187,7 @@ class Show < ActiveRecord::Base
 
   def add_season_count
     self.seasonNumbers = self.season_numbers.to_s
-    self.seasonCount = self.seasons.count.to_s
+    self.seasonCount = regular_seasons.size.to_s
     self.episodeCount = self.episode_count.to_s
   end
 

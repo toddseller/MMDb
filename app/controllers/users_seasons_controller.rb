@@ -3,7 +3,7 @@ post '/users/:user_id/shows/:show_id/seasons/:id' do
   user = current_user
   show = Show.find(params[:show_id])
   p '+' * 80
-  p seasons = show.seasons.sorted_seasons
+  p seasons = show.seasons
   seasons.each do |s|
     s.season.to_s == params[:id] ? s.update(is_active: true) : s.update(is_active: false)
   end

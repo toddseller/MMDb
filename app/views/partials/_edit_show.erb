@@ -7,9 +7,9 @@
       <div class="col-sm-9 show-title">
         <h4><%= @show.title %></h4>
         <% if @count > 1 || @count == 0 %>
-          <p>Season <%= "#{@season.season}" %>, <%= "#{@count}" %> episodes selected</p>
+          <p><%= @season.label %>, <%= "#{@count}" %> episodes selected</p>
         <% else %>
-          <p>Season <%= "#{@season.season}" %>, <%= "#{@count}" %> episode selected</p>
+          <p><%= @season.label %>, <%= "#{@count}" %> episode selected</p>
         <% end %>
       </div>
     </div>

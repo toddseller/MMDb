@@ -60,7 +60,7 @@ test.describe('the Movies/TV Shows switch', () => {
     await pageButton(page, 'TV Shows').click()
 
     await expect(page.locator('#show-list img[alt="Night Ferry Poster"]')).toBeVisible()
-    await expect(page.locator('.footer')).toHaveText('1 TV Shows \u2014 2 Episodes')
+    await expect(page.locator('.footer')).toHaveText('1 TV Shows \u2014 3 Episodes')
     expect(await count()).toBe(1)
   })
 

@@ -57,6 +57,9 @@ other.movies << Movie.create!(title: 'Ferry Lights', year: '2001', director: 'Ja
 night = Show.create!(title: 'Night Ferry', year: '2022', show_collection_id: '997', poster: 'https://is1-ssl.mzstatic.com/image/thumb/night-ferry/600x600.jpg')
 night_season = night.seasons.create!(season: 1, collectionName: 'Night Ferry, Season 1', collectionId: 'tmdb9971', is_active: true)
 (1..2).each { |number| night_season.episodes.create!(title: "Night Ferry 1x#{number}", tv_episode: number, plot: "Episode #{number}.") }
+# Specials, which the drawer lists last and names Specials.
+night.seasons.create!(season: 0, collectionName: 'Night Ferry, Specials', collectionId: 'tmdb9970')
+  .episodes.create!(title: 'Night Ferry Special', tv_episode: 1, plot: 'A special.')
 other.shows << night
 
 # The letter rail needs a collection many screens long, with a gap at Q, a leading article and titles under #.

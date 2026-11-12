@@ -2,15 +2,7 @@
   <div class="index-preview-show text-center" data-letter="<%= RailLetter.of(show.sort_name) %>" id="<%="#{user.id}"%>">
     <a class="show-modal" id="<%="#{show.id}"%>"><img src='<%= show.thumbnail %>' loading='lazy' alt='<%="#{show.title}" %> Poster' width='200' height='200' class='list-poster'></a>
     <p class="show-truncate"><%= show.title %></p>
-    <p class="season">
-      <% if show.seasons.size > 1 && show.seasons.size < 5 %>
-        Seasons <%= show.season_numbers %>
-      <% elsif show.seasons.size >= 5 %>
-        <%= show.seasons.length %> seasons
-      <% else %>
-        Season <%= show.seasons[0].season %>
-      <% end %>
-    </p>
+    <p class="season"><%= show.season_caption %></p>
     <div class="show-pointer"></div>
   </div>
 <% end %>

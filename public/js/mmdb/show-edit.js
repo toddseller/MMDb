@@ -164,7 +164,7 @@ const upload = async (document, input) => {
   }
 }
 
-/** @param {Document} document @param {HTMLInputElement} button */
+/** @param {Document} document @param {HTMLButtonElement} button */
 const setDefaultSeason = async (document, button) => {
   const { page, poster } = await request(`${button.form?.getAttribute('action') ?? ''}${button.value}`, { method: 'POST' })
   showSaved(document, page, poster)
@@ -187,7 +187,7 @@ export const init = (document) => {
   })
   on(document, 'click', '.season-submit', (event, button) => {
     event.preventDefault()
-    setDefaultSeason(document, /** @type {HTMLInputElement} */ (button))
+    setDefaultSeason(document, /** @type {HTMLButtonElement} */ (button))
   })
   on(document, 'click', '#create-new', async (event) => {
     event.preventDefault()

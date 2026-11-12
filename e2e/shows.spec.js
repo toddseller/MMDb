@@ -1,5 +1,5 @@
 import { readFileSync } from 'node:fs'
-import { test, expect, USER, reseed, signIn } from './fixtures.js'
+import { test, expect, USER, OTHER, reseed, signIn } from './fixtures.js'
 
 // Written by the seed from the real routes and partials, with Apple and TMDB replaced by canned results.
 const recorded = (name) => readFileSync(new URL(`./.generated/${name}.json`, import.meta.url), 'utf8')
@@ -86,7 +86,7 @@ test.describe('a show with more seasons than fit on one line', () => {
     await expect(seasons).toHaveCount(48)
 
     expect(await seasons.evaluateAll((els) => new Set(els.map((el) => el.getBoundingClientRect().top)).size)).toBe(1)
-    await expect(page.locator('#active-season')).toHaveValue('48')
+    await expect(page.locator('#active-season')).toHaveAttribute('value', '48')
     expect(await inView(page)).toContain(48)
     await expect(earlier(page)).toBeVisible()
     await expect(later(page)).toBeHidden()
@@ -105,7 +105,7 @@ test.describe('a show with more seasons than fit on one line', () => {
     const target = (await inView(page))[2]
 
     await line(page).getByRole('button', { name: String(target), exact: true }).click()
-    await expect(page.locator('#active-season')).toHaveValue(String(target))
+    await expect(page.locator('#active-season')).toHaveAttribute('value', String(target))
     expect(await scrolled(page)).toBe(position)
   })
 
@@ -130,12 +130,12 @@ test.describe('a show with more seasons than fit on one line', () => {
     await page.emulateMedia({ reducedMotion: 'reduce' })
     await oldHouse(page).click()
     await line(page).getByRole('button', { name: '40', exact: true }).click()
-    await expect(page.locator('#active-season')).toHaveValue('40')
+    await expect(page.locator('#active-season')).toHaveAttribute('value', '40')
 
     await page.reload()
     await oldHouse(page).click()
 
-    await expect(page.locator('#active-season')).toHaveValue('40')
+    await expect(page.locator('#active-season')).toHaveAttribute('value', '40')
     await expect(later(page)).toBeVisible()
     const [box, arrow] = await Promise.all([page.locator('#active-season').boundingBox(), later(page).boundingBox()])
     expect(box.x + box.width).toBeLessThanOrEqual(arrow.x)
@@ -149,4 +149,15 @@ test.describe('a show with more seasons than fit on one line', () => {
     await expect(earlier(page)).toBeHidden()
     await expect(later(page)).toBeHidden()
   })
+})
+
+test('a show with specials lists them last as Specials, and leaves them out of its season count', async ({ page }) => {
+  await page.goto(`/users/${OTHER.id}/shows`)
+  const tile = page.locator('.index-preview-show', { has: page.locator('img[alt="Night Ferry Poster"]') })
+  await expect(tile.locator('.season')).toHaveText('Season 1')
+
+  await tile.locator('img').click()
+
+  await expect(page.locator('#season-default .season-submit')).toHaveText(['1', 'Specials'])
+  await expect(page.locator('#counts')).toHaveText('1 season, 3 episodes')
 })
