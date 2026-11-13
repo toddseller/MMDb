@@ -135,41 +135,44 @@ class Show < ActiveRecord::Base
     title = data['type'] == 'show' ? data['title'].downcase() : data['grandparentTitle'].downcase()
     season_number = data['type'] == 'show' ? data['childCount'] : data['parentIndex']
     episode_number = data['index'] if data['type'] != 'show'
-    year = title == 'matlock' ? 2024 : data['year']
     show = nil
     season = nil
     episode = nil
     episodes = []
 
-    series = get_series(title)
-    series.each do |s|
-      series_condition = data['type'] == 'show' ? s[:title].downcase() == title && s[:season].to_i == season_number && s[:year].to_i == year : s[:title].downcase() == title && s[:season].to_i == season_number
-      if series_condition
-        show = Show.find_by(show_collection_id: s[:show_collection_id]) || Show.new(title: s[:title], year: s[:year], rating: s[:rating], genre: s[:genre], poster: s[:poster], show_collection_id: s[:show_collection_id])
-        s.except!(:genre, :rating, :title, :year, :show_collection_id)
-        season = Season.find_by(collectionId: s[:collectionId]) || show.seasons.new(s)
+    matches = get_series(title).select do |s|
+      s[:title].downcase == title && s[:season].to_i == season_number && (data['type'] != 'show' || Match.same_year?(s[:year], data['year']))
+    end
+    matches = plex_episode_show(matches, data['Guid']) if data['type'] == 'episode'
+    if data['type'] == 'episode' && matches.map { |s| s[:show_collection_id] }.uniq.size > 1
+      puts "Plex episode skipped, several shows match: #{data['grandparentTitle']} S#{season_number}E#{episode_number}"
+      return
+    end
+    matches.each do |s|
+      show = Show.find_by(show_collection_id: s[:show_collection_id]) || Show.new(title: s[:title], year: s[:year], rating: s[:rating], genre: s[:genre], poster: s[:poster], show_collection_id: s[:show_collection_id])
+      s.except!(:genre, :rating, :title, :year, :show_collection_id)
+      season = Season.find_by(collectionId: s[:collectionId]) || show.seasons.new(s)
 
-        if season.collectionId.include? 'tmdb'
-          episodes = data['type'] == 'show' ? tmdb_episodes(show.show_collection_id, season_number) : tmdb_episodes(show.show_collection_id, season_number, episode_number)
-        else
-          skip, count = apple_season_window(season.appleTvId, season_number, season.storeId) || [season.skip.to_i, season.count.to_i]
-          episodes = data['type'] == 'show' ? appletv_episodes(season.appleTvId, skip.to_s, count.to_s, season.storeId, season_number) : appletv_episodes(season.appleTvId, (skip + episode_number - 1).to_s, '1', season.storeId, season_number)
-        end
+      if season.collectionId.include? 'tmdb'
+        episodes = data['type'] == 'show' ? tmdb_episodes(show.show_collection_id, season_number) : tmdb_episodes(show.show_collection_id, season_number, episode_number)
+      else
+        skip, count = apple_season_window(season.appleTvId, season_number, season.storeId) || [season.skip.to_i, season.count.to_i]
+        episodes = data['type'] == 'show' ? appletv_episodes(season.appleTvId, skip.to_s, count.to_s, season.storeId, season_number) : appletv_episodes(season.appleTvId, (skip + episode_number - 1).to_s, '1', season.storeId, season_number)
+      end
 
-        if data['type'] == 'episode'
-          episodes.each do |episode|
-            if episode[:tv_episode].to_i == episode_number.to_i
-              new_episode = season.episodes.find_or_initialize_by(tv_episode: episode[:tv_episode])
-              new_episode.assign_attributes(episode)
-              save_show(user, s, show, season, new_episode)
-            end
-          end
-        else
-          episodes.select { |episode| aired?(episode[:date]) }.each do |episode|
+      if data['type'] == 'episode'
+        episodes.each do |episode|
+          if episode[:tv_episode].to_i == episode_number.to_i
             new_episode = season.episodes.find_or_initialize_by(tv_episode: episode[:tv_episode])
             new_episode.assign_attributes(episode)
             save_show(user, s, show, season, new_episode)
           end
+        end
+      else
+        episodes.select { |episode| aired?(episode[:date]) }.each do |episode|
+          new_episode = season.episodes.find_or_initialize_by(tv_episode: episode[:tv_episode])
+          new_episode.assign_attributes(episode)
+          save_show(user, s, show, season, new_episode)
         end
       end
     end
@@ -393,6 +396,27 @@ class Show < ActiveRecord::Base
       puts "Error in appletv_episodes: #{e.message}"
     end
     return episodes
+  end
+
+  # Plex names an episode's show only by title, which namesakes share. Its IMDb or TVDB ID leads TMDB to the one show;
+  # without that, or when TMDB's show matches no candidate, the episode goes to a show already stored when there is one.
+  def self.plex_episode_show(matches, guids)
+    found = plex_tmdb_show(guids)
+    placed = found ? matches.select { |s| s[:collectionId].to_s.start_with?('tmdb') ? s[:show_collection_id] == found[:id] : Match.same_year?(s[:year], found[:year]) } : []
+    return placed if placed.any?
+    stored = matches.select { |s| Show.exists?(show_collection_id: s[:show_collection_id]) }
+    stored.empty? ? matches : stored
+  end
+
+  def self.plex_tmdb_show(guids)
+    ids = Array(guids).to_h { |guid| guid['id'].to_s.split('://', 2).values_at(0, 1) }
+    show_id = { 'imdb' => 'imdb_id', 'tvdb' => 'tvdb_id' }.lazy.filter_map do |source, external_source|
+      ids[source] && Tmdb.get("find/#{ids[source]}", external_source: external_source)[:body]['tv_episode_results']&.first&.dig('show_id')
+    end.first
+    show_id && { id: show_id.to_s, year: get_year(Tmdb.get("tv/#{show_id}")[:body]['first_air_date']) }
+  rescue StandardError => e
+    puts "TMDB couldn't place the Plex episode: #{e.message}"
+    nil
   end
 
   def self.save_show(user, series, show, season, episode)
