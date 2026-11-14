@@ -14,19 +14,22 @@ export type IssueProps = {
 }
 
 // pageText is for the few words that sit on the page colour, outside the white column.
-export type Theme = { page: string, pageText: string, surface: string, text: string, muted: string, accent: string, tile: string }
+export type Theme = { page: string, pageText: string, surface: string, text: string, muted: string, accent: string, playBar: string }
 
 const FONT = "'Helvetica Neue', Helvetica, Arial, sans-serif"
 const LOGO = 'https://cdn.myflix.stream/avatars/myflix_m.png'
 const WORDMARK = 'https://myflix.stream/images/logo_red.png'
 
 const PER_ROW = 3
-const POSTER_WIDTH = 176
-const POSTER_HEIGHT = 264
+// The column's real size (600px less the grid's and columns' padding, in thirds) at a poster's 2:3, for Outlook,
+// which draws images at their declared size rather than filling the column.
+const POSTER_WIDTH = 178
+const POSTER_HEIGHT = 267
+const NO_POSTER = 'https://cdn.myflix.stream/avatars/no-poster.png'
 
-// Posters shrink with the column on a phone; this keeps a tile without one the same height as its neighbours.
+// The footer's side padding shrinks on a phone so its text keeps a readable width.
 const PhoneStyles = () => (
-  <style>{'@media (max-width: 480px) { .no-art { height: 165px !important; } .footer { padding: 32px 20px 24px !important; } }'}</style>
+  <style>{'@media (max-width: 480px) { .footer { padding: 32px 20px 24px !important; } }'}</style>
 )
 
 const ViewInBrowser = ({ url, theme }: { url?: string, theme: Theme }) => url ? (
@@ -85,21 +88,16 @@ const HeroCard = ({ hero, theme }: { hero?: Hero, theme: Theme }) => hero ? (
 const rows = (cards: Card[]) =>
   Array.from({ length: Math.ceil(cards.length / PER_ROW) }, (_, n) => cards.slice(n * PER_ROW, (n + 1) * PER_ROW))
 
+// Every card ends in a bar joined flush under its poster (top corners round, bar's bottom ones): a show's label in the
+// accent colour, or a movie's Play cue in the theme's quieter playBar colour so the accent still marks what's new.
 const Tile = ({ card, theme }: { card: Card, theme: Theme }) => (
   <Link href={card.link} style={{ color: theme.text, textDecoration: 'none' }}>
-    {card.poster
-      ? <Img src={card.poster} alt={card.title} width={POSTER_WIDTH} height={POSTER_HEIGHT}
-          style={{ display: 'block', width: '100%', maxWidth: POSTER_WIDTH, height: 'auto', borderRadius: 6 }} />
-      : <Section className="no-art" style={{ height: POSTER_HEIGHT, maxWidth: POSTER_WIDTH, background: theme.tile, borderRadius: 6 }}>
-          <Text style={{ margin: 0, padding: '0 10px', fontSize: 15, fontWeight: 'bold', textAlign: 'center', color: theme.muted }}>{card.title}</Text>
-        </Section>}
-    {card.label && (
-      <Text style={{ margin: '8px 0 0' }}>
-        <span style={{ display: 'inline-block', padding: '3px 7px', borderRadius: 3, background: theme.accent, color: '#ffffff',
-          fontSize: 11, fontWeight: 'bold', letterSpacing: 0.3, textTransform: 'uppercase' }}>{card.label}</span>
-      </Text>
-    )}
-    <Text style={{ margin: '6px 0 0', fontSize: 14, fontWeight: 'bold', lineHeight: '18px', color: theme.text }}>{card.title}</Text>
+    <Img src={card.poster ?? NO_POSTER} alt={card.title} width={POSTER_WIDTH} height={POSTER_HEIGHT}
+      style={{ display: 'block', width: '100%', height: 'auto', borderRadius: '6px 6px 0 0' }} />
+    <Text style={{ margin: 0, padding: '5px 0', borderRadius: '0 0 6px 6px', background: card.label ? theme.accent : theme.playBar,
+      color: '#ffffff', fontSize: 11, fontWeight: 'bold', lineHeight: '14px', letterSpacing: 0.3, textAlign: 'center',
+      textTransform: 'uppercase' }}>{card.label ?? '▶ Play'}</Text>
+    <Text style={{ margin: '8px 0 0', fontSize: 14, fontWeight: 'bold', lineHeight: '18px', color: theme.text }}>{card.title}</Text>
     {card.year && <Text style={{ margin: '2px 0 0', fontSize: 13, lineHeight: '17px', color: theme.muted }}>{card.year}</Text>}
   </Link>
 )
@@ -108,7 +106,7 @@ const Cards = ({ heading, cards, theme }: { heading: string, cards: Card[], them
   <Section style={{ padding: '0 14px 12px' }}>
     <Text style={{ margin: '0 6px 12px', fontSize: 22, fontWeight: 'bold', color: theme.text }}>{heading}</Text>
     {rows(cards).map((row, n) => (
-      <Row key={n} style={{ marginBottom: 22 }}>
+      <Row key={n} style={{ marginBottom: 22, tableLayout: 'fixed' }}>
         {Array.from({ length: PER_ROW }, (_, i) => (
           <Column key={i} width="33%" valign="top" style={{ padding: '0 6px' }}>
             {row[i] && <Tile card={row[i]} theme={theme} />}

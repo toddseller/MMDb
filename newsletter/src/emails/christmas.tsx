@@ -2,7 +2,7 @@ import { Section, Text } from '@react-email/components'
 import { Layout, type IssueProps, type Theme } from './_parts.tsx'
 import Regular from './regular.tsx'
 
-const theme: Theme = { page: '#0b3d2c', pageText: '#cfe3d6', surface: '#fffaf3', text: '#221f1f', muted: '#6b6259', accent: '#c8102e', tile: '#efe6d8' }
+const theme: Theme = { page: '#0b3d2c', pageText: '#cfe3d6', surface: '#fffaf3', text: '#221f1f', muted: '#6b6259', accent: '#c8102e', playBar: '#0b3d2c' }
 
 const banner = (
   <Section style={{ background: theme.accent, padding: '10px 20px', textAlign: 'center' }}>
