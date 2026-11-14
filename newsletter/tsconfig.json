@@ -1,0 +1,17 @@
+{
+  // tsx runs the sources as written; tsc only checks them.
+  "compilerOptions": {
+    "noEmit": true,
+    "strict": true,
+    "target": "ES2022",
+    // React Email's declarations name DOM element types and untyped helper packages.
+    "lib": ["ES2022", "DOM"],
+    "skipLibCheck": true,
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
+    "jsx": "react-jsx",
+    "allowImportingTsExtensions": true,
+    "types": ["node"]
+  },
+  "include": ["src", "test"]
+}

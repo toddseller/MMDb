@@ -1,0 +1,11 @@
+[Unit]
+Description=Send MMDb's weekly newsletter every Sunday at midnight Pacific
+
+[Timer]
+# The server runs on UTC; naming the zone keeps it at midnight Pacific through daylight saving changes.
+OnCalendar=Sun *-*-* 00:00:00 America/Los_Angeles
+# A run missed while the server was down happens at the next boot.
+Persistent=true
+
+[Install]
+WantedBy=timers.target

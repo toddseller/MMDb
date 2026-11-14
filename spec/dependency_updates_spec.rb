@@ -15,6 +15,15 @@ describe 'dependency updates' do
     expect(requirement).to be_satisfied_by(Gem::Version.new("#{major}.#{minor}.#{patch + 1}"))
   end
 
+  it "pins the newsletter's base image by digest" do
+    expect(File.read(APP_ROOT.join('newsletter', 'Dockerfile'))[/^FROM (\S+)/, 1]).to match(/\Anode:\d+\.\d+\.\d+-slim@sha256:\h{64}\z/)
+  end
+
+  it "watches the newsletter's npm packages and base image" do
+    updates = YAML.safe_load_file(APP_ROOT.join('.github', 'dependabot.yml'))['updates']
+    expect(updates.select { |u| u['directory'] == '/newsletter' }.map { |u| u['package-ecosystem'] }).to match_array %w[npm docker]
+  end
+
   describe 'the Tests workflow' do
     let(:jobs) { YAML.safe_load_file(APP_ROOT.join('.github', 'workflows', 'test.yml'))['jobs'] }
     let(:runs) { ->(job) { jobs[job]['steps'].map { |step| step['run'].to_s } } }
@@ -22,6 +31,15 @@ describe 'dependency updates' do
     # The tests run outside Docker, so only building the image catches an update that breaks it.
     it 'builds the image in a job the required check waits for' do
       expect(runs.('image')).to include(start_with('docker build'))
+    end
+
+    it 'builds the newsletter image too' do
+      expect(runs.('image')).to include('docker build newsletter')
+    end
+
+    it "type-checks and tests the newsletter in the unit job" do
+      newsletter = jobs['unit']['steps'].select { |step| step['working-directory'] == 'newsletter' }.map { |step| step['run'] }
+      expect(newsletter).to eq ['npm ci', 'npm run typecheck', 'npm test']
     end
 
     # The ci-test-gate spec runs tests on production's Postgres major version, now 18 on 192.168.40.5.

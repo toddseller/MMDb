@@ -54,3 +54,6 @@ vendor/bundle/
 
 # Coverage
 coverage/
+
+# The newsletter job has its own image and writes issue pages here.
+newsletter/

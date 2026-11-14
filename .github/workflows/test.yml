@@ -23,6 +23,10 @@ jobs:
       - name: Build the image
         run: docker build .
 
+      # The weekly timer builds this image itself, so CI is where a broken one shows up before Sunday.
+      - name: Build the newsletter image
+        run: docker build newsletter
+
   unit:
     # Follows GitHub's current image on purpose; if Ruby setup fails after GitHub moves it, setup-ruby has no build of the Ruby below for that image yet.
     runs-on: ubuntu-latest
@@ -74,12 +78,24 @@ jobs:
         with:
           node-version: '24'
           cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            newsletter/package-lock.json
 
       - run: npm ci
 
       - run: npm run typecheck
 
       - run: npm test
+
+      - run: npm ci
+        working-directory: newsletter
+
+      - run: npm run typecheck
+        working-directory: newsletter
+
+      - run: npm test
+        working-directory: newsletter
 
   # Browser tests: Playwright drives Chromium against the app, which runs on its own database (see e2e/).
   # They share that seeded database, so they run in parallel only as separate jobs, each with its own.
