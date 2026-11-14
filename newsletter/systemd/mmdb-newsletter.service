@@ -1,0 +1,10 @@
+[Unit]
+Description=Send MMDb's weekly newsletter
+
+[Service]
+Type=oneshot
+WorkingDirectory=%h/MMDb
+# A user unit can't order itself after the system's docker.service, and a catch-up run fires right at boot.
+ExecStartPre=/bin/sh -c 'until /usr/bin/docker info >/dev/null 2>&1; do sleep 5; done'
+# --build, so each run uses the code the server has checked out; bin/deploy doesn't build this image.
+ExecStart=/usr/bin/docker compose run --rm --build -T newsletter

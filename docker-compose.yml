@@ -24,3 +24,16 @@ services:
       - PLEX_USER_ID=${PLEX_USER_ID}
       - LIBRARY_KEY=${LIBRARY_KEY:-1}
       - REDISTOGO_URL=${REDISTOGO_URL:-redis://localhost:6379/}
+
+  # Run once a week by the systemd timer in newsletter/systemd; the profile keeps `compose up` from starting it.
+  newsletter:
+    build: ./newsletter
+    profiles: [newsletter]
+    volumes:
+      - ./newsletter/issues:/issues
+    # Passes TAUTULLI_KEY, TMDB_TOKEN, RESEND_API_KEY and RESEND_SEGMENT_ID.
+    env_file:
+      - .env
+    environment:
+      # The run date (issue name, holiday windows) follows Pacific time, not the server's UTC.
+      - TZ=America/Los_Angeles

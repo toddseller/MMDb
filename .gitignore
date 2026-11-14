@@ -86,3 +86,6 @@ node_modules/
 test-results/
 playwright-report/
 e2e/.generated/
+
+# Issue pages the newsletter job writes; myflix serves them.
+newsletter/issues/

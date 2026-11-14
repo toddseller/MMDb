@@ -37,3 +37,24 @@ updates:
       # A new Ruby minor or major also needs the Gemfile and CI changed, so it stays deliberate.
       - dependency-name: ruby
         update-types: [version-update:semver-minor, version-update:semver-major]
+
+  # The newsletter job has its own packages and Node base image.
+  - package-ecosystem: npm
+    directory: /newsletter
+    schedule:
+      interval: weekly
+    groups:
+      newsletter-npm:
+        update-types: [minor, patch]
+
+  - package-ecosystem: docker
+    directory: /newsletter
+    schedule:
+      interval: weekly
+    groups:
+      newsletter-base-image:
+        update-types: [minor, patch]
+    ignore:
+      # A new Node major is a deliberate upgrade, like Ruby's.
+      - dependency-name: node
+        update-types: [version-update:semver-major]

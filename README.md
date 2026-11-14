@@ -337,6 +337,18 @@ MMDb can automatically update your library via Plex webhooks.
    - `library.new` - Automatically adds new media to MMDb
    - Matches movies and shows using the TMDB and Apple TV APIs
 
+## Weekly Newsletter
+
+Every Sunday at midnight Pacific, a separate Node job in `newsletter/` emails the week's Plex additions, as reported by Tautulli, to a Resend segment, replacing Tautulli's own newsletter. Each title links into Plex with its TMDB poster, readers can unsubscribe, and each issue is also saved as a page on myflix.stream. Templates are React Email components in `newsletter/src/emails/`; they rotate weekly, with a Christmas template from December 1 to 26. Setup, the systemd timer and test sends are in [DOCKER_DEPLOYMENT.md](DOCKER_DEPLOYMENT.md#weekly-newsletter).
+
+```bash
+cd newsletter
+npm ci
+npm run typecheck   # TypeScript checks the job and its templates
+npm test            # unit tests; Tautulli, TMDB and Resend are stubbed
+npm run preview     # the templates with sample data
+```
+
 ## Database Management
 
 ### Migrations
