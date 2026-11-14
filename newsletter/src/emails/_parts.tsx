@@ -17,7 +17,8 @@ export type IssueProps = {
 export type Theme = { page: string, pageText: string, surface: string, text: string, muted: string, accent: string, tile: string }
 
 const FONT = "'Helvetica Neue', Helvetica, Arial, sans-serif"
-const LOGO = 'https://myflix.stream/images/logo_red.png'
+const LOGO = 'https://cdn.myflix.stream/avatars/myflix_m.png'
+const WORDMARK = 'https://myflix.stream/images/logo_red.png'
 
 const PER_ROW = 3
 const POSTER_WIDTH = 176
@@ -37,8 +38,8 @@ const ViewInBrowser = ({ url, theme }: { url?: string, theme: Theme }) => url ? 
 const Masthead = ({ date, theme, kicker = 'Recently added' }: { date: string, theme: Theme, kicker?: string }) => (
   <Section style={{ padding: '24px 20px 8px' }}>
     <Row>
-      <Column width={110} valign="middle"><Img src={LOGO} alt="MYFLIX" width={96} height={31} /></Column>
-      <Column valign="middle" style={{ paddingLeft: 14 }}>
+      <Column width={44} valign="middle"><Img src={LOGO} alt="MYFLIX" width={40} height={41} /></Column>
+      <Column valign="middle" style={{ paddingLeft: 12 }}>
         <Text style={{ margin: 0, fontSize: 16, fontWeight: 'bold', lineHeight: '20px', color: theme.text }}>{kicker}</Text>
         <Text style={{ margin: 0, fontSize: 13, lineHeight: '18px', color: theme.muted }}>{date}</Text>
       </Column>
@@ -127,7 +128,11 @@ const FOOTER_TEXT = '#b3b3b3'
 const Footer = ({ unsubscribeUrl, recipient }: FooterProps) => {
   const line = { margin: '0 0 16px', fontSize: 14, lineHeight: '20px', color: FOOTER_TEXT }
   return (
-    <Section className="footer" style={{ background: FOOTER_BG, padding: '40px 48px 32px' }}>
+    <Section className="footer" style={{ background: FOOTER_BG, padding: '32px 48px 32px' }}>
+      {/* A centred cell, because Outlook ignores margin: auto on images. */}
+      <Row style={{ marginBottom: 24 }}>
+        <Column align="center"><Img src={WORDMARK} alt="MYFLIX" width={124} height={40} style={{ margin: '0 auto' }} /></Column>
+      </Row>
       <Text style={line}>Questions? With Myflix, No Support Is The Best Support!</Text>
       {unsubscribeUrl && (
         <Text style={line}>

@@ -26,6 +26,10 @@ for (const [name, Template] of [['regular', Regular], ['christmas', Christmas]] 
     assert.ok(html.includes('href="https://app.plex.tv/desktop/#!/server/abc/details?key=%2Flibrary%2Fmetadata%2F2"'))
     assert.ok(html.includes('src="https://image.tmdb.org/t/p/w342/carter.jpg"'))
     assert.doesNotMatch(html, /Artwork from TMDB|Tap a title/)
+    assert.equal(html.split('src="https://cdn.myflix.stream/avatars/myflix_m.png"').length - 1, 1, 'the M in the masthead')
+    assert.equal(html.split('src="https://myflix.stream/images/logo_red.png"').length - 1, 1, 'the wordmark atop the footer')
+    // Outlook ignores margin: auto on images but honours a centred table cell.
+    assert.match(html, /<td align="center"[^>]*><img[^>]*src="https:\/\/myflix\.stream\/images\/logo_red\.png"/)
     assert.match(html, /Questions\? With Myflix, No Support Is The Best Support!/)
     assert.match(html, /Use of the Myflix service and website is subject to our Terms of Use and Privacy Statement\./)
   })
