@@ -37,14 +37,14 @@ test('a movie card has its title, year, TMDB poster and Plex link', async () => 
   }])
 })
 
-test("a season's card uses the show's guid, poster and link, never the season's", async () => {
+test("a season's card links to the season but uses the show's guid and poster", async () => {
   const calls = stubFetch(...plex(), tmdb({ '/3/tv/84773': '/rings.jpg' }))
 
   const { shows } = await cards([season3])
 
   assert.equal(shows[0].poster, 'https://image.tmdb.org/t/p/w342/rings.jpg')
-  assert.equal(shows[0].link, 'https://app.plex.tv/desktop/#!/server/abc123/details?key=%2Flibrary%2Fmetadata%2F75801')
-  assert.deepEqual([shows[0].title, shows[0].label], ['The Rings of Power', 'Season 3'])
+  assert.equal(shows[0].link, 'https://app.plex.tv/desktop/#!/server/abc123/details?key=%2Flibrary%2Fmetadata%2F133907')
+  assert.deepEqual([shows[0].title, shows[0].label], ['The Rings of Power', 'New season'])
   assert.ok(!calls.some((c) => c.searchParams.get('rating_key') === '133907' || c.pathname.includes('467821')))
 })
 
@@ -75,36 +75,46 @@ const tulsa: Added = { rating_key: '106477', section_id: '2', media_type: 'episo
   grandparent_rating_key: '106477', grandparent_title: 'Tulsa King', added_at: '20' }
 const both = { ...GUIDS, '106477': ['tmdb://153312'] }
 
-test('the newest addition with a backdrop becomes the hero and leaves its grid', async () => {
-  stubFetch(...plex(both), tmdb({ '/3/movie/1485': '/carter.jpg', '/3/tv/153312': '/tulsa.jpg' }, { '/3/tv/153312': '/tulsa-wide.jpg' }))
+const bothWide = () => tmdb({ '/3/movie/1485': '/carter.jpg', '/3/tv/153312': '/tulsa.jpg' },
+  { '/3/movie/1485': '/carter-wide.jpg', '/3/tv/153312': '/tulsa-wide.jpg' })
 
-  const { hero, movies, shows } = await cards([tulsa, carter])
+test('the hero is picked at random from the titles with a backdrop, and leaves its grid', async (t) => {
+  stubFetch(...plex(both), bothWide())
+  t.mock.method(Math, 'random', () => 0)
 
-  assert.equal(hero?.title, 'Tulsa King')
-  assert.equal(hero?.kind, 'Series')
-  assert.equal(hero?.label, '1 new episode')
-  assert.equal(hero?.backdrop, 'https://image.tmdb.org/t/p/w780/tulsa-wide.jpg')
-  assert.deepEqual(shows, [])
-  assert.deepEqual(movies.map((m) => m.title), ['Get Carter'])
+  const first = await cards([tulsa, carter])
+
+  assert.deepEqual([first.hero?.title, first.hero?.kind, first.hero?.year], ['Get Carter', 'Movie', '1971'])
+  assert.equal(first.hero?.backdrop, 'https://image.tmdb.org/t/p/w780/carter-wide.jpg')
+  assert.deepEqual(first.movies, [])
+  assert.deepEqual(first.shows.map((s) => s.title), ['Tulsa King'])
+
+  stubFetch(...plex(both), bothWide())
+  t.mock.method(Math, 'random', () => 0.99)
+
+  const last = await cards([tulsa, carter])
+
+  assert.deepEqual([last.hero?.title, last.hero?.kind, last.hero?.label], ['Tulsa King', 'Series', '1 episode'])
+  assert.deepEqual(last.shows, [])
+  assert.deepEqual(last.movies.map((m) => m.title), ['Get Carter'])
 })
 
-test('a movie can be the hero', async () => {
-  stubFetch(...plex(both), tmdb({ '/3/movie/1485': '/carter.jpg', '/3/tv/153312': '/tulsa.jpg' }, { '/3/movie/1485': '/carter-wide.jpg' }))
-
-  const { hero, movies, shows } = await cards([{ ...carter, added_at: '30' }, tulsa])
-
-  assert.deepEqual([hero?.title, hero?.kind, hero?.year], ['Get Carter', 'Movie', '1971'])
-  assert.deepEqual(movies, [])
-  assert.equal(shows.length, 1)
-})
-
-test('without a backdrop for the newest addition there is no hero', async () => {
+test('a title without a backdrop is never the hero, however new', async () => {
   stubFetch(...plex(both), tmdb({ '/3/movie/1485': '/carter.jpg', '/3/tv/153312': '/tulsa.jpg' }, { '/3/movie/1485': '/carter-wide.jpg' }))
 
   const { hero, shows } = await cards([tulsa, carter])
 
-  assert.equal(hero, undefined)
+  assert.equal(hero?.title, 'Get Carter')
   assert.equal(shows[0].title, 'Tulsa King')
+})
+
+test('with no backdrops at all there is no hero', async () => {
+  stubFetch(...plex(both), tmdb({ '/3/movie/1485': '/carter.jpg', '/3/tv/153312': '/tulsa.jpg' }))
+
+  const { hero, movies, shows } = await cards([tulsa, carter])
+
+  assert.equal(hero, undefined)
+  assert.equal(movies.length + shows.length, 2)
 })
 
 test('the run fails when Tautulli answers without a server identity', async () => {

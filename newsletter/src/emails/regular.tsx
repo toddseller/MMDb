@@ -1,6 +1,6 @@
 import { Layout, type IssueProps, type Theme } from './_parts.tsx'
 
-const theme: Theme = { page: '#ebebeb', pageText: '#6d6d6e', surface: '#ffffff', text: '#221f1f', muted: '#6d6d6e', accent: '#e50914', tile: '#e6e6e6' }
+const theme: Theme = { page: '#ebebeb', pageText: '#6d6d6e', surface: '#ffffff', text: '#221f1f', muted: '#6d6d6e', accent: '#e50914', playBar: '#221f1f' }
 
 export default function Regular(props: IssueProps) {
   return <Layout {...props} theme={theme} headline="New this week." previewLead="New on MYFLIX:" />
@@ -9,7 +9,7 @@ export default function Regular(props: IssueProps) {
 Regular.PreviewProps = {
   date: 'November 15, 2026',
   hero: {
-    title: 'Tulsa King', kind: 'Series', label: '8 new episodes', link: '#',
+    title: 'Tulsa King', kind: 'Series', label: '8 episodes', link: '#',
     backdrop: 'https://image.tmdb.org/t/p/w780/mNHRGO1gFpR2CYZdANe72kcKq7G.jpg',
   },
   movies: [
@@ -18,9 +18,9 @@ Regular.PreviewProps = {
     { title: 'Primetime', year: '2025', link: '#' },
   ],
   shows: [
-    { title: 'The Lord of the Rings: The Rings of Power', label: 'Season 3', poster: 'https://image.tmdb.org/t/p/w342/bMXWXKM9ydUmMTNvDnYo9QtCBRt.jpg', link: '#' },
+    { title: 'The Lord of the Rings: The Rings of Power', label: 'New season', poster: 'https://image.tmdb.org/t/p/w342/bMXWXKM9ydUmMTNvDnYo9QtCBRt.jpg', link: '#' },
     { title: 'MythBusters', label: 'New series', poster: 'https://image.tmdb.org/t/p/w342/lvRnMu00NLGiTPijGZg9CRF3nuY.jpg', link: '#' },
-    { title: 'Dexter: Resurrection', label: 'Season 2, 2 new episodes', link: '#' },
+    { title: 'Dexter: Resurrection', label: 'New season', link: '#' },
   ],
   viewUrl: '#',
   unsubscribeUrl: '#',

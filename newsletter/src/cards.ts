@@ -22,10 +22,10 @@ const tmdbArt = async (ratingKey: string, kind: 'movie' | 'tv'): Promise<Art> =>
 // One at a time, so a long week doesn't fire dozens of lookups at Tautulli at once and time out.
 const toCards = async (groups: Group[], kind: 'movie' | 'tv', server: string) => {
   const result: (Card & Art)[] = []
-  for (const { ratingKey, addedAt, ...rest } of groups) {
+  for (const { ratingKey, linkKey = ratingKey, ...rest } of groups) {
     const art = await tmdbArt(ratingKey, kind).catch(() => ({}))
     result.push({ ...rest, ...art,
-      link: `https://app.plex.tv/desktop/#!/server/${server}/details?key=${encodeURIComponent(`/library/metadata/${ratingKey}`)}` })
+      link: `https://app.plex.tv/desktop/#!/server/${server}/details?key=${encodeURIComponent(`/library/metadata/${linkKey}`)}` })
   }
   return result
 }
@@ -35,10 +35,13 @@ export const cards = async (items: Added[]) => {
   const groups = group(items)
   const movies = await toCards(groups.movies, 'movie', server)
   const shows = await toCards(groups.shows, 'tv', server)
-  const movieIsNewest = (groups.movies[0]?.addedAt ?? -1) > (groups.shows[0]?.addedAt ?? -1)
-  const [newest, rest] = movieIsNewest ? [movies[0], movies] : [shows[0], shows]
-  // The newest addition leads the issue when it has wide artwork; otherwise the issue has no hero.
-  const hero: Hero | undefined = newest?.backdrop ? { ...newest, kind: movieIsNewest ? 'Movie' : 'Series', backdrop: newest.backdrop } : undefined
-  if (hero) rest.shift()
+  const wide = [...movies.map((card) => ({ card, kind: 'Movie' as const })),
+    ...shows.map((card) => ({ card, kind: 'Series' as const }))].filter(({ card }) => card.backdrop)
+  // Any title with wide artwork can lead, so the hero varies from week to week.
+  const pick = wide[Math.floor(Math.random() * wide.length)]
+  if (!pick) return { hero: undefined, movies, shows }
+  const list = pick.kind === 'Movie' ? movies : shows
+  list.splice(list.indexOf(pick.card), 1)
+  const hero: Hero = { ...pick.card, kind: pick.kind, backdrop: pick.card.backdrop! }
   return { hero, movies, shows }
 }

@@ -68,15 +68,17 @@ Grouping key: a movie keys on its own `rating_key`, a show on its own, a season 
 3. Any episodes are counted ("1 new episode", "8 new episodes").
 4. When a card has both seasons and episodes, both labels appear.
 
+(Changed on 2026-11-14 by `newsletter-show-labels`: a show's label is one phrase that fits a phone's bar on one line, "New series", else "New season", else "N episodes", and a show card links to the season it is about, or to the show for a new series.)
+
 A card's title and year come from the recently-added item itself (`parent_title` for a season, `grandparent_title` for an episode), so a failed lookup never costs a card its title. The job then makes one `get_metadata` call per card's movie or show `rating_key`, one card at a time, for its `tmdb://` guid. It never uses a season's guid, which is the season's own TMDB ID. TMDB `/movie/{id}` or `/tv/{id}` then gives `poster_path`, and the poster URL is `https://image.tmdb.org/t/p/w342{poster_path}`. If a card's metadata or TMDB lookup fails, it goes out without a poster. If the recently-added list or the server identity can't be fetched, the run fails: the issue would be incomplete or have broken links. Every request has the app's 5-second timeout.
 
 The Plex link is `https://app.plex.tv/desktop/#!/server/{machine_identifier}/details?key=%2Flibrary%2Fmetadata%2F{rating_key}`.
 
 ### The hero
 
-Each issue leads with its newest addition, the movie or show whose `added_at` is latest, shown as a wide TMDB backdrop (`backdrop_path`, at `w780`) with its title, chips (year, Movie or Series, label) and a Play button that opens it in Plex. The backdrop comes from the same TMDB response as the poster, so it costs no extra request. The hero leaves its grid so it isn't listed twice. When the newest addition has no backdrop, the issue has no hero and every title stays in its grid.
+Each issue leads with a hero picked at random from the week's titles that have a wide TMDB backdrop (`backdrop_path`, at `w780`), movies and shows alike, shown with its title, chips (year, Movie or Series, label) and a Play button that opens it in Plex. The backdrop comes from the same TMDB response as the poster, so it costs no extra request. The hero leaves its grid so it isn't listed twice. Only a week with no backdrops at all goes without a hero. The pick happens once per run, before rendering, so the email and its browser copy show the same hero; a rerun may pick another. (Changed on 2026-11-14 from "the newest addition, or no hero if it lacks a backdrop", at the owner's request.)
 
-The layout borrows from Netflix's emails, which myflix.stream's styling already follows: a light grey page, a white 600px column, the MYFLIX logo with a "Recently added" kicker, a "New this week." headline, the hero, then rounded poster grids with red badges for the show labels.
+The layout borrows from Netflix's emails, which myflix.stream's styling already follows: a light grey page, a white 600px column, the MYFLIX logo with a "Recently added" kicker, a "New this week." headline, the hero, then rounded poster grids with red badges for the show labels. (Changed on 2026-11-14: the masthead shows the ribbon M, the footer the wordmark, and every poster ends in a joined bar: the label in the accent colour for shows, "▶ Play" in the template's quieter colour for movies. A title without a poster shows a grey 2:3 placeholder image.)
 
 ### The footer
 
