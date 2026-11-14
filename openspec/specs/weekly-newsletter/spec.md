@@ -22,19 +22,23 @@ An issue SHALL list every item Tautulli reports as added to Plex libraries 1 (mo
 - **THEN** the issue still lists a movie added at 01:00 on the Sunday before last
 
 ### Requirement: Each show gets one card
-TV additions SHALL be grouped into one card per show, whether Plex reports the show itself, its seasons or its episodes. The card SHALL say "New series" when the show itself was added. Otherwise it SHALL name the added seasons and count the added episodes, for example "Season 3" or "8 new episodes".
+TV additions SHALL be grouped into one card per show, whether Plex reports the show itself, its seasons or its episodes. The card's label SHALL be a single phrase: "New series" when the show itself was added, otherwise "New season" when a whole season was added, otherwise the number of episodes added, for example "8 episodes" or "1 episode".
 
 #### Scenario: Several episodes of one show
 - **WHEN** eight episodes of Tulsa King were added this week
-- **THEN** the issue has one Tulsa King card that says "8 new episodes"
+- **THEN** the issue has one Tulsa King card that says "8 episodes"
 
 #### Scenario: A whole season
 - **WHEN** Plex reports Season 3 of The Rings of Power as one added item
-- **THEN** the issue has one card for The Rings of Power that says "Season 3"
+- **THEN** the issue has one card for The Rings of Power that says "New season"
 
 #### Scenario: A new show
 - **WHEN** Plex reports MythBusters itself as added
 - **THEN** the issue has one MythBusters card that says "New series"
+
+#### Scenario: A whole season and some episodes
+- **WHEN** Season 2 of Dexter was added whole and two episodes of Season 3 were added too
+- **THEN** the issue has one Dexter card that says "New season"
 
 ### Requirement: Each movie gets its own card
 Each movie added in the window SHALL get its own card with its title and year. The issue SHALL list movies and TV in separate sections, with the most recently added first in each.
@@ -55,11 +59,19 @@ A card SHALL show the poster of its movie or show, loaded from TMDB's public ima
 - **THEN** its card appears without a poster
 
 ### Requirement: Cards link into Plex
-Each card SHALL link to its movie or show in Plex's web app on this Plex server, so a reader can open the title with one click.
+Each card SHALL link to its title in Plex's web app on this Plex server, so a reader can open it with one click. A movie card SHALL link to the movie. A show card SHALL link to the show when the show itself was added, otherwise to the season added whole, otherwise to the season of the newest added episode.
 
 #### Scenario: Opening a show
-- **WHEN** a reader clicks the Tulsa King card
-- **THEN** Plex's web app opens Tulsa King's page on the server
+- **WHEN** a reader clicks the Tulsa King card for two new Season 3 episodes
+- **THEN** Plex's web app opens Tulsa King's Season 3 page on the server
+
+#### Scenario: Opening a new season
+- **WHEN** a reader clicks The Rings of Power card for a Season 3 added whole
+- **THEN** Plex's web app opens that Season 3 page
+
+#### Scenario: Opening a new series
+- **WHEN** a reader clicks the MythBusters card for a show added whole
+- **THEN** Plex's web app opens MythBusters' show page
 
 ### Requirement: Each subscriber gets their own copy, with an unsubscribe link
 The issue SHALL be sent from `MYFLIX Newsletter <info@myflix.stream>` as one email per subscriber, addressed to that subscriber. Each email SHALL carry an unsubscribe link and the headers mail clients use for one-click unsubscribe. A subscriber who has unsubscribed SHALL receive no later issue.
