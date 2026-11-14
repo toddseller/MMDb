@@ -100,7 +100,6 @@ test('a movie search shows the searching message and dismiss, then the results c
   assert.equal(loadingText(), 'Searching Our Database...')
   assert.equal(el('#preview').style.display, 'flex')
   assert.equal(el('#dismiss').style.display, 'block')
-  assert.equal(el('#dismiss').style.top, '0px')
 
   await answerNext(json({ query: [{}], page: movieResult() }))
 
@@ -119,7 +118,6 @@ test('a show search uses the shows layout', async () => {
   submit('#show-search')
   assert.equal(fetched.calls[0].url, '/shows?query=')
   assert.equal(el('#preview').style.height, '300px')
-  assert.equal(el('#dismiss').style.top, '')
   await answerNext(json({ query: [{}], page: seasonResult }))
   assert.ok(el('#preview input[alt="Harbor Lights Poster"]'))
 })

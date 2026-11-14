@@ -31,6 +31,7 @@ test.describe('on the movies page', () => {
   test('dismissing the results closes the panel and brings back Add Movie', async ({ page }) => {
     await searchMovies(page, json(recorded('movie_search')))
     await expect(page.getByRole('button', { name: 'Nova Drift Poster' })).toBeVisible()
+    expect(await top(page.locator('#dismiss'))).toBe(await top(page.locator('#search')))
 
     await page.locator('#dismiss').click()
 
@@ -242,6 +243,27 @@ test.describe('on the shows page', () => {
     await page.locator('#show-list img[alt="Harbor Lights Poster"]').click()
     await expect(page.getByText('Harbor Lights 1x2', { exact: true })).toBeVisible()
   })
+
+  // The letter rail shares the dismiss control's gutter, so a control placed under it never gets the click.
+  for (const after of ['results', 'picking a season']) {
+    test(`dismissing after ${after} closes the panel and brings back Add TV Show`, async ({ page }) => {
+      await page.route(`**/users/${USER.id}/shows`, (route) =>
+        route.request().method() === 'POST' ? route.fulfill(json(recorded('show_episodes'))) : route.fallback())
+      await searchShows(page, json(recorded('show_search')))
+      await expect(page.getByRole('button', { name: 'Harbor Lights Poster' })).toBeVisible()
+      if (after !== 'results') {
+        await page.getByRole('button', { name: 'Harbor Lights Poster' }).click()
+        await expect(panel(page).locator('#episode-video')).toBeVisible()
+      }
+      await opened(page)
+      expect(await top(page.locator('#dismiss'))).toBe(await top(page.locator('#search')))
+
+      await page.locator('#dismiss').click()
+
+      await expect(panel(page)).toBeHidden()
+      await expect(page.getByRole('button', { name: 'Add TV Show' })).toBeVisible()
+    })
+  }
 
   test('a failed show search offers Create New Show', async ({ page }) => {
     await searchShows(page, { status: 500, body: 'error' })

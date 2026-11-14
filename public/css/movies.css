@@ -387,6 +387,12 @@
     position: relative;
 }
 
+/* The dismiss control is placed from the band, not the panel, so it sits level with the search box whatever rows come between. */
+#search-wrapper
+{
+    position: relative;
+}
+
 #preview
 {
     position: relative;
@@ -417,7 +423,7 @@
 {
     position: absolute;
     z-index: 3;
-    top: 87px;
+    top: 0;
     right: -50px;
 
     display: none;

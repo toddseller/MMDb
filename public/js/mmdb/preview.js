@@ -11,12 +11,12 @@ const CENTRED_RESULTS = 6
 const SPREAD_EPISODES = 5
 
 /** @typedef {'movies' | 'shows' | 'episodes'} Layout */
-/** @typedef {{ panel?: string, dismiss?: string, arrows?: string, glyph?: string }} LayoutStyles */
+/** @typedef {{ panel?: string, arrows?: string, glyph?: string }} LayoutStyles */
 
 // The inline values each layout had under jQuery; the stylesheet supplies the rest. Kept here so the responsive change reworks them in one place.
 /** @type {Record<Layout, LayoutStyles>} */
 const LAYOUT = {
-  movies: { dismiss: 'top: 0' },
+  movies: {},
   shows: { panel: 'height: 300px' },
   episodes: { panel: 'height: 300px', arrows: 'height: 169px; top: 84px', glyph: 'line-height: 3.3em' },
 }
@@ -53,13 +53,12 @@ const hide = (el) => { el.style.display = 'none' }
 
 /** @param {Document} document @param {Layout} layout */
 const applyLayout = (document, layout) => {
-  const { panel, dismiss, left, right } = parts(document)
+  const { panel, left, right } = parts(document)
   const styles = LAYOUT[layout]
   const display = panel.style.display
   const justify = panel.style.justifyContent
   panel.style.cssText = styles.panel ?? ''
   Object.assign(panel.style, { display, justifyContent: justify })
-  dismiss.style.cssText = `${styles.dismiss ?? ''}; display: ${dismiss.style.display || 'none'}`
   for (const arrow of [left, right]) {
     arrow.style.cssText = `${styles.arrows ?? ''}; display: ${arrow.style.display || 'none'}`
     const glyph = /** @type {HTMLElement | null} */ (arrow.querySelector('.glyphicon'))
