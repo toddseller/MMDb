@@ -5,17 +5,9 @@ post '/users/:user_id/shows/:show_id/seasons/:season_id/episodes' do
   @show = Show.find(params[:show_id])
   @season = @show.seasons.find(params[:season_id])
   if params.has_key?('episode')
-    @episode = @season.episodes.find_by(tv_episode: params[:episode]['tv_episode']) || @season.episodes.new(params[:episode])
-    if @episode.save
-      @season.episodes << @episode if !@season.episodes.include?(@episode)
-    end
+    @season.add_episode(params[:episode])
   else
-    params['episodes'].each do |e|
-      @episode = @season.episodes.find_by(tv_episode: e[:tv_episode]) || @season.episodes.new(e)
-      if @episode.save
-        @season.episodes << @episode if !@season.episodes.include?(@episode)
-      end
-    end
+    params['episodes'].each { |e| @season.add_episode(e) }
   end
   if request.xhr?
     page = erb :'/partials/_show_list', locals: {show: @my_shows, user: @user}, layout: false

@@ -162,10 +162,7 @@ namespace '/api/v2' do
 
       params['episode'].each do |e|
         e.except!(:show_id, :season_id)
-        episode = season.episodes.find_by(tv_episode: e[:tv_episode]) || season.episodes.new(e)
-        if episode.save
-          season.episodes << episode if !season.episodes.include?(episode)
-        end
+        season.add_episode(e)
       end
     else
       show = Show.find(params[:episode]['show_id'])
@@ -173,10 +170,7 @@ namespace '/api/v2' do
 
       params[:episode].except!(:show_id, :season_id)
 
-      episode = season.episodes.find_by(tv_episode: params[:episode]['tv_episode']) || season.episodes.new(params[:episode])
-      if episode.save
-        season.episodes << episode if !season.episodes.include?(episode)
-      end
+      season.add_episode(params[:episode])
     end
 
     show.to_json({include: [seasons: {include: :episodes}]})
