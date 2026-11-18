@@ -119,8 +119,21 @@ describe 'PlexLibrary.sync, movies' do
 
   def collection = user.movies.reload.map { |m| [m.title, m.year, m.plex_key] }
 
-  it 'replaces a movie whose Plex match was fixed, keeping the old row' do
+  it 'replaces a movie whose Plex match was fixed, deleting the old row and its rating' do
     old = movie('Madden', 2023, key: 134511)
+    rating = old.ratings.create!(user: user, stars: 3)
+    stub_recent_movies([134511, 'Madden', 2026, 1.hour])
+    stub_found('madden', 1131943, 'Madden', 2026)
+
+    expect { PlexLibrary.sync(user) }.to output("Added movie: Madden (2026)\nDeleted movie: Madden (2023)\n").to_stdout
+
+    expect(collection).to eq [['Madden', '2026', 134511]]
+    expect([Movie.exists?(old.id), Rating.exists?(rating.id)]).to eq [false, false]
+  end
+
+  it "keeps the replaced movie's row when another user has it" do
+    old = movie('Madden', 2023, key: 134511)
+    other = create_user.tap { |u| u.movies << old }
     stub_recent_movies([134511, 'Madden', 2026, 1.hour])
     stub_found('madden', 1131943, 'Madden', 2026)
 
@@ -128,6 +141,7 @@ describe 'PlexLibrary.sync, movies' do
 
     expect(collection).to eq [['Madden', '2026', 134511]]
     expect(old.reload.plex_key).to be_nil
+    expect(other.movies.reload).to eq [old]
   end
 
   it 'replaces a movie whose fix changed the title' do

@@ -72,9 +72,17 @@ module PlexLibrary
     puts "Added movie: #{label(movie.title, movie.year)}" unless collection.include?(movie.id)
     return unless linked
 
-    linked.users.destroy(user)
-    linked.update_column(:plex_key, nil)
-    puts "Removed movie: #{label(linked.title, linked.year)}"
+    # One transaction, so a crash between steps can't leave the old movie owned by nobody.
+    Movie.transaction do
+      linked.users.destroy(user)
+      if linked.users.exists?
+        linked.update_column(:plex_key, nil)
+        puts "Removed movie: #{label(linked.title, linked.year)}"
+      else
+        linked.destroy
+        puts "Deleted movie: #{label(linked.title, linked.year)}"
+      end
+    end
   end
 
   # Links each Plex item to an unlinked row of the same name that the block accepts, when each is the other's only

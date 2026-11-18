@@ -145,10 +145,10 @@ cd newsletter && npm ci && npm run preview   # React Email's preview server
 
 Plex sends its `library.new` webhook once, before the owner can fix a wrong match, and an import that finds nothing then is never retried. So movies and shows store the owner's Plex item ID (`plex_key`), and an hourly job, `rake plex:sync`, looks at what Plex added in the last 7 days (through Tautulli, with `TAUTULLI_KEY`):
 
-- A movie whose Plex title or year no longer matches its linked MMDb movie is replaced: the movie Plex now names is imported and linked, and the old one leaves the owner's collection (its row stays).
+- A movie whose Plex title or year no longer matches its linked MMDb movie is replaced: the movie Plex now names is imported and linked, and the old one leaves the owner's collection. Its row, and any rating on it, is then deleted, unless another user has the movie.
 - A movie or episode MMDb doesn't have is imported the way the webhook would.
 
-It prints one line for each movie added or removed and each episode added or still missing, and nothing when all is in order.
+It prints one line for each movie added, deleted ("Deleted movie") or removed but kept for another user ("Removed movie"), and each episode added or still missing, and nothing when all is in order.
 
 **Linking existing titles.** Run once after the deploy that adds `plex_key`. It is safe to repeat, and fills in only rows still unlinked:
 
