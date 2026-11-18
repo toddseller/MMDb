@@ -31,11 +31,7 @@ post '/shows' do
       @season.update(is_active: true)
     end
   end
-  @episode = @season.episodes.find_by(tv_episode: params[:episode]['tv_episode']) || @season.episodes.new(params[:episode])
-  if @episode.save
-    @season.episodes << @episode if !@season.episodes.include?(@episode)
-    count = @season.episodes.count
-  end
+  count = @season.episodes.count if @season.add_episode(params[:episode]).persisted?
   if request.xhr?
     if params[:new]
       form = erb :"/partials/_new_episode", layout: false
