@@ -64,6 +64,24 @@ describe 'Plex imports' do
     expect(season.episodes.pluck(:tv_episode)).to eq [2]
   end
 
+  it "stores the show's Plex ID from a single-episode import" do
+    season = store_lupin
+    stub_apple([today], skip: 1)
+
+    Show.plex_add(episode_event.merge('ratingKey' => '5', 'grandparentRatingKey' => '9001'), user.id)
+
+    expect(season.show.reload.plex_key).to eq 9001
+  end
+
+  it "stores the show's Plex ID from a show-level import" do
+    season = store_lupin
+    stub_apple([today - 7, today - 1, today, today + 7, nil])
+
+    Show.plex_add(show_event.merge('ratingKey' => '9001'), user.id)
+
+    expect(season.show.reload.plex_key).to eq 9001
+  end
+
   it 'adds a reported episode whose title the source spells differently' do
     season = store_lupin
     stub_window(1, [apple_episode(2, today).merge(title: 'Chapter 2, Part 1')])
@@ -290,5 +308,67 @@ describe 'Plex imports' do
     episode.update!(runtime: '1h 10m')
 
     expect(episode.reload.runtime).to eq '1h 10m'
+  end
+end
+
+describe 'Plex movie imports' do
+  include MovieSearchStubs
+
+  let(:user) { create_user }
+
+  before { stub_movie_sources_empty }
+
+  def madden_event = { 'title' => 'Madden', 'year' => 2026, 'ratingKey' => '134511' }
+
+  it 'adds a movie another user stored first to the collection, without a second row' do
+    movie = create_movie(create_user, title: 'Madden').tap { |m| m.update!(year: '2026') }
+
+    Movie.plex_add(madden_event, user.id)
+
+    expect(user.movies.reload).to eq [movie]
+    expect(Movie.where(title: 'Madden').count).to eq 1
+  end
+
+  it 'lists a movie already in the collection once' do
+    movie = create_movie(user, title: 'Madden').tap { |m| m.update!(year: '2026') }
+
+    Movie.plex_add(madden_event, user.id)
+
+    expect(user.movies.reload).to eq [movie]
+  end
+
+  it 'stores the Plex item ID on the movie it adds' do
+    stub_tmdb_movie_search('madden', [[1131943, 'Madden', 2026]])
+    stub_tmdb_movie(1131943, title: 'Madden', year: 2026)
+
+    Movie.plex_add(madden_event, user.id)
+
+    expect(user.movies.reload.map { |movie| [movie.title, movie.year, movie.plex_key] }).to eq [['Madden', '2026', 134511]]
+  end
+
+  it 'links a stored movie whose title differs only in case, without a second row' do
+    movie = create_movie(create_user, title: 'Get carter').tap { |m| m.update!(year: '1971') }
+
+    Movie.plex_add({ 'title' => 'Get Carter', 'year' => 1971, 'ratingKey' => '134221' }, user.id)
+
+    expect(user.movies.reload).to eq [movie]
+    expect(movie.reload.plex_key).to eq 134221
+  end
+
+  it 'stores the Plex item ID on a stored movie it links' do
+    movie = create_movie(create_user, title: 'Madden').tap { |m| m.update!(year: '2026') }
+
+    Movie.plex_add(madden_event, user.id)
+
+    expect(movie.reload.plex_key).to eq 134511
+  end
+
+  it 'changes no Plex ID when the search finds nothing' do
+    other = create_movie(user, title: 'Madden').tap { |m| m.update!(year: '2023', plex_key: 7) }
+
+    Movie.plex_add(madden_event, user.id)
+
+    expect(Movie.pluck(:plex_key)).to eq [7]
+    expect(user.movies.reload).to eq [other]
   end
 end

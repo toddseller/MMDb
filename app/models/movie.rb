@@ -30,19 +30,16 @@ class Movie < ActiveRecord::Base
 
   def self.plex_add(data, user)
     user = User.find(user.to_i)
-    movie = Movie.where('title = ? AND year = ?', data['title'], data['year'].to_s)
-    if movie.empty?
-      movies = get_titles(data['title'].downcase)
-      movies.each do |movie|
-        if movie[:title].downcase() == data['title'].downcase() && movie[:year] == data['year'].to_s
-          movie = Movie.new(movie)
-          if movie.save
-            movie.users << user if !movie.users.include?(user)
-            movie.save
-          end
-        end 
-      end
-    end
+    title, year = data['title'], data['year'].to_s
+    movie = Movie.find_by(title: title, year: year) ||
+            get_titles(title.downcase).find { |found| found[:title].downcase == title.downcase && found[:year] == year }
+    return unless movie
+
+    movie = Movie.new(movie) unless movie.is_a?(Movie)
+    movie.plex_key = data['ratingKey'] if data['ratingKey']
+    movie.users << user unless movie.users.include?(user)
+    movie.save
+    movie
   end
 
   def self.plex_count()

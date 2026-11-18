@@ -135,6 +135,7 @@ class Show < ActiveRecord::Base
     title = data['type'] == 'show' ? data['title'].downcase() : data['grandparentTitle'].downcase()
     season_number = data['type'] == 'show' ? data['childCount'] : data['parentIndex']
     episode_number = data['index'] if data['type'] != 'show'
+    plex_key = data['type'] == 'show' ? data['ratingKey'] : data['grandparentRatingKey']
     show = nil
     season = nil
     episode = nil
@@ -150,6 +151,7 @@ class Show < ActiveRecord::Base
     end
     matches.each do |s|
       show = Show.find_by(show_collection_id: s[:show_collection_id]) || Show.new(title: s[:title], year: s[:year], rating: s[:rating], genre: s[:genre], poster: s[:poster], show_collection_id: s[:show_collection_id])
+      show.plex_key = plex_key if plex_key
       s.except!(:genre, :rating, :title, :year, :show_collection_id)
       season = Season.find_by(collectionId: s[:collectionId]) || show.seasons.new(s)
 
