@@ -102,7 +102,8 @@ CREATE TABLE public.movies (
     hd integer DEFAULT 1080,
     file_name character varying DEFAULT ''::character varying,
     director_check character varying DEFAULT ''::character varying,
-    user_count integer
+    user_count integer,
+    plex_key integer
 );
 
 
@@ -237,7 +238,8 @@ CREATE TABLE public.shows (
     "seasonNumbers" character varying,
     "seasonCount" character varying,
     show_collection_id character varying,
-    "episodeCount" character varying
+    "episodeCount" character varying,
+    plex_key integer
 );
 
 
@@ -461,6 +463,13 @@ CREATE INDEX index_episodes_on_season_id ON public.episodes USING btree (season_
 
 
 --
+-- Name: index_movies_on_plex_key; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_movies_on_plex_key ON public.movies USING btree (plex_key);
+
+
+--
 -- Name: index_movies_users_on_movie_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -493,6 +502,13 @@ CREATE INDEX index_ratings_on_user_id ON public.ratings USING btree (user_id);
 --
 
 CREATE INDEX index_seasons_on_show_id ON public.seasons USING btree (show_id);
+
+
+--
+-- Name: index_shows_on_plex_key; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_shows_on_plex_key ON public.shows USING btree (plex_key);
 
 
 --

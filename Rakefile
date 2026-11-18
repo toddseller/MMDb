@@ -115,6 +115,18 @@ namespace :db do
   end
 end
 
+namespace :plex do
+  desc "Link the Plex owner's movies and shows to their Plex items, printing what it couldn't match"
+  task :link do
+    PlexLibrary.link(User.find(ENV['PLEX_USER_ID']))
+  end
+
+  desc "Fix the Plex owner's recent movies whose Plex match changed, and import recent movies and episodes MMDb missed"
+  task :sync do
+    PlexLibrary.sync(User.find(ENV['PLEX_USER_ID']))
+  end
+end
+
 desc 'Start IRB with application environment loaded'
 task "console" do
   exec "irb -r./config/environment"

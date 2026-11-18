@@ -9,6 +9,7 @@ This project runs in Docker with Ruby 3.4, locally and on the production server,
 - `Dockerfile` - The Docker image, used locally and in production
 - `docker-compose.yml` - The web service, with the code mounted for live reloading, and the weekly `newsletter` job
 - `newsletter/` - The newsletter job's Node code, `Dockerfile` and systemd timer
+- `systemd/` - The hourly Plex sync's systemd timer
 - `config/puma.rb` - Puma web server configuration
 - `.dockerignore` - Files to exclude from Docker builds
 - `.env.example` - Template for environment variables
@@ -138,6 +139,37 @@ cd ~/MMDb && docker compose run --rm --build -e RESEND_SEGMENT_ID=<test segment 
 
 ```bash
 cd newsletter && npm ci && npm run preview   # React Email's preview server
+```
+
+## Plex sync
+
+Plex sends its `library.new` webhook once, before the owner can fix a wrong match, and an import that finds nothing then is never retried. So movies and shows store the owner's Plex item ID (`plex_key`), and an hourly job, `rake plex:sync`, looks at what Plex added in the last 7 days (through Tautulli, with `TAUTULLI_KEY`):
+
+- A movie whose Plex title or year no longer matches its linked MMDb movie is replaced: the movie Plex now names is imported and linked, and the old one leaves the owner's collection (its row stays).
+- A movie or episode MMDb doesn't have is imported the way the webhook would.
+
+It prints one line for each movie added or removed and each episode added or still missing, and nothing when all is in order.
+
+**Linking existing titles.** Run once after the deploy that adds `plex_key`. It is safe to repeat, and fills in only rows still unlinked:
+
+```bash
+cd ~/MMDb && docker compose exec -T web bundle exec rake plex:link < /dev/null
+```
+
+It links by name and a year within one, and links a movie whose only same-name entry has another year (printed as "Linked across years"). It prints every Plex item it left unlinked. It never changes a title, year or collection.
+
+**The timer.** Install it once:
+
+```bash
+systemctl --user link ~/MMDb/systemd/mmdb-plex-sync.service ~/MMDb/systemd/mmdb-plex-sync.timer
+systemctl --user enable --now mmdb-plex-sync.timer
+```
+
+Day to day:
+
+```bash
+systemctl --user start mmdb-plex-sync.service   # run it now
+journalctl --user -u mmdb-plex-sync -n 50      # what the last runs printed
 ```
 
 ## Monitoring

@@ -1,0 +1,10 @@
+[Unit]
+Description=Fix MMDb's recent Plex movie matches and import missed movies and episodes
+
+[Service]
+Type=oneshot
+WorkingDirectory=%h/MMDb
+# A user unit can't order itself after the system's docker.service, and a catch-up run fires right at boot.
+ExecStartPre=/bin/sh -c 'until /usr/bin/docker info >/dev/null 2>&1; do sleep 5; done'
+# The running web container already has the deployed code and .env; without stdin, exec -T would wait forever.
+ExecStart=/bin/sh -c '/usr/bin/docker compose exec -T web bundle exec rake plex:sync < /dev/null'
