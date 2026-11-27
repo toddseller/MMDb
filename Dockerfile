@@ -1,4 +1,4 @@
-FROM ruby:3.4.12@sha256:5803b69dd8a875a9afc7e3bbc10d0ba683e12aad2640dbbd44295b4890cc8927
+FROM ruby:3.4.12@sha256:09e55ffd89bacb59398d260e49450ed30627276672358a27ccea7641f96595be
 
 RUN apt-get update -qq && apt-get install -y build-essential libpq-dev
 
